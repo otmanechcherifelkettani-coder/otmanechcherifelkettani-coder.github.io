@@ -1,0 +1,15 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment — never commit credentials
+.env
+
+# Database — lives on the server only
+data/agent.db
+
+# macOS
+.DS_Store

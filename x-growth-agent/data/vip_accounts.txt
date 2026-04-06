@@ -1,0 +1,11 @@
+# VIP accounts — top 10 only to minimise API calls
+hubermanlab
+peterattiamd
+bryan_johnson
+glucosegoddess
+biolayne
+foundmyfitness
+davidasinclair
+drinkag1
+samcorcos
+ycombinator

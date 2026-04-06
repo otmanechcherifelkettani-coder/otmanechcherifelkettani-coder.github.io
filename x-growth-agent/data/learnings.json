@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "last_updated": null,
+  "top_hook_styles": [],
+  "top_content_types": [],
+  "best_posting_hours": [8, 9, 12, 18, 19, 20],
+  "worst_performing_topics": [],
+  "avg_engagement_rate": 0.0,
+  "style_weights": {
+    "numbered_list": 1.0,
+    "hot_take": 1.0,
+    "story_format": 1.0,
+    "question": 1.0,
+    "counterintuitive": 1.0,
+    "thread": 1.0
+  },
+  "high_performing_patterns": [],
+  "weekly_summaries": []
+}
