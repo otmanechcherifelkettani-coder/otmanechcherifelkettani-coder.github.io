@@ -7,6 +7,13 @@
     "motion-plus": {
       "type": "http",
       "url": "https://mcp.motion.dev/plus"
+    },
+    "21st": {
+      "type": "http",
+      "url": "https://21st.dev/api/mcp",
+      "headers": {
+        "x-api-key": "${TWENTY_FIRST_API_KEY}"
+      }
     }
   }
 }
