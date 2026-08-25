@@ -1,681 +1,978 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Good morning, Otman</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cadence — Conseil en automatisation et intelligence artificielle</title>
+<meta name="description" content="Cadence identifie les processus dont la valeur économique justifie l'automatisation, décide de la meilleure réponse et la met en production. Casablanca." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBFAF4;
+  --grey-band:#E8E6E1;
+  --taupe:#B0A69C;
+  --panel:#EDEBE6;
+  --black:#111111;
+  --grey:#625f58;
+  --grey-2:#726f68;
+  --line:#DCD9D2;
+  --line-2:#C9C5BD;
+  --tan:#C08A5A;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--cream);
+  color:var(--black);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  font-weight:400;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img,svg{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+ul{list-style:none;}
+button{font-family:inherit;cursor:pointer;}
 
-    :root {
-      --bg:      #0d0d0f;
-      --surface: #141416;
-      --surface2: #1a1a1e;
-      --border:  rgba(255,255,255,0.07);
-      --accent:  #7c6af7;
-      --accent2: #c084fc;
-      --green:   #4ade80;
-      --text:    #e8e8f0;
-      --muted:   #6b6b80;
-      --glow:    rgba(124,106,247,0.25);
-    }
+:focus-visible{outline:2px solid var(--tan);outline-offset:3px;}
 
-    html { scroll-behavior: smooth; }
+.wrap{max-width:1280px;margin:0 auto;padding-left:clamp(20px,4vw,56px);padding-right:clamp(20px,4vw,56px);}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+.serif{font-family:'Cormorant Garamond',serif;font-weight:500;}
+.mut{color:#827e75;}
+.on-dark .mut{color:#8f8d88;}
+.taupe-band .mut{color:#5b564e;}
 
-    /* ── Background grid ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 60px 60px;
-      pointer-events: none;
-      z-index: 0;
-    }
+.eyebrow{display:flex;align-items:center;gap:10px;font-size:11.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--tan);margin-bottom:20px;}
+.eyebrow::before{content:"";width:7px;height:7px;background:var(--tan);flex:none;}
 
-    /* ── Glow orb ── */
-    body::after {
-      content: '';
-      position: fixed;
-      top: -20vh;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80vw;
-      height: 80vw;
-      max-width: 900px;
-      max-height: 900px;
-      background: radial-gradient(circle, rgba(124,106,247,0.1) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
+h2{font-size:clamp(34px,4.9vw,68px);font-weight:600;letter-spacing:-.01em;line-height:1.06;}
+h3{font-size:clamp(20px,2vw,26px);font-weight:600;}
 
-    /* ── Layout ── */
-    .page {
-      position: relative;
-      z-index: 1;
-      max-width: 880px;
-      margin: 0 auto;
-      padding: 40px 24px 60px;
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
-    }
+.section{padding:clamp(96px,11.5vw,200px) 0;}
+.section-head{max-width:760px;margin-bottom:clamp(48px,6vw,88px);}
+.section-head p.dek{margin-top:24px;font-size:18px;color:var(--grey);max-width:640px;}
 
-    /* ── Card ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 28px 32px;
-      position: relative;
-      overflow: hidden;
-    }
+/* reveal animation */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.2,.6,.2,1),transform .7s cubic-bezier(.2,.6,.2,1);}
+.reveal.in{opacity:1;transform:translateY(0);}
 
-    .card-label {
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 600;
-      margin-bottom: 14px;
-    }
+/* ===== NAV ===== */
+header.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(251,250,244,.92);
+  border-bottom:1px solid transparent;
+  transition:border-color .3s, backdrop-filter .3s;
+}
+header.nav.scrolled{border-bottom-color:var(--line);backdrop-filter:blur(10px);}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:78px;}
+.brand{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:24px;letter-spacing:.01em;}
+.nav-links{display:flex;gap:36px;}
+.nav-links a{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--black);position:relative;padding:4px 0;}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--tan);transition:width .25s;}
+.nav-links a:hover::after{width:100%;}
+.nav-right{display:flex;align-items:center;gap:22px;}
+.lang-switch{display:flex;border:1px solid var(--line-2);}
+.lang-switch button{padding:6px 11px;font-size:11px;font-weight:600;letter-spacing:.06em;background:transparent;border:0;color:var(--grey);}
+.lang-switch button.active{background:var(--black);color:var(--cream);}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;font-size:13px;font-weight:600;letter-spacing:.03em;border:1px solid var(--black);white-space:nowrap;transition:background .2s,color .2s,transform .15s;}
+.btn-solid{background:var(--black);color:var(--cream);}
+.btn-solid:hover{background:#000;transform:translateY(-1px);}
+.btn-outline{background:transparent;color:var(--black);}
+.btn-outline:hover{background:var(--black);color:var(--cream);}
+.btn-sm{padding:11px 18px;font-size:12px;}
+.nav-mobile-toggle{display:none;background:none;border:0;}
 
-    /* ── Top row: clock + weather ── */
-    .top-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
+/* ===== HERO ===== */
+.hero{padding:calc(78px + clamp(56px,9vw,120px)) 0 clamp(80px,8vw,120px);}
+.hero-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(40px,6vw,90px);align-items:start;}
+.hero h1{font-size:clamp(42px,5.1vw,78px);line-height:1.03;letter-spacing:-.01em;max-width:16ch;}
+.hero .sub{margin-top:28px;font-size:19px;line-height:1.6;color:var(--grey);max-width:52ch;}
+.hero-actions{display:flex;margin-top:40px;width:max-content;}
+.hero-actions .btn-solid{border-right:0;}
+.hero-actions .btn-outline{background:var(--cream);}
+.hero-actions .btn-outline:hover{background:var(--black);}
+.hero-note{margin-top:24px;font-size:13px;color:var(--grey-2);font-style:italic;}
 
-    @media (max-width: 600px) { .top-row { grid-template-columns: 1fr; } }
+.sequence{border:1px solid var(--line-2);background:var(--panel);padding:clamp(28px,3vw,40px);position:sticky;top:110px;}
+.sequence-title{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin-bottom:24px;}
+.seq-track{position:relative;padding-left:26px;}
+.seq-track::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:1px;background:var(--line-2);}
+.seq-fill{position:absolute;left:5px;top:6px;width:1px;height:0%;background:var(--tan);transition:height .3s linear;}
+.seq-step{position:relative;padding:16px 0;opacity:.45;transition:opacity .3s;}
+.seq-step.active{opacity:1;}
+.seq-step::before{content:"";position:absolute;left:-26px;top:20px;width:11px;height:11px;background:var(--cream);border:1px solid var(--grey-2);transform:translateX(0);}
+.seq-step.active::before{background:var(--tan);border-color:var(--tan);}
+.seq-step .k{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--tan);}
+.seq-step .v{font-size:14px;color:var(--grey);margin-top:4px;}
 
-    /* ── Clock card ── */
-    .clock-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
-    }
+/* ===== GRID / FILET TECHNIQUE ===== */
+.grid{display:grid;gap:1px;background:var(--line-2);border:1px solid var(--line-2);}
+.grid>*{background:var(--cream);padding:clamp(32px,3.4vw,50px);min-height:260px;}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.grid-2{grid-template-columns:repeat(2,1fr);}
+.grid-5{grid-template-columns:repeat(5,1fr);}
+.grid-6{grid-template-columns:repeat(6,1fr);}
 
-    #clock-time {
-      font-size: clamp(2.8rem, 6vw, 4rem);
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      line-height: 1;
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 6px;
-    }
+.stat-num{font-size:clamp(44px,4.6vw,64px);font-weight:600;letter-spacing:-.02em;color:var(--black);}
+.stat-cell h3{margin-top:18px;font-size:16px;font-weight:600;}
+.stat-cell p{margin-top:10px;font-size:14.5px;color:var(--grey);line-height:1.6;}
+.stat-cell .src{margin-top:18px;font-size:12px;color:var(--grey-2);border-top:1px solid var(--line);padding-top:12px;}
 
-    #clock-date {
-      font-size: 0.95rem;
-      color: var(--muted);
-      font-weight: 400;
-    }
+/* ===== CASE CARDS ===== */
+.case-cell{display:flex;flex-direction:column;}
+.case-cell.dark{background:var(--black);color:var(--cream);}
+.case-co{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tan);}
+.case-num{font-family:'Inter',system-ui,sans-serif;font-size:clamp(38px,3.6vw,52px);font-weight:600;letter-spacing:-.02em;margin-top:16px;}
+.case-cell.dark .case-num{color:var(--cream);}
+.case-hook{margin-top:12px;font-size:15px;color:var(--grey);line-height:1.55;}
+.case-cell.dark .case-hook{color:#cfccc4;}
+.case-details{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);font-size:13.5px;color:var(--grey);line-height:2;flex:1;}
+.case-cell.dark .case-details{border-top-color:#333;color:#b8b5ad;}
+.case-details li::before{content:"— ";color:var(--tan);}
+.case-src{margin-top:20px;font-size:12px;}
+.case-src a{color:var(--tan);border-bottom:1px solid var(--tan);}
+.case-foot{margin-top:clamp(28px,3vw,44px);font-size:14.5px;color:var(--grey);max-width:70ch;padding:24px 0;border-top:1px solid var(--line);}
 
-    /* ── Weather card ── */
-    .weather-card {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
+/* ===== METHOD ===== */
+.method-schema{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;border:1px solid var(--line-2);margin-bottom:clamp(64px,7vw,110px);}
+.schema-block{padding:clamp(24px,2.6vw,40px);background:var(--cream);}
+.schema-block .no{font-size:12px;color:var(--tan);font-weight:700;letter-spacing:.08em;}
+.schema-block h4{margin-top:10px;font-size:20px;font-weight:600;}
+.schema-block .q{margin-top:8px;font-size:13.5px;color:var(--grey);}
+.schema-block .dur{margin-top:16px;display:inline-block;font-size:12px;color:var(--tan);font-weight:600;letter-spacing:.03em;}
+.schema-div{writing-mode:vertical-rl;text-orientation:mixed;display:flex;align-items:center;justify-content:center;background:var(--panel);font-size:10.5px;font-weight:700;letter-spacing:.14em;color:var(--grey);padding:14px 0;text-transform:uppercase;}
 
-    .weather-main {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 10px;
-    }
+.phase-rail-wrap{display:grid;grid-template-columns:220px 1fr;gap:clamp(40px,5vw,72px);}
+.rail{position:sticky;top:120px;align-self:start;height:max-content;}
+.rail-item{padding:14px 0 14px 22px;border-left:1px solid var(--line-2);font-size:13px;color:var(--grey);opacity:.4;transition:opacity .3s,border-color .3s,color .3s;cursor:pointer;}
+.rail-item .rn{font-size:11px;color:var(--tan);font-weight:700;display:block;margin-bottom:3px;}
+.rail-item.active{opacity:1;border-left-color:var(--tan);color:var(--black);font-weight:600;}
+.phase{padding-bottom:clamp(72px,8vw,120px);border-bottom:1px solid var(--line);}
+.phase:last-child{border-bottom:0;padding-bottom:0;}
+.phase h3{font-size:clamp(24px,2.6vw,32px);}
+.phase p.lead{margin-top:18px;font-size:16.5px;color:var(--grey);max-width:62ch;line-height:1.7;}
+.tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;}
+.tags span{font-size:12px;padding:7px 13px;border:1px solid var(--line-2);color:var(--grey);}
+.tree{margin-top:28px;display:grid;gap:1px;background:var(--line-2);border:1px solid var(--line-2);}
+.tree>div{background:var(--cream);padding:18px 22px;font-size:14px;}
+.tree>div.tree-dark{background:var(--black);color:var(--cream);}
+.tree b{display:block;font-size:12px;color:var(--tan);letter-spacing:.06em;margin-bottom:4px;}
+.flow{margin-top:26px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:13px;color:var(--grey);}
+.flow span{padding:8px 14px;border:1px solid var(--line-2);}
+.flow .arrow{border:0;padding:0;color:var(--tan);}
+.deliverable{margin-top:30px;border-left:2px solid var(--tan);padding:18px 24px;background:var(--panel);}
+.deliverable .lbl{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--tan);}
+.deliverable p{margin-top:8px;font-size:14.5px;color:var(--black);}
+.note-inline{margin-top:16px;font-size:13px;color:var(--grey-2);font-style:italic;}
 
-    #weather-icon {
-      font-size: 2.8rem;
-      line-height: 1;
-    }
+/* ===== AUDIT ===== */
+.audit-cols{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-2);border:1px solid var(--line-2);}
+.audit-col{background:var(--cream);padding:clamp(32px,3.6vw,52px);}
+.audit-col.dark{background:var(--black);color:var(--cream);}
+.audit-col h3{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tan);}
+.audit-col ul{margin-top:26px;display:flex;flex-direction:column;gap:0;}
+.audit-col li{padding:16px 0;border-top:1px solid var(--line);font-size:15px;line-height:1.55;}
+.audit-col.dark li{border-top-color:#2c2c2c;color:#e2e0da;}
+.audit-col li:first-child{border-top:0;}
+.audit-funcs{margin-top:1px;}
+.func-title{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);padding:22px clamp(32px,3.6vw,52px) 10px;background:var(--cream);border:1px solid var(--line-2);border-bottom:0;}
+.audit-note{margin-top:24px;font-size:14px;color:var(--grey);max-width:70ch;}
 
-    #weather-temp {
-      font-size: 2.4rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
+/* ===== ECONOMICS BAND ===== */
+.taupe-band{background:var(--taupe);color:var(--black);}
+.equation{display:flex;flex-wrap:wrap;align-items:stretch;gap:1px;background:#9c9186;border:1px solid #9c9186;margin-top:clamp(40px,5vw,64px);}
+.eq-block{flex:1;min-width:200px;background:var(--panel);padding:clamp(26px,3vw,40px);display:flex;flex-direction:column;justify-content:center;}
+.eq-block.solid{background:var(--black);color:var(--cream);}
+.eq-block .lbl{font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);}
+.eq-block.solid .lbl{color:#9a9891;}
+.eq-block .val{font-size:clamp(26px,2.6vw,36px);font-weight:600;margin-top:10px;}
+.eq-op{display:flex;align-items:center;justify-content:center;padding:0 18px;font-size:26px;color:var(--black);font-weight:300;}
+.econ-text{max-width:70ch;margin-top:clamp(40px,4vw,56px);font-size:16.5px;line-height:1.75;color:#3a3733;}
+.econ-text b{color:var(--black);}
+.example-box{margin-top:32px;background:var(--cream);border:1px solid #9c9186;padding:clamp(24px,2.6vw,36px);max-width:600px;}
+.example-box .lbl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tan);margin-bottom:12px;}
+.example-box .eq-line{font-size:16px;font-weight:600;}
+.example-box p{margin-top:14px;font-size:13.5px;color:var(--grey);line-height:1.6;}
 
-    #weather-desc {
-      font-size: 0.9rem;
-      color: var(--muted);
-      margin-bottom: 10px;
-      text-transform: capitalize;
-    }
+/* ===== DECISION ===== */
+.decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-2);border:1px solid var(--line-2);}
+.decision-cell{background:var(--cream);padding:clamp(28px,3vw,40px);}
+.decision-cell h3{font-size:18px;font-weight:600;}
+.decision-cell p{margin-top:14px;font-size:14px;color:var(--grey);line-height:1.6;}
+.decision-cell .no{font-size:12px;color:var(--tan);font-weight:700;}
+.nothing-card{margin-top:1px;background:var(--black);color:var(--cream);padding:clamp(40px,4.4vw,64px);border:1px solid var(--line-2);border-top:0;}
+.nothing-card h3{font-size:clamp(22px,2.2vw,28px);}
+.nothing-card p{margin-top:16px;font-size:16px;color:#cfccc4;max-width:70ch;line-height:1.65;}
 
-    .weather-meta {
-      display: flex;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
+.donts{margin-top:clamp(56px,6vw,88px);}
+.donts h3{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin-bottom:8px;}
+.donts ul{margin-top:20px;}
+.donts li{padding:18px 0;border-top:1px solid var(--line);font-size:16.5px;}
+.donts li:last-child{border-bottom:1px solid var(--line);}
+.donts li::before{content:"— ";color:var(--tan);}
 
-    .weather-meta span {
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
+/* ===== FOUNDER ===== */
+.founder-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(40px,6vw,90px);align-items:start;}
+.founder-nums{display:flex;flex-direction:column;gap:36px;}
+.fnum .n{font-size:clamp(40px,4vw,56px);font-weight:600;}
+.fnum .l{font-size:13px;color:#4a4742;margin-top:6px;}
+.lessons{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#9c9186;border:1px solid #9c9186;}
+.lesson{background:var(--panel);padding:26px;}
+.lesson h4{font-size:15px;font-weight:600;}
+.lesson p{margin-top:10px;font-size:13.5px;color:#4a4742;line-height:1.6;}
+.founder-quote{margin-top:36px;font-size:17px;line-height:1.7;max-width:64ch;}
+.legal-note{margin-top:28px;font-size:12.5px;color:#4a4742;border-top:1px solid #9c9186;padding-top:18px;line-height:1.6;max-width:70ch;}
 
-    .weather-meta span b {
-      color: var(--text);
-    }
+/* ===== ENGAGEMENT ===== */
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-2);border:1px solid var(--line-2);}
+.tier{background:var(--cream);padding:clamp(30px,3.2vw,44px);display:flex;flex-direction:column;}
+.tier.dark{background:var(--black);color:var(--cream);}
+.tier .lvl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tan);}
+.tier h3{margin-top:14px;font-size:22px;}
+.tier .goal{margin-top:8px;font-size:14px;color:var(--grey);}
+.tier.dark .goal{color:#b8b5ad;}
+.tier ul{margin-top:22px;flex:1;}
+.tier li{padding:10px 0;border-top:1px solid var(--line);font-size:13.5px;color:var(--grey);}
+.tier.dark li{border-top-color:#2c2c2c;color:#d4d1ca;}
+.tier li:first-child{border-top:0;}
+.tier li::before{content:"— ";color:var(--tan);}
+.conditions{margin-top:1px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-2);border:1px solid var(--line-2);border-top:0;}
+.condition{background:var(--panel);padding:22px 26px;font-size:13.5px;color:var(--black);text-align:center;font-weight:500;}
 
-    #weather-loading, #weather-error {
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
+/* ===== CTA ===== */
+.cta-section{background:var(--grey-band);text-align:center;}
+.cta-section .eyebrow{justify-content:center;}
+.cta-section h2{max-width:16ch;margin:0 auto;}
+.cta-section .sub{max-width:56ch;margin:24px auto 0;font-size:17px;color:var(--grey);line-height:1.7;}
+.cta-actions{display:flex;justify-content:center;margin-top:40px;width:max-content;margin-left:auto;margin-right:auto;}
+.cta-actions .btn-solid{border-right:0;}
+.cta-actions .btn-outline{background:var(--grey-band);}
+.cta-actions .btn-outline:hover{background:var(--black);}
 
-    /* ── Quote card ── */
-    .quote-card::before {
-      content: '"';
-      position: absolute;
-      top: 12px;
-      right: 24px;
-      font-size: 7rem;
-      line-height: 1;
-      font-weight: 900;
-      color: rgba(124,106,247,0.07);
-      font-family: Georgia, serif;
-      pointer-events: none;
-    }
+/* ===== FOOTER ===== */
+footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0 32px;}
+.footer-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:40px;padding-bottom:40px;border-bottom:1px solid #2c2c2c;}
+.footer-brand .serif{font-size:26px;}
+.footer-brand p{margin-top:10px;font-size:13.5px;color:#9a9891;}
+.footer-brand .sig{margin-top:16px;font-style:italic;font-size:13px;color:#c9c5bd;}
+.footer-links{display:flex;flex-direction:column;gap:12px;}
+.footer-links a{font-size:13.5px;color:#c9c5bd;}
+.footer-links a:hover{color:var(--tan);}
+.footer-langs{font-size:12.5px;color:#7a7873;}
+.footer-bottom{margin-top:28px;font-size:12px;color:#7a7873;line-height:1.6;max-width:80ch;}
 
-    #quote-text {
-      font-size: 1.1rem;
-      line-height: 1.7;
-      color: var(--text);
-      font-style: italic;
-      margin-bottom: 12px;
-      max-width: 700px;
-    }
+/* ===== RESPONSIVE ===== */
+@media (max-width:1000px){
+  .nav-links{display:none;}
+  .hero-grid{grid-template-columns:1fr;}
+  .sequence{position:static;margin-top:44px;}
+  .grid-3,.grid-2,.grid-5,.grid-6{grid-template-columns:1fr;}
+  .method-schema{grid-template-columns:1fr;}
+  .schema-div{writing-mode:horizontal-tb;padding:8px 0;}
+  .phase-rail-wrap{grid-template-columns:1fr;}
+  .rail{position:static;display:flex;overflow-x:auto;gap:0;margin-bottom:36px;}
+  .rail-item{border-left:0;border-bottom:2px solid var(--line-2);padding:10px 18px;white-space:nowrap;}
+  .rail-item.active{border-bottom-color:var(--tan);border-left:0;}
+  .audit-cols{grid-template-columns:1fr;}
+  .decision-grid{grid-template-columns:1fr 1fr;}
+  .founder-grid{grid-template-columns:1fr;}
+  .lessons{grid-template-columns:1fr;}
+  .tiers{grid-template-columns:1fr;}
+  .conditions{grid-template-columns:1fr;}
+  .footer-top{flex-direction:column;}
+}
+@media (max-width:560px){
+  .decision-grid{grid-template-columns:1fr;}
+  .hero-actions,.cta-actions{width:100%;flex-direction:column;}
+  .hero-actions .btn-solid,.cta-actions .btn-solid{border-right:1px solid var(--black);border-bottom:0;}
+}
 
-    #quote-author {
-      font-size: 0.82rem;
-      color: var(--accent2);
-      font-weight: 600;
-      font-style: normal;
-    }
-
-    /* ── Todo card ── */
-    .todo-input-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    #todo-input {
-      flex: 1;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 16px;
-      color: var(--text);
-      font-size: 0.9rem;
-      font-family: inherit;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    #todo-input::placeholder { color: var(--muted); }
-    #todo-input:focus { border-color: rgba(124,106,247,0.5); }
-
-    #todo-add {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 20px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: opacity 0.2s, transform 0.15s;
-      box-shadow: 0 0 20px var(--glow);
-    }
-
-    #todo-add:hover { opacity: 0.9; transform: translateY(-1px); }
-
-    #todo-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .todo-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      transition: border-color 0.2s, opacity 0.2s;
-      animation: slide-in 0.25s ease;
-    }
-
-    @keyframes slide-in {
-      from { opacity: 0; transform: translateY(-8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .todo-item.done {
-      opacity: 0.45;
-      border-color: transparent;
-    }
-
-    .todo-check {
-      width: 20px;
-      height: 20px;
-      border-radius: 6px;
-      border: 2px solid var(--border);
-      background: transparent;
-      cursor: pointer;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s, border-color 0.2s;
-      font-size: 0.75rem;
-    }
-
-    .todo-item.done .todo-check {
-      background: var(--green);
-      border-color: var(--green);
-      color: #0d0d0f;
-    }
-
-    .todo-text {
-      flex: 1;
-      font-size: 0.92rem;
-      line-height: 1.4;
-      transition: text-decoration 0.2s;
-    }
-
-    .todo-item.done .todo-text {
-      text-decoration: line-through;
-      color: var(--muted);
-    }
-
-    .todo-delete {
-      background: none;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 2px 6px;
-      border-radius: 6px;
-      line-height: 1;
-      transition: color 0.2s, background 0.2s;
-      flex-shrink: 0;
-    }
-
-    .todo-delete:hover { color: #f87171; background: rgba(248,113,113,0.1); }
-
-    .todo-empty {
-      text-align: center;
-      padding: 24px;
-      color: var(--muted);
-      font-size: 0.88rem;
-    }
-
-    .todo-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-    }
-
-    .todo-footer span { font-size: 0.8rem; color: var(--muted); }
-
-    .todo-clear {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 0.8rem;
-      cursor: pointer;
-      font-family: inherit;
-      transition: color 0.2s;
-    }
-
-    .todo-clear:hover { color: #f87171; }
-
-    /* ── Location badge ── */
-    .location-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--green);
-      animation: pulse 2.5s infinite;
-      flex-shrink: 0;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.45; transform: scale(0.8); }
-    }
-
-    /* ── Footer ── */
-    footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.78rem;
-      padding-top: 8px;
-    }
-
-    footer span { color: var(--accent2); }
-  </style>
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;}
+  .reveal{opacity:1!important;transform:none!important;}
+}
+</style>
 </head>
 <body>
 
-<main class="page">
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="brand serif" data-fr="Cadence" data-en="Cadence">Cadence</a>
+    <nav class="nav-links" aria-label="Navigation principale">
+      <a href="#contexte" data-fr="Contexte" data-en="Context">Contexte</a>
+      <a href="#cas" data-fr="Cas publics" data-en="Public cases">Cas publics</a>
+      <a href="#methode" data-fr="Méthode" data-en="Method">Méthode</a>
+      <a href="#audit" data-fr="L'audit" data-en="The audit">L'audit</a>
+      <a href="#decision" data-fr="Décision" data-en="Decision">Décision</a>
+      <a href="#fondateur" data-fr="Fondateur" data-en="Founder">Fondateur</a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang-switch" role="group" aria-label="Langue / Language">
+        <button type="button" id="lang-fr" class="active" aria-pressed="true">FR</button>
+        <button type="button" id="lang-en" aria-pressed="false">EN</button>
+      </div>
+      <a class="btn btn-solid btn-sm" href="#cta" data-fr="Parler d'un sujet" data-en="Discuss a topic">Parler d'un sujet</a>
+    </div>
+  </div>
+</header>
 
-  <!-- Top row: Clock + Weather -->
-  <div class="top-row">
+<main id="top">
 
-    <!-- Clock -->
-    <div class="card clock-card">
-      <div class="location-badge"><span class="dot"></span> Amsterdam, Netherlands</div>
-      <div id="clock-time">00:00:00</div>
-      <div id="clock-date">Loading…</div>
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow reveal" data-fr="Conseil en automatisation et intelligence artificielle · Casablanca" data-en="Automation and artificial intelligence consulting · Casablanca">Conseil en automatisation et intelligence artificielle · Casablanca</p>
+      <h1 class="serif reveal"
+        data-fr="Toutes les opérations ne méritent pas <span class='mut'>d'être automatisées.</span>"
+        data-en="Not every operation deserves <span class='mut'>to be automated.</span>">Toutes les opérations ne méritent pas <span class="mut">d'être automatisées.</span></h1>
+      <p class="sub reveal" data-fr="Cadence identifie celles dont la valeur économique justifie l'investissement, détermine la meilleure réponse — acheter, intégrer, construire, renforcer l'équipe ou ne rien faire — et la met en production. Cela commence par un audit de deux semaines."
+        data-en="Cadence identifies the operations whose economic value justifies the investment, determines the right response — buy, integrate, build, staff up, or do nothing — and puts it into production. It starts with a two-week audit.">Cadence identifie celles dont la valeur économique justifie l'investissement, détermine la meilleure réponse — acheter, intégrer, construire, renforcer l'équipe ou ne rien faire — et la met en production. Cela commence par un audit de deux semaines.</p>
+      <div class="hero-actions reveal">
+        <a href="#cta" class="btn btn-solid" data-fr="Parler d'un sujet →" data-en="Discuss a topic →">Parler d'un sujet →</a>
+        <a href="#methode" class="btn btn-outline" data-fr="Voir la méthode" data-en="See the method">Voir la méthode</a>
+      </div>
+      <p class="hero-note reveal" data-fr="Un conseiller, pas une agence." data-en="An advisor, not an agency.">Un conseiller, pas une agence.</p>
     </div>
 
-    <!-- Weather -->
-    <div class="card weather-card">
-      <div class="card-label">Weather</div>
-      <div id="weather-loading">Fetching Amsterdam weather…</div>
-      <div id="weather-content" style="display:none">
-        <div class="weather-main">
-          <span id="weather-icon">🌤</span>
-          <span id="weather-temp">—</span>
+    <div class="sequence reveal" id="sequence">
+      <p class="sequence-title" data-fr="La séquence" data-en="The sequence">La séquence</p>
+      <div class="seq-track">
+        <div class="seq-fill" id="seq-fill"></div>
+        <div class="seq-step active" data-idx="0">
+          <div class="k" data-fr="Problème" data-en="Problem">Problème</div>
+          <div class="v" data-fr="Ce qui vous ralentit" data-en="What is slowing you down">Ce qui vous ralentit</div>
         </div>
-        <div id="weather-desc">—</div>
-        <div class="weather-meta">
-          <span>Feels like <b id="weather-feels">—</b></span>
-          <span>Humidity <b id="weather-humidity">—</b></span>
-          <span>Wind <b id="weather-wind">—</b></span>
+        <div class="seq-step" data-idx="1">
+          <div class="k" data-fr="Valeur" data-en="Value">Valeur</div>
+          <div class="v" data-fr="Ce que cela coûte" data-en="What it costs">Ce que cela coûte</div>
+        </div>
+        <div class="seq-step" data-idx="2">
+          <div class="k" data-fr="Solution" data-en="Solution">Solution</div>
+          <div class="v" data-fr="Acheter, intégrer, construire" data-en="Buy, integrate, build">Acheter, intégrer, construire</div>
+        </div>
+        <div class="seq-step" data-idx="3">
+          <div class="k" data-fr="Production" data-en="Production">Production</div>
+          <div class="v" data-fr="Un système qui tourne" data-en="A system that runs">Un système qui tourne</div>
         </div>
       </div>
-      <div id="weather-error" style="display:none">Could not load weather.</div>
-    </div>
-
-  </div>
-
-  <!-- Motivational Quote -->
-  <div class="card quote-card">
-    <div class="card-label">Daily Inspiration</div>
-    <p id="quote-text">Loading…</p>
-    <span id="quote-author"></span>
-  </div>
-
-  <!-- To-Do List -->
-  <div class="card">
-    <div class="card-label">To-Do</div>
-    <div class="todo-input-row">
-      <input id="todo-input" type="text" placeholder="Add a task and press Enter…" maxlength="200" />
-      <button id="todo-add">+ Add</button>
-    </div>
-    <div id="todo-list"></div>
-    <div class="todo-footer">
-      <span id="todo-count">0 tasks</span>
-      <button class="todo-clear" id="todo-clear-done">Clear completed</button>
     </div>
   </div>
+</section>
+
+<!-- CONTEXTE -->
+<section class="section" id="contexte">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-fr="Le contexte" data-en="The context">Le contexte</p>
+      <h2 data-fr="Le problème n'est pas la technologie. <span class='mut'>C'est le passage en production.</span>"
+          data-en="The problem is not the technology. <span class='mut'>It is getting to production.</span>">Le problème n'est pas la technologie. <span class="mut">C'est le passage en production.</span></h2>
+    </div>
+    <div class="grid grid-3">
+      <div class="stat-cell reveal">
+        <div class="stat-num" data-count="65" data-suffix="%">0%</div>
+        <h3 data-fr="Le potentiel technique" data-en="The technical potential">Le potentiel technique</h3>
+        <p data-fr="Part des heures de travail présentant un potentiel technique d'automatisation lorsque les technologies disponibles sont intégrées aux processus."
+           data-en="Share of work hours with technical automation potential once available technologies are integrated into processes.">Part des heures de travail présentant un potentiel technique d'automatisation lorsque les technologies disponibles sont intégrées aux processus.</p>
+        <div class="src" data-fr="Source : McKinsey Global Institute, 2023." data-en="Source: McKinsey Global Institute, 2023.">Source : McKinsey Global Institute, 2023.</div>
+      </div>
+      <div class="stat-cell reveal">
+        <div class="stat-num" data-count="18" data-suffix="%">0%</div>
+        <h3 data-fr="L'IA à côté du travail" data-en="AI alongside the work">L'IA à côté du travail</h3>
+        <p data-fr="Part des organisations où l'IA est principalement intégrée aux flux de travail ; ailleurs elle fonctionne en outils autonomes, à côté des processus."
+           data-en="Share of organizations where AI is mainly embedded in workflows; elsewhere it runs as standalone tools, alongside processes.">Part des organisations où l'IA est principalement intégrée aux flux de travail ; ailleurs elle fonctionne en outils autonomes, à côté des processus.</p>
+        <div class="src" data-fr="Source : Harvard Business Review Analytic Services (étude sponsorisée par Appian), 385 décideurs, mars 2026." data-en="Source: Harvard Business Review Analytic Services (study sponsored by Appian), 385 decision-makers, March 2026.">Source : Harvard Business Review Analytic Services (étude sponsorisée par Appian), 385 décideurs, mars 2026.</div>
+      </div>
+      <div class="stat-cell reveal">
+        <div class="stat-num" data-count="62" data-suffix="%">0%</div>
+        <h3 data-fr="Où se trouve la valeur" data-en="Where the value sits">Où se trouve la valeur</h3>
+        <p data-fr="Part de la valeur générée par l'IA dans les processus cœur de métier chez les entreprises leaders."
+           data-en="Share of AI-generated value sitting in core business processes among leading companies.">Part de la valeur générée par l'IA dans les processus cœur de métier chez les entreprises leaders.</p>
+        <div class="src" data-fr="Source : BCG, Where's the Value in AI?, 2024." data-en="Source: BCG, Where's the Value in AI?, 2024.">Source : BCG, <em>Where's the Value in AI?</em>, 2024.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CAS PUBLICS -->
+<section class="section" id="cas" style="background:var(--grey-band);">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-fr="Ce qui tourne déjà" data-en="What is already running">Ce qui tourne déjà</p>
+      <h2 data-fr="Déjà en production, <span class='mut'>chez d'autres.</span>" data-en="Already in production, <span class='mut'>at other companies.</span>">Déjà en production, <span class="mut">chez d'autres.</span></h2>
+      <p class="dek" data-fr="Trois déploiements publics, documentés par les entreprises elles-mêmes. Cadence n'est intervenue dans aucun d'eux : ils montrent ce que la technologie fait déjà, à quelle échelle — et ce qu'elle ne fait pas."
+         data-en="Three public deployments, documented by the companies themselves. Cadence was not involved in any of them: they show what the technology already does, at what scale — and what it does not.">Trois déploiements publics, documentés par les entreprises elles-mêmes. Cadence n'est intervenue dans aucun d'eux : ils montrent ce que la technologie fait déjà, à quelle échelle — et ce qu'elle ne fait pas.</p>
+    </div>
+    <div class="grid grid-3">
+      <article class="case-cell reveal">
+        <div class="case-co">Kuehne+Nagel</div>
+        <div class="case-num">78%</div>
+        <p class="case-hook" data-fr="des appels traités de bout en bout par des agents autonomes, sur le fret aérien."
+           data-en="of calls handled end to end by autonomous agents, in air freight.">des appels traités de bout en bout par des agents autonomes, sur le fret aérien.</p>
+        <ul class="case-details">
+          <li data-fr="Plus de 6 000 e-mails traités" data-en="Over 6,000 emails processed">Plus de 6 000 e-mails traités</li>
+          <li data-fr="+47 % de capacité sur le premier cas d'usage" data-en="+47% capacity on the first use case">+47 % de capacité sur le premier cas d'usage</li>
+          <li data-fr="Escalade des exceptions et coordination en cinq langues" data-en="Exception escalation and coordination across five languages">Escalade des exceptions et coordination en cinq langues</li>
+        </ul>
+        <div class="case-src"><a href="https://happyrobot.ai/customer-story/kuehne-nagel" target="_blank" rel="noopener" data-fr="Source : happyrobot.ai/customer-story/kuehne-nagel" data-en="Source: happyrobot.ai/customer-story/kuehne-nagel">Source : happyrobot.ai/customer-story/kuehne-nagel</a></div>
+      </article>
+
+      <article class="case-cell reveal">
+        <div class="case-co">DHL Supply Chain</div>
+        <div class="case-num" data-fr="18 mois" data-en="18 months">18 mois</div>
+        <p class="case-hook" data-fr="de validation des cas d'usage avant tout déploiement à l'échelle."
+           data-en="spent validating use cases before any deployment at scale.">de validation des cas d'usage avant tout déploiement à l'échelle.</p>
+        <ul class="case-details">
+          <li data-fr="Prise de rendez-vous, relances chauffeurs, coordination entrepôt" data-en="Appointment scheduling, driver follow-ups, warehouse coordination">Prise de rendez-vous, relances chauffeurs, coordination entrepôt</li>
+          <li data-fr="Des millions de minutes d'appel et des centaines de milliers d'e-mails par an" data-en="Millions of call minutes and hundreds of thousands of emails per year">Des millions de minutes d'appel et des centaines de milliers d'e-mails par an</li>
+          <li data-fr="Déployé région par région" data-en="Rolled out region by region">Déployé région par région</li>
+        </ul>
+        <div class="case-src"><span data-fr="Source : Communiqué DHL Group, novembre 2025" data-en="Source: DHL Group press release, November 2025">Source : Communiqué DHL Group, novembre 2025</span></div>
+      </article>
+
+      <article class="case-cell dark reveal">
+        <div class="case-co">Klarna</div>
+        <div class="case-num">2/3</div>
+        <p class="case-hook" data-fr="des conversations clients traitées par l'IA dès le premier mois — puis un rétropédalage."
+           data-en="of customer conversations handled by AI within the first month — then a walk-back.">des conversations clients traitées par l'IA dès le premier mois — puis un rétropédalage.</p>
+        <ul class="case-details">
+          <li data-fr="2,3 millions de conversations, résolution de 11 minutes à moins de 2" data-en="2.3 million conversations, resolution time cut from 11 minutes to under 2">2,3 millions de conversations, résolution de 11 minutes à moins de 2</li>
+          <li data-fr="Puis en 2025 : réintroduction d'agents humains sur les cas complexes" data-en="Then in 2025: human agents reintroduced for complex cases">Puis en 2025 : réintroduction d'agents humains sur les cas complexes</li>
+          <li data-fr="Le dirigeant reconnaît avoir coupé trop vite" data-en="The executive acknowledged cutting too fast">Le dirigeant reconnaît avoir coupé trop vite</li>
+        </ul>
+        <div class="case-src"><span data-fr="Source : Klarna 2024 ; Forbes 2026" data-en="Source: Klarna 2024; Forbes 2026">Source : Klarna 2024 ; Forbes 2026</span></div>
+      </article>
+    </div>
+    <p class="case-foot reveal" data-fr="Le cas Klarna est le plus instructif des trois : la technologie a tenu, la décision d'organisation non. C'est exactement ce qu'un audit doit anticiper — ce qui doit rester humain, et pourquoi."
+       data-en="The Klarna case is the most instructive of the three: the technology held, the organizational decision did not. That is exactly what an audit must anticipate — what should stay human, and why.">Le cas Klarna est le plus instructif des trois : la technologie a tenu, la décision d'organisation non. C'est exactement ce qu'un audit doit anticiper — ce qui doit rester humain, et pourquoi.</p>
+  </div>
+</section>
+
+<!-- METHODE -->
+<section class="section" id="methode">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-fr="La méthode" data-en="The method">La méthode</p>
+      <h2 data-fr="Trois phases. <span class='mut'>Chacune se suffit à elle-même.</span>" data-en="Three phases. <span class='mut'>Each stands on its own.</span>">Trois phases. <span class="mut">Chacune se suffit à elle-même.</span></h2>
+      <p class="dek" data-fr="Le client peut s'arrêter après chaque phase. Aucune phase suivante n'est obligatoire."
+         data-en="The client can stop after each phase. No following phase is mandatory.">Le client peut s'arrêter après chaque phase. Aucune phase suivante n'est obligatoire.</p>
+    </div>
+
+    <div class="method-schema reveal">
+      <div class="schema-block">
+        <div class="no">01</div>
+        <h4 data-fr="Audit" data-en="Audit">Audit</h4>
+        <p class="q" data-fr="Où est la valeur ?" data-en="Where is the value?">Où est la valeur ?</p>
+        <span class="dur" data-fr="2 semaines" data-en="2 weeks">2 semaines</span>
+      </div>
+      <div class="schema-div" data-fr="Vous pouvez vous arrêter" data-en="You can stop here">Vous pouvez vous arrêter</div>
+      <div class="schema-block">
+        <div class="no">02</div>
+        <h4 data-fr="Conception" data-en="Design">Conception</h4>
+        <p class="q" data-fr="Comment la capturer ?" data-en="How to capture it?">Comment la capturer ?</p>
+        <span class="dur" data-fr="2 à 4 semaines" data-en="2 to 4 weeks">2 à 4 semaines</span>
+      </div>
+      <div class="schema-div" data-fr="Vous pouvez vous arrêter" data-en="You can stop here">Vous pouvez vous arrêter</div>
+      <div class="schema-block">
+        <div class="no">03</div>
+        <h4 data-fr="Mise en œuvre" data-en="Implementation">Mise en œuvre</h4>
+        <p class="q" data-fr="Comment la mettre en production ?" data-en="How to put it into production?">Comment la mettre en production ?</p>
+        <span class="dur" data-fr="6 à 16 semaines selon le périmètre" data-en="6 to 16 weeks depending on scope">6 à 16 semaines selon le périmètre</span>
+      </div>
+    </div>
+
+    <div class="phase-rail-wrap">
+      <div class="rail" id="rail">
+        <div class="rail-item active" data-phase="0"><span class="rn">01</span><span data-fr="Audit" data-en="Audit">Audit</span></div>
+        <div class="rail-item" data-phase="1"><span class="rn">02</span><span data-fr="Conception" data-en="Design">Conception</span></div>
+        <div class="rail-item" data-phase="2"><span class="rn">03</span><span data-fr="Mise en œuvre" data-en="Implementation">Mise en œuvre</span></div>
+      </div>
+
+      <div>
+        <article class="phase reveal" data-phase-block="0">
+          <h3 data-fr="Audit — comprendre et chiffrer." data-en="Audit — understand and quantify.">Audit — comprendre et chiffrer.</h3>
+          <p class="lead" data-fr="Immersion sur site. Nous analysons les processus, les volumes, les coûts, les systèmes et les points de friction. Chaque opportunité est évaluée sur sa valeur potentielle, son effort, sa complexité, ses risques et ses dépendances."
+             data-en="On-site immersion. We analyze processes, volumes, costs, systems and friction points. Each opportunity is scored on potential value, effort, complexity, risk and dependencies.">Immersion sur site. Nous analysons les processus, les volumes, les coûts, les systèmes et les points de friction. Chaque opportunité est évaluée sur sa valeur potentielle, son effort, sa complexité, ses risques et ses dépendances.</p>
+          <div class="tags">
+            <span data-fr="Processus" data-en="Processes">Processus</span>
+            <span data-fr="Volumes" data-en="Volumes">Volumes</span>
+            <span data-fr="Coûts" data-en="Costs">Coûts</span>
+            <span data-fr="Friction" data-en="Friction">Friction</span>
+            <span data-fr="Opportunités" data-en="Opportunities">Opportunités</span>
+            <span data-fr="Valeur" data-en="Value">Valeur</span>
+            <span data-fr="Risques" data-en="Risks">Risques</span>
+          </div>
+          <div class="deliverable">
+            <div class="lbl" data-fr="Livrable" data-en="Deliverable">Livrable</div>
+            <p data-fr="Une carte des opportunités chiffrées et priorisées, qui vous appartient." data-en="A map of quantified, prioritized opportunities, which is yours to keep.">Une carte des opportunités chiffrées et priorisées, qui vous appartient.</p>
+          </div>
+          <p class="note-inline" data-fr="Le client peut s'arrêter ici et mettre en œuvre en interne ou avec un autre prestataire." data-en="The client can stop here and implement in-house or with another provider.">Le client peut s'arrêter ici et mettre en œuvre en interne ou avec un autre prestataire.</p>
+        </article>
+
+        <article class="phase reveal" data-phase-block="1">
+          <h3 data-fr="Conception — décider quoi faire, et comment." data-en="Design — decide what to do, and how.">Conception — décider quoi faire, et comment.</h3>
+          <p class="lead" data-fr="Nous déterminons la meilleure solution — sans dépendance à un éditeur, un cloud ou un prestataire."
+             data-en="We determine the best solution — with no dependency on a vendor, a cloud provider, or a contractor.">Nous déterminons la meilleure solution — sans dépendance à un éditeur, un cloud ou un prestataire.</p>
+          <div class="tree">
+            <div><b data-fr="Acheter" data-en="Buy">Acheter</b><span data-fr="Une solution du marché répond au besoin" data-en="A market solution meets the need">Une solution du marché répond au besoin</span></div>
+            <div><b data-fr="Intégrer" data-en="Integrate">Intégrer</b><span data-fr="Les systèmes déjà en place suffisent, une fois connectés" data-en="Existing systems are enough, once connected">Les systèmes déjà en place suffisent, une fois connectés</span></div>
+            <div><b data-fr="Construire" data-en="Build">Construire</b><span data-fr="Le besoin justifie un développement spécifique" data-en="The need justifies custom development">Le besoin justifie un développement spécifique</span></div>
+            <div><b data-fr="Renforcer" data-en="Staff up">Renforcer</b><span data-fr="La bonne réponse est une compétence interne" data-en="The right answer is an in-house skill">La bonne réponse est une compétence interne</span></div>
+            <div class="tree-dark"><b data-fr="Ne rien faire" data-en="Do nothing">Ne rien faire</b><span data-fr="L'économie ne justifie pas l'investissement" data-en="The economics do not justify the investment">L'économie ne justifie pas l'investissement</span></div>
+          </div>
+          <div class="deliverable">
+            <div class="lbl" data-fr="Livrable" data-en="Deliverable">Livrable</div>
+            <p data-fr="Une décision d'investissement explicite — solution, architecture, budget, feuille de route, critères de succès." data-en="An explicit investment decision — solution, architecture, budget, roadmap, success criteria.">Une décision d'investissement explicite — solution, architecture, budget, feuille de route, critères de succès.</p>
+          </div>
+        </article>
+
+        <article class="phase reveal" data-phase-block="2">
+          <h3 data-fr="Mise en œuvre — construire et mettre en production." data-en="Implementation — build and put into production.">Mise en œuvre — construire et mettre en production.</h3>
+          <p class="lead" data-fr="Cadence construit, configure ou intègre la solution — et coordonne les tiers lorsque la solution est fournie par un éditeur ou un prestataire."
+             data-en="Cadence builds, configures or integrates the solution — and coordinates third parties when the solution is provided by a vendor or a contractor.">Cadence construit, configure ou intègre la solution — et coordonne les tiers lorsque la solution est fournie par un éditeur ou un prestataire.</p>
+          <div class="flow">
+            <span data-fr="Construire" data-en="Build">Construire</span><span class="arrow">→</span>
+            <span data-fr="Intégrer" data-en="Integrate">Intégrer</span><span class="arrow">→</span>
+            <span data-fr="Tester" data-en="Test">Tester</span><span class="arrow">→</span>
+            <span data-fr="Déployer" data-en="Deploy">Déployer</span><span class="arrow">→</span>
+            <span data-fr="Former" data-en="Train">Former</span><span class="arrow">→</span>
+            <span data-fr="Mesurer" data-en="Measure">Mesurer</span>
+          </div>
+          <div class="deliverable">
+            <div class="lbl" data-fr="Livrable" data-en="Deliverable">Livrable</div>
+            <p data-fr="Un système en production, testé, documenté et adopté par les équipes." data-en="A system in production, tested, documented, and adopted by the teams.">Un système en production, testé, documenté et adopté par les équipes.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUDIT -->
+<section class="section" id="audit" style="background:var(--grey-band);">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-fr="L'audit" data-en="The audit">L'audit</p>
+      <h2 data-fr="Deux semaines sur site. <span class='mut'>Un document qui vous appartient.</span>" data-en="Two weeks on site. <span class='mut'>A document that is yours.</span>">Deux semaines sur site. <span class="mut">Un document qui vous appartient.</span></h2>
+      <p class="dek" data-fr="Rien n'est estimé de loin. Chaque opportunité est chiffrée sur vos volumes, vos coûts et vos délais réels — puis évaluée contre le seuil de cinq fois l'investissement."
+         data-en="Nothing is estimated from a distance. Every opportunity is quantified against your real volumes, costs and timelines — then measured against the five-times-investment threshold.">Rien n'est estimé de loin. Chaque opportunité est chiffrée sur vos volumes, vos coûts et vos délais réels — puis évaluée contre le seuil de cinq fois l'investissement.</p>
+    </div>
+
+    <div class="audit-cols reveal">
+      <div class="audit-col">
+        <h3 data-fr="Le déroulé" data-en="What happens">Le déroulé</h3>
+        <ul>
+          <li data-fr="Séance de cadrage de 90 minutes avec la direction" data-en="90-minute scoping session with leadership">Séance de cadrage de 90 minutes avec la direction</li>
+          <li data-fr="Entretiens avec deux à quatre membres de vos équipes" data-en="Interviews with two to four members of your teams">Entretiens avec deux à quatre membres de vos équipes</li>
+          <li data-fr="Accès en lecture seule aux outils concernés" data-en="Read-only access to the relevant tools">Accès en lecture seule aux outils concernés</li>
+          <li data-fr="Observation des volumes réels d'une semaine d'activité" data-en="Observation of real volumes over one week of activity">Observation des volumes réels d'une semaine d'activité</li>
+          <li data-fr="Restitution d'une heure avec la direction" data-en="One-hour findings session with leadership">Restitution d'une heure avec la direction</li>
+        </ul>
+      </div>
+      <div class="audit-col dark">
+        <h3 data-fr="Le livrable" data-en="The deliverable">Le livrable</h3>
+        <ul>
+          <li data-fr="La cartographie des processus examinés, avec volumes et coûts constatés" data-en="A map of the processes examined, with observed volumes and costs">La cartographie des processus examinés, avec volumes et coûts constatés</li>
+          <li data-fr="Pour chaque opportunité, la valeur annuelle estimée en dirhams" data-en="For each opportunity, the estimated annual value in dirhams">Pour chaque opportunité, la valeur annuelle estimée en dirhams</li>
+          <li data-fr="La solution recommandée — acheter, intégrer, construire, renforcer, ou ne rien faire" data-en="The recommended solution — buy, integrate, build, staff up, or do nothing">La solution recommandée — acheter, intégrer, construire, renforcer, ou ne rien faire</li>
+          <li data-fr="Le coût estimé de chaque solution et ses risques" data-en="The estimated cost of each solution and its risks">Le coût estimé de chaque solution et ses risques</li>
+          <li data-fr="La priorisation : par quoi commencer, et pourquoi" data-en="Prioritization: what to start with, and why">La priorisation : par quoi commencer, et pourquoi</li>
+          <li data-fr="Un prix fixe pour la mise en œuvre de l'opportunité prioritaire" data-en="A fixed price for implementing the priority opportunity">Un prix fixe pour la mise en œuvre de l'opportunité prioritaire</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="func-title reveal" data-fr="Ce que nous examinons" data-en="What we examine">Ce que nous examinons</div>
+    <div class="grid grid-6 reveal">
+      <div style="min-height:auto;padding:22px;text-align:center;font-size:14px;font-weight:600;" data-fr="Relation client" data-en="Customer relations">Relation client</div>
+      <div style="min-height:auto;padding:22px;text-align:center;font-size:14px;font-weight:600;" data-fr="Commercial" data-en="Sales">Commercial</div>
+      <div style="min-height:auto;padding:22px;text-align:center;font-size:14px;font-weight:600;" data-fr="Opérations" data-en="Operations">Opérations</div>
+      <div style="min-height:auto;padding:22px;text-align:center;font-size:14px;font-weight:600;" data-fr="Finance" data-en="Finance">Finance</div>
+      <div style="min-height:auto;padding:22px;text-align:center;font-size:14px;font-weight:600;" data-fr="Direction" data-en="Leadership">Direction</div>
+      <div style="min-height:auto;padding:22px;text-align:center;font-size:14px;font-weight:600;" data-fr="Fonctions support" data-en="Support functions">Fonctions support</div>
+    </div>
+
+    <p class="audit-note reveal" data-fr="Le document reste exploitable que vous poursuiviez avec Cadence, en interne, ou avec un autre prestataire. C'est le seul livrable que nous vendons sans condition de suite."
+       data-en="The document remains usable whether you continue with Cadence, in-house, or with another provider. It is the only deliverable we sell with no strings attached.">Le document reste exploitable que vous poursuiviez avec Cadence, en interne, ou avec un autre prestataire. C'est le seul livrable que nous vendons sans condition de suite.</p>
+  </div>
+</section>
+
+<!-- DISCIPLINE ECONOMIQUE -->
+<section class="section taupe-band" id="discipline">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-fr="La discipline économique" data-en="Economic discipline">La discipline économique</p>
+      <h2 data-fr="Nous construisons le business case avant de vous demander d'investir." data-en="We build the business case before asking you to invest.">Nous construisons le business case avant de vous demander d'investir.</h2>
+    </div>
+
+    <div class="equation reveal">
+      <div class="eq-block">
+        <div class="lbl" data-fr="Valeur annuelle estimée" data-en="Estimated annual value">Valeur annuelle estimée</div>
+        <div class="val" data-fr="Sur vos données" data-en="Based on your data">Sur vos données</div>
+      </div>
+      <div class="eq-op">÷</div>
+      <div class="eq-block">
+        <div class="lbl" data-fr="Investissement" data-en="Investment">Investissement</div>
+        <div class="val" data-fr="Prix fixe" data-en="Fixed price">Prix fixe</div>
+      </div>
+      <div class="eq-op">=</div>
+      <div class="eq-block solid">
+        <div class="lbl" data-fr="Multiple de retour" data-en="Return multiple">Multiple de retour</div>
+        <div class="val" data-count="5" data-suffix="×">0×</div>
+      </div>
+    </div>
+
+    <p class="econ-text reveal" data-fr="Cadence privilégie les opportunités dont la valeur économique potentielle représente au moins cinq fois l'investissement initial. La valeur est estimée à partir des données réelles de l'organisation : volume, temps consacré, coût, erreurs, délais et capacité mobilisée. <b>5× est un seuil de sélection, pas une garantie de résultat.</b>"
+       data-en="Cadence favors opportunities whose potential economic value represents at least five times the initial investment. Value is estimated from the organization's real data: volume, time spent, cost, errors, delays and capacity involved. <b>5× is a selection threshold, not a guaranteed outcome.</b>">Cadence privilégie les opportunités dont la valeur économique potentielle représente au moins cinq fois l'investissement initial. La valeur est estimée à partir des données réelles de l'organisation : volume, temps consacré, coût, erreurs, délais et capacité mobilisée. <b>5× est un seuil de sélection, pas une garantie de résultat.</b></p>
+
+    <div class="example-box reveal">
+      <div class="lbl" data-fr="Exemple illustratif" data-en="Illustrative example">Exemple illustratif</div>
+      <div class="eq-line" data-fr="50 000 MAD investis → ≥ 250 000 MAD de valeur annuelle estimée → ≥ 5×" data-en="MAD 50,000 invested → ≥ MAD 250,000 estimated annual value → ≥ 5×">50 000 MAD investis → ≥ 250 000 MAD de valeur annuelle estimée → ≥ 5×</div>
+      <p data-fr="Le business case réel est établi à partir des données du client pendant l'audit. Les résultats dépendent du processus, de l'adoption, des coûts d'intégration et de la capacité de l'organisation à capturer les gains."
+         data-en="The actual business case is built from the client's data during the audit. Results depend on the process, adoption, integration costs, and the organization's ability to capture the gains.">Le business case réel est établi à partir des données du client pendant l'audit. Les résultats dépendent du processus, de l'adoption, des coûts d'intégration et de la capacité de l'organisation à capturer les gains.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DECISION -->
+<section class="section" id="decision">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-fr="L'indépendance" data-en="Independence">L'indépendance</p>
+      <h2 data-fr="La bonne solution <span class='mut'>n'est pas toujours la nôtre.</span>" data-en="The right solution <span class='mut'>is not always ours.</span>">La bonne solution <span class="mut">n'est pas toujours la nôtre.</span></h2>
+      <p class="dek" data-fr="Cadence n'est financièrement dépendante d'aucune technologie. Acheter, intégrer, construire, renforcer — ou ne rien faire."
+         data-en="Cadence has no financial dependency on any technology. Buy, integrate, build, staff up — or do nothing.">Cadence n'est financièrement dépendante d'aucune technologie. Acheter, intégrer, construire, renforcer — ou ne rien faire.</p>
+    </div>
+
+    <div class="decision-grid reveal">
+      <div class="decision-cell">
+        <div class="no">01</div>
+        <h3 data-fr="Acheter" data-en="Buy">Acheter</h3>
+        <p data-fr="Une solution du marché répond déjà au besoin." data-en="A market solution already meets the need.">Une solution du marché répond déjà au besoin.</p>
+      </div>
+      <div class="decision-cell">
+        <div class="no">02</div>
+        <h3 data-fr="Intégrer" data-en="Integrate">Intégrer</h3>
+        <p data-fr="Vos systèmes actuels suffisent, une fois connectés." data-en="Your current systems are enough, once connected.">Vos systèmes actuels suffisent, une fois connectés.</p>
+      </div>
+      <div class="decision-cell">
+        <div class="no">03</div>
+        <h3 data-fr="Construire" data-en="Build">Construire</h3>
+        <p data-fr="Le besoin justifie un développement spécifique." data-en="The need justifies custom development.">Le besoin justifie un développement spécifique.</p>
+      </div>
+      <div class="decision-cell">
+        <div class="no">04</div>
+        <h3 data-fr="Renforcer" data-en="Staff up">Renforcer</h3>
+        <p data-fr="La bonne réponse est une compétence interne." data-en="The right answer is an in-house skill.">La bonne réponse est une compétence interne.</p>
+      </div>
+    </div>
+    <div class="nothing-card reveal">
+      <div class="no" style="color:var(--tan);font-size:12px;font-weight:700;">05 · <span data-fr="Ne rien faire" data-en="Do nothing">Ne rien faire</span></div>
+      <h3 data-fr="Ne rien faire" data-en="Do nothing">Ne rien faire</h3>
+      <p data-fr="Lorsque l'économie ne justifie pas l'investissement, nous le disons. Ne pas lancer un projet est une recommandation à part entière — et c'est ce qui distingue un conseiller d'une agence."
+         data-en="When the economics do not justify the investment, we say so. Not launching a project is a recommendation in its own right — and it is what distinguishes an advisor from an agency.">Lorsque l'économie ne justifie pas l'investissement, nous le disons. Ne pas lancer un projet est une recommandation à part entière — et c'est ce qui distingue un conseiller d'une agence.</p>
+    </div>
+
+    <div class="donts reveal">
+      <h3 data-fr="Ce que je ne fais pas" data-en="What I don't do">Ce que je ne fais pas</h3>
+      <ul>
+        <li data-fr="Pas de stratégie en diapositives sans mise en œuvre." data-en="No slide-deck strategy without implementation.">Pas de stratégie en diapositives sans mise en œuvre.</li>
+        <li data-fr="Pas de gadget conversationnel posé sur un site web." data-en="No chat gadget bolted onto a website.">Pas de gadget conversationnel posé sur un site web.</li>
+        <li data-fr="Pas de revente de licences ni de commission sur un éditeur." data-en="No license reselling and no commission from a vendor.">Pas de revente de licences ni de commission sur un éditeur.</li>
+        <li data-fr="Pas de mission acceptée quand le calcul économique ne tient pas." data-en="No engagement accepted when the economics do not hold up.">Pas de mission acceptée quand le calcul économique ne tient pas.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FONDATEUR -->
+<section class="section taupe-band" id="fondateur">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-fr="Le fondateur" data-en="The founder">Le fondateur</p>
+      <h2 data-fr="Qui construit, <span class='mut'>et avec quelle expérience.</span>" data-en="Who builds it, <span class='mut'>and with what experience.</span>">Qui construit, <span class="mut">et avec quelle expérience.</span></h2>
+    </div>
+
+    <div class="founder-grid reveal">
+      <div class="founder-nums">
+        <div class="fnum">
+          <div class="n"><span data-count="51">0</span></div>
+          <div class="l" data-fr="Pays en production" data-en="Countries in production">Pays en production</div>
+        </div>
+        <div class="fnum">
+          <div class="n"><span data-count="11">0</span></div>
+          <div class="l" data-fr="Langues" data-en="Languages">Langues</div>
+        </div>
+        <div class="fnum">
+          <div class="n" data-fr="Millions" data-en="Millions">Millions</div>
+          <div class="l" data-fr="D'interactions clients" data-en="Of customer interactions">D'interactions clients</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="lessons">
+          <div class="lesson">
+            <h4 data-fr="Production, pas pilote" data-en="Production, not pilot">Production, pas pilote</h4>
+            <p data-fr="Fiabilité, supervision et reprise sur erreur se conçoivent dès le départ." data-en="Reliability, monitoring and error recovery are designed in from the start.">Fiabilité, supervision et reprise sur erreur se conçoivent dès le départ.</p>
+          </div>
+          <div class="lesson">
+            <h4 data-fr="L'humain reste dans la boucle" data-en="The human stays in the loop">L'humain reste dans la boucle</h4>
+            <p data-fr="Savoir quand le système doit passer la main est le premier facteur de réussite." data-en="Knowing when the system must hand off is the top success factor.">Savoir quand le système doit passer la main est le premier facteur de réussite.</p>
+          </div>
+          <div class="lesson">
+            <h4 data-fr="Multilingue" data-en="Multilingual">Multilingue</h4>
+            <p data-fr="Expérience de systèmes opérés en onze langues, directement applicable au couple français / darija." data-en="Experience operating systems in eleven languages, directly applicable to the French / Darija pair.">Expérience de systèmes opérés en onze langues, directement applicable au couple français / darija.</p>
+          </div>
+          <div class="lesson">
+            <h4 data-fr="Économie" data-en="Economics">Économie</h4>
+            <p data-fr="À grande échelle, le coût par interaction automatisée compte." data-en="At scale, the cost per automated interaction matters.">À grande échelle, le coût par interaction automatisée compte.</p>
+          </div>
+        </div>
+
+        <p class="founder-quote" data-fr="Ingénieur de l'École Centrale Paris, je dirige l'automatisation du support client d'Uber Eats. Cadence est ma pratique indépendante. Vous travaillez avec moi, pas avec un junior facturé au prix d'un senior."
+           data-en="An engineer from École Centrale Paris, I lead automation for Uber Eats customer support. Cadence is my independent practice. You work with me, not with a junior billed at a senior's rate.">Ingénieur de l'École Centrale Paris, je dirige l'automatisation du support client d'Uber Eats. Cadence est ma pratique indépendante. Vous travaillez avec moi, pas avec un junior facturé au prix d'un senior.</p>
+
+        <p class="legal-note" data-fr="Expérience professionnelle du fondateur — Head of Automation, support client Uber Eats. Uber Eats n'est pas un client de Cadence : les missions Cadence sont réalisées à titre indépendant."
+           data-en="Founder's professional experience — Head of Automation, Uber Eats customer support. Uber Eats is not a Cadence client: Cadence engagements are carried out independently.">Expérience professionnelle du fondateur — Head of Automation, support client Uber Eats. Uber Eats n'est pas un client de Cadence : les missions Cadence sont réalisées à titre indépendant.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENGAGEMENT -->
+<section class="section" id="engagement">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-fr="L'engagement" data-en="Engagement">L'engagement</p>
+      <h2 data-fr="Trois niveaux <span class='mut'>d'engagement.</span>" data-en="Three levels <span class='mut'>of engagement.</span>">Trois niveaux <span class="mut">d'engagement.</span></h2>
+      <p class="dek" data-fr="Vous pouvez vous arrêter après chaque phase." data-en="You can stop after each phase.">Vous pouvez vous arrêter après chaque phase.</p>
+    </div>
+
+    <div class="tiers reveal">
+      <div class="tier dark">
+        <div class="lvl" data-fr="Niveau 01 · Point d'entrée" data-en="Level 01 · Entry point">Niveau 01 · Point d'entrée</div>
+        <h3 data-fr="Audit" data-en="Audit">Audit</h3>
+        <p class="goal" data-fr="Identifier les opportunités." data-en="Identify the opportunities.">Identifier les opportunités.</p>
+        <ul>
+          <li data-fr="Immersion sur site : processus, volumes, coûts, friction" data-en="On-site immersion: processes, volumes, costs, friction">Immersion sur site : processus, volumes, coûts, friction</li>
+          <li data-fr="Évaluation économique et priorisation" data-en="Economic evaluation and prioritization">Évaluation économique et priorisation</li>
+          <li data-fr="Carte des opportunités qui vous appartient" data-en="A map of opportunities that is yours to keep">Carte des opportunités qui vous appartient</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <div class="lvl" data-fr="Niveau 02" data-en="Level 02">Niveau 02</div>
+        <h3 data-fr="Audit + Conception" data-en="Audit + Design">Audit + Conception</h3>
+        <p class="goal" data-fr="Décider quoi faire, et comment." data-en="Decide what to do, and how.">Décider quoi faire, et comment.</p>
+        <ul>
+          <li data-fr="Analyse acheter / intégrer / construire / renforcer" data-en="Buy / integrate / build / staff-up analysis">Analyse acheter / intégrer / construire / renforcer</li>
+          <li data-fr="Architecture cible, feuille de route, budget" data-en="Target architecture, roadmap, budget">Architecture cible, feuille de route, budget</li>
+          <li data-fr="Impact économique attendu et critères de succès" data-en="Expected economic impact and success criteria">Impact économique attendu et critères de succès</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <div class="lvl" data-fr="Niveau 03" data-en="Level 03">Niveau 03</div>
+        <h3 data-fr="Audit + Conception + Mise en œuvre" data-en="Audit + Design + Implementation">Audit + Conception + Mise en œuvre</h3>
+        <p class="goal" data-fr="Construire et mettre en production." data-en="Build and put into production.">Construire et mettre en production.</p>
+        <ul>
+          <li data-fr="Construction, configuration ou intégration" data-en="Building, configuring, or integrating">Construction, configuration ou intégration</li>
+          <li data-fr="Coordination des tiers le cas échéant" data-en="Third-party coordination where relevant">Coordination des tiers le cas échéant</li>
+          <li data-fr="Tests, déploiement, documentation, formation" data-en="Testing, deployment, documentation, training">Tests, déploiement, documentation, formation</li>
+        </ul>
+      </div>
+    </div>
+    <div class="conditions reveal">
+      <div class="condition" data-fr="Prix fixes connus avant le démarrage" data-en="Fixed prices known before the start">Prix fixes connus avant le démarrage</div>
+      <div class="condition" data-fr="Périmètre défini, pas de facturation au temps" data-en="Defined scope, no time-based billing">Périmètre défini, pas de facturation au temps</div>
+      <div class="condition" data-fr="Maximum trois missions par trimestre" data-en="Maximum three engagements per quarter">Maximum trois missions par trimestre</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section cta-section" id="cta">
+  <div class="wrap">
+    <p class="eyebrow reveal" data-fr="Prochaine étape" data-en="Next step">Prochaine étape</p>
+    <h2 class="reveal" data-fr="Une opération vous coûte plus <span class='mut'>qu'elle ne devrait ?</span>" data-en="Is an operation costing you more <span class='mut'>than it should?</span>">Une opération vous coûte plus <span class="mut">qu'elle ne devrait ?</span></h2>
+    <p class="sub reveal" data-fr="30 minutes suffisent pour déterminer si elle mérite un audit. Avec le dirigeant concerné, sur place à Casablanca ou en visioconférence — sans engagement et sans présentation commerciale."
+       data-en="30 minutes are enough to determine whether it warrants an audit. With the relevant executive, in person in Casablanca or by video call — no commitment and no sales pitch.">30 minutes suffisent pour déterminer si elle mérite un audit. Avec le dirigeant concerné, sur place à Casablanca ou en visioconférence — sans engagement et sans présentation commerciale.</p>
+    <div class="cta-actions reveal">
+      <a href="https://calendly.com/VOTRE-LIEN/30min" target="_blank" rel="noopener" class="btn btn-solid" data-fr="Parler d'un sujet →" data-en="Discuss a topic →">Parler d'un sujet →</a>
+      <a href="mailto:contact@cadence.ma" class="btn btn-outline" data-fr="Écrire un message" data-en="Write a message">Écrire un message</a>
+    </div>
+  </div>
+</section>
 
 </main>
 
 <footer>
-  <p>Made with curiosity in <span>Amsterdam</span> &mdash; &copy; 2026 Otman</p>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="serif">Cadence</div>
+        <p data-fr="Conseil en automatisation et intelligence artificielle · Casablanca, Maroc" data-en="Automation and artificial intelligence consulting · Casablanca, Morocco">Conseil en automatisation et intelligence artificielle · Casablanca, Maroc</p>
+        <p class="sig" data-fr="Un conseiller, pas une agence." data-en="An advisor, not an agency.">Un conseiller, pas une agence.</p>
+        <p class="footer-langs" style="margin-top:16px;" data-fr="Langues de travail : français, anglais, arabe, darija, espagnol" data-en="Working languages: French, English, Arabic, Darija, Spanish">Langues de travail : français, anglais, arabe, darija, espagnol</p>
+      </div>
+      <div class="footer-links">
+        <a href="mailto:contact@cadence.ma">contact@cadence.ma</a>
+        <a href="https://wa.me/212XXXXXXXXX" target="_blank" rel="noopener" data-fr="WhatsApp (lien fictif)" data-en="WhatsApp (placeholder link)">WhatsApp (lien fictif)</a>
+        <a href="https://www.linkedin.com/in/VOTRE-PROFIL" target="_blank" rel="noopener" data-fr="LinkedIn (lien fictif)" data-en="LinkedIn (placeholder link)">LinkedIn (lien fictif)</a>
+        <a href="https://calendly.com/VOTRE-LIEN/30min" target="_blank" rel="noopener" data-fr="Réserver 30 minutes (lien fictif)" data-en="Book 30 minutes (placeholder link)">Réserver 30 minutes (lien fictif)</a>
+      </div>
+    </div>
+    <p class="footer-bottom" data-fr="Vos données ne quittent jamais l'entreprise sans accord écrit — conformité loi 09-08 relative à la protection des données personnelles."
+       data-en="Your data never leaves the company without written agreement — compliant with Law 09-08 on the protection of personal data.">Vos données ne quittent jamais l'entreprise sans accord écrit — conformité loi 09-08 relative à la protection des données personnelles.</p>
+  </div>
 </footer>
 
 <script>
-// ══════════════════════════════
-//  CLOCK
-// ══════════════════════════════
-(function initClock() {
-  const timeEl = document.getElementById('clock-time');
-  const dateEl = document.getElementById('clock-date');
+(function(){
+  "use strict";
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const MONTHS = ['January','February','March','April','May','June',
-                  'July','August','September','October','November','December'];
+  /* ---------- Language toggle ---------- */
+  var LANG_KEY = 'cadence-lang';
+  var btnFr = document.getElementById('lang-fr');
+  var btnEn = document.getElementById('lang-en');
+  var nodes = document.querySelectorAll('[data-fr][data-en]');
 
-  function tick() {
-    const now = new Date();
-    const h = String(now.getHours()).padStart(2,'0');
-    const m = String(now.getMinutes()).padStart(2,'0');
-    const s = String(now.getSeconds()).padStart(2,'0');
-    timeEl.textContent = `${h}:${m}:${s}`;
-
-    const day   = DAYS[now.getDay()];
-    const date  = now.getDate();
-    const month = MONTHS[now.getMonth()];
-    const year  = now.getFullYear();
-    const suffix = date === 1 ? 'st' : date === 2 ? 'nd' : date === 3 ? 'rd' : 'th';
-    dateEl.textContent = `${day}, ${month} ${date}${suffix} ${year}`;
-  }
-
-  tick();
-  setInterval(tick, 1000);
-})();
-
-// ══════════════════════════════
-//  WEATHER  (wttr.in)
-// ══════════════════════════════
-(function initWeather() {
-  const WMO_ICONS = {
-    0:'☀️',1:'🌤',2:'⛅',3:'☁️',
-    45:'🌫',48:'🌫',
-    51:'🌦',53:'🌦',55:'🌧',
-    61:'🌧',63:'🌧',65:'🌧',
-    71:'🌨',73:'🌨',75:'❄️',
-    80:'🌦',81:'🌧',82:'⛈',
-    95:'⛈',96:'⛈',99:'⛈'
-  };
-  const WMO_DESC = {
-    0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',
-    45:'Foggy',48:'Icy fog',
-    51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',
-    61:'Light rain',63:'Rain',65:'Heavy rain',
-    71:'Light snow',73:'Snow',75:'Heavy snow',
-    80:'Showers',81:'Rain showers',82:'Heavy showers',
-    95:'Thunderstorm',96:'Thunderstorm',99:'Heavy thunderstorm'
-  };
-
-  fetch('https://api.open-meteo.com/v1/forecast?latitude=52.3676&longitude=4.9041&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code&wind_speed_unit=kmh&temperature_unit=celsius')
-    .then(r => r.json())
-    .then(data => {
-      const c = data.current;
-      const code = c.weather_code;
-
-      document.getElementById('weather-icon').textContent = WMO_ICONS[code] || '🌡';
-      document.getElementById('weather-temp').textContent  = `${Math.round(c.temperature_2m)}°C`;
-      document.getElementById('weather-desc').textContent  = WMO_DESC[code] || 'Unknown';
-      document.getElementById('weather-feels').textContent    = `${Math.round(c.apparent_temperature)}°C`;
-      document.getElementById('weather-humidity').textContent = `${c.relative_humidity_2m}%`;
-      document.getElementById('weather-wind').textContent     = `${Math.round(c.wind_speed_10m)} km/h`;
-
-      document.getElementById('weather-loading').style.display = 'none';
-      document.getElementById('weather-content').style.display = 'block';
-    })
-    .catch(() => {
-      document.getElementById('weather-loading').style.display = 'none';
-      document.getElementById('weather-error').style.display   = 'block';
+  function applyLang(lang){
+    document.documentElement.lang = lang;
+    nodes.forEach(function(el){
+      var val = el.getAttribute('data-' + lang);
+      if(val !== null){ el.innerHTML = val; }
     });
-})();
-
-// ══════════════════════════════
-//  DAILY QUOTE
-// ══════════════════════════════
-(function initQuote() {
-  const quotes = [
-    { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
-    { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
-    { text: "Our greatest glory is not in never falling, but in rising every time we fall.", author: "Confucius" },
-    { text: "Well done is better than well said.", author: "Benjamin Franklin" },
-    { text: "In the middle of every difficulty lies opportunity.", author: "Albert Einstein" },
-    { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
-    { text: "Act as if what you do makes a difference. It does.", author: "William James" },
-    { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
-    { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-    { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
-    { text: "You are never too old to set another goal or to dream a new dream.", author: "C.S. Lewis" },
-    { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
-    { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
-    { text: "What you get by achieving your goals is not as important as what you become.", author: "Henry David Thoreau" },
-    { text: "Small daily improvements over time lead to stunning results.", author: "Robin Sharma" },
-    { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
-    { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar" },
-    { text: "Energy and persistence conquer all things.", author: "Benjamin Franklin" },
-    { text: "Clarity of mind means clarity of passion.", author: "Blaise Pascal" },
-    { text: "Nothing in life is to be feared, only to be understood.", author: "Marie Curie" },
-    { text: "Everything you've ever wanted is on the other side of fear.", author: "George Addair" },
-    { text: "Push yourself, because no one else is going to do it for you.", author: "Unknown" },
-    { text: "Dream it. Wish it. Do it.", author: "Unknown" },
-    { text: "Great things never come from comfort zones.", author: "Unknown" },
-    { text: "Little things make big days.", author: "Unknown" },
-    { text: "It's going to be hard, but hard does not mean impossible.", author: "Unknown" },
-    { text: "Don't wait for opportunity. Create it.", author: "Unknown" },
-    { text: "Sometimes we're tested not to show our weaknesses, but to discover our strengths.", author: "Unknown" },
-    { text: "Do something today that your future self will thank you for.", author: "Unknown" },
-    { text: "The harder you work for something, the greater you'll feel when you achieve it.", author: "Unknown" },
-    { text: "Wake up with determination. Go to bed with satisfaction.", author: "Unknown" },
-    { text: "Stop waiting for Friday. Start living for today.", author: "Unknown" },
-    { text: "Be so good they can't ignore you.", author: "Steve Martin" },
-    { text: "Simplicity is the ultimate sophistication.", author: "Leonardo da Vinci" },
-    { text: "Stay hungry, stay foolish.", author: "Steve Jobs" },
-    { text: "Make each day your masterpiece.", author: "John Wooden" },
-    { text: "Intelligence is the ability to adapt to change.", author: "Stephen Hawking" },
-    { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
-  ];
-
-  // Pick quote based on day of year so it's stable all day but changes daily
-  const now   = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  const diff  = now - start;
-  const oneDay = 1000 * 60 * 60 * 24;
-  const dayOfYear = Math.floor(diff / oneDay);
-  const q = quotes[dayOfYear % quotes.length];
-
-  document.getElementById('quote-text').textContent   = q.text;
-  document.getElementById('quote-author').textContent = `— ${q.author}`;
-})();
-
-// ══════════════════════════════
-//  TO-DO LIST
-// ══════════════════════════════
-(function initTodo() {
-  const STORAGE_KEY = 'morning-dashboard-todos';
-  const listEl    = document.getElementById('todo-list');
-  const input     = document.getElementById('todo-input');
-  const addBtn    = document.getElementById('todo-add');
-  const countEl   = document.getElementById('todo-count');
-  const clearBtn  = document.getElementById('todo-clear-done');
-
-  let todos = [];
-
-  function load() {
-    try { todos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-    catch { todos = []; }
+    btnFr.classList.toggle('active', lang === 'fr');
+    btnEn.classList.toggle('active', lang === 'en');
+    btnFr.setAttribute('aria-pressed', lang === 'fr');
+    btnEn.setAttribute('aria-pressed', lang === 'en');
+    try{ localStorage.setItem(LANG_KEY, lang); }catch(e){}
   }
 
-  function save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-  }
+  btnFr.addEventListener('click', function(){ applyLang('fr'); });
+  btnEn.addEventListener('click', function(){ applyLang('en'); });
 
-  function render() {
-    listEl.innerHTML = '';
-    if (todos.length === 0) {
-      listEl.innerHTML = '<div class="todo-empty">No tasks yet — add one above 🎯</div>';
-    } else {
-      todos.forEach((todo, idx) => {
-        const item = document.createElement('div');
-        item.className = 'todo-item' + (todo.done ? ' done' : '');
+  var savedLang = 'fr';
+  try{ savedLang = localStorage.getItem(LANG_KEY) || 'fr'; }catch(e){}
+  applyLang(savedLang);
 
-        const check = document.createElement('button');
-        check.className = 'todo-check';
-        check.setAttribute('aria-label', todo.done ? 'Mark incomplete' : 'Mark complete');
-        check.innerHTML = todo.done ? '✓' : '';
-        check.addEventListener('click', () => toggle(idx));
-
-        const text = document.createElement('span');
-        text.className = 'todo-text';
-        text.textContent = todo.text;
-
-        const del = document.createElement('button');
-        del.className = 'todo-delete';
-        del.innerHTML = '×';
-        del.setAttribute('aria-label', 'Delete task');
-        del.addEventListener('click', () => remove(idx));
-
-        item.append(check, text, del);
-        listEl.appendChild(item);
-      });
-    }
-
-    const total    = todos.length;
-    const done     = todos.filter(t => t.done).length;
-    const remaining = total - done;
-    countEl.textContent = `${remaining} remaining · ${done} done`;
-  }
-
-  function add() {
-    const text = input.value.trim();
-    if (!text) return;
-    todos.unshift({ text, done: false, id: Date.now() });
-    save();
-    render();
-    input.value = '';
-    input.focus();
-  }
-
-  function toggle(idx) {
-    todos[idx].done = !todos[idx].done;
-    save();
-    render();
-  }
-
-  function remove(idx) {
-    todos.splice(idx, 1);
-    save();
-    render();
-  }
-
-  addBtn.addEventListener('click', add);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
-  clearBtn.addEventListener('click', () => {
-    todos = todos.filter(t => !t.done);
-    save();
-    render();
+  /* ---------- Smooth in-page anchor scrolling ---------- */
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      var id = a.getAttribute('href');
+      if(id.length < 2) return;
+      var target = document.querySelector(id);
+      if(target){
+        e.preventDefault();
+        target.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'start'});
+      }
+    });
   });
 
-  load();
-  render();
+  /* ---------- Nav scroll border ---------- */
+  var nav = document.getElementById('nav');
+  window.addEventListener('scroll', function(){
+    nav.classList.toggle('scrolled', window.scrollY > 8);
+  }, {passive:true});
+
+  /* ---------- Reveal on scroll ---------- */
+  var revealEls = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window && !reduceMotion){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          var el = entry.target;
+          var parent = el.parentElement;
+          var idx = Array.prototype.indexOf.call(parent.children, el);
+          var delay = Math.min(idx, 6) * 90;
+          setTimeout(function(){ el.classList.add('in'); }, delay);
+          io.unobserve(el);
+        }
+      });
+    }, {threshold:0.12, rootMargin:'0px 0px -40px 0px'});
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('in'); });
+  }
+
+  /* ---------- Animated counters ---------- */
+  var counters = document.querySelectorAll('[data-count]');
+  function animateCounter(el){
+    var target = parseFloat(el.getAttribute('data-count'));
+    var suffix = el.getAttribute('data-suffix') || '';
+    if(reduceMotion){ el.textContent = target + suffix; return; }
+    var start = null;
+    var duration = 1400;
+    function step(ts){
+      if(!start) start = ts;
+      var progress = Math.min((ts - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var val = Math.round(target * eased);
+      el.textContent = val + suffix;
+      if(progress < 1){ requestAnimationFrame(step); }
+      else { el.textContent = target + suffix; }
+    }
+    requestAnimationFrame(step);
+  }
+  if('IntersectionObserver' in window){
+    var cio = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          animateCounter(entry.target);
+          cio.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.4});
+    counters.forEach(function(el){ cio.observe(el); });
+  } else {
+    counters.forEach(function(el){ el.textContent = el.getAttribute('data-count') + (el.getAttribute('data-suffix')||''); });
+  }
+
+  /* ---------- Sequence loop (hero) ---------- */
+  var seqSteps = document.querySelectorAll('.seq-step');
+  var seqFill = document.getElementById('seq-fill');
+  if(seqSteps.length && !reduceMotion){
+    var seqIdx = 0;
+    var STEP_MS = 2000;
+    function tickSeq(){
+      seqSteps.forEach(function(s, i){ s.classList.toggle('active', i === seqIdx); });
+      var pct = ((seqIdx + 1) / seqSteps.length) * 100;
+      seqFill.style.height = pct + '%';
+      seqIdx = (seqIdx + 1) % seqSteps.length;
+      if(seqIdx === 0){
+        setTimeout(function(){ seqFill.style.transition = 'none'; seqFill.style.height = '0%'; requestAnimationFrame(function(){ seqFill.style.transition = 'height .3s linear'; }); }, STEP_MS - 50);
+      }
+    }
+    tickSeq();
+    setInterval(tickSeq, STEP_MS);
+  } else if(seqSteps.length){
+    seqSteps[0].classList.add('active');
+  }
+
+  /* ---------- Method rail ---------- */
+  var railItems = document.querySelectorAll('.rail-item');
+  var phaseBlocks = document.querySelectorAll('[data-phase-block]');
+  railItems.forEach(function(item){
+    item.addEventListener('click', function(){
+      var target = document.querySelector('[data-phase-block="' + item.getAttribute('data-phase') + '"]');
+      if(target){ target.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'start'}); }
+    });
+  });
+  if('IntersectionObserver' in window && phaseBlocks.length){
+    var pio = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          var idx = entry.target.getAttribute('data-phase-block');
+          railItems.forEach(function(r){ r.classList.toggle('active', r.getAttribute('data-phase') === idx); });
+        }
+      });
+    }, {threshold:0.5, rootMargin:'-20% 0px -50% 0px'});
+    phaseBlocks.forEach(function(b){ pio.observe(b); });
+  }
 })();
 </script>
-
 </body>
 </html>
