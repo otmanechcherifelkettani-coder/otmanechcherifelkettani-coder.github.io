@@ -118,27 +118,26 @@ header.nav.scrolled{border-bottom-color:var(--line);backdrop-filter:blur(10px);}
 .hero-note{margin-top:24px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted-dark);letter-spacing:.02em;}
 .on-ink .hero-note{color:var(--muted-dark);}
 
-/* sequence diagram — draws in once as it enters view, then holds still */
+/* sequence diagram — segmented stepper. Track fills once as it scrolls
+   into view (like watching a short pipeline run), then holds still,
+   fully lit, as a static reference diagram. */
 .sequence{position:relative;}
 .seq-title{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-dark);margin-bottom:28px;}
-.seq-path{display:flex;flex-direction:column;}
-.seq-node{display:flex;align-items:flex-start;gap:18px;position:relative;padding-bottom:34px;}
-.seq-node:last-child{padding-bottom:0;}
-.seq-line{position:absolute;left:13px;top:28px;bottom:6px;width:1px;background:var(--copper-bright);opacity:.4;transform:scaleY(0);transform-origin:top;transition:transform .7s ease;}
-.seq-node:last-child .seq-line{display:none;}
-.seq-dot{width:27px;height:27px;border:1px solid var(--ink-line);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-dark);flex:none;z-index:1;background:var(--ink);transition:border-color .5s ease,color .5s ease,background .5s ease;}
-.seq-body{padding-top:2px;}
-.seq-k{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;color:var(--muted-dark);transition:color .5s ease;}
-.seq-v{font-size:14.5px;color:var(--muted-dark);margin-top:4px;opacity:.6;transition:opacity .5s ease,color .5s ease;}
-/* once .sequence has scrolled into view, each node resolves in turn */
-.sequence.in .seq-line{transform:scaleY(1);}
-.sequence.in .seq-dot{border-color:var(--copper-bright);color:var(--ink);background:var(--copper-bright);}
-.sequence.in .seq-k{color:var(--copper-bright);}
-.sequence.in .seq-v{opacity:1;color:var(--white);}
-.sequence.in .seq-node:nth-child(1) .seq-dot,.sequence.in .seq-node:nth-child(1) .seq-k,.sequence.in .seq-node:nth-child(1) .seq-v,.sequence.in .seq-node:nth-child(1) .seq-line{transition-delay:.1s;}
-.sequence.in .seq-node:nth-child(2) .seq-dot,.sequence.in .seq-node:nth-child(2) .seq-k,.sequence.in .seq-node:nth-child(2) .seq-v,.sequence.in .seq-node:nth-child(2) .seq-line{transition-delay:.55s;}
-.sequence.in .seq-node:nth-child(3) .seq-dot,.sequence.in .seq-node:nth-child(3) .seq-k,.sequence.in .seq-node:nth-child(3) .seq-v,.sequence.in .seq-node:nth-child(3) .seq-line{transition-delay:1s;}
-.sequence.in .seq-node:nth-child(4) .seq-dot,.sequence.in .seq-node:nth-child(4) .seq-k,.sequence.in .seq-node:nth-child(4) .seq-v{transition-delay:1.45s;}
+.seq-track{display:flex;gap:4px;height:3px;}
+.seq-track span{flex:1;background:var(--copper-bright);opacity:.22;transform:scaleX(0);transform-origin:left;transition:transform .5s ease,opacity .5s ease;}
+.seq-labels{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px;}
+.seq-item .no{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-dark);transition:color .4s ease;}
+.seq-item h4{font-size:14px;font-weight:600;color:var(--muted-dark);margin-top:7px;transition:color .4s ease;}
+.seq-item p{font-size:12px;color:var(--muted-dark);margin-top:5px;line-height:1.45;opacity:.55;transition:opacity .4s ease;}
+/* once .sequence has scrolled into view, the track fills segment by segment */
+.sequence.in .seq-track span{opacity:1;transform:scaleX(1);}
+.sequence.in .seq-item .no{color:var(--copper-bright);}
+.sequence.in .seq-item h4{color:var(--white);}
+.sequence.in .seq-item p{opacity:1;}
+.sequence.in .seq-track span:nth-child(1),.sequence.in .seq-item:nth-child(1) *{transition-delay:.1s;}
+.sequence.in .seq-track span:nth-child(2),.sequence.in .seq-item:nth-child(2) *{transition-delay:.45s;}
+.sequence.in .seq-track span:nth-child(3),.sequence.in .seq-item:nth-child(3) *{transition-delay:.8s;}
+.sequence.in .seq-track span:nth-child(4),.sequence.in .seq-item:nth-child(4) *{transition-delay:1.15s;}
 
 /* ===== NUMBER ROWS (context) ===== */
 .numrow-list{border-top:1px solid var(--line);}
@@ -331,6 +330,7 @@ footer{background:var(--ink);color:var(--white);padding:clamp(52px,6vw,76px) 0 3
 @media (max-width:640px){
   .func-grid{grid-template-columns:repeat(2,1fr);}
   .dt-body{grid-template-columns:1fr;gap:8px;}
+  .seq-labels{grid-template-columns:1fr 1fr;row-gap:22px;}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -396,37 +396,29 @@ footer{background:var(--ink);color:var(--white);padding:clamp(52px,6vw,76px) 0 3
 
     <div class="sequence reveal" id="sequence">
       <p class="seq-title" data-fr="La séquence" data-en="The sequence">La séquence</p>
-      <div class="seq-path" id="seqPath">
-        <div class="seq-node" data-idx="0">
-          <div class="seq-line"></div>
-          <div class="seq-dot mono">01</div>
-          <div class="seq-body">
-            <div class="seq-k" data-fr="Problème" data-en="Problem">Problème</div>
-            <div class="seq-v" data-fr="Ce qui vous ralentit" data-en="What is slowing you down">Ce qui vous ralentit</div>
-          </div>
+      <div class="seq-track">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="seq-labels">
+        <div class="seq-item">
+          <div class="no mono">01</div>
+          <h4 data-fr="Problème" data-en="Problem">Problème</h4>
+          <p data-fr="Ce qui vous ralentit" data-en="What is slowing you down">Ce qui vous ralentit</p>
         </div>
-        <div class="seq-node" data-idx="1">
-          <div class="seq-line"></div>
-          <div class="seq-dot mono">02</div>
-          <div class="seq-body">
-            <div class="seq-k" data-fr="Valeur" data-en="Value">Valeur</div>
-            <div class="seq-v" data-fr="Ce que cela coûte" data-en="What it costs">Ce que cela coûte</div>
-          </div>
+        <div class="seq-item">
+          <div class="no mono">02</div>
+          <h4 data-fr="Valeur" data-en="Value">Valeur</h4>
+          <p data-fr="Ce que cela coûte" data-en="What it costs">Ce que cela coûte</p>
         </div>
-        <div class="seq-node" data-idx="2">
-          <div class="seq-line"></div>
-          <div class="seq-dot mono">03</div>
-          <div class="seq-body">
-            <div class="seq-k" data-fr="Solution" data-en="Solution">Solution</div>
-            <div class="seq-v" data-fr="Acheter, intégrer, construire" data-en="Buy, integrate, build">Acheter, intégrer, construire</div>
-          </div>
+        <div class="seq-item">
+          <div class="no mono">03</div>
+          <h4 data-fr="Solution" data-en="Solution">Solution</h4>
+          <p data-fr="Acheter, intégrer, construire" data-en="Buy, integrate, build">Acheter, intégrer, construire</p>
         </div>
-        <div class="seq-node" data-idx="3">
-          <div class="seq-dot mono">04</div>
-          <div class="seq-body">
-            <div class="seq-k" data-fr="Production" data-en="Production">Production</div>
-            <div class="seq-v" data-fr="Un système qui tourne" data-en="A system that runs">Un système qui tourne</div>
-          </div>
+        <div class="seq-item">
+          <div class="no mono">04</div>
+          <h4 data-fr="Production" data-en="Production">Production</h4>
+          <p data-fr="Un système qui tourne" data-en="A system that runs">Un système qui tourne</p>
         </div>
       </div>
     </div>
