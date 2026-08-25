@@ -7,25 +7,29 @@
 <meta name="description" content="Cadence identifie les processus dont la valeur économique justifie l'automatisation, décide de la meilleure réponse et la met en production. Casablanca." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,460;9..144,600&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --cream:#FBFAF4;
-  --grey-band:#E8E6E1;
-  --taupe:#B0A69C;
-  --panel:#EDEBE6;
-  --black:#111111;
-  --grey:#625f58;
-  --grey-2:#726f68;
-  --line:#DCD9D2;
-  --line-2:#C9C5BD;
-  --tan:#C08A5A;
+  --ink:#14161C;
+  --ink-2:#1D212B;
+  --ink-line:#333744;
+  --paper:#F6F3EC;
+  --paper-2:#EDE8DB;
+  --line:#DCD5C4;
+  --copper:#B5651D;
+  --copper-bright:#D89A5A;
+  --muted:#5B564B;
+  --muted-2:#5F5A4E;
+  --muted-dark:#ABA79A;
+  --white:#F8F6F0;
+  --max:1360px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;}
 body{
-  background:var(--cream);
-  color:var(--black);
-  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Public Sans',system-ui,-apple-system,sans-serif;
   font-weight:400;
   line-height:1.5;
   -webkit-font-smoothing:antialiased;
@@ -34,260 +38,293 @@ body{
 img,svg{display:block;max-width:100%;}
 a{color:inherit;text-decoration:none;}
 ul{list-style:none;}
-button{font-family:inherit;cursor:pointer;}
+button{font-family:inherit;cursor:pointer;background:none;border:0;color:inherit;}
 
-:focus-visible{outline:2px solid var(--tan);outline-offset:3px;}
+:focus-visible{outline:2px solid var(--copper);outline-offset:3px;}
 
-.wrap{max-width:1280px;margin:0 auto;padding-left:clamp(20px,4vw,56px);padding-right:clamp(20px,4vw,56px);}
+.wrap{max-width:var(--max);margin:0 auto;padding-left:clamp(20px,4vw,64px);padding-right:clamp(20px,4vw,64px);}
+.wrap-rail{padding-left:clamp(20px,4vw,104px);}
 
-.serif{font-family:'Cormorant Garamond',serif;font-weight:500;}
-.mut{color:#827e75;}
-.on-dark .mut{color:#8f8d88;}
-.taupe-band .mut{color:#5b564e;}
+.serif{font-family:'Fraunces',serif;font-optical-sizing:auto;}
+.mono{font-family:'IBM Plex Mono',monospace;}
 
-.eyebrow{display:flex;align-items:center;gap:10px;font-size:11.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--tan);margin-bottom:20px;}
-.eyebrow::before{content:"";width:7px;height:7px;background:var(--tan);flex:none;}
+.mut{color:var(--muted-2);}
+.on-ink .mut{color:var(--muted-dark);}
 
-h2{font-size:clamp(34px,4.9vw,68px);font-weight:600;letter-spacing:-.01em;line-height:1.06;}
-h3{font-size:clamp(20px,2vw,26px);font-weight:600;}
+.eyebrow{display:flex;align-items:center;gap:12px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:22px;}
+.eyebrow::before{content:"";width:18px;height:1px;background:var(--copper);flex:none;}
+.on-ink .eyebrow{color:var(--muted-dark);}
 
-.section{padding:clamp(96px,11.5vw,200px) 0;}
-.section-head{max-width:760px;margin-bottom:clamp(48px,6vw,88px);}
-.section-head p.dek{margin-top:24px;font-size:18px;color:var(--grey);max-width:640px;}
+h2{font-family:'Fraunces',serif;font-weight:460;font-size:clamp(32px,4.4vw,60px);letter-spacing:-.01em;line-height:1.08;}
+h3{font-size:clamp(19px,1.9vw,24px);font-weight:600;}
 
-/* reveal animation */
-.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.2,.6,.2,1),transform .7s cubic-bezier(.2,.6,.2,1);}
+.section{padding:clamp(88px,10vw,168px) 0;position:relative;}
+.section-head{max-width:740px;margin-bottom:clamp(48px,6vw,84px);}
+.section-head p.dek{margin-top:22px;font-size:17px;color:var(--muted);max-width:620px;line-height:1.65;}
+.on-ink .section-head p.dek{color:var(--muted-dark);}
+
+.on-ink{background:var(--ink);color:var(--white);}
+.on-paper2{background:var(--paper-2);}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s cubic-bezier(.2,.6,.2,1),transform .6s cubic-bezier(.2,.6,.2,1);}
 .reveal.in{opacity:1;transform:translateY(0);}
+
+/* ===== SECTION INDEX RAIL ===== */
+.index-rail{position:fixed;left:20px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:14px;}
+.index-rail a{display:flex;align-items:center;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted-2);letter-spacing:.04em;}
+.index-rail .tick{width:10px;height:1px;background:var(--line);transition:background .25s,width .25s;}
+.index-rail a.active .tick{background:var(--copper);width:20px;}
+.index-rail a.active{color:var(--ink);}
+.index-rail .rail-label{opacity:0;transform:translateX(-6px);transition:opacity .2s,transform .2s;white-space:nowrap;}
+.index-rail a:hover .rail-label,.index-rail a.active .rail-label{opacity:1;transform:translateX(0);}
 
 /* ===== NAV ===== */
 header.nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
-  background:rgba(251,250,244,.92);
+  background:rgba(246,243,236,.88);
   border-bottom:1px solid transparent;
-  transition:border-color .3s, backdrop-filter .3s;
+  transition:border-color .3s, backdrop-filter .3s, background .3s;
 }
 header.nav.scrolled{border-bottom-color:var(--line);backdrop-filter:blur(10px);}
-.nav-inner{display:flex;align-items:center;justify-content:space-between;height:78px;}
-.brand{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:24px;letter-spacing:.01em;}
-.nav-links{display:flex;gap:36px;}
-.nav-links a{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--black);position:relative;padding:4px 0;}
-.nav-links a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--tan);transition:width .25s;}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:76px;}
+.brand{font-family:'Fraunces',serif;font-weight:460;font-size:22px;letter-spacing:.005em;}
+.brand .dot{color:var(--copper);}
+.nav-links{display:flex;gap:30px;}
+.nav-links a{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);position:relative;padding:4px 0;}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--copper);transition:width .25s;}
 .nav-links a:hover::after{width:100%;}
-.nav-right{display:flex;align-items:center;gap:22px;}
-.lang-switch{display:flex;border:1px solid var(--line-2);}
-.lang-switch button{padding:6px 11px;font-size:11px;font-weight:600;letter-spacing:.06em;background:transparent;border:0;color:var(--grey);}
-.lang-switch button.active{background:var(--black);color:var(--cream);}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;font-size:13px;font-weight:600;letter-spacing:.03em;border:1px solid var(--black);white-space:nowrap;transition:background .2s,color .2s,transform .15s;}
-.btn-solid{background:var(--black);color:var(--cream);}
-.btn-solid:hover{background:#000;transform:translateY(-1px);}
-.btn-outline{background:transparent;color:var(--black);}
-.btn-outline:hover{background:var(--black);color:var(--cream);}
-.btn-sm{padding:11px 18px;font-size:12px;}
-.nav-mobile-toggle{display:none;background:none;border:0;}
+.nav-right{display:flex;align-items:center;gap:20px;}
+.lang-switch{display:flex;border:1px solid var(--ink);}
+.lang-switch button{padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500;letter-spacing:.04em;color:var(--muted);}
+.lang-switch button.active{background:var(--ink);color:var(--white);}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;font-size:13px;font-weight:600;letter-spacing:.01em;white-space:nowrap;transition:background .2s,color .2s,border-color .2s,transform .15s;}
+.btn-solid{background:var(--ink);color:var(--white);border:1px solid var(--ink);}
+.btn-solid:hover{background:var(--copper);border-color:var(--copper);transform:translateY(-1px);}
+.on-ink .btn-solid{background:var(--white);color:var(--ink);border-color:var(--white);}
+.on-ink .btn-solid:hover{background:var(--copper-bright);border-color:var(--copper-bright);}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--ink);}
+.btn-outline:hover{border-color:var(--copper);color:var(--copper);}
+.on-ink .btn-outline{color:var(--white);border-color:var(--ink-line);}
+.on-ink .btn-outline:hover{border-color:var(--copper-bright);color:var(--copper-bright);}
+.btn-row{display:flex;gap:14px;flex-wrap:wrap;}
 
 /* ===== HERO ===== */
-.hero{padding:calc(78px + clamp(56px,9vw,120px)) 0 clamp(80px,8vw,120px);}
-.hero-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(40px,6vw,90px);align-items:start;}
-.hero h1{font-size:clamp(42px,5.1vw,78px);line-height:1.03;letter-spacing:-.01em;max-width:16ch;}
-.hero .sub{margin-top:28px;font-size:19px;line-height:1.6;color:var(--grey);max-width:52ch;}
-.hero-actions{display:flex;margin-top:40px;width:max-content;}
-.hero-actions .btn-solid{border-right:0;}
-.hero-actions .btn-outline{background:var(--cream);}
-.hero-actions .btn-outline:hover{background:var(--black);}
-.hero-note{margin-top:24px;font-size:13px;color:var(--grey-2);font-style:italic;}
+.hero{padding-top:calc(76px + clamp(64px,9vw,120px));padding-bottom:clamp(72px,8vw,120px);overflow:hidden;}
+.hero-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(40px,6vw,90px);align-items:center;}
+.hero h1{font-family:'Fraunces',serif;font-weight:460;font-size:clamp(40px,5vw,74px);line-height:1.06;letter-spacing:-.01em;max-width:16ch;}
+.hero .sub{margin-top:26px;font-size:18px;line-height:1.65;color:var(--muted-dark);max-width:50ch;}
+.hero-actions{margin-top:38px;}
+.hero-note{margin-top:24px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted-dark);letter-spacing:.02em;}
+.on-ink .hero-note{color:var(--muted-dark);}
 
-.sequence{border:1px solid var(--line-2);background:var(--panel);padding:clamp(28px,3vw,40px);position:sticky;top:110px;}
-.sequence-title{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin-bottom:24px;}
-.seq-track{position:relative;padding-left:26px;}
-.seq-track::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:1px;background:var(--line-2);}
-.seq-fill{position:absolute;left:5px;top:6px;width:1px;height:0%;background:var(--tan);transition:height .3s linear;}
-.seq-step{position:relative;padding:16px 0;opacity:.45;transition:opacity .3s;}
-.seq-step.active{opacity:1;}
-.seq-step::before{content:"";position:absolute;left:-26px;top:20px;width:11px;height:11px;background:var(--cream);border:1px solid var(--grey-2);transform:translateX(0);}
-.seq-step.active::before{background:var(--tan);border-color:var(--tan);}
-.seq-step .k{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--tan);}
-.seq-step .v{font-size:14px;color:var(--grey);margin-top:4px;}
+/* sequence diagram */
+.sequence{position:relative;}
+.seq-title{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-dark);margin-bottom:28px;}
+.seq-path{display:flex;flex-direction:column;}
+.seq-node{display:flex;align-items:flex-start;gap:18px;position:relative;padding-bottom:34px;}
+.seq-node:last-child{padding-bottom:0;}
+.seq-line{position:absolute;left:13px;top:28px;bottom:6px;width:1px;background:var(--ink-line);}
+.seq-node:last-child .seq-line{display:none;}
+.seq-dot{width:27px;height:27px;border:1px solid var(--ink-line);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-dark);flex:none;z-index:1;background:var(--ink);transition:border-color .35s,color .35s,background .35s;}
+.seq-node.active .seq-dot{border-color:var(--copper-bright);color:var(--ink);background:var(--copper-bright);}
+.seq-body{padding-top:2px;}
+.seq-k{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;color:var(--muted-dark);transition:color .35s;}
+.seq-node.active .seq-k{color:var(--copper-bright);}
+.seq-v{font-size:14.5px;color:var(--muted-dark);margin-top:4px;opacity:.6;transition:opacity .35s;}
+.seq-node.active .seq-v{opacity:1;color:var(--white);}
 
-/* ===== GRID / FILET TECHNIQUE ===== */
-.grid{display:grid;gap:1px;background:var(--line-2);border:1px solid var(--line-2);}
-.grid>*{background:var(--cream);padding:clamp(32px,3.4vw,50px);min-height:260px;}
-.grid-3{grid-template-columns:repeat(3,1fr);}
-.grid-2{grid-template-columns:repeat(2,1fr);}
-.grid-5{grid-template-columns:repeat(5,1fr);}
-.grid-6{grid-template-columns:repeat(6,1fr);}
+/* ===== NUMBER ROWS (context) ===== */
+.numrow-list{border-top:1px solid var(--line);}
+.numrow{display:grid;grid-template-columns:150px 1fr;gap:clamp(24px,4vw,56px);padding:clamp(34px,4vw,54px) 0;border-bottom:1px solid var(--line);align-items:start;}
+.numrow .num{font-family:'Public Sans',sans-serif;font-weight:700;font-size:clamp(44px,5vw,68px);letter-spacing:-.02em;line-height:1;}
+.numrow .num .accent{color:var(--copper);}
+.numrow-body h3{font-size:17px;font-weight:600;}
+.numrow-body p{margin-top:10px;font-size:15px;color:var(--muted);line-height:1.65;max-width:60ch;}
+.numrow-body .src{margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted-2);}
 
-.stat-num{font-size:clamp(44px,4.6vw,64px);font-weight:600;letter-spacing:-.02em;color:var(--black);}
-.stat-cell h3{margin-top:18px;font-size:16px;font-weight:600;}
-.stat-cell p{margin-top:10px;font-size:14.5px;color:var(--grey);line-height:1.6;}
-.stat-cell .src{margin-top:18px;font-size:12px;color:var(--grey-2);border-top:1px solid var(--line);padding-top:12px;}
+/* ===== CASES ===== */
+.cases-grid{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:1px;background:var(--line);border:1px solid var(--line);}
+.on-paper2 .cases-grid{background:#DAD4C4;border-color:#DAD4C4;}
+.case-cell{background:var(--paper);padding:clamp(30px,3vw,44px);display:flex;flex-direction:column;}
+.case-cell.spot{background:var(--ink);color:var(--white);}
+.case-idx{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);letter-spacing:.06em;}
+.case-cell.spot .case-idx{color:var(--copper-bright);}
+.case-co{margin-top:10px;font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--muted);}
+.case-cell.spot .case-co{color:var(--muted-dark);}
+.case-num{margin-top:18px;font-weight:700;font-size:clamp(36px,3.4vw,50px);letter-spacing:-.02em;}
+.case-hook{margin-top:12px;font-size:14.5px;color:var(--muted);line-height:1.55;}
+.case-cell.spot .case-hook{color:var(--muted-dark);}
+.case-details{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:2;flex:1;}
+.case-cell.spot .case-details{border-top-color:var(--ink-line);color:#c9c5b8;}
+.case-details li::before{content:"·  ";color:var(--copper);font-weight:700;}
+.case-cell.spot .case-details li::before{color:var(--copper-bright);}
+.case-src{margin-top:20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);}
+.case-cell.spot .case-src{color:var(--muted-dark);}
+.case-src a{border-bottom:1px solid currentColor;}
+.case-foot{margin-top:clamp(28px,3vw,44px);font-size:14.5px;color:var(--muted);max-width:72ch;padding:24px 0 0;}
 
-/* ===== CASE CARDS ===== */
-.case-cell{display:flex;flex-direction:column;}
-.case-cell.dark{background:var(--black);color:var(--cream);}
-.case-co{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tan);}
-.case-num{font-family:'Inter',system-ui,sans-serif;font-size:clamp(38px,3.6vw,52px);font-weight:600;letter-spacing:-.02em;margin-top:16px;}
-.case-cell.dark .case-num{color:var(--cream);}
-.case-hook{margin-top:12px;font-size:15px;color:var(--grey);line-height:1.55;}
-.case-cell.dark .case-hook{color:#cfccc4;}
-.case-details{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);font-size:13.5px;color:var(--grey);line-height:2;flex:1;}
-.case-cell.dark .case-details{border-top-color:#333;color:#b8b5ad;}
-.case-details li::before{content:"— ";color:var(--tan);}
-.case-src{margin-top:20px;font-size:12px;}
-.case-src a{color:var(--tan);border-bottom:1px solid var(--tan);}
-.case-foot{margin-top:clamp(28px,3vw,44px);font-size:14.5px;color:var(--grey);max-width:70ch;padding:24px 0;border-top:1px solid var(--line);}
+/* ===== METHOD DIAGRAM ===== */
+.method-diagram{display:flex;align-items:stretch;margin-bottom:clamp(60px,7vw,100px);border:1px solid var(--ink-line);}
+.md-node{flex:1;padding:clamp(26px,2.6vw,40px);position:relative;}
+.md-node + .md-node{border-left:1px solid var(--ink-line);}
+.md-no{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--copper-bright);}
+.md-node h4{margin-top:12px;font-family:'Fraunces',serif;font-weight:460;font-size:22px;}
+.md-q{margin-top:8px;font-size:13.5px;color:var(--muted-dark);}
+.md-dur{margin-top:20px;display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--white);background:var(--ink-line);padding:5px 10px;}
+.md-stop{position:absolute;bottom:0;right:-1px;transform:translateX(50%);background:var(--ink);border:1px solid var(--ink-line);padding:4px 8px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-dark);z-index:2;white-space:nowrap;display:none;}
+@media (min-width:781px){ .md-node:not(:last-child) .md-stop{display:block;} }
 
-/* ===== METHOD ===== */
-.method-schema{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;border:1px solid var(--line-2);margin-bottom:clamp(64px,7vw,110px);}
-.schema-block{padding:clamp(24px,2.6vw,40px);background:var(--cream);}
-.schema-block .no{font-size:12px;color:var(--tan);font-weight:700;letter-spacing:.08em;}
-.schema-block h4{margin-top:10px;font-size:20px;font-weight:600;}
-.schema-block .q{margin-top:8px;font-size:13.5px;color:var(--grey);}
-.schema-block .dur{margin-top:16px;display:inline-block;font-size:12px;color:var(--tan);font-weight:600;letter-spacing:.03em;}
-.schema-div{writing-mode:vertical-rl;text-orientation:mixed;display:flex;align-items:center;justify-content:center;background:var(--panel);font-size:10.5px;font-weight:700;letter-spacing:.14em;color:var(--grey);padding:14px 0;text-transform:uppercase;}
-
-.phase-rail-wrap{display:grid;grid-template-columns:220px 1fr;gap:clamp(40px,5vw,72px);}
-.rail{position:sticky;top:120px;align-self:start;height:max-content;}
-.rail-item{padding:14px 0 14px 22px;border-left:1px solid var(--line-2);font-size:13px;color:var(--grey);opacity:.4;transition:opacity .3s,border-color .3s,color .3s;cursor:pointer;}
-.rail-item .rn{font-size:11px;color:var(--tan);font-weight:700;display:block;margin-bottom:3px;}
-.rail-item.active{opacity:1;border-left-color:var(--tan);color:var(--black);font-weight:600;}
-.phase{padding-bottom:clamp(72px,8vw,120px);border-bottom:1px solid var(--line);}
+.phase-wrap{display:grid;grid-template-columns:180px 1fr;gap:clamp(36px,5vw,70px);}
+.p-rail{position:sticky;top:118px;align-self:start;height:max-content;}
+.p-item{padding:13px 0 13px 20px;border-left:1px solid var(--ink-line);font-size:12.5px;color:var(--muted-dark);opacity:.5;transition:opacity .3s,border-color .3s,color .3s;cursor:pointer;font-family:'IBM Plex Mono',monospace;}
+.p-item b{display:block;font-size:11px;color:var(--copper);margin-bottom:3px;font-weight:500;}
+.p-item.active{opacity:1;border-left-color:var(--copper);color:var(--white);}
+.phase{padding-bottom:clamp(64px,7vw,108px);border-bottom:1px solid var(--ink-line);}
 .phase:last-child{border-bottom:0;padding-bottom:0;}
-.phase h3{font-size:clamp(24px,2.6vw,32px);}
-.phase p.lead{margin-top:18px;font-size:16.5px;color:var(--grey);max-width:62ch;line-height:1.7;}
-.tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px;}
-.tags span{font-size:12px;padding:7px 13px;border:1px solid var(--line-2);color:var(--grey);}
-.tree{margin-top:28px;display:grid;gap:1px;background:var(--line-2);border:1px solid var(--line-2);}
-.tree>div{background:var(--cream);padding:18px 22px;font-size:14px;}
-.tree>div.tree-dark{background:var(--black);color:var(--cream);}
-.tree b{display:block;font-size:12px;color:var(--tan);letter-spacing:.06em;margin-bottom:4px;}
-.flow{margin-top:26px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:13px;color:var(--grey);}
-.flow span{padding:8px 14px;border:1px solid var(--line-2);}
-.flow .arrow{border:0;padding:0;color:var(--tan);}
-.deliverable{margin-top:30px;border-left:2px solid var(--tan);padding:18px 24px;background:var(--panel);}
-.deliverable .lbl{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--tan);}
-.deliverable p{margin-top:8px;font-size:14.5px;color:var(--black);}
-.note-inline{margin-top:16px;font-size:13px;color:var(--grey-2);font-style:italic;}
+.phase h3{font-family:'Fraunces',serif;font-weight:460;font-size:clamp(23px,2.4vw,30px);}
+.phase p.lead{margin-top:16px;font-size:15.5px;color:var(--muted-dark);max-width:62ch;line-height:1.7;}
+.tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px;}
+.tags span{font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:6px 12px;border:1px solid var(--ink-line);color:var(--muted-dark);}
+.tree{margin-top:26px;border-top:1px solid var(--ink-line);}
+.tree>div{padding:16px 0;border-bottom:1px solid var(--ink-line);font-size:14px;display:flex;gap:16px;align-items:baseline;}
+.tree>div.tree-dark{background:#0D0E12;color:var(--white);padding:16px 18px;border-bottom:0;margin-top:2px;border:1px solid var(--ink-line);}
+.tree b{flex:0 0 130px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--copper-bright);font-weight:500;}
+.tree-dark b{color:var(--copper-bright);}
+.flow{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--muted-dark);}
+.flow span{padding:7px 13px;border:1px solid var(--ink-line);}
+.flow .arrow{border:0;padding:0;color:var(--copper);}
+.deliverable{margin-top:28px;border:1px solid var(--line);border-left:3px solid var(--copper);padding:18px 22px;background:var(--paper-2);}
+.deliverable .lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper);}
+.deliverable p{margin-top:8px;font-size:14.5px;color:var(--ink);}
+.note-inline{margin-top:16px;font-size:13px;color:var(--muted-dark);font-style:italic;}
 
 /* ===== AUDIT ===== */
-.audit-cols{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-2);border:1px solid var(--line-2);}
-.audit-col{background:var(--cream);padding:clamp(32px,3.6vw,52px);}
-.audit-col.dark{background:var(--black);color:var(--cream);}
-.audit-col h3{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tan);}
-.audit-col ul{margin-top:26px;display:flex;flex-direction:column;gap:0;}
-.audit-col li{padding:16px 0;border-top:1px solid var(--line);font-size:15px;line-height:1.55;}
-.audit-col.dark li{border-top-color:#2c2c2c;color:#e2e0da;}
+.audit-cols{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);}
+.audit-col{background:var(--paper);padding:clamp(30px,3.4vw,50px);}
+.audit-col.dark{background:var(--ink);color:var(--white);}
+.audit-col h3{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--copper);}
+.audit-col.dark h3{color:var(--copper-bright);}
+.audit-col ol{margin-top:24px;counter-reset:aitem;}
+.audit-col li{counter-increment:aitem;padding:15px 0;border-top:1px solid var(--line);font-size:14.5px;line-height:1.55;display:flex;gap:16px;}
+.audit-col.dark li{border-top-color:var(--ink-line);color:#e2ddd0;}
 .audit-col li:first-child{border-top:0;}
-.audit-funcs{margin-top:1px;}
-.func-title{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);padding:22px clamp(32px,3.6vw,52px) 10px;background:var(--cream);border:1px solid var(--line-2);border-bottom:0;}
-.audit-note{margin-top:24px;font-size:14px;color:var(--grey);max-width:70ch;}
+.audit-col li::before{content:counter(aitem,decimal-leading-zero);font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--copper);flex:none;padding-top:2px;}
+.audit-col.dark li::before{color:var(--copper-bright);}
+.func-title{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:22px clamp(30px,3.4vw,50px) 10px;background:var(--paper);border:1px solid var(--line);border-bottom:0;}
+.func-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-top:0;}
+.func-grid div{background:var(--paper);padding:20px 14px;text-align:center;font-size:13.5px;font-weight:600;}
+.audit-note{margin-top:24px;font-size:14px;color:var(--muted);max-width:70ch;}
 
-/* ===== ECONOMICS BAND ===== */
-.taupe-band{background:var(--taupe);color:var(--black);}
-.equation{display:flex;flex-wrap:wrap;align-items:stretch;gap:1px;background:#9c9186;border:1px solid #9c9186;margin-top:clamp(40px,5vw,64px);}
-.eq-block{flex:1;min-width:200px;background:var(--panel);padding:clamp(26px,3vw,40px);display:flex;flex-direction:column;justify-content:center;}
-.eq-block.solid{background:var(--black);color:var(--cream);}
-.eq-block .lbl{font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);}
-.eq-block.solid .lbl{color:#9a9891;}
-.eq-block .val{font-size:clamp(26px,2.6vw,36px);font-weight:600;margin-top:10px;}
-.eq-op{display:flex;align-items:center;justify-content:center;padding:0 18px;font-size:26px;color:var(--black);font-weight:300;}
-.econ-text{max-width:70ch;margin-top:clamp(40px,4vw,56px);font-size:16.5px;line-height:1.75;color:#3a3733;}
-.econ-text b{color:var(--black);}
-.example-box{margin-top:32px;background:var(--cream);border:1px solid #9c9186;padding:clamp(24px,2.6vw,36px);max-width:600px;}
-.example-box .lbl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tan);margin-bottom:12px;}
-.example-box .eq-line{font-size:16px;font-weight:600;}
-.example-box p{margin-top:14px;font-size:13.5px;color:var(--grey);line-height:1.6;}
+/* ===== ECONOMICS ===== */
+.equation-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:20px;margin-top:clamp(44px,5vw,68px);font-family:'Fraunces',serif;}
+.eq-item{display:flex;flex-direction:column;gap:8px;}
+.eq-item .lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-dark);}
+.eq-item .val{font-size:clamp(26px,2.8vw,38px);font-weight:460;color:var(--white);}
+.eq-item.result .val{color:var(--copper-bright);}
+.eq-sym{font-size:clamp(22px,2.4vw,32px);color:var(--muted-dark);}
+.econ-text{max-width:70ch;margin-top:clamp(44px,5vw,68px);font-size:16px;line-height:1.75;color:var(--muted-dark);}
+.econ-text b{color:var(--white);font-weight:600;}
+.example-box{margin-top:30px;border:1px solid var(--ink-line);padding:clamp(24px,2.6vw,34px);max-width:620px;}
+.example-box .lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper-bright);margin-bottom:12px;}
+.example-box .eq-line{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500;color:var(--white);}
+.example-box p{margin-top:14px;font-size:13.5px;color:var(--muted-dark);line-height:1.6;}
 
-/* ===== DECISION ===== */
-.decision-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-2);border:1px solid var(--line-2);}
-.decision-cell{background:var(--cream);padding:clamp(28px,3vw,40px);}
-.decision-cell h3{font-size:18px;font-weight:600;}
-.decision-cell p{margin-top:14px;font-size:14px;color:var(--grey);line-height:1.6;}
-.decision-cell .no{font-size:12px;color:var(--tan);font-weight:700;}
-.nothing-card{margin-top:1px;background:var(--black);color:var(--cream);padding:clamp(40px,4.4vw,64px);border:1px solid var(--line-2);border-top:0;}
-.nothing-card h3{font-size:clamp(22px,2.2vw,28px);}
-.nothing-card p{margin-top:16px;font-size:16px;color:#cfccc4;max-width:70ch;line-height:1.65;}
+/* ===== DECISION TREE ===== */
+.decision-tree{display:flex;flex-direction:column;border-top:1px solid var(--line);}
+.dt-row{display:grid;grid-template-columns:64px 1fr;border-bottom:1px solid var(--line);}
+.dt-row.last{border-bottom:2px solid var(--ink);}
+.dt-idx{display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--copper);border-right:1px solid var(--line);}
+.dt-row.last .dt-idx{color:var(--white);background:var(--ink);border-right-color:var(--ink);}
+.dt-body{padding:24px clamp(20px,2.4vw,32px);display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:center;}
+.dt-row.last .dt-body{background:var(--ink);color:var(--white);}
+.dt-body h3{font-size:17px;font-weight:600;}
+.dt-body p{font-size:14.5px;color:var(--muted);line-height:1.6;}
+.dt-row.last .dt-body p{color:var(--muted-dark);}
 
 .donts{margin-top:clamp(56px,6vw,88px);}
-.donts h3{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);margin-bottom:8px;}
-.donts ul{margin-top:20px;}
-.donts li{padding:18px 0;border-top:1px solid var(--line);font-size:16.5px;}
-.donts li:last-child{border-bottom:1px solid var(--line);}
-.donts li::before{content:"— ";color:var(--tan);}
+.donts h3{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.donts ul{margin-top:20px;border-top:1px solid var(--line);}
+.donts li{padding:18px 0;border-bottom:1px solid var(--line);font-size:16px;display:flex;gap:14px;}
+.donts li::before{content:"—";color:var(--copper);flex:none;}
 
 /* ===== FOUNDER ===== */
-.founder-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(40px,6vw,90px);align-items:start;}
-.founder-nums{display:flex;flex-direction:column;gap:36px;}
-.fnum .n{font-size:clamp(40px,4vw,56px);font-weight:600;}
-.fnum .l{font-size:13px;color:#4a4742;margin-top:6px;}
-.lessons{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#9c9186;border:1px solid #9c9186;}
-.lesson{background:var(--panel);padding:26px;}
-.lesson h4{font-size:15px;font-weight:600;}
-.lesson p{margin-top:10px;font-size:13.5px;color:#4a4742;line-height:1.6;}
-.founder-quote{margin-top:36px;font-size:17px;line-height:1.7;max-width:64ch;}
-.legal-note{margin-top:28px;font-size:12.5px;color:#4a4742;border-top:1px solid #9c9186;padding-top:18px;line-height:1.6;max-width:70ch;}
+.founder-grid{display:grid;grid-template-columns:0.85fr 1.15fr;gap:clamp(40px,6vw,90px);align-items:start;}
+.founder-nums{display:flex;flex-direction:column;gap:8px;}
+.fnum{padding:22px 0;border-bottom:1px solid var(--ink-line);}
+.fnum:first-child{border-top:1px solid var(--ink-line);}
+.fnum .n{font-family:'Public Sans',sans-serif;font-weight:700;font-size:clamp(38px,3.6vw,52px);color:var(--copper-bright);}
+.fnum .l{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted-dark);margin-top:6px;}
+.lessons{display:flex;flex-direction:column;gap:1px;background:var(--ink-line);}
+.lesson{background:var(--ink);padding:24px 0;display:grid;grid-template-columns:120px 1fr;gap:16px;}
+.lesson .lno{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper-bright);}
+.lesson h4{font-size:15px;font-weight:600;color:var(--white);}
+.lesson p{margin-top:8px;font-size:13.5px;color:var(--muted-dark);line-height:1.6;}
+.founder-quote{margin-top:40px;font-family:'Fraunces',serif;font-weight:460;font-size:clamp(19px,1.8vw,24px);line-height:1.55;max-width:60ch;color:var(--white);position:relative;padding-left:28px;border-left:2px solid var(--copper);}
+.legal-note{margin-top:28px;padding-left:28px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted-dark);line-height:1.7;max-width:68ch;}
 
 /* ===== ENGAGEMENT ===== */
-.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-2);border:1px solid var(--line-2);}
-.tier{background:var(--cream);padding:clamp(30px,3.2vw,44px);display:flex;flex-direction:column;}
-.tier.dark{background:var(--black);color:var(--cream);}
-.tier .lvl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tan);}
-.tier h3{margin-top:14px;font-size:22px;}
-.tier .goal{margin-top:8px;font-size:14px;color:var(--grey);}
-.tier.dark .goal{color:#b8b5ad;}
-.tier ul{margin-top:22px;flex:1;}
-.tier li{padding:10px 0;border-top:1px solid var(--line);font-size:13.5px;color:var(--grey);}
-.tier.dark li{border-top-color:#2c2c2c;color:#d4d1ca;}
-.tier li:first-child{border-top:0;}
-.tier li::before{content:"— ";color:var(--tan);}
-.conditions{margin-top:1px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-2);border:1px solid var(--line-2);border-top:0;}
-.condition{background:var(--panel);padding:22px 26px;font-size:13.5px;color:var(--black);text-align:center;font-weight:500;}
+.tiers{display:flex;flex-direction:column;}
+.tier{display:grid;grid-template-columns:110px 200px 1fr;gap:24px;padding:clamp(28px,3vw,40px) 0;border-top:1px solid var(--line);align-items:start;}
+.tiers .tier:last-child{border-bottom:1px solid var(--line);}
+.tier.dark{background:var(--ink);color:var(--white);padding-left:24px;padding-right:24px;margin:0 -24px;border-top-color:var(--ink);}
+.tier .lvl{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--copper);padding-top:4px;}
+.tier.dark .lvl{color:var(--copper-bright);}
+.tier h3{font-family:'Fraunces',serif;font-weight:460;font-size:22px;}
+.tier .goal{margin-top:8px;font-size:14px;color:var(--muted);}
+.tier.dark .goal{color:var(--muted-dark);}
+.tier ul{display:flex;flex-direction:column;gap:9px;}
+.tier li{font-size:13.5px;color:var(--muted);padding-left:16px;position:relative;}
+.tier.dark li{color:var(--muted-dark);}
+.tier li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:1px;background:var(--copper);}
+.conditions{margin-top:clamp(40px,4vw,56px);display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+.condition{background:var(--paper-2);padding:20px 24px;font-size:13.5px;color:var(--ink);font-weight:600;text-align:center;}
 
 /* ===== CTA ===== */
-.cta-section{background:var(--grey-band);text-align:center;}
+.cta-section{text-align:center;}
 .cta-section .eyebrow{justify-content:center;}
-.cta-section h2{max-width:16ch;margin:0 auto;}
-.cta-section .sub{max-width:56ch;margin:24px auto 0;font-size:17px;color:var(--grey);line-height:1.7;}
-.cta-actions{display:flex;justify-content:center;margin-top:40px;width:max-content;margin-left:auto;margin-right:auto;}
-.cta-actions .btn-solid{border-right:0;}
-.cta-actions .btn-outline{background:var(--grey-band);}
-.cta-actions .btn-outline:hover{background:var(--black);}
+.cta-section h2{max-width:15ch;margin:0 auto;}
+.cta-section .sub{max-width:56ch;margin:22px auto 0;font-size:16.5px;color:var(--muted-dark);line-height:1.7;}
+.cta-actions{display:flex;gap:14px;justify-content:center;margin-top:36px;flex-wrap:wrap;}
 
 /* ===== FOOTER ===== */
-footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0 32px;}
-.footer-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:40px;padding-bottom:40px;border-bottom:1px solid #2c2c2c;}
-.footer-brand .serif{font-size:26px;}
-.footer-brand p{margin-top:10px;font-size:13.5px;color:#9a9891;}
-.footer-brand .sig{margin-top:16px;font-style:italic;font-size:13px;color:#c9c5bd;}
-.footer-links{display:flex;flex-direction:column;gap:12px;}
-.footer-links a{font-size:13.5px;color:#c9c5bd;}
-.footer-links a:hover{color:var(--tan);}
-.footer-langs{font-size:12.5px;color:#7a7873;}
-.footer-bottom{margin-top:28px;font-size:12px;color:#7a7873;line-height:1.6;max-width:80ch;}
+footer{background:var(--ink);color:var(--white);padding:clamp(52px,6vw,76px) 0 30px;border-top:1px solid var(--ink-line);}
+.footer-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:40px;padding-bottom:36px;border-bottom:1px solid var(--ink-line);}
+.footer-brand .serif{font-size:24px;}
+.footer-brand p{margin-top:10px;font-size:13.5px;color:var(--muted-dark);}
+.footer-brand .sig{margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--copper-bright);}
+.footer-links{display:flex;flex-direction:column;gap:11px;}
+.footer-links a{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--muted-dark);}
+.footer-links a:hover{color:var(--copper-bright);}
+.footer-langs{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted-dark);margin-top:16px;}
+.footer-bottom{margin-top:26px;font-size:12px;color:var(--muted-dark);line-height:1.6;max-width:82ch;}
 
 /* ===== RESPONSIVE ===== */
-@media (max-width:1000px){
+@media (max-width:1080px){
+  .index-rail{display:none;}
+  .wrap-rail{padding-left:clamp(20px,4vw,64px);}
   .nav-links{display:none;}
   .hero-grid{grid-template-columns:1fr;}
-  .sequence{position:static;margin-top:44px;}
-  .grid-3,.grid-2,.grid-5,.grid-6{grid-template-columns:1fr;}
-  .method-schema{grid-template-columns:1fr;}
-  .schema-div{writing-mode:horizontal-tb;padding:8px 0;}
-  .phase-rail-wrap{grid-template-columns:1fr;}
-  .rail{position:static;display:flex;overflow-x:auto;gap:0;margin-bottom:36px;}
-  .rail-item{border-left:0;border-bottom:2px solid var(--line-2);padding:10px 18px;white-space:nowrap;}
-  .rail-item.active{border-bottom-color:var(--tan);border-left:0;}
+  .cases-grid{grid-template-columns:1fr;}
+  .method-diagram{flex-direction:column;}
+  .md-node + .md-node{border-left:0;border-top:1px solid var(--ink-line);}
+  .md-stop{display:none;}
+  .phase-wrap{grid-template-columns:1fr;}
+  .p-rail{position:static;display:flex;overflow-x:auto;gap:0;margin-bottom:36px;}
+  .p-item{border-left:0;border-bottom:2px solid var(--line);padding:10px 16px;white-space:nowrap;}
+  .p-item.active{border-bottom-color:var(--copper);border-left:0;}
   .audit-cols{grid-template-columns:1fr;}
-  .decision-grid{grid-template-columns:1fr 1fr;}
+  .func-grid{grid-template-columns:repeat(3,1fr);}
   .founder-grid{grid-template-columns:1fr;}
-  .lessons{grid-template-columns:1fr;}
-  .tiers{grid-template-columns:1fr;}
+  .tier{grid-template-columns:1fr;gap:10px;}
+  .tier.dark{margin:0 -20px;padding-left:20px;padding-right:20px;}
   .conditions{grid-template-columns:1fr;}
+  .numrow{grid-template-columns:1fr;gap:14px;}
   .footer-top{flex-direction:column;}
 }
-@media (max-width:560px){
-  .decision-grid{grid-template-columns:1fr;}
-  .hero-actions,.cta-actions{width:100%;flex-direction:column;}
-  .hero-actions .btn-solid,.cta-actions .btn-solid{border-right:1px solid var(--black);border-bottom:0;}
+@media (max-width:640px){
+  .func-grid{grid-template-columns:repeat(2,1fr);}
+  .dt-body{grid-template-columns:1fr;gap:8px;}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -298,9 +335,22 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
 </head>
 <body>
 
+<div class="index-rail" id="indexRail" aria-hidden="true">
+  <a href="#top" data-target="top"><span class="tick"></span><span class="rail-label mono">00 · Cadence</span></a>
+  <a href="#contexte" data-target="contexte"><span class="tick"></span><span class="rail-label mono">01 · Contexte</span></a>
+  <a href="#cas" data-target="cas"><span class="tick"></span><span class="rail-label mono">02 · Cas publics</span></a>
+  <a href="#methode" data-target="methode"><span class="tick"></span><span class="rail-label mono">03 · Méthode</span></a>
+  <a href="#audit" data-target="audit"><span class="tick"></span><span class="rail-label mono">04 · Audit</span></a>
+  <a href="#discipline" data-target="discipline"><span class="tick"></span><span class="rail-label mono">05 · Économie</span></a>
+  <a href="#decision" data-target="decision"><span class="tick"></span><span class="rail-label mono">06 · Décision</span></a>
+  <a href="#fondateur" data-target="fondateur"><span class="tick"></span><span class="rail-label mono">07 · Fondateur</span></a>
+  <a href="#engagement" data-target="engagement"><span class="tick"></span><span class="rail-label mono">08 · Engagement</span></a>
+  <a href="#cta" data-target="cta"><span class="tick"></span><span class="rail-label mono">09 · Contact</span></a>
+</div>
+
 <header class="nav" id="nav">
-  <div class="wrap nav-inner">
-    <a href="#top" class="brand serif" data-fr="Cadence" data-en="Cadence">Cadence</a>
+  <div class="wrap wrap-rail nav-inner">
+    <a href="#top" class="brand serif" data-fr="Cadence" data-en="Cadence">Cadence<span class="dot">.</span></a>
     <nav class="nav-links" aria-label="Navigation principale">
       <a href="#contexte" data-fr="Contexte" data-en="Context">Contexte</a>
       <a href="#cas" data-fr="Cas publics" data-en="Public cases">Cas publics</a>
@@ -314,16 +364,16 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
         <button type="button" id="lang-fr" class="active" aria-pressed="true">FR</button>
         <button type="button" id="lang-en" aria-pressed="false">EN</button>
       </div>
-      <a class="btn btn-solid btn-sm" href="#cta" data-fr="Parler d'un sujet" data-en="Discuss a topic">Parler d'un sujet</a>
+      <a class="btn btn-solid" href="#cta" data-fr="Parler d'un sujet" data-en="Discuss a topic">Parler d'un sujet</a>
     </div>
   </div>
 </header>
 
 <main id="top">
 
-<!-- HERO -->
-<section class="hero">
-  <div class="wrap hero-grid">
+<!-- HERO (ink) -->
+<section class="hero on-ink" id="hero">
+  <div class="wrap wrap-rail hero-grid">
     <div>
       <p class="eyebrow reveal" data-fr="Conseil en automatisation et intelligence artificielle · Casablanca" data-en="Automation and artificial intelligence consulting · Casablanca">Conseil en automatisation et intelligence artificielle · Casablanca</p>
       <h1 class="serif reveal"
@@ -331,32 +381,46 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
         data-en="Not every operation deserves <span class='mut'>to be automated.</span>">Toutes les opérations ne méritent pas <span class="mut">d'être automatisées.</span></h1>
       <p class="sub reveal" data-fr="Cadence identifie celles dont la valeur économique justifie l'investissement, détermine la meilleure réponse — acheter, intégrer, construire, renforcer l'équipe ou ne rien faire — et la met en production. Cela commence par un audit de deux semaines."
         data-en="Cadence identifies the operations whose economic value justifies the investment, determines the right response — buy, integrate, build, staff up, or do nothing — and puts it into production. It starts with a two-week audit.">Cadence identifie celles dont la valeur économique justifie l'investissement, détermine la meilleure réponse — acheter, intégrer, construire, renforcer l'équipe ou ne rien faire — et la met en production. Cela commence par un audit de deux semaines.</p>
-      <div class="hero-actions reveal">
+      <div class="hero-actions btn-row reveal">
         <a href="#cta" class="btn btn-solid" data-fr="Parler d'un sujet →" data-en="Discuss a topic →">Parler d'un sujet →</a>
         <a href="#methode" class="btn btn-outline" data-fr="Voir la méthode" data-en="See the method">Voir la méthode</a>
       </div>
-      <p class="hero-note reveal" data-fr="Un conseiller, pas une agence." data-en="An advisor, not an agency.">Un conseiller, pas une agence.</p>
+      <p class="hero-note reveal" data-fr="— Un conseiller, pas une agence." data-en="— An advisor, not an agency.">— Un conseiller, pas une agence.</p>
     </div>
 
     <div class="sequence reveal" id="sequence">
-      <p class="sequence-title" data-fr="La séquence" data-en="The sequence">La séquence</p>
-      <div class="seq-track">
-        <div class="seq-fill" id="seq-fill"></div>
-        <div class="seq-step active" data-idx="0">
-          <div class="k" data-fr="Problème" data-en="Problem">Problème</div>
-          <div class="v" data-fr="Ce qui vous ralentit" data-en="What is slowing you down">Ce qui vous ralentit</div>
+      <p class="seq-title" data-fr="La séquence" data-en="The sequence">La séquence</p>
+      <div class="seq-path" id="seqPath">
+        <div class="seq-node active" data-idx="0">
+          <div class="seq-line"></div>
+          <div class="seq-dot mono">01</div>
+          <div class="seq-body">
+            <div class="seq-k" data-fr="Problème" data-en="Problem">Problème</div>
+            <div class="seq-v" data-fr="Ce qui vous ralentit" data-en="What is slowing you down">Ce qui vous ralentit</div>
+          </div>
         </div>
-        <div class="seq-step" data-idx="1">
-          <div class="k" data-fr="Valeur" data-en="Value">Valeur</div>
-          <div class="v" data-fr="Ce que cela coûte" data-en="What it costs">Ce que cela coûte</div>
+        <div class="seq-node" data-idx="1">
+          <div class="seq-line"></div>
+          <div class="seq-dot mono">02</div>
+          <div class="seq-body">
+            <div class="seq-k" data-fr="Valeur" data-en="Value">Valeur</div>
+            <div class="seq-v" data-fr="Ce que cela coûte" data-en="What it costs">Ce que cela coûte</div>
+          </div>
         </div>
-        <div class="seq-step" data-idx="2">
-          <div class="k" data-fr="Solution" data-en="Solution">Solution</div>
-          <div class="v" data-fr="Acheter, intégrer, construire" data-en="Buy, integrate, build">Acheter, intégrer, construire</div>
+        <div class="seq-node" data-idx="2">
+          <div class="seq-line"></div>
+          <div class="seq-dot mono">03</div>
+          <div class="seq-body">
+            <div class="seq-k" data-fr="Solution" data-en="Solution">Solution</div>
+            <div class="seq-v" data-fr="Acheter, intégrer, construire" data-en="Buy, integrate, build">Acheter, intégrer, construire</div>
+          </div>
         </div>
-        <div class="seq-step" data-idx="3">
-          <div class="k" data-fr="Production" data-en="Production">Production</div>
-          <div class="v" data-fr="Un système qui tourne" data-en="A system that runs">Un système qui tourne</div>
+        <div class="seq-node" data-idx="3">
+          <div class="seq-dot mono">04</div>
+          <div class="seq-body">
+            <div class="seq-k" data-fr="Production" data-en="Production">Production</div>
+            <div class="seq-v" data-fr="Un système qui tourne" data-en="A system that runs">Un système qui tourne</div>
+          </div>
         </div>
       </div>
     </div>
@@ -365,50 +429,56 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
 
 <!-- CONTEXTE -->
 <section class="section" id="contexte">
-  <div class="wrap">
+  <div class="wrap wrap-rail">
     <div class="section-head reveal">
-      <p class="eyebrow" data-fr="Le contexte" data-en="The context">Le contexte</p>
+      <p class="eyebrow" data-fr="01 · Le contexte" data-en="01 · The context">01 · Le contexte</p>
       <h2 data-fr="Le problème n'est pas la technologie. <span class='mut'>C'est le passage en production.</span>"
           data-en="The problem is not the technology. <span class='mut'>It is getting to production.</span>">Le problème n'est pas la technologie. <span class="mut">C'est le passage en production.</span></h2>
     </div>
-    <div class="grid grid-3">
-      <div class="stat-cell reveal">
-        <div class="stat-num" data-count="65" data-suffix="%">0%</div>
-        <h3 data-fr="Le potentiel technique" data-en="The technical potential">Le potentiel technique</h3>
-        <p data-fr="Part des heures de travail présentant un potentiel technique d'automatisation lorsque les technologies disponibles sont intégrées aux processus."
-           data-en="Share of work hours with technical automation potential once available technologies are integrated into processes.">Part des heures de travail présentant un potentiel technique d'automatisation lorsque les technologies disponibles sont intégrées aux processus.</p>
-        <div class="src" data-fr="Source : McKinsey Global Institute, 2023." data-en="Source: McKinsey Global Institute, 2023.">Source : McKinsey Global Institute, 2023.</div>
+    <div class="numrow-list reveal">
+      <div class="numrow">
+        <div class="num"><span data-count="65" data-suffix="%">0%</span></div>
+        <div class="numrow-body">
+          <h3 data-fr="Le potentiel technique" data-en="The technical potential">Le potentiel technique</h3>
+          <p data-fr="Part des heures de travail présentant un potentiel technique d'automatisation lorsque les technologies disponibles sont intégrées aux processus."
+             data-en="Share of work hours with technical automation potential once available technologies are integrated into processes.">Part des heures de travail présentant un potentiel technique d'automatisation lorsque les technologies disponibles sont intégrées aux processus.</p>
+          <div class="src" data-fr="Source : McKinsey Global Institute, 2023." data-en="Source: McKinsey Global Institute, 2023.">Source : McKinsey Global Institute, 2023.</div>
+        </div>
       </div>
-      <div class="stat-cell reveal">
-        <div class="stat-num" data-count="18" data-suffix="%">0%</div>
-        <h3 data-fr="L'IA à côté du travail" data-en="AI alongside the work">L'IA à côté du travail</h3>
-        <p data-fr="Part des organisations où l'IA est principalement intégrée aux flux de travail ; ailleurs elle fonctionne en outils autonomes, à côté des processus."
-           data-en="Share of organizations where AI is mainly embedded in workflows; elsewhere it runs as standalone tools, alongside processes.">Part des organisations où l'IA est principalement intégrée aux flux de travail ; ailleurs elle fonctionne en outils autonomes, à côté des processus.</p>
-        <div class="src" data-fr="Source : Harvard Business Review Analytic Services (étude sponsorisée par Appian), 385 décideurs, mars 2026." data-en="Source: Harvard Business Review Analytic Services (study sponsored by Appian), 385 decision-makers, March 2026.">Source : Harvard Business Review Analytic Services (étude sponsorisée par Appian), 385 décideurs, mars 2026.</div>
+      <div class="numrow">
+        <div class="num"><span data-count="18" data-suffix="%">0%</span></div>
+        <div class="numrow-body">
+          <h3 data-fr="L'IA à côté du travail" data-en="AI alongside the work">L'IA à côté du travail</h3>
+          <p data-fr="Part des organisations où l'IA est principalement intégrée aux flux de travail ; ailleurs elle fonctionne en outils autonomes, à côté des processus."
+             data-en="Share of organizations where AI is mainly embedded in workflows; elsewhere it runs as standalone tools, alongside processes.">Part des organisations où l'IA est principalement intégrée aux flux de travail ; ailleurs elle fonctionne en outils autonomes, à côté des processus.</p>
+          <div class="src" data-fr="Source : Harvard Business Review Analytic Services (étude sponsorisée par Appian), 385 décideurs, mars 2026." data-en="Source: Harvard Business Review Analytic Services (study sponsored by Appian), 385 decision-makers, March 2026.">Source : Harvard Business Review Analytic Services (étude sponsorisée par Appian), 385 décideurs, mars 2026.</div>
+        </div>
       </div>
-      <div class="stat-cell reveal">
-        <div class="stat-num" data-count="62" data-suffix="%">0%</div>
-        <h3 data-fr="Où se trouve la valeur" data-en="Where the value sits">Où se trouve la valeur</h3>
-        <p data-fr="Part de la valeur générée par l'IA dans les processus cœur de métier chez les entreprises leaders."
-           data-en="Share of AI-generated value sitting in core business processes among leading companies.">Part de la valeur générée par l'IA dans les processus cœur de métier chez les entreprises leaders.</p>
-        <div class="src" data-fr="Source : BCG, Where's the Value in AI?, 2024." data-en="Source: BCG, Where's the Value in AI?, 2024.">Source : BCG, <em>Where's the Value in AI?</em>, 2024.</div>
+      <div class="numrow">
+        <div class="num"><span data-count="62" data-suffix="%">0%</span></div>
+        <div class="numrow-body">
+          <h3 data-fr="Où se trouve la valeur" data-en="Where the value sits">Où se trouve la valeur</h3>
+          <p data-fr="Part de la valeur générée par l'IA dans les processus cœur de métier chez les entreprises leaders." data-en="Share of AI-generated value sitting in core business processes among leading companies.">Part de la valeur générée par l'IA dans les processus cœur de métier chez les entreprises leaders.</p>
+          <div class="src" data-fr="Source : BCG, Where's the Value in AI?, 2024." data-en="Source: BCG, Where's the Value in AI?, 2024.">Source : BCG, <em>Where's the Value in AI?</em>, 2024.</div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- CAS PUBLICS -->
-<section class="section" id="cas" style="background:var(--grey-band);">
-  <div class="wrap">
+<section class="section on-paper2" id="cas">
+  <div class="wrap wrap-rail">
     <div class="section-head reveal">
-      <p class="eyebrow" data-fr="Ce qui tourne déjà" data-en="What is already running">Ce qui tourne déjà</p>
+      <p class="eyebrow" data-fr="02 · Ce qui tourne déjà" data-en="02 · What is already running">02 · Ce qui tourne déjà</p>
       <h2 data-fr="Déjà en production, <span class='mut'>chez d'autres.</span>" data-en="Already in production, <span class='mut'>at other companies.</span>">Déjà en production, <span class="mut">chez d'autres.</span></h2>
       <p class="dek" data-fr="Trois déploiements publics, documentés par les entreprises elles-mêmes. Cadence n'est intervenue dans aucun d'eux : ils montrent ce que la technologie fait déjà, à quelle échelle — et ce qu'elle ne fait pas."
          data-en="Three public deployments, documented by the companies themselves. Cadence was not involved in any of them: they show what the technology already does, at what scale — and what it does not.">Trois déploiements publics, documentés par les entreprises elles-mêmes. Cadence n'est intervenue dans aucun d'eux : ils montrent ce que la technologie fait déjà, à quelle échelle — et ce qu'elle ne fait pas.</p>
     </div>
-    <div class="grid grid-3">
-      <article class="case-cell reveal">
-        <div class="case-co">Kuehne+Nagel</div>
+    <div class="cases-grid reveal">
+      <article class="case-cell">
+        <div class="case-idx mono">01</div>
+        <div class="case-co">KUEHNE+NAGEL</div>
         <div class="case-num">78%</div>
         <p class="case-hook" data-fr="des appels traités de bout en bout par des agents autonomes, sur le fret aérien."
            data-en="of calls handled end to end by autonomous agents, in air freight.">des appels traités de bout en bout par des agents autonomes, sur le fret aérien.</p>
@@ -420,8 +490,9 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
         <div class="case-src"><a href="https://happyrobot.ai/customer-story/kuehne-nagel" target="_blank" rel="noopener" data-fr="Source : happyrobot.ai/customer-story/kuehne-nagel" data-en="Source: happyrobot.ai/customer-story/kuehne-nagel">Source : happyrobot.ai/customer-story/kuehne-nagel</a></div>
       </article>
 
-      <article class="case-cell reveal">
-        <div class="case-co">DHL Supply Chain</div>
+      <article class="case-cell">
+        <div class="case-idx mono">02</div>
+        <div class="case-co">DHL SUPPLY CHAIN</div>
         <div class="case-num" data-fr="18 mois" data-en="18 months">18 mois</div>
         <p class="case-hook" data-fr="de validation des cas d'usage avant tout déploiement à l'échelle."
            data-en="spent validating use cases before any deployment at scale.">de validation des cas d'usage avant tout déploiement à l'échelle.</p>
@@ -433,8 +504,9 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
         <div class="case-src"><span data-fr="Source : Communiqué DHL Group, novembre 2025" data-en="Source: DHL Group press release, November 2025">Source : Communiqué DHL Group, novembre 2025</span></div>
       </article>
 
-      <article class="case-cell dark reveal">
-        <div class="case-co">Klarna</div>
+      <article class="case-cell spot">
+        <div class="case-idx mono">03</div>
+        <div class="case-co">KLARNA</div>
         <div class="case-num">2/3</div>
         <p class="case-hook" data-fr="des conversations clients traitées par l'IA dès le premier mois — puis un rétropédalage."
            data-en="of customer conversations handled by AI within the first month — then a walk-back.">des conversations clients traitées par l'IA dès le premier mois — puis un rétropédalage.</p>
@@ -451,44 +523,44 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
   </div>
 </section>
 
-<!-- METHODE -->
-<section class="section" id="methode">
-  <div class="wrap">
+<!-- METHODE (ink diagram + paper detail) -->
+<section class="section on-ink" id="methode">
+  <div class="wrap wrap-rail">
     <div class="section-head reveal">
-      <p class="eyebrow" data-fr="La méthode" data-en="The method">La méthode</p>
+      <p class="eyebrow" data-fr="03 · La méthode" data-en="03 · The method">03 · La méthode</p>
       <h2 data-fr="Trois phases. <span class='mut'>Chacune se suffit à elle-même.</span>" data-en="Three phases. <span class='mut'>Each stands on its own.</span>">Trois phases. <span class="mut">Chacune se suffit à elle-même.</span></h2>
       <p class="dek" data-fr="Le client peut s'arrêter après chaque phase. Aucune phase suivante n'est obligatoire."
          data-en="The client can stop after each phase. No following phase is mandatory.">Le client peut s'arrêter après chaque phase. Aucune phase suivante n'est obligatoire.</p>
     </div>
 
-    <div class="method-schema reveal">
-      <div class="schema-block">
-        <div class="no">01</div>
+    <div class="method-diagram reveal">
+      <div class="md-node">
+        <div class="md-no mono">01</div>
         <h4 data-fr="Audit" data-en="Audit">Audit</h4>
-        <p class="q" data-fr="Où est la valeur ?" data-en="Where is the value?">Où est la valeur ?</p>
-        <span class="dur" data-fr="2 semaines" data-en="2 weeks">2 semaines</span>
+        <p class="md-q" data-fr="Où est la valeur ?" data-en="Where is the value?">Où est la valeur ?</p>
+        <span class="md-dur mono" data-fr="2 semaines" data-en="2 weeks">2 semaines</span>
+        <div class="md-stop mono" data-fr="Vous pouvez vous arrêter" data-en="You can stop">Vous pouvez vous arrêter</div>
       </div>
-      <div class="schema-div" data-fr="Vous pouvez vous arrêter" data-en="You can stop here">Vous pouvez vous arrêter</div>
-      <div class="schema-block">
-        <div class="no">02</div>
+      <div class="md-node">
+        <div class="md-no mono">02</div>
         <h4 data-fr="Conception" data-en="Design">Conception</h4>
-        <p class="q" data-fr="Comment la capturer ?" data-en="How to capture it?">Comment la capturer ?</p>
-        <span class="dur" data-fr="2 à 4 semaines" data-en="2 to 4 weeks">2 à 4 semaines</span>
+        <p class="md-q" data-fr="Comment la capturer ?" data-en="How to capture it?">Comment la capturer ?</p>
+        <span class="md-dur mono" data-fr="2 à 4 semaines" data-en="2 to 4 weeks">2 à 4 semaines</span>
+        <div class="md-stop mono" data-fr="Vous pouvez vous arrêter" data-en="You can stop">Vous pouvez vous arrêter</div>
       </div>
-      <div class="schema-div" data-fr="Vous pouvez vous arrêter" data-en="You can stop here">Vous pouvez vous arrêter</div>
-      <div class="schema-block">
-        <div class="no">03</div>
+      <div class="md-node">
+        <div class="md-no mono">03</div>
         <h4 data-fr="Mise en œuvre" data-en="Implementation">Mise en œuvre</h4>
-        <p class="q" data-fr="Comment la mettre en production ?" data-en="How to put it into production?">Comment la mettre en production ?</p>
-        <span class="dur" data-fr="6 à 16 semaines selon le périmètre" data-en="6 to 16 weeks depending on scope">6 à 16 semaines selon le périmètre</span>
+        <p class="md-q" data-fr="Comment la mettre en production ?" data-en="How to put it into production?">Comment la mettre en production ?</p>
+        <span class="md-dur mono" data-fr="6 à 16 semaines selon le périmètre" data-en="6 to 16 weeks depending on scope">6 à 16 semaines selon le périmètre</span>
       </div>
     </div>
 
-    <div class="phase-rail-wrap">
-      <div class="rail" id="rail">
-        <div class="rail-item active" data-phase="0"><span class="rn">01</span><span data-fr="Audit" data-en="Audit">Audit</span></div>
-        <div class="rail-item" data-phase="1"><span class="rn">02</span><span data-fr="Conception" data-en="Design">Conception</span></div>
-        <div class="rail-item" data-phase="2"><span class="rn">03</span><span data-fr="Mise en œuvre" data-en="Implementation">Mise en œuvre</span></div>
+    <div class="phase-wrap">
+      <div class="p-rail" id="rail">
+        <div class="p-item active" data-phase="0"><b>01</b><span data-fr="Audit" data-en="Audit">Audit</span></div>
+        <div class="p-item" data-phase="1"><b>02</b><span data-fr="Conception" data-en="Design">Conception</span></div>
+        <div class="p-item" data-phase="2"><b>03</b><span data-fr="Mise en œuvre" data-en="Implementation">Mise en œuvre</span></div>
       </div>
 
       <div>
@@ -552,10 +624,10 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
 </section>
 
 <!-- AUDIT -->
-<section class="section" id="audit" style="background:var(--grey-band);">
-  <div class="wrap">
+<section class="section" id="audit">
+  <div class="wrap wrap-rail">
     <div class="section-head reveal">
-      <p class="eyebrow" data-fr="L'audit" data-en="The audit">L'audit</p>
+      <p class="eyebrow" data-fr="04 · L'audit" data-en="04 · The audit">04 · L'audit</p>
       <h2 data-fr="Deux semaines sur site. <span class='mut'>Un document qui vous appartient.</span>" data-en="Two weeks on site. <span class='mut'>A document that is yours.</span>">Deux semaines sur site. <span class="mut">Un document qui vous appartient.</span></h2>
       <p class="dek" data-fr="Rien n'est estimé de loin. Chaque opportunité est chiffrée sur vos volumes, vos coûts et vos délais réels — puis évaluée contre le seuil de cinq fois l'investissement."
          data-en="Nothing is estimated from a distance. Every opportunity is quantified against your real volumes, costs and timelines — then measured against the five-times-investment threshold.">Rien n'est estimé de loin. Chaque opportunité est chiffrée sur vos volumes, vos coûts et vos délais réels — puis évaluée contre le seuil de cinq fois l'investissement.</p>
@@ -564,35 +636,35 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
     <div class="audit-cols reveal">
       <div class="audit-col">
         <h3 data-fr="Le déroulé" data-en="What happens">Le déroulé</h3>
-        <ul>
+        <ol>
           <li data-fr="Séance de cadrage de 90 minutes avec la direction" data-en="90-minute scoping session with leadership">Séance de cadrage de 90 minutes avec la direction</li>
           <li data-fr="Entretiens avec deux à quatre membres de vos équipes" data-en="Interviews with two to four members of your teams">Entretiens avec deux à quatre membres de vos équipes</li>
           <li data-fr="Accès en lecture seule aux outils concernés" data-en="Read-only access to the relevant tools">Accès en lecture seule aux outils concernés</li>
           <li data-fr="Observation des volumes réels d'une semaine d'activité" data-en="Observation of real volumes over one week of activity">Observation des volumes réels d'une semaine d'activité</li>
           <li data-fr="Restitution d'une heure avec la direction" data-en="One-hour findings session with leadership">Restitution d'une heure avec la direction</li>
-        </ul>
+        </ol>
       </div>
       <div class="audit-col dark">
         <h3 data-fr="Le livrable" data-en="The deliverable">Le livrable</h3>
-        <ul>
+        <ol>
           <li data-fr="La cartographie des processus examinés, avec volumes et coûts constatés" data-en="A map of the processes examined, with observed volumes and costs">La cartographie des processus examinés, avec volumes et coûts constatés</li>
           <li data-fr="Pour chaque opportunité, la valeur annuelle estimée en dirhams" data-en="For each opportunity, the estimated annual value in dirhams">Pour chaque opportunité, la valeur annuelle estimée en dirhams</li>
           <li data-fr="La solution recommandée — acheter, intégrer, construire, renforcer, ou ne rien faire" data-en="The recommended solution — buy, integrate, build, staff up, or do nothing">La solution recommandée — acheter, intégrer, construire, renforcer, ou ne rien faire</li>
           <li data-fr="Le coût estimé de chaque solution et ses risques" data-en="The estimated cost of each solution and its risks">Le coût estimé de chaque solution et ses risques</li>
           <li data-fr="La priorisation : par quoi commencer, et pourquoi" data-en="Prioritization: what to start with, and why">La priorisation : par quoi commencer, et pourquoi</li>
           <li data-fr="Un prix fixe pour la mise en œuvre de l'opportunité prioritaire" data-en="A fixed price for implementing the priority opportunity">Un prix fixe pour la mise en œuvre de l'opportunité prioritaire</li>
-        </ul>
+        </ol>
       </div>
     </div>
 
     <div class="func-title reveal" data-fr="Ce que nous examinons" data-en="What we examine">Ce que nous examinons</div>
-    <div class="grid grid-6 reveal">
-      <div style="min-height:auto;padding:22px;text-align:center;font-size:14px;font-weight:600;" data-fr="Relation client" data-en="Customer relations">Relation client</div>
-      <div style="min-height:auto;padding:22px;text-align:center;font-size:14px;font-weight:600;" data-fr="Commercial" data-en="Sales">Commercial</div>
-      <div style="min-height:auto;padding:22px;text-align:center;font-size:14px;font-weight:600;" data-fr="Opérations" data-en="Operations">Opérations</div>
-      <div style="min-height:auto;padding:22px;text-align:center;font-size:14px;font-weight:600;" data-fr="Finance" data-en="Finance">Finance</div>
-      <div style="min-height:auto;padding:22px;text-align:center;font-size:14px;font-weight:600;" data-fr="Direction" data-en="Leadership">Direction</div>
-      <div style="min-height:auto;padding:22px;text-align:center;font-size:14px;font-weight:600;" data-fr="Fonctions support" data-en="Support functions">Fonctions support</div>
+    <div class="func-grid reveal">
+      <div data-fr="Relation client" data-en="Customer relations">Relation client</div>
+      <div data-fr="Commercial" data-en="Sales">Commercial</div>
+      <div data-fr="Opérations" data-en="Operations">Opérations</div>
+      <div data-fr="Finance" data-en="Finance">Finance</div>
+      <div data-fr="Direction" data-en="Leadership">Direction</div>
+      <div data-fr="Fonctions support" data-en="Support functions">Fonctions support</div>
     </div>
 
     <p class="audit-note reveal" data-fr="Le document reste exploitable que vous poursuiviez avec Cadence, en interne, ou avec un autre prestataire. C'est le seul livrable que nous vendons sans condition de suite."
@@ -600,28 +672,28 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
   </div>
 </section>
 
-<!-- DISCIPLINE ECONOMIQUE -->
-<section class="section taupe-band" id="discipline">
-  <div class="wrap">
+<!-- DISCIPLINE ECONOMIQUE (ink) -->
+<section class="section on-ink" id="discipline">
+  <div class="wrap wrap-rail">
     <div class="section-head reveal">
-      <p class="eyebrow" data-fr="La discipline économique" data-en="Economic discipline">La discipline économique</p>
+      <p class="eyebrow" data-fr="05 · La discipline économique" data-en="05 · Economic discipline">05 · La discipline économique</p>
       <h2 data-fr="Nous construisons le business case avant de vous demander d'investir." data-en="We build the business case before asking you to invest.">Nous construisons le business case avant de vous demander d'investir.</h2>
     </div>
 
-    <div class="equation reveal">
-      <div class="eq-block">
+    <div class="equation-line reveal">
+      <div class="eq-item">
         <div class="lbl" data-fr="Valeur annuelle estimée" data-en="Estimated annual value">Valeur annuelle estimée</div>
         <div class="val" data-fr="Sur vos données" data-en="Based on your data">Sur vos données</div>
       </div>
-      <div class="eq-op">÷</div>
-      <div class="eq-block">
+      <div class="eq-sym">÷</div>
+      <div class="eq-item">
         <div class="lbl" data-fr="Investissement" data-en="Investment">Investissement</div>
         <div class="val" data-fr="Prix fixe" data-en="Fixed price">Prix fixe</div>
       </div>
-      <div class="eq-op">=</div>
-      <div class="eq-block solid">
+      <div class="eq-sym">=</div>
+      <div class="eq-item result">
         <div class="lbl" data-fr="Multiple de retour" data-en="Return multiple">Multiple de retour</div>
-        <div class="val" data-count="5" data-suffix="×">0×</div>
+        <div class="val"><span data-count="5" data-suffix="×">0×</span></div>
       </div>
     </div>
 
@@ -639,41 +711,51 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
 
 <!-- DECISION -->
 <section class="section" id="decision">
-  <div class="wrap">
+  <div class="wrap wrap-rail">
     <div class="section-head reveal">
-      <p class="eyebrow" data-fr="L'indépendance" data-en="Independence">L'indépendance</p>
+      <p class="eyebrow" data-fr="06 · L'indépendance" data-en="06 · Independence">06 · L'indépendance</p>
       <h2 data-fr="La bonne solution <span class='mut'>n'est pas toujours la nôtre.</span>" data-en="The right solution <span class='mut'>is not always ours.</span>">La bonne solution <span class="mut">n'est pas toujours la nôtre.</span></h2>
       <p class="dek" data-fr="Cadence n'est financièrement dépendante d'aucune technologie. Acheter, intégrer, construire, renforcer — ou ne rien faire."
          data-en="Cadence has no financial dependency on any technology. Buy, integrate, build, staff up — or do nothing.">Cadence n'est financièrement dépendante d'aucune technologie. Acheter, intégrer, construire, renforcer — ou ne rien faire.</p>
     </div>
 
-    <div class="decision-grid reveal">
-      <div class="decision-cell">
-        <div class="no">01</div>
-        <h3 data-fr="Acheter" data-en="Buy">Acheter</h3>
-        <p data-fr="Une solution du marché répond déjà au besoin." data-en="A market solution already meets the need.">Une solution du marché répond déjà au besoin.</p>
+    <div class="decision-tree reveal">
+      <div class="dt-row">
+        <div class="dt-idx mono">01</div>
+        <div class="dt-body">
+          <h3 data-fr="Acheter" data-en="Buy">Acheter</h3>
+          <p data-fr="Une solution du marché répond déjà au besoin." data-en="A market solution already meets the need.">Une solution du marché répond déjà au besoin.</p>
+        </div>
       </div>
-      <div class="decision-cell">
-        <div class="no">02</div>
-        <h3 data-fr="Intégrer" data-en="Integrate">Intégrer</h3>
-        <p data-fr="Vos systèmes actuels suffisent, une fois connectés." data-en="Your current systems are enough, once connected.">Vos systèmes actuels suffisent, une fois connectés.</p>
+      <div class="dt-row">
+        <div class="dt-idx mono">02</div>
+        <div class="dt-body">
+          <h3 data-fr="Intégrer" data-en="Integrate">Intégrer</h3>
+          <p data-fr="Vos systèmes actuels suffisent, une fois connectés." data-en="Your current systems are enough, once connected.">Vos systèmes actuels suffisent, une fois connectés.</p>
+        </div>
       </div>
-      <div class="decision-cell">
-        <div class="no">03</div>
-        <h3 data-fr="Construire" data-en="Build">Construire</h3>
-        <p data-fr="Le besoin justifie un développement spécifique." data-en="The need justifies custom development.">Le besoin justifie un développement spécifique.</p>
+      <div class="dt-row">
+        <div class="dt-idx mono">03</div>
+        <div class="dt-body">
+          <h3 data-fr="Construire" data-en="Build">Construire</h3>
+          <p data-fr="Le besoin justifie un développement spécifique." data-en="The need justifies custom development.">Le besoin justifie un développement spécifique.</p>
+        </div>
       </div>
-      <div class="decision-cell">
-        <div class="no">04</div>
-        <h3 data-fr="Renforcer" data-en="Staff up">Renforcer</h3>
-        <p data-fr="La bonne réponse est une compétence interne." data-en="The right answer is an in-house skill.">La bonne réponse est une compétence interne.</p>
+      <div class="dt-row">
+        <div class="dt-idx mono">04</div>
+        <div class="dt-body">
+          <h3 data-fr="Renforcer" data-en="Staff up">Renforcer</h3>
+          <p data-fr="La bonne réponse est une compétence interne." data-en="The right answer is an in-house skill.">La bonne réponse est une compétence interne.</p>
+        </div>
       </div>
-    </div>
-    <div class="nothing-card reveal">
-      <div class="no" style="color:var(--tan);font-size:12px;font-weight:700;">05 · <span data-fr="Ne rien faire" data-en="Do nothing">Ne rien faire</span></div>
-      <h3 data-fr="Ne rien faire" data-en="Do nothing">Ne rien faire</h3>
-      <p data-fr="Lorsque l'économie ne justifie pas l'investissement, nous le disons. Ne pas lancer un projet est une recommandation à part entière — et c'est ce qui distingue un conseiller d'une agence."
-         data-en="When the economics do not justify the investment, we say so. Not launching a project is a recommendation in its own right — and it is what distinguishes an advisor from an agency.">Lorsque l'économie ne justifie pas l'investissement, nous le disons. Ne pas lancer un projet est une recommandation à part entière — et c'est ce qui distingue un conseiller d'une agence.</p>
+      <div class="dt-row last">
+        <div class="dt-idx mono">05</div>
+        <div class="dt-body">
+          <h3 data-fr="Ne rien faire" data-en="Do nothing">Ne rien faire</h3>
+          <p data-fr="Lorsque l'économie ne justifie pas l'investissement, nous le disons. Ne pas lancer un projet est une recommandation à part entière — et c'est ce qui distingue un conseiller d'une agence."
+             data-en="When the economics do not justify the investment, we say so. Not launching a project is a recommendation in its own right — and it is what distinguishes an advisor from an agency.">Lorsque l'économie ne justifie pas l'investissement, nous le disons. Ne pas lancer un projet est une recommandation à part entière — et c'est ce qui distingue un conseiller d'une agence.</p>
+        </div>
+      </div>
     </div>
 
     <div class="donts reveal">
@@ -688,11 +770,11 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
   </div>
 </section>
 
-<!-- FONDATEUR -->
-<section class="section taupe-band" id="fondateur">
-  <div class="wrap">
+<!-- FONDATEUR (ink) -->
+<section class="section on-ink" id="fondateur">
+  <div class="wrap wrap-rail">
     <div class="section-head reveal">
-      <p class="eyebrow" data-fr="Le fondateur" data-en="The founder">Le fondateur</p>
+      <p class="eyebrow" data-fr="07 · Le fondateur" data-en="07 · The founder">07 · Le fondateur</p>
       <h2 data-fr="Qui construit, <span class='mut'>et avec quelle expérience.</span>" data-en="Who builds it, <span class='mut'>and with what experience.</span>">Qui construit, <span class="mut">et avec quelle expérience.</span></h2>
     </div>
 
@@ -715,20 +797,32 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
       <div>
         <div class="lessons">
           <div class="lesson">
-            <h4 data-fr="Production, pas pilote" data-en="Production, not pilot">Production, pas pilote</h4>
-            <p data-fr="Fiabilité, supervision et reprise sur erreur se conçoivent dès le départ." data-en="Reliability, monitoring and error recovery are designed in from the start.">Fiabilité, supervision et reprise sur erreur se conçoivent dès le départ.</p>
+            <div class="lno mono">01</div>
+            <div>
+              <h4 data-fr="Production, pas pilote" data-en="Production, not pilot">Production, pas pilote</h4>
+              <p data-fr="Fiabilité, supervision et reprise sur erreur se conçoivent dès le départ." data-en="Reliability, monitoring and error recovery are designed in from the start.">Fiabilité, supervision et reprise sur erreur se conçoivent dès le départ.</p>
+            </div>
           </div>
           <div class="lesson">
-            <h4 data-fr="L'humain reste dans la boucle" data-en="The human stays in the loop">L'humain reste dans la boucle</h4>
-            <p data-fr="Savoir quand le système doit passer la main est le premier facteur de réussite." data-en="Knowing when the system must hand off is the top success factor.">Savoir quand le système doit passer la main est le premier facteur de réussite.</p>
+            <div class="lno mono">02</div>
+            <div>
+              <h4 data-fr="L'humain reste dans la boucle" data-en="The human stays in the loop">L'humain reste dans la boucle</h4>
+              <p data-fr="Savoir quand le système doit passer la main est le premier facteur de réussite." data-en="Knowing when the system must hand off is the top success factor.">Savoir quand le système doit passer la main est le premier facteur de réussite.</p>
+            </div>
           </div>
           <div class="lesson">
-            <h4 data-fr="Multilingue" data-en="Multilingual">Multilingue</h4>
-            <p data-fr="Expérience de systèmes opérés en onze langues, directement applicable au couple français / darija." data-en="Experience operating systems in eleven languages, directly applicable to the French / Darija pair.">Expérience de systèmes opérés en onze langues, directement applicable au couple français / darija.</p>
+            <div class="lno mono">03</div>
+            <div>
+              <h4 data-fr="Multilingue" data-en="Multilingual">Multilingue</h4>
+              <p data-fr="Expérience de systèmes opérés en onze langues, directement applicable au couple français / darija." data-en="Experience operating systems in eleven languages, directly applicable to the French / Darija pair.">Expérience de systèmes opérés en onze langues, directement applicable au couple français / darija.</p>
+            </div>
           </div>
           <div class="lesson">
-            <h4 data-fr="Économie" data-en="Economics">Économie</h4>
-            <p data-fr="À grande échelle, le coût par interaction automatisée compte." data-en="At scale, the cost per automated interaction matters.">À grande échelle, le coût par interaction automatisée compte.</p>
+            <div class="lno mono">04</div>
+            <div>
+              <h4 data-fr="Économie" data-en="Economics">Économie</h4>
+              <p data-fr="À grande échelle, le coût par interaction automatisée compte." data-en="At scale, the cost per automated interaction matters.">À grande échelle, le coût par interaction automatisée compte.</p>
+            </div>
           </div>
         </div>
 
@@ -744,18 +838,20 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
 
 <!-- ENGAGEMENT -->
 <section class="section" id="engagement">
-  <div class="wrap">
+  <div class="wrap wrap-rail">
     <div class="section-head reveal">
-      <p class="eyebrow" data-fr="L'engagement" data-en="Engagement">L'engagement</p>
+      <p class="eyebrow" data-fr="08 · L'engagement" data-en="08 · Engagement">08 · L'engagement</p>
       <h2 data-fr="Trois niveaux <span class='mut'>d'engagement.</span>" data-en="Three levels <span class='mut'>of engagement.</span>">Trois niveaux <span class="mut">d'engagement.</span></h2>
       <p class="dek" data-fr="Vous pouvez vous arrêter après chaque phase." data-en="You can stop after each phase.">Vous pouvez vous arrêter après chaque phase.</p>
     </div>
 
     <div class="tiers reveal">
       <div class="tier dark">
-        <div class="lvl" data-fr="Niveau 01 · Point d'entrée" data-en="Level 01 · Entry point">Niveau 01 · Point d'entrée</div>
-        <h3 data-fr="Audit" data-en="Audit">Audit</h3>
-        <p class="goal" data-fr="Identifier les opportunités." data-en="Identify the opportunities.">Identifier les opportunités.</p>
+        <div class="lvl mono" data-fr="Niveau 01 · Point d'entrée" data-en="Level 01 · Entry point">Niveau 01 · Point d'entrée</div>
+        <div>
+          <h3 data-fr="Audit" data-en="Audit">Audit</h3>
+          <p class="goal" data-fr="Identifier les opportunités." data-en="Identify the opportunities.">Identifier les opportunités.</p>
+        </div>
         <ul>
           <li data-fr="Immersion sur site : processus, volumes, coûts, friction" data-en="On-site immersion: processes, volumes, costs, friction">Immersion sur site : processus, volumes, coûts, friction</li>
           <li data-fr="Évaluation économique et priorisation" data-en="Economic evaluation and prioritization">Évaluation économique et priorisation</li>
@@ -763,9 +859,11 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
         </ul>
       </div>
       <div class="tier">
-        <div class="lvl" data-fr="Niveau 02" data-en="Level 02">Niveau 02</div>
-        <h3 data-fr="Audit + Conception" data-en="Audit + Design">Audit + Conception</h3>
-        <p class="goal" data-fr="Décider quoi faire, et comment." data-en="Decide what to do, and how.">Décider quoi faire, et comment.</p>
+        <div class="lvl mono" data-fr="Niveau 02" data-en="Level 02">Niveau 02</div>
+        <div>
+          <h3 data-fr="Audit + Conception" data-en="Audit + Design">Audit + Conception</h3>
+          <p class="goal" data-fr="Décider quoi faire, et comment." data-en="Decide what to do, and how.">Décider quoi faire, et comment.</p>
+        </div>
         <ul>
           <li data-fr="Analyse acheter / intégrer / construire / renforcer" data-en="Buy / integrate / build / staff-up analysis">Analyse acheter / intégrer / construire / renforcer</li>
           <li data-fr="Architecture cible, feuille de route, budget" data-en="Target architecture, roadmap, budget">Architecture cible, feuille de route, budget</li>
@@ -773,9 +871,11 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
         </ul>
       </div>
       <div class="tier">
-        <div class="lvl" data-fr="Niveau 03" data-en="Level 03">Niveau 03</div>
-        <h3 data-fr="Audit + Conception + Mise en œuvre" data-en="Audit + Design + Implementation">Audit + Conception + Mise en œuvre</h3>
-        <p class="goal" data-fr="Construire et mettre en production." data-en="Build and put into production.">Construire et mettre en production.</p>
+        <div class="lvl mono" data-fr="Niveau 03" data-en="Level 03">Niveau 03</div>
+        <div>
+          <h3 data-fr="Audit + Conception + Mise en œuvre" data-en="Audit + Design + Implementation">Audit + Conception + Mise en œuvre</h3>
+          <p class="goal" data-fr="Construire et mettre en production." data-en="Build and put into production.">Construire et mettre en production.</p>
+        </div>
         <ul>
           <li data-fr="Construction, configuration ou intégration" data-en="Building, configuring, or integrating">Construction, configuration ou intégration</li>
           <li data-fr="Coordination des tiers le cas échéant" data-en="Third-party coordination where relevant">Coordination des tiers le cas échéant</li>
@@ -791,10 +891,10 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
   </div>
 </section>
 
-<!-- CTA -->
-<section class="section cta-section" id="cta">
-  <div class="wrap">
-    <p class="eyebrow reveal" data-fr="Prochaine étape" data-en="Next step">Prochaine étape</p>
+<!-- CTA (ink) -->
+<section class="section on-ink cta-section" id="cta">
+  <div class="wrap wrap-rail">
+    <p class="eyebrow reveal" data-fr="09 · Prochaine étape" data-en="09 · Next step">09 · Prochaine étape</p>
     <h2 class="reveal" data-fr="Une opération vous coûte plus <span class='mut'>qu'elle ne devrait ?</span>" data-en="Is an operation costing you more <span class='mut'>than it should?</span>">Une opération vous coûte plus <span class="mut">qu'elle ne devrait ?</span></h2>
     <p class="sub reveal" data-fr="30 minutes suffisent pour déterminer si elle mérite un audit. Avec le dirigeant concerné, sur place à Casablanca ou en visioconférence — sans engagement et sans présentation commerciale."
        data-en="30 minutes are enough to determine whether it warrants an audit. With the relevant executive, in person in Casablanca or by video call — no commitment and no sales pitch.">30 minutes suffisent pour déterminer si elle mérite un audit. Avec le dirigeant concerné, sur place à Casablanca ou en visioconférence — sans engagement et sans présentation commerciale.</p>
@@ -808,13 +908,13 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
 </main>
 
 <footer>
-  <div class="wrap">
+  <div class="wrap wrap-rail">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="serif">Cadence</div>
+        <div class="serif">Cadence<span style="color:var(--copper-bright)">.</span></div>
         <p data-fr="Conseil en automatisation et intelligence artificielle · Casablanca, Maroc" data-en="Automation and artificial intelligence consulting · Casablanca, Morocco">Conseil en automatisation et intelligence artificielle · Casablanca, Maroc</p>
-        <p class="sig" data-fr="Un conseiller, pas une agence." data-en="An advisor, not an agency.">Un conseiller, pas une agence.</p>
-        <p class="footer-langs" style="margin-top:16px;" data-fr="Langues de travail : français, anglais, arabe, darija, espagnol" data-en="Working languages: French, English, Arabic, Darija, Spanish">Langues de travail : français, anglais, arabe, darija, espagnol</p>
+        <p class="sig" data-fr="— Un conseiller, pas une agence." data-en="— An advisor, not an agency.">— Un conseiller, pas une agence.</p>
+        <p class="footer-langs" data-fr="Langues de travail : français, anglais, arabe, darija, espagnol" data-en="Working languages: French, English, Arabic, Darija, Spanish">Langues de travail : français, anglais, arabe, darija, espagnol</p>
       </div>
       <div class="footer-links">
         <a href="mailto:contact@cadence.ma">contact@cadence.ma</a>
@@ -867,7 +967,7 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
       var target = document.querySelector(id);
       if(target){
         e.preventDefault();
-        target.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block:'start'});
+        target.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth', block: id === '#top' ? 'start' : 'start'});
       }
     });
   });
@@ -887,7 +987,7 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
           var el = entry.target;
           var parent = el.parentElement;
           var idx = Array.prototype.indexOf.call(parent.children, el);
-          var delay = Math.min(idx, 6) * 90;
+          var delay = Math.min(idx, 6) * 80;
           setTimeout(function(){ el.classList.add('in'); }, delay);
           io.unobserve(el);
         }
@@ -905,7 +1005,7 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
     var suffix = el.getAttribute('data-suffix') || '';
     if(reduceMotion){ el.textContent = target + suffix; return; }
     var start = null;
-    var duration = 1400;
+    var duration = 1300;
     function step(ts){
       if(!start) start = ts;
       var progress = Math.min((ts - start) / duration, 1);
@@ -932,28 +1032,22 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
   }
 
   /* ---------- Sequence loop (hero) ---------- */
-  var seqSteps = document.querySelectorAll('.seq-step');
-  var seqFill = document.getElementById('seq-fill');
-  if(seqSteps.length && !reduceMotion){
+  var seqNodes = document.querySelectorAll('.seq-node');
+  if(seqNodes.length && !reduceMotion){
     var seqIdx = 0;
-    var STEP_MS = 2000;
+    var STEP_MS = 1900;
     function tickSeq(){
-      seqSteps.forEach(function(s, i){ s.classList.toggle('active', i === seqIdx); });
-      var pct = ((seqIdx + 1) / seqSteps.length) * 100;
-      seqFill.style.height = pct + '%';
-      seqIdx = (seqIdx + 1) % seqSteps.length;
-      if(seqIdx === 0){
-        setTimeout(function(){ seqFill.style.transition = 'none'; seqFill.style.height = '0%'; requestAnimationFrame(function(){ seqFill.style.transition = 'height .3s linear'; }); }, STEP_MS - 50);
-      }
+      seqNodes.forEach(function(s, i){ s.classList.toggle('active', i === seqIdx); });
+      seqIdx = (seqIdx + 1) % seqNodes.length;
     }
     tickSeq();
     setInterval(tickSeq, STEP_MS);
-  } else if(seqSteps.length){
-    seqSteps[0].classList.add('active');
+  } else if(seqNodes.length){
+    seqNodes[0].classList.add('active');
   }
 
   /* ---------- Method rail ---------- */
-  var railItems = document.querySelectorAll('.rail-item');
+  var railItems = document.querySelectorAll('.p-item');
   var phaseBlocks = document.querySelectorAll('[data-phase-block]');
   railItems.forEach(function(item){
     item.addEventListener('click', function(){
@@ -971,6 +1065,22 @@ footer{background:var(--black);color:var(--cream);padding:clamp(56px,6vw,80px) 0
       });
     }, {threshold:0.5, rootMargin:'-20% 0px -50% 0px'});
     phaseBlocks.forEach(function(b){ pio.observe(b); });
+  }
+
+  /* ---------- Section index rail ---------- */
+  var railLinks = document.querySelectorAll('#indexRail a');
+  var sections = ['hero','contexte','cas','methode','audit','discipline','decision','fondateur','engagement','cta']
+    .map(function(id){ return document.getElementById(id); }).filter(Boolean);
+  if('IntersectionObserver' in window && sections.length){
+    var sio = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          var id = entry.target.id === 'hero' ? 'top' : entry.target.id;
+          railLinks.forEach(function(l){ l.classList.toggle('active', l.getAttribute('data-target') === id); });
+        }
+      });
+    }, {threshold:0, rootMargin:'-45% 0px -50% 0px'});
+    sections.forEach(function(s){ sio.observe(s); });
   }
 })();
 </script>
