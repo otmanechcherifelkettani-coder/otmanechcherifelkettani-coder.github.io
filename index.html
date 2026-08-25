@@ -118,21 +118,27 @@ header.nav.scrolled{border-bottom-color:var(--line);backdrop-filter:blur(10px);}
 .hero-note{margin-top:24px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted-dark);letter-spacing:.02em;}
 .on-ink .hero-note{color:var(--muted-dark);}
 
-/* sequence diagram */
+/* sequence diagram — draws in once as it enters view, then holds still */
 .sequence{position:relative;}
 .seq-title{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-dark);margin-bottom:28px;}
 .seq-path{display:flex;flex-direction:column;}
 .seq-node{display:flex;align-items:flex-start;gap:18px;position:relative;padding-bottom:34px;}
 .seq-node:last-child{padding-bottom:0;}
-.seq-line{position:absolute;left:13px;top:28px;bottom:6px;width:1px;background:var(--ink-line);}
+.seq-line{position:absolute;left:13px;top:28px;bottom:6px;width:1px;background:var(--copper-bright);opacity:.4;transform:scaleY(0);transform-origin:top;transition:transform .7s ease;}
 .seq-node:last-child .seq-line{display:none;}
-.seq-dot{width:27px;height:27px;border:1px solid var(--ink-line);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-dark);flex:none;z-index:1;background:var(--ink);transition:border-color .35s,color .35s,background .35s;}
-.seq-node.active .seq-dot{border-color:var(--copper-bright);color:var(--ink);background:var(--copper-bright);}
+.seq-dot{width:27px;height:27px;border:1px solid var(--ink-line);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-dark);flex:none;z-index:1;background:var(--ink);transition:border-color .5s ease,color .5s ease,background .5s ease;}
 .seq-body{padding-top:2px;}
-.seq-k{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;color:var(--muted-dark);transition:color .35s;}
-.seq-node.active .seq-k{color:var(--copper-bright);}
-.seq-v{font-size:14.5px;color:var(--muted-dark);margin-top:4px;opacity:.6;transition:opacity .35s;}
-.seq-node.active .seq-v{opacity:1;color:var(--white);}
+.seq-k{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;color:var(--muted-dark);transition:color .5s ease;}
+.seq-v{font-size:14.5px;color:var(--muted-dark);margin-top:4px;opacity:.6;transition:opacity .5s ease,color .5s ease;}
+/* once .sequence has scrolled into view, each node resolves in turn */
+.sequence.in .seq-line{transform:scaleY(1);}
+.sequence.in .seq-dot{border-color:var(--copper-bright);color:var(--ink);background:var(--copper-bright);}
+.sequence.in .seq-k{color:var(--copper-bright);}
+.sequence.in .seq-v{opacity:1;color:var(--white);}
+.sequence.in .seq-node:nth-child(1) .seq-dot,.sequence.in .seq-node:nth-child(1) .seq-k,.sequence.in .seq-node:nth-child(1) .seq-v,.sequence.in .seq-node:nth-child(1) .seq-line{transition-delay:.1s;}
+.sequence.in .seq-node:nth-child(2) .seq-dot,.sequence.in .seq-node:nth-child(2) .seq-k,.sequence.in .seq-node:nth-child(2) .seq-v,.sequence.in .seq-node:nth-child(2) .seq-line{transition-delay:.55s;}
+.sequence.in .seq-node:nth-child(3) .seq-dot,.sequence.in .seq-node:nth-child(3) .seq-k,.sequence.in .seq-node:nth-child(3) .seq-v,.sequence.in .seq-node:nth-child(3) .seq-line{transition-delay:1s;}
+.sequence.in .seq-node:nth-child(4) .seq-dot,.sequence.in .seq-node:nth-child(4) .seq-k,.sequence.in .seq-node:nth-child(4) .seq-v{transition-delay:1.45s;}
 
 /* ===== NUMBER ROWS (context) ===== */
 .numrow-list{border-top:1px solid var(--line);}
@@ -391,7 +397,7 @@ footer{background:var(--ink);color:var(--white);padding:clamp(52px,6vw,76px) 0 3
     <div class="sequence reveal" id="sequence">
       <p class="seq-title" data-fr="La séquence" data-en="The sequence">La séquence</p>
       <div class="seq-path" id="seqPath">
-        <div class="seq-node active" data-idx="0">
+        <div class="seq-node" data-idx="0">
           <div class="seq-line"></div>
           <div class="seq-dot mono">01</div>
           <div class="seq-body">
@@ -1031,20 +1037,8 @@ footer{background:var(--ink);color:var(--white);padding:clamp(52px,6vw,76px) 0 3
     counters.forEach(function(el){ el.textContent = el.getAttribute('data-count') + (el.getAttribute('data-suffix')||''); });
   }
 
-  /* ---------- Sequence loop (hero) ---------- */
-  var seqNodes = document.querySelectorAll('.seq-node');
-  if(seqNodes.length && !reduceMotion){
-    var seqIdx = 0;
-    var STEP_MS = 1900;
-    function tickSeq(){
-      seqNodes.forEach(function(s, i){ s.classList.toggle('active', i === seqIdx); });
-      seqIdx = (seqIdx + 1) % seqNodes.length;
-    }
-    tickSeq();
-    setInterval(tickSeq, STEP_MS);
-  } else if(seqNodes.length){
-    seqNodes[0].classList.add('active');
-  }
+  /* Sequence diagram now animates via .sequence.in (set by the reveal
+     IntersectionObserver above) — draws in once, then holds. No timer. */
 
   /* ---------- Method rail ---------- */
   var railItems = document.querySelectorAll('.p-item');
