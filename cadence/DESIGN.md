@@ -68,7 +68,7 @@ The reference jumps from display straight to 10px annotation. Cadence keeps both
 | Slot | Size | Leading | Face | Use |
 |---|---|---|---|---|
 | Display XL | `clamp(40px, 10vw, 144px)` | 0.95 | Archivo 400 | Hero statement only. One per page. |
-| Display L | `clamp(40px, 6.5vw, 84px)` | 1.0 | Archivo 400 | Offer names, section-opening claims. |
+| Display L | `clamp(32px, 6.5vw, 84px)` | 1.0 | Archivo 400 | Offer names, section-opening claims. Floor is 32px so it stays a clear step below Display XL's 40px at the 375px breakpoint. |
 | Heading | `clamp(30px, 4vw, 40px)` | 1.15 | Archivo 400 | Section titles ("Method", "Pricing"). |
 | Subheading | `24px` | 1.3 | Archivo 400 | Method step titles, table row leads. |
 | **Lead** | `20px` | 1.5 | Archivo 400 | First paragraph of a section. The persuasion size. |
@@ -131,7 +131,7 @@ Media queries are `min-width` only, written against these four tokens.
 
 **Nav** — text only: wordmark set in Archivo 400 tracked normally, links in mono uppercase 12px. Active link in `--oxide`. Hairline below.
 
-**Forms** — `--paper` field on bone, `1px var(--line)` border, radius 0, ink focus border. Labels in mono uppercase 12px above the field.
+**Forms** — `--paper` field on bone, `1px solid var(--ink-2)` border (fields must read as interactive; `--line` is reserved for rules, table borders, and separators), radius 0, ink focus border. Labels in mono uppercase 12px above the field.
 
 ---
 
