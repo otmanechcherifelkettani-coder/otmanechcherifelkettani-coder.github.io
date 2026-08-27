@@ -67,7 +67,7 @@ The reference jumps from display straight to 10px annotation. Cadence keeps both
 
 | Slot | Size | Leading | Face | Use |
 |---|---|---|---|---|
-| Display XL | `clamp(56px, 10vw, 144px)` | 0.95 | Archivo 400 | Hero statement only. One per page. |
+| Display XL | `clamp(40px, 10vw, 144px)` | 0.95 | Archivo 400 | Hero statement only. One per page. |
 | Display L | `clamp(40px, 6.5vw, 84px)` | 1.0 | Archivo 400 | Offer names, section-opening claims. |
 | Heading | `clamp(30px, 4vw, 40px)` | 1.15 | Archivo 400 | Section titles ("Method", "Pricing"). |
 | Subheading | `24px` | 1.3 | Archivo 400 | Method step titles, table row leads. |
@@ -100,6 +100,19 @@ The reference jumps from display straight to 10px annotation. Cadence keeps both
 
 Base unit **8px**. Band vertical padding `96–160px` desktop, `64px` mobile. Content column: max-width `1160px`, 12-column grid, `24px` gutters. Reading content (method, pricing prose) narrows to `68ch` — full-bleed backgrounds, narrow text.
 
+## Breakpoints
+
+Exactly four, and no others — no ad-hoc media queries at component-convenient widths. Design and QA at each value; `clamp()` handles everything between them.
+
+| Name | Width | Layout |
+|---|---|---|
+| `--bp-s` | `375px` | Design floor. Single column, band padding `64px`, grid collapses, pricing table restacked (all prices still visible). Nothing is verified below this width. |
+| `--bp-m` | `768px` | Grid engages (12-col), pricing table goes tabular, nav on one line. |
+| `--bp-l` | `1160px` | Content column reaches its max-width; from here only band padding and display size grow. |
+| `--bp-xl` | `1440px` | Ceiling. Band padding at its `160px` max; content stays at `1160px` and centers — the canvas widens, the document does not. |
+
+Media queries are `min-width` only, written against these four tokens.
+
 ---
 
 ## Components
@@ -114,7 +127,7 @@ Base unit **8px**. Band vertical padding `96–160px` desktop, `64px` mobile. Co
 
 **Method steps** — mono index (`01` `02` `03`) in `--oxide`, Subheading title, Body text, hairline between steps. A numbered procedure, not a feature grid.
 
-**Pricing table** — one hairline table for all three offers, not three cards. Mono for figures and terms, Archivo for descriptions. The recommended offer gets a `1px` ink border and a mono `RECOMMENDED` tag — no fill, no badge shapes. Fixed prices displayed plainly; a fixed number in mono is the whole trust argument.
+**Pricing table** — one hairline table for all three offers: not three cards, and never an accordion. All three prices are visible without any interaction, at every breakpoint — on narrow screens the table restacks, it does not collapse. Mono for figures and terms, Archivo for descriptions. The recommended offer gets a `1px` ink border and a mono `RECOMMENDED` tag — no fill, no badge shapes. Fixed prices displayed plainly; a fixed number in mono is the whole trust argument.
 
 **Nav** — text only: wordmark set in Archivo 400 tracked normally, links in mono uppercase 12px. Active link in `--oxide`. Hairline below.
 
