@@ -1,6 +1,7 @@
+import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  Briefcase,
+  Route,
   Target,
   Crown,
   Star,
@@ -83,7 +84,7 @@ export default function HeroSection() {
             <div className="animate-fade-in delay-100">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-md transition-colors hover:bg-white/10">
                 <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-zinc-300 flex items-center gap-2">
-                  AI &amp; Automation Advisory
+                  Automation That Drives Profit
                   <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
                 </span>
               </div>
@@ -97,30 +98,30 @@ export default function HeroSection() {
                 WebkitMaskImage: "linear-gradient(180deg, black 0%, black 80%, transparent 100%)"
               }}
             >
-              Automation<br />
+              We build<br />
               <span className="bg-gradient-to-br from-white via-white to-[#ffcd75] bg-clip-text text-transparent">
-                that pays
+                automation that
               </span><br />
-              for itself.
+              pays for itself.
             </h1>
 
             {/* Description */}
             <p className="animate-fade-in delay-300 max-w-xl text-lg text-zinc-400 leading-relaxed">
-              I find where LLMs and automation create real leverage in your
-              operations — then build it, measure it, and hand it over.
+              We find the work slowing your business down and build AI-powered
+              systems that save time, cut costs, and unlock growth.
             </p>
 
             {/* CTA Buttons */}
             <div className="animate-fade-in delay-400 flex flex-col sm:flex-row gap-4">
-              <a href="mailto:otmankettani5@gmail.com" className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-semibold text-zinc-950 transition-all hover:scale-[1.02] hover:bg-zinc-200 active:scale-[0.98]">
-                Email me
+              <Link to="/assessment" className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-semibold text-zinc-950 transition-all hover:scale-[1.02] hover:bg-zinc-200 active:scale-[0.98]">
+                Find your biggest opportunity
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </a>
+              </Link>
 
-              <a href="/cadence/work.html" className="group inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/10 hover:border-white/20">
-                <Briefcase className="w-4 h-4" />
-                See the work
-              </a>
+              <Link to="/approach" className="group inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/10 hover:border-white/20">
+                <Route className="w-4 h-4" />
+                See how it works
+              </Link>
             </div>
           </div>
 
