@@ -3,116 +3,182 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cadence</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:      #0d0d0f;
-      --surface: #141416;
-      --surface2: #1a1a1e;
-      --border:  rgba(255,255,255,0.07);
-      --accent:  #7c6af7;
-      --accent2: #c084fc;
-      --text:    #e8e8f0;
-      --muted:   #6b6b80;
-      --glow:    rgba(124,106,247,0.25);
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 60px 60px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      top: -20vh;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80vw;
-      height: 80vw;
-      max-width: 900px;
-      max-height: 900px;
-      background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .card {
-      position: relative;
-      z-index: 1;
-      max-width: 560px;
-      margin: 24px;
-      padding: 48px 40px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      text-align: center;
-    }
-
-    .label {
-      font-size: 0.72rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 600;
-      margin-bottom: 18px;
-    }
-
-    h1 {
-      font-size: 2.4rem;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 14px;
-    }
-
-    p {
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.6;
-    }
-
-    .badge {
-      display: inline-block;
-      margin-top: 24px;
-      padding: 8px 16px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-  </style>
+  <title>Cadence — AI &amp; automation advisory</title>
+  <meta name="description" content="Cadence is a one-person AI and automation advisory. I find where your company loses time and money, then design and ship the fix. Fixed prices." />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="card">
-    <div class="label">Cadence</div>
-    <h1>Something's coming</h1>
-    <p>This is the starting point for the Cadence project. Content, design, and features land here as the site takes shape.</p>
-    <span class="badge">Under construction</span>
-  </div>
+
+  <nav class="nav" aria-label="Main">
+    <div class="container">
+      <a class="nav-wordmark" href="#top">Cadence</a>
+      <ul class="nav-links">
+        <li><a href="#what">What I do</a></li>
+        <li><a href="#offers">Offers</a></li>
+        <li><a href="#method">Method</a></li>
+        <li><a href="#who">Who I am</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main id="top">
+
+    <!-- 01 Hero -->
+    <section class="band band--bone hero" aria-labelledby="hero-title">
+      <div class="container">
+        <div class="band-head">
+          <span class="annotation">01</span>
+          <span class="annotation muted">Advisory</span>
+        </div>
+        <h1 class="display-xl" id="hero-title">An <span class="mark">advisor</span>,<br />not an agency.</h1>
+        <p class="lead">Cadence is one person. I find where your company loses time and money, then design and ship the automation that fixes it. Three offers, fixed prices, no team to bill for.</p>
+        <a class="btn btn--primary" href="#offers">See the offers and prices</a>
+      </div>
+    </section>
+
+    <!-- 02 What I do -->
+    <section class="band band--paper" id="what" aria-labelledby="what-title">
+      <div class="container">
+        <div class="band-head">
+          <span class="annotation">02</span>
+          <span class="annotation muted">What I do</span>
+        </div>
+        <h2 class="heading" id="what-title">Find the leak. Design the fix. Ship it.</h2>
+        <p class="lead">Every engagement runs the same loop, and each step stands on its own.</p>
+        <p>First I find where the money leaks: the hours your people spend re-typing, chasing, copy-pasting, and reconciling — priced, per month, in a written report.</p>
+        <p>Then I design the fix: one automation, specified down to the tools, the running costs, and what your team stops doing. A blueprint anyone competent could build from.</p>
+        <p>Then I build it, run it next to your current process until it holds, and hand it over documented. You own everything. Nothing depends on me staying.</p>
+      </div>
+    </section>
+
+    <!-- 03 Offers — the single ink band -->
+    <section class="band band--ink" id="offers" aria-labelledby="offers-title">
+      <div class="container">
+        <div class="band-head">
+          <span class="annotation">03</span>
+          <span class="annotation muted">Offers</span>
+        </div>
+        <h2 class="heading" id="offers-title">Fixed prices, quoted before we start.</h2>
+        <p class="lead offers-note muted">Each offer ends with something you keep. Start with the audit; continue only if the numbers say so.</p>
+
+        <div class="offer-table">
+          <div class="offer">
+            <h3 class="offer-name">Audit</h3>
+            <p class="offer-desc">Two weeks inside your operation. You get a written report: where time and money leak, what each leak costs per month, and which fixes pay for themselves. Useful even if we never speak again.</p>
+            <span class="offer-term muted">2 weeks · Fixed</span>
+            <span class="offer-price">PRICE_TBD</span>
+          </div>
+          <div class="offer">
+            <h3 class="offer-name">Design</h3>
+            <p class="offer-desc">The blueprint for one fix from the audit: exact workflow, tooling, running costs, risks, and what changes for your team. Any competent developer could build from it. So can I.</p>
+            <span class="offer-term muted">2 weeks · Fixed</span>
+            <span class="offer-price">PRICE_TBD</span>
+          </div>
+          <div class="offer">
+            <h3 class="offer-name">Implementation</h3>
+            <p class="offer-desc">I build the automation from the design, test it against your real work, run it alongside your team until it holds, and hand it over documented and owned by you.</p>
+            <span class="offer-term muted">4–8 weeks · Fixed</span>
+            <span class="offer-price">PRICE_TBD</span>
+          </div>
+          <div class="offer">
+            <h3 class="offer-name">Retainer</h3>
+            <p class="offer-desc">Optional, after implementation. I keep what we shipped running, and keep finding the next leak. Cancel any month.</p>
+            <span class="offer-term muted">Monthly</span>
+            <span class="offer-price">PRICE_TBD</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 Method -->
+    <section class="band band--bone" id="method" aria-labelledby="method-title">
+      <div class="container">
+        <div class="band-head">
+          <span class="annotation">04</span>
+          <span class="annotation muted">Method</span>
+        </div>
+        <h2 class="heading" id="method-title">How an engagement runs.</h2>
+        <p class="lead">No workshops, no steering committees. I work where the work happens.</p>
+
+        <ol class="method-steps">
+          <li class="method-step">
+            <span class="method-index">01 · Week 1</span>
+            <div>
+              <h3 class="subheading">Watch the work</h3>
+              <p class="method-body">I sit with the people who actually do the work and time where the hours go. Not interviews about the process — the process itself.</p>
+            </div>
+          </li>
+          <li class="method-step">
+            <span class="method-index">02 · Week 2</span>
+            <div>
+              <h3 class="subheading">Price the leaks</h3>
+              <p class="method-body">Every problem gets a number: hours lost, cost per month, cost to fix. You get the list, ranked. That's the audit report.</p>
+            </div>
+          </li>
+          <li class="method-step">
+            <span class="method-index">03 · Weeks 3–4</span>
+            <div>
+              <h3 class="subheading">Design one fix</h3>
+              <p class="method-body">The top leak gets a full specification: workflow, tools, running costs, failure modes, and what your team stops doing by hand.</p>
+            </div>
+          </li>
+          <li class="method-step">
+            <span class="method-index">04 · Weeks 5–12</span>
+            <div>
+              <h3 class="subheading">Build and prove</h3>
+              <p class="method-body">I build it and run it in parallel with your current process. It replaces nothing until it beats the manual version on your own numbers.</p>
+            </div>
+          </li>
+          <li class="method-step">
+            <span class="method-index">05 · Handover</span>
+            <div>
+              <h3 class="subheading">Hand it over</h3>
+              <p class="method-body">Documentation, training, and your own accounts on everything. The engagement is designed to end. The retainer exists only if you want it.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 05 Who I am -->
+    <section class="band band--bone-2" id="who" aria-labelledby="who-title">
+      <div class="container">
+        <div class="band-head">
+          <span class="annotation">05</span>
+          <span class="annotation muted">Who I am</span>
+        </div>
+        <h2 class="heading" id="who-title">One person. One credential.</h2>
+        <p class="lead">I've shipped LLM automation in production across 51 countries and 11 languages, running at scale.</p>
+        <p>That's it. No team photo, no logo wall, no framework with a trademarked name. The person who audits your operation is the person who designs the fix and the person who ships it.</p>
+      </div>
+    </section>
+
+    <!-- 06 Contact -->
+    <section class="band band--paper contact" id="contact" aria-labelledby="contact-title">
+      <div class="container">
+        <div class="band-head">
+          <span class="annotation">06</span>
+          <span class="annotation muted">Contact</span>
+        </div>
+        <h2 class="heading" id="contact-title">One email is enough.</h2>
+        <p class="lead">Tell me what your company does and where you think the time goes. I'll reply with whether an audit makes sense — and if it doesn't, I'll say so.</p>
+        <div class="contact-actions">
+          <a class="btn btn--primary" href="mailto:otman.echcherifelkettani@gmail.com?subject=Cadence%20audit">Write to me</a>
+          <a href="mailto:otman.echcherifelkettani@gmail.com">otman.echcherifelkettani@gmail.com</a>
+        </div>
+        <p class="small muted">No newsletter, no discovery-call funnel. You email, I answer.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span class="annotation muted">Cadence · AI &amp; automation advisory</span>
+      <span class="annotation muted">EN · FR à venir</span>
+    </div>
+  </footer>
+
 </body>
 </html>
