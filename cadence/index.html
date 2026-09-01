@@ -232,27 +232,61 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
 .ledger-row.total .ledger-value{font-size:30px;color:var(--wine)}
 .ledger-note{margin-top:18px}
 
-/* ---------- offer ---------- */
+/* ---------- offer: exclusive accordion ---------- */
 .offer-head{margin-bottom:64px;max-width:720px}
 .offer-head .eyebrow{margin-bottom:18px}
 .offer{border-top:1px solid var(--line-strong)}
-.offer-row{
-  display:grid;grid-template-columns:1fr 5fr 6fr;gap:40px;
-  padding:44px 0;border-bottom:1px solid var(--line);
+.offer-row{border-bottom:1px solid var(--line)}
+.offer-row summary{
+  display:grid;grid-template-columns:72px 1fr 20px;gap:24px;align-items:start;
+  padding:28px 0;cursor:pointer;list-style:none;
 }
+.offer-row summary::-webkit-details-marker{display:none}
+.offer-row summary::marker{content:none}
+.offer-row summary:focus-visible{outline:2px solid var(--wine);outline-offset:4px}
 .offer-num{
   font-family:var(--serif);font-size:20px;color:var(--wine);
-  font-variant-numeric:tabular-nums;padding-top:4px;
+  font-variant-numeric:tabular-nums;padding-top:3px;
 }
-.offer-row .title{margin-bottom:8px}
-.offer-row .caption{margin-bottom:0}
-.offer-row>div p{color:var(--stone)}
-.offer-list{margin-top:20px;display:grid;gap:9px}
+.offer-row .title{transition:color 200ms ease}
+.offer-when{margin-top:4px}
+.offer-toggle{
+  position:relative;width:16px;height:16px;align-self:center;justify-self:end;
+  transition:transform 250ms var(--ease-out);
+}
+.offer-toggle::before,.offer-toggle::after{
+  content:"";position:absolute;background:var(--wine);
+}
+.offer-toggle::before{left:0;right:0;top:50%;height:1px;margin-top:-.5px}
+.offer-toggle::after{top:0;bottom:0;left:50%;width:1px;margin-left:-.5px}
+.offer-row[open] .offer-toggle{transform:rotate(45deg)}
+@media(hover:hover) and (pointer:fine){
+  .offer-row summary:hover .title{color:var(--wine)}
+}
+.offer-body{
+  display:grid;grid-template-columns:5fr 6fr;gap:40px;
+  padding:4px 44px 40px 96px;
+}
+.offer-body p{color:var(--stone)}
+.offer-list{display:grid;gap:9px;align-content:start}
 .offer-list li{
   display:flex;gap:14px;font-size:15.5px;line-height:1.5;color:var(--ink);
 }
 .offer-list li::before{content:"—";color:var(--wine);flex:0 0 auto}
 .offer-foot{margin-top:28px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center}
+
+/* open/close animation where the platform supports it; elsewhere it snaps */
+@supports (interpolate-size: allow-keywords){
+  .offer-row{interpolate-size:allow-keywords}
+  @media(prefers-reduced-motion:no-preference){
+    .offer-row::details-content{
+      height:0;overflow:clip;opacity:0;
+      transition:height 320ms var(--ease-out),opacity 240ms var(--ease-out),
+                 content-visibility 320ms allow-discrete;
+    }
+    .offer-row[open]::details-content{height:auto;opacity:1}
+  }
+}
 
 /* ---------- domains ---------- */
 .domains{
@@ -353,8 +387,9 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
   .two{grid-template-columns:1fr;gap:36px}
   .two>.rail{position:static}
   .principles{grid-template-columns:1fr;gap:24px;margin-top:56px}
-  .offer-row{grid-template-columns:1fr;gap:14px;padding:32px 0}
-  .offer-num{padding-top:0}
+  .offer-row summary{grid-template-columns:40px 1fr 18px;gap:14px;padding:22px 0}
+  .offer-num{font-size:17px;padding-top:2px}
+  .offer-body{grid-template-columns:1fr;gap:18px;padding:0 0 30px 54px}
   .domains,.limits{grid-template-columns:1fr}
   .stats{grid-template-columns:repeat(2,1fr);gap:28px}
   .ledger{padding:24px 20px 16px}
@@ -505,13 +540,16 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
       <h2 class="display">Trois étapes, dans l'ordre. Vous pouvez vous arrêter après chacune.</h2>
     </div>
     <div class="offer">
-      <div class="offer-row">
-        <div class="offer-num">01</div>
-        <div>
-          <h3 class="title">Audit</h3>
-          <p class="caption">2–3&nbsp;semaines&nbsp;· prix fixe</p>
-        </div>
-        <div>
+      <details class="offer-row" name="offre" open>
+        <summary>
+          <span class="offer-num">01</span>
+          <span>
+            <h3 class="title">Audit</h3>
+            <p class="caption offer-when">2–3&nbsp;semaines&nbsp;· prix fixe</p>
+          </span>
+          <span class="offer-toggle" aria-hidden="true"></span>
+        </summary>
+        <div class="offer-body">
           <p>Je passe du temps dans votre opération, avec vos chiffres et vos équipes. Le livrable garde sa valeur même si nous ne travaillons plus jamais ensemble.</p>
           <ul class="offer-list">
             <li>Décomposition chiffrée des pertes</li>
@@ -520,14 +558,17 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
             <li>Recommandation&nbsp;: construire, acheter, déléguer ou ne rien faire</li>
           </ul>
         </div>
-      </div>
-      <div class="offer-row">
-        <div class="offer-num">02</div>
-        <div>
-          <h3 class="title">Conception</h3>
-          <p class="caption">Durée selon chantier&nbsp;· prix fixe</p>
-        </div>
-        <div>
+      </details>
+      <details class="offer-row" name="offre">
+        <summary>
+          <span class="offer-num">02</span>
+          <span>
+            <h3 class="title">Conception</h3>
+            <p class="caption offer-when">Durée selon chantier&nbsp;· prix fixe</p>
+          </span>
+          <span class="offer-toggle" aria-hidden="true"></span>
+        </summary>
+        <div class="offer-body">
           <p>Pour le chantier retenu&nbsp;: définition de la solution, critères de réussite mesurables, choix entre développement interne, outil existant ou partenaire, et prototype lorsque cela permet de réduire le risque.</p>
           <ul class="offer-list">
             <li>Critères de réussite définis avant le code</li>
@@ -536,14 +577,17 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
             <li>Décision claire&nbsp;: déployer ou arrêter</li>
           </ul>
         </div>
-      </div>
-      <div class="offer-row">
-        <div class="offer-num">03</div>
-        <div>
-          <h3 class="title">Mise en œuvre</h3>
-          <p class="caption">Durée selon chantier&nbsp;· fixe&nbsp;+ part au résultat</p>
-        </div>
-        <div>
+      </details>
+      <details class="offer-row" name="offre">
+        <summary>
+          <span class="offer-num">03</span>
+          <span>
+            <h3 class="title">Mise en œuvre</h3>
+            <p class="caption offer-when">Durée selon chantier&nbsp;· fixe&nbsp;+ part au résultat</p>
+          </span>
+          <span class="offer-toggle" aria-hidden="true"></span>
+        </summary>
+        <div class="offer-body">
           <p>J'accompagne la mise en œuvre jusqu'au résultat. Selon le chantier, je construis moi-même, travaille avec vos équipes ou fais intervenir le bon spécialiste. Mon rôle reste le même&nbsp;: garder le cap sur le résultat et faire avancer le projet plus vite.</p>
           <ul class="offer-list">
             <li>Pilotage et accélération de la mise en œuvre</li>
@@ -552,7 +596,7 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
             <li>Transfert aux équipes, sans dépendance</li>
           </ul>
         </div>
-      </div>
+      </details>
     </div>
     <div class="offer-foot">
       <p class="caption">Chaque étape est autonome. Prix annoncé avant de commencer, aucun engagement sur l'étape suivante.</p>
@@ -727,6 +771,17 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
   }
 
   reveal('.section .rail, .section .two > div:not(.rail), .thesis .rail, .thesis .two > div:not(.rail), .offer-head, .offer-row, .offer-foot, .final .shell > *');
+
+  /* one-open-at-a-time fallback for engines without <details name> */
+  var acc = Array.prototype.slice.call(document.querySelectorAll('details[name="offre"]'));
+  if (acc.length && !('name' in document.createElement('details'))) {
+    acc.forEach(function (d) {
+      d.addEventListener('toggle', function () {
+        if (!d.open) return;
+        acc.forEach(function (o) { if (o !== d) o.open = false; });
+      });
+    });
+  }
   reveal('.principles > div', { rule: true, step: 110, base: 600 });
   reveal('.stats > div', { rule: true, step: 90 });
   reveal('.domain', { rule: true, step: 80 });
