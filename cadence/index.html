@@ -31,6 +31,9 @@
   --sans:'Instrument Sans',ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --shell:1140px;
   --gutter:24px;
+
+  --ease-out:cubic-bezier(.23,1,.32,1);
+  --ease-in-out:cubic-bezier(.77,0,.175,1);
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -77,20 +80,25 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
   display:inline-flex;align-items:center;gap:10px;
   padding:14px 26px;border:1px solid var(--wine);border-radius:2px;
   font-size:15px;font-weight:500;letter-spacing:.01em;line-height:1.2;
-  transition:background .15s,color .15s,border-color .15s;
+  transition:background 180ms var(--ease-out),color 180ms var(--ease-out),
+             border-color 180ms var(--ease-out),transform 160ms var(--ease-out);
 }
+.btn:active{transform:scale(.97)}
 .btn-fill{background:var(--wine);color:var(--on-wine)}
-.btn-fill:hover{background:var(--wine-deep);border-color:var(--wine-deep)}
 .btn-fill.on-dark{border-color:var(--on-wine);background:transparent;color:var(--on-wine)}
-.btn-fill.on-dark:hover{background:var(--on-wine);color:var(--wine)}
 .link-arrow{
   display:inline-flex;align-items:center;gap:8px;
   font-size:15px;font-weight:500;color:var(--wine);
   border-bottom:1px solid var(--line-strong);padding-bottom:2px;
-  transition:border-color .15s;
+  transition:border-color 180ms var(--ease-out);
 }
-.link-arrow:hover{border-color:var(--wine)}
-.link-arrow::after{content:"→";font-family:var(--sans)}
+.link-arrow::after{content:"→";font-family:var(--sans);transition:transform 160ms var(--ease-out)}
+@media(hover:hover) and (pointer:fine){
+  .btn-fill:hover{background:var(--wine-deep);border-color:var(--wine-deep)}
+  .btn-fill.on-dark:hover{background:var(--on-wine);color:var(--wine)}
+  .link-arrow:hover{border-color:var(--wine)}
+  .link-arrow:hover::after{transform:translateX(4px)}
+}
 
 /* ---------- header ---------- */
 .skip-link{
@@ -105,17 +113,27 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
   position:sticky;top:0;z-index:10;
   background:rgba(242,240,235,.85);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border-bottom:1px solid transparent;transition:border-color .2s;
+  border-bottom:1px solid transparent;
+  transition:border-color .2s,transform 300ms var(--ease-out);
 }
 .nav.scrolled{border-bottom-color:var(--line)}
+.nav.nav-hidden{transform:translateY(-100%)}
 .nav .shell{height:72px;display:flex;align-items:center;justify-content:space-between;gap:32px}
 .wordmark{
   font-family:var(--serif);font-size:22px;font-weight:500;letter-spacing:.01em;
   color:var(--ink);
 }
 .nav-links{display:flex;gap:30px;align-items:center}
-.nav-links a{font-size:15px;color:var(--ink);padding:6px 0;border-bottom:1px solid transparent;transition:border-color .15s}
-.nav-links a:hover{border-bottom-color:var(--line-strong)}
+.nav-links a{position:relative;font-size:15px;color:var(--ink);padding:6px 0}
+.nav-links a::after{
+  content:"";position:absolute;left:0;right:0;bottom:2px;height:1px;
+  background:var(--wine);transform:scaleX(0);transform-origin:left;
+  transition:transform 200ms var(--ease-out);
+}
+.nav-links a.active::after{transform:scaleX(1)}
+@media(hover:hover) and (pointer:fine){
+  .nav-links a:hover::after{transform:scaleX(1)}
+}
 .nav-cta{padding:10px 20px;font-size:14px}
 
 /* ---------- hero ---------- */
@@ -133,14 +151,27 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
 .principles p{font-size:16px;line-height:1.5;color:var(--ink)}
 
 @media(prefers-reduced-motion:no-preference){
-  .hero .eyebrow,.hero h1,.hero .lead,.hero .cta-row,.hero .principles{
-    animation:rise .8s cubic-bezier(.16,1,.3,1) backwards;
+  .hero .eyebrow,.hero .lead,.hero .cta-row{
+    animation:rise .8s var(--ease-out) backwards;
   }
-  .hero h1{animation-delay:.06s}
-  .hero .lead{animation-delay:.12s}
-  .hero .cta-row{animation-delay:.18s}
-  .hero .principles{animation-delay:.26s}
+  .hero .lead{animation-delay:.42s}
+  .hero .cta-row{animation-delay:.54s}
   @keyframes rise{from{opacity:0;transform:translateY(14px)}}
+}
+
+/* Word-mask reveal: JS wraps words in .w > span; the inner span rises out of the mask */
+.mask-lines .w{
+  display:inline-block;overflow:hidden;vertical-align:bottom;
+  padding-bottom:.12em;margin-bottom:-.12em;
+}
+.mask-lines .w>span{display:inline-block}
+@media(prefers-reduced-motion:no-preference){
+  .mask-lines .w>span{
+    transform:translateY(112%);
+    transition:transform 800ms var(--ease-out);
+    transition-delay:var(--d,0ms);
+  }
+  .mask-lines.in-view .w>span{transform:none}
 }
 
 /* ---------- sections ---------- */
@@ -265,10 +296,52 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
 .footer-bottom .caption{color:rgba(244,239,233,.5)}
 .footer ::selection{background:var(--on-wine);color:var(--wine)}
 
-/* ---------- reveal ---------- */
+/* ---------- reveal system (classes added by JS, motion-gated) ---------- */
 @media(prefers-reduced-motion:no-preference){
-  .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
+  .reveal{
+    opacity:0;transform:translateY(18px);
+    transition:opacity .7s var(--ease-out),transform .7s var(--ease-out);
+    transition-delay:var(--d,0ms);
+  }
   .reveal.in-view{opacity:1;transform:none}
+
+  /* hairline rules draw in from the left */
+  .reveal-rule{border-top-color:transparent !important;position:relative}
+  .reveal-rule::before{
+    content:"";position:absolute;top:-1px;left:0;width:100%;height:1px;
+    background:var(--line-strong);transform:scaleX(0);transform-origin:left;
+    transition:transform 900ms var(--ease-in-out);
+    transition-delay:var(--d,0ms);
+  }
+  .limit.reveal-rule::before{background:var(--line)}
+  .reveal-rule.in-view::before{transform:scaleX(1)}
+
+  /* ledger total: rule draws, figure settles into place */
+  .ledger-row.total{border-top-color:transparent}
+  .ledger-row.total::before{
+    content:"";position:absolute;top:-1px;left:0;width:100%;height:1px;
+    background:var(--ink);transform:scaleX(0);transform-origin:left;
+    transition:transform 700ms var(--ease-in-out) 250ms;
+  }
+  .ledger.in-view .ledger-row.total::before{transform:scaleX(1)}
+  .ledger-row.total{position:relative}
+  .ledger-row.total .ledger-value{
+    opacity:0;transform:translateY(8px) scale(.97);
+    transition:opacity .5s var(--ease-out) 500ms,transform .5s var(--ease-out) 500ms;
+  }
+  .ledger.in-view .ledger-row.total .ledger-value{opacity:1;transform:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .reveal{opacity:0;transition:opacity .25s ease}
+  .reveal.in-view{opacity:1}
+  .nav-links a::after{transition:none}
+  .nav.nav-hidden{transform:none}
+}
+
+/* quiet hover on the domain cells */
+.domain .title{transition:color 200ms ease}
+@media(hover:hover) and (pointer:fine){
+  .domain:hover .title{color:var(--wine)}
 }
 
 /* ---------- responsive ---------- */
@@ -315,7 +388,7 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
 <header class="hero">
   <div class="shell">
     <p class="eyebrow">Conseil en IA, automatisation &amp; opérations — Casablanca&nbsp;·&nbsp;Amsterdam</p>
-    <h1 class="display-xl">L'IA doit améliorer votre résultat.</h1>
+    <h1 class="display-xl mask-lines">L'IA doit améliorer votre résultat.</h1>
     <p class="lead">Sinon, ne la déployez pas. J'identifie où la technologie peut créer de la valeur, définis ce qu'il faut mettre en place et accompagne sa mise en œuvre.</p>
     <div class="cta-row">
       <a class="btn btn-fill" href="#contact">Parler de votre opération</a>
@@ -370,7 +443,7 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
   <div class="shell two">
     <div class="rail">
       <p class="eyebrow">La méthode</p>
-      <h2 class="display">Commencer par le résultat. La technologie vient ensuite.</h2>
+      <h2 class="display mask-lines">Commencer par le résultat. La technologie vient ensuite.</h2>
     </div>
     <div>
       <p>Une technologie n'a de valeur que si elle améliore un chiffre qui compte&nbsp;: marge, temps récupéré, vitesse commerciale ou capacité opérationnelle.</p>
@@ -593,26 +666,127 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
 </footer>
 
 <script>
+(function () {
+  'use strict';
+  var motionOK = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
   var nav = document.getElementById('siteNav');
-  new IntersectionObserver(function(entries){
+
+  /* nav hairline once scrolled */
+  new IntersectionObserver(function (entries) {
     nav.classList.toggle('scrolled', !entries[0].isIntersecting);
   }).observe(document.getElementById('topSentinel'));
 
-  if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
-    var targets = document.querySelectorAll('.section .rail, .section .two > div:not(.rail), .thesis .rail, .thesis .two > div:not(.rail), .offer-head, .offer-row, .offer-foot, .final .shell > *');
-    var revealer = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in-view');
-          revealer.unobserve(entry.target);
-        }
+  /* nav hides on scroll down, returns on scroll up */
+  if (motionOK) {
+    var lastY = 0, ticking = false;
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        var y = window.scrollY;
+        nav.classList.toggle('nav-hidden', y > lastY && y > 480);
+        lastY = y;
+        ticking = false;
       });
-    }, {threshold: .1, rootMargin: '0px 0px -30px 0px'});
-    targets.forEach(function(el){
+    }, { passive: true });
+  }
+
+  /* scrollspy: underline follows the section in view */
+  var spyLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  var spy = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      var id = entry.target.id;
+      spyLinks.forEach(function (a) {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+      });
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  spyLinks.forEach(function (a) {
+    var target = document.querySelector(a.getAttribute('href'));
+    if (target) spy.observe(target);
+  });
+
+  /* single reveal observer; classes and delays are set here so no-JS stays visible */
+  var revealer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('in-view');
+      revealer.unobserve(entry.target);
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+  function reveal(selector, opts) {
+    opts = opts || {};
+    document.querySelectorAll(selector).forEach(function (el, i) {
       el.classList.add('reveal');
+      if (opts.rule) el.classList.add('reveal-rule');
+      if (opts.step) el.style.setProperty('--d', (opts.base || 0) + i * opts.step + 'ms');
       revealer.observe(el);
     });
   }
+
+  reveal('.section .rail, .section .two > div:not(.rail), .thesis .rail, .thesis .two > div:not(.rail), .offer-head, .offer-row, .offer-foot, .final .shell > *');
+  reveal('.principles > div', { rule: true, step: 110, base: 600 });
+  reveal('.stats > div', { rule: true, step: 90 });
+  reveal('.domain', { rule: true, step: 80 });
+  reveal('.limit', { rule: true, step: 80 });
+  document.querySelectorAll('.ledger').forEach(function (el) { revealer.observe(el); });
+
+  if (!motionOK) return;
+  /* everything below is transform- or value-based motion: skipped under reduced motion */
+
+  /* word-mask reveal on the display headlines */
+  function maskWords(el, base, step) {
+    el.setAttribute('aria-label', el.textContent.trim());
+    var words = el.textContent.trim().split(/\s+/);
+    el.textContent = '';
+    var holder = document.createElement('span');
+    holder.setAttribute('aria-hidden', 'true');
+    words.forEach(function (word, i) {
+      var mask = document.createElement('span');
+      mask.className = 'w';
+      var inner = document.createElement('span');
+      inner.textContent = word;
+      inner.style.setProperty('--d', (base + i * step) + 'ms');
+      mask.appendChild(inner);
+      holder.appendChild(mask);
+      if (i < words.length - 1) holder.appendChild(document.createTextNode(' '));
+    });
+    el.appendChild(holder);
+  }
+  var heroH1 = document.querySelector('.hero .mask-lines');
+  if (heroH1) {
+    maskWords(heroH1, 120, 60);
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { heroH1.classList.add('in-view'); });
+    });
+  }
+  document.querySelectorAll('.thesis .mask-lines').forEach(function (el) {
+    maskWords(el, 0, 50);
+    revealer.observe(el);
+  });
+
+  /* stat numerals count up once, ease-out cubic */
+  document.querySelectorAll('.stat-num').forEach(function (el) {
+    var m = el.textContent.match(/^(\d+)([\s\S]*)$/);
+    if (!m) return;
+    var end = parseInt(m[1], 10), suffix = m[2];
+    var counter = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      counter.disconnect();
+      var start = null;
+      function tick(ts) {
+        if (start === null) start = ts;
+        var p = Math.min((ts - start) / 900, 1);
+        el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3))) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }, { threshold: 0.6 });
+    counter.observe(el);
+  });
+})();
 </script>
 
 </body>
