@@ -201,7 +201,25 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
   font-variant-numeric:tabular-nums;margin-bottom:8px;display:block;
 }
 .stats p{font-size:15px;color:var(--stone);margin:0}
-.who-foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line)}
+
+/* formation & langues */
+.parcours{margin-top:48px;display:grid;grid-template-columns:3fr 2fr;gap:36px 40px}
+.parcours>div{border-top:1px solid var(--line-strong);padding-top:16px}
+.parcours .eyebrow{margin-bottom:16px}
+.edu{display:grid;gap:18px}
+.edu-name{font-family:var(--serif);font-size:21px;line-height:1.25;font-weight:400}
+.edu-note{margin-top:3px}
+.lang-list{display:grid;gap:10px}
+.lang-list li{font-size:15.5px;line-height:1.5}
+.lang-list .caption{display:block}
+.profile-links{display:block;margin-top:8px}
+.profile-links a{
+  color:var(--wine);border-bottom:1px solid var(--line-strong);
+  transition:border-color 180ms var(--ease-out);
+}
+@media(hover:hover) and (pointer:fine){
+  .profile-links a:hover{border-color:var(--wine)}
+}
 
 /* ---------- thesis band ---------- */
 .thesis{background:var(--wine);color:var(--on-wine);padding:104px 0;border-bottom:none}
@@ -390,7 +408,7 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
   .offer-row summary{grid-template-columns:40px 1fr 18px;gap:14px;padding:22px 0}
   .offer-num{font-size:17px;padding-top:2px}
   .offer-body{grid-template-columns:1fr;gap:18px;padding:0 0 30px 54px}
-  .domains,.limits{grid-template-columns:1fr}
+  .domains,.limits,.parcours{grid-template-columns:1fr}
   .stats{grid-template-columns:repeat(2,1fr);gap:28px}
   .ledger{padding:24px 20px 16px}
 }
@@ -455,7 +473,9 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
       <h2 class="display">J'opère l'un des plus grands systèmes d'IA de support client au monde.</h2>
       <figure class="portrait-figure">
         <img src="assets/portrait.webp" alt="Portrait d'Otman Ech Cherif El Kettani" width="760" height="760" loading="lazy">
-        <figcaption class="caption"><strong>Otman Ech Cherif El Kettani</strong><br>Fondateur, Cadence</figcaption>
+        <figcaption class="caption"><strong>Otman Ech Cherif El Kettani</strong><br>Fondateur, Cadence
+          <span class="profile-links"><a href="https://linkedin.com/in/otmaneekettani" rel="me noopener" target="_blank">LinkedIn&nbsp;↗</a></span>
+        </figcaption>
       </figure>
     </div>
     <div>
@@ -468,7 +488,30 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
         <div><dt class="stat-num">15&nbsp;M$</dt><dd><p>d'économies annuelles, impact mesuré sur le périmètre que j'opère</p></dd></div>
         <div><dt class="stat-num">20&nbsp;M$</dt><dd><p>de volume incrémental, chiffre d'affaires additionnel mesuré</p></dd></div>
       </dl>
-      <p class="who-foot caption">École Centrale Paris · Universidad Politécnica de Madrid. Français, arabe&nbsp;/&nbsp;darija, espagnol, anglais.</p>
+      <div class="parcours">
+        <div>
+          <p class="eyebrow">Formation</p>
+          <div class="edu">
+            <div>
+              <p class="edu-name">École Centrale Paris</p>
+              <p class="edu-note caption">Grande école d'ingénieurs — Paris</p>
+            </div>
+            <div>
+              <p class="edu-name">Universidad Politécnica de Madrid</p>
+              <p class="edu-note caption">École d'ingénieurs — Madrid</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <p class="eyebrow">Langues</p>
+          <ul class="lang-list">
+            <li>Français</li>
+            <li>Arabe&nbsp;/&nbsp;darija</li>
+            <li>Espagnol</li>
+            <li>Anglais</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -784,6 +827,7 @@ h1,h2,h3{text-wrap:balance;font-weight:400}
   }
   reveal('.principles > div', { rule: true, step: 110, base: 600 });
   reveal('.stats > div', { rule: true, step: 90 });
+  reveal('.parcours > div', { rule: true, step: 90 });
   reveal('.domain', { rule: true, step: 80 });
   reveal('.limit', { rule: true, step: 80 });
   document.querySelectorAll('.ledger').forEach(function (el) { revealer.observe(el); });
