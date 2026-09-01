@@ -1,190 +1,619 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cadence — Automation that pays for itself</title>
-<meta name="description" content="AI &amp; automation advisory. I find where LLMs and automation create real leverage in your operations — then build it, measure it, and hand it over.">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadence — Conseil en IA &amp; opérations</title>
+<meta name="description" content="Cadence est un conseil indépendant en IA, automatisation et opérations : identifier les opportunités, définir la bonne solution et accélérer sa mise en œuvre. Aucun chantier n'est recommandé s'il ne rapporte pas au moins cinq fois son coût.">
 <link rel="canonical" href="https://otmanechcherifelkettani-coder.github.io/cadence/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Cadence — Automation that pays for itself">
-<meta property="og:description" content="I find where LLMs and automation create real leverage in your operations — then build it, measure it, and hand it over.">
+<meta property="og:title" content="Cadence — Conseil en IA &amp; opérations">
+<meta property="og:description" content="Un conseiller, pas une agence. J'identifie où la technologie peut créer de la valeur, définis ce qu'il faut mettre en place et accompagne sa mise en œuvre.">
+<meta name="theme-color" content="#f2f0eb">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23421d24'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' fill='%23f2f0eb' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f2f0eb;
+  --surface:#fbfaf8;
+  --ink:#28241f;
+  --wine:#421d24;
+  --wine-deep:#341219;
+  --on-wine:#f4efe9;
+  --on-wine-muted:#cbb7ae;
+  --stone:#6b635c;
+  --line:#ddd6ca;
+  --line-strong:#c9c0b1;
+
+  --serif:'Newsreader',Georgia,'Times New Roman',serif;
+  --sans:'Instrument Sans',ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --shell:1140px;
+  --gutter:24px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--paper);scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-size:16.5px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid var(--wine);outline-offset:3px}
+p{max-width:62ch}
+p+p{margin-top:14px}
+ul{list-style:none}
+img{max-width:100%;display:block}
+h1,h2,h3{text-wrap:balance;font-weight:400}
+::selection{background:var(--wine);color:var(--on-wine)}
+
+.shell{width:min(100%,var(--shell));margin:0 auto;padding:0 var(--gutter)}
+
+/* ---------- type roles ---------- */
+.display-xl{
+  font-family:var(--serif);font-size:clamp(42px,6vw,68px);
+  line-height:1.04;letter-spacing:-.01em;font-weight:400;
+}
+.display{
+  font-family:var(--serif);font-size:clamp(29px,3.6vw,40px);
+  line-height:1.14;letter-spacing:-.008em;font-weight:400;
+}
+.title{
+  font-family:var(--serif);font-size:23px;line-height:1.25;font-weight:500;
+}
+.lead{font-size:19px;line-height:1.55;color:var(--stone)}
+.eyebrow{
+  font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--wine);
+}
+.caption{font-size:13px;line-height:1.55;color:var(--stone)}
+.muted{color:var(--stone)}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 26px;border:1px solid var(--wine);border-radius:2px;
+  font-size:15px;font-weight:500;letter-spacing:.01em;line-height:1.2;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.btn-fill{background:var(--wine);color:var(--on-wine)}
+.btn-fill:hover{background:var(--wine-deep);border-color:var(--wine-deep)}
+.btn-fill.on-dark{border-color:var(--on-wine);background:transparent;color:var(--on-wine)}
+.btn-fill.on-dark:hover{background:var(--on-wine);color:var(--wine)}
+.link-arrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:15px;font-weight:500;color:var(--wine);
+  border-bottom:1px solid var(--line-strong);padding-bottom:2px;
+  transition:border-color .15s;
+}
+.link-arrow:hover{border-color:var(--wine)}
+.link-arrow::after{content:"→";font-family:var(--sans)}
+
+/* ---------- header ---------- */
+.skip-link{
+  position:absolute;left:16px;top:-52px;z-index:100;
+  background:var(--wine);color:var(--on-wine);padding:12px 20px;border-radius:2px;
+  transition:top .15s;
+}
+.skip-link:focus-visible{top:12px;outline:2px solid var(--on-wine);outline-offset:2px}
+.top-sentinel{position:absolute;top:0;left:0;width:1px;height:8px}
+
+.nav{
+  position:sticky;top:0;z-index:10;
+  background:rgba(242,240,235,.85);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid transparent;transition:border-color .2s;
+}
+.nav.scrolled{border-bottom-color:var(--line)}
+.nav .shell{height:72px;display:flex;align-items:center;justify-content:space-between;gap:32px}
+.wordmark{
+  font-family:var(--serif);font-size:22px;font-weight:500;letter-spacing:.01em;
+  color:var(--ink);
+}
+.nav-links{display:flex;gap:30px;align-items:center}
+.nav-links a{font-size:15px;color:var(--ink);padding:6px 0;border-bottom:1px solid transparent;transition:border-color .15s}
+.nav-links a:hover{border-bottom-color:var(--line-strong)}
+.nav-cta{padding:10px 20px;font-size:14px}
+
+/* ---------- hero ---------- */
+.hero{padding:104px 0 88px;border-bottom:1px solid var(--line)}
+.hero .eyebrow{margin-bottom:26px}
+.hero h1{max-width:16ch;margin-bottom:26px}
+.hero .lead{max-width:52ch;margin-bottom:38px}
+.cta-row{display:flex;gap:28px;flex-wrap:wrap;align-items:center}
+
+.principles{
+  margin-top:84px;display:grid;grid-template-columns:repeat(3,1fr);gap:40px;
+}
+.principles>div{border-top:1px solid var(--line-strong);padding-top:18px}
+.principles .eyebrow{margin-bottom:10px;letter-spacing:.14em}
+.principles p{font-size:16px;line-height:1.5;color:var(--ink)}
+
+@media(prefers-reduced-motion:no-preference){
+  .hero .eyebrow,.hero h1,.hero .lead,.hero .cta-row,.hero .principles{
+    animation:rise .8s cubic-bezier(.16,1,.3,1) backwards;
+  }
+  .hero h1{animation-delay:.06s}
+  .hero .lead{animation-delay:.12s}
+  .hero .cta-row{animation-delay:.18s}
+  .hero .principles{animation-delay:.26s}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}}
+}
+
+/* ---------- sections ---------- */
+.section{padding:96px 0;border-bottom:1px solid var(--line)}
+.section:last-of-type{border-bottom:none}
+.two{display:grid;grid-template-columns:5fr 7fr;gap:72px;align-items:start}
+.two>.rail{position:sticky;top:104px}
+.rail .eyebrow{margin-bottom:18px}
+.rail .display{max-width:16ch}
+
+/* ---------- about ---------- */
+.portrait-figure{margin-top:36px;max-width:340px}
+.portrait-figure img{
+  width:100%;aspect-ratio:1/1;object-fit:cover;
+  filter:grayscale(1) contrast(1.04);
+  border:1px solid var(--line-strong);
+}
+.portrait-figure figcaption{margin-top:12px}
+.portrait-figure .caption strong{color:var(--ink);font-weight:600}
+
+.stats{
+  margin-top:48px;display:grid;grid-template-columns:repeat(2,1fr);gap:36px 40px;
+}
+.stats>div{border-top:1px solid var(--line-strong);padding-top:16px}
+.stat-num{
+  font-family:var(--serif);font-size:44px;line-height:1;font-weight:400;
+  font-variant-numeric:tabular-nums;margin-bottom:8px;display:block;
+}
+.stats p{font-size:15px;color:var(--stone);margin:0}
+.who-foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line)}
+
+/* ---------- thesis band ---------- */
+.thesis{background:var(--wine);color:var(--on-wine);padding:104px 0;border-bottom:none}
+.thesis .eyebrow{color:var(--on-wine-muted)}
+.thesis .display{color:var(--on-wine)}
+.thesis p{color:var(--on-wine-muted)}
+.thesis p strong{color:var(--on-wine);font-weight:500}
+.thesis ::selection{background:var(--on-wine);color:var(--wine)}
+
+/* ---------- 5x rule / ledger ---------- */
+.ledger{
+  margin-top:40px;background:var(--surface);border:1px solid var(--line);
+  padding:32px 32px 24px;max-width:560px;
+}
+.ledger .eyebrow{letter-spacing:.14em;margin-bottom:22px;display:block}
+.ledger-row{
+  display:flex;justify-content:space-between;align-items:baseline;gap:24px;
+  padding:12px 0;border-bottom:1px solid var(--line);
+}
+.ledger-row:last-of-type{border-bottom:none}
+.ledger-row.total{border-top:1px solid var(--ink);border-bottom:none;margin-top:4px;padding-top:16px}
+.ledger-label{font-size:15px;color:var(--stone)}
+.ledger-value{
+  font-family:var(--serif);font-size:24px;font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.ledger-row.total .ledger-label{color:var(--ink);font-weight:500}
+.ledger-row.total .ledger-value{font-size:30px;color:var(--wine)}
+.ledger-note{margin-top:18px}
+
+/* ---------- offer ---------- */
+.offer-head{margin-bottom:64px;max-width:720px}
+.offer-head .eyebrow{margin-bottom:18px}
+.offer{border-top:1px solid var(--line-strong)}
+.offer-row{
+  display:grid;grid-template-columns:1fr 5fr 6fr;gap:40px;
+  padding:44px 0;border-bottom:1px solid var(--line);
+}
+.offer-num{
+  font-family:var(--serif);font-size:20px;color:var(--wine);
+  font-variant-numeric:tabular-nums;padding-top:4px;
+}
+.offer-row .title{margin-bottom:8px}
+.offer-row .caption{margin-bottom:0}
+.offer-row>div p{color:var(--stone)}
+.offer-list{margin-top:20px;display:grid;gap:9px}
+.offer-list li{
+  display:flex;gap:14px;font-size:15.5px;line-height:1.5;color:var(--ink);
+}
+.offer-list li::before{content:"—";color:var(--wine);flex:0 0 auto}
+.offer-foot{margin-top:28px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center}
+
+/* ---------- domains ---------- */
+.domains{
+  margin-top:0;display:grid;grid-template-columns:1fr 1fr;gap:40px 48px;
+}
+.domain{border-top:1px solid var(--line-strong);padding-top:20px}
+.domain .eyebrow{letter-spacing:.14em;margin-bottom:10px}
+.domain .title{margin-bottom:4px}
+.domain .caption{margin-bottom:12px}
+.domain p{font-size:15.5px;color:var(--stone)}
+
+/* ---------- limits ---------- */
+.limits{display:grid;grid-template-columns:1fr 1fr;gap:36px 48px}
+.limit{border-top:1px solid var(--line);padding-top:18px}
+.limit h3{font-family:var(--sans);font-size:16.5px;font-weight:600;margin-bottom:6px}
+.limit p{font-size:15.5px;color:var(--stone)}
+
+/* ---------- final ---------- */
+.final{padding:120px 0 136px}
+.final .eyebrow{margin-bottom:22px}
+.final .display{max-width:20ch;margin-bottom:28px}
+.final p{color:var(--stone)}
+.final .cta-row{margin-top:40px}
+.final .contact-line{margin-top:28px}
+.final .contact-line a{border-bottom:1px solid var(--line-strong);transition:border-color .15s}
+.final .contact-line a:hover{border-color:var(--wine)}
+
+/* ---------- footer ---------- */
+.footer{background:var(--wine);color:var(--on-wine);padding:76px 0 48px}
+.footer .shell{display:flex;justify-content:space-between;gap:48px;flex-wrap:wrap}
+.footer-col{display:grid;gap:8px;align-content:start}
+.footer .wordmark{color:var(--on-wine);margin-bottom:6px}
+.footer-col a,.footer-col span{font-size:14.5px;color:var(--on-wine-muted)}
+.footer-col a{border-bottom:1px solid transparent;transition:color .15s,border-color .15s;width:fit-content}
+.footer-col a:hover{color:var(--on-wine);border-bottom-color:var(--on-wine-muted)}
+.footer-col .col-label{
+  font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--on-wine-muted);margin-bottom:8px;
+}
+.footer-bottom{margin-top:64px;padding-top:24px;border-top:1px solid rgba(244,239,233,.18)}
+.footer-bottom .caption{color:rgba(244,239,233,.5)}
+.footer ::selection{background:var(--on-wine);color:var(--wine)}
+
+/* ---------- reveal ---------- */
+@media(prefers-reduced-motion:no-preference){
+  .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in-view{opacity:1;transform:none}
+}
+
+/* ---------- responsive ---------- */
+@media(max-width:900px){
+  .nav-links{display:none}
+  .hero{padding:72px 0 64px}
+  .section,.thesis{padding:64px 0}
+  .final{padding:80px 0 96px}
+  .two{grid-template-columns:1fr;gap:36px}
+  .two>.rail{position:static}
+  .principles{grid-template-columns:1fr;gap:24px;margin-top:56px}
+  .offer-row{grid-template-columns:1fr;gap:14px;padding:32px 0}
+  .offer-num{padding-top:0}
+  .domains,.limits{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr);gap:28px}
+  .ledger{padding:24px 20px 16px}
+}
+@media(max-width:480px){
+  .stats{grid-template-columns:1fr}
+  .ledger-value{font-size:20px}
+}
+</style>
 </head>
 <body>
-<div class="page">
-  <a class="skip-link" href="#main">Skip to content</a>
 
-  <header class="site-header">
-    <div class="shell header-inner">
-      <a class="wordmark" href="index.html">Cadence</a>
-      <nav class="site-nav" aria-label="Primary">
-        <a href="#services">Services</a>
-        <a href="work.html">Work</a>
-        <a href="about.html">About</a>
-        <a class="btn btn-primary btn-sm" href="mailto:otmankettani5@gmail.com">Email me</a>
-      </nav>
+<div class="top-sentinel" id="topSentinel" aria-hidden="true"></div>
+<a class="skip-link" href="#main">Aller au contenu</a>
+
+<nav class="nav" id="siteNav" aria-label="Navigation principale">
+  <div class="shell">
+    <a class="wordmark" href="#">Cadence</a>
+    <div class="nav-links">
+      <a href="#apropos">À&nbsp;propos</a>
+      <a href="#methode">Méthode</a>
+      <a href="#offre">Offre</a>
+      <a href="#chantiers">Chantiers</a>
     </div>
-  </header>
+    <a class="btn btn-fill nav-cta" href="#contact">Prendre contact</a>
+  </div>
+</nav>
 
-  <main id="main" class="shell">
+<main id="main">
 
-    <section class="section-hero hero">
-      <div class="eyebrow eyebrow-lg">AI &amp; AUTOMATION ADVISORY</div>
-      <h1 class="h1-hero">Automation that pays for itself.</h1>
-      <p class="lead">I find where LLMs and automation create real leverage in your operations — then build it, measure it, and hand it over.</p>
-      <div class="btn-row">
-        <a class="btn btn-primary" href="mailto:otmankettani5@gmail.com">Email me</a>
-        <a class="btn btn-ghost" href="work.html">See the work</a>
+<header class="hero">
+  <div class="shell">
+    <p class="eyebrow">Conseil en IA, automatisation &amp; opérations — Casablanca&nbsp;·&nbsp;Amsterdam</p>
+    <h1 class="display-xl">L'IA doit améliorer votre résultat.</h1>
+    <p class="lead">Sinon, ne la déployez pas. J'identifie où la technologie peut créer de la valeur, définis ce qu'il faut mettre en place et accompagne sa mise en œuvre.</p>
+    <div class="cta-row">
+      <a class="btn btn-fill" href="#contact">Parler de votre opération</a>
+      <a class="link-arrow" href="#methode">Découvrir la méthode</a>
+    </div>
+
+    <div class="principles">
+      <div>
+        <p class="eyebrow">Principe</p>
+        <p>Un chantier doit rapporter au moins cinq fois son coût la première année.</p>
       </div>
-      <div class="stats">
-        <div>
-          <div class="stat-value">$35M+</div>
-          <div class="stat-label">annual impact shipped</div>
-        </div>
-        <div>
-          <div class="stat-value">8+ yrs</div>
-          <div class="stat-label">product &amp; operations</div>
-        </div>
-        <div>
-          <div class="stat-value">20+</div>
-          <div class="stat-label">experiments at global scale</div>
-        </div>
+      <div>
+        <p class="eyebrow">Modèle</p>
+        <p>Prix fixe, annoncé avant de commencer. Résultat mesuré.</p>
       </div>
-    </section>
-
-    <section class="section">
-      <div class="eyebrow">THE STORY</div>
-      <h2 class="h2-section" style="max-width: 760px;">Strategy consultant. Then operator. Then builder.</h2>
-      <div class="story-grid">
-        <div>
-          <div class="story-year">2017 — ADVISE</div>
-          <p class="body-copy">Started in strategy consulting, building cost and pricing models for major telecom operators. Learned to find the numbers that matter.</p>
-        </div>
-        <div>
-          <div class="story-year">2020 — OPERATE</div>
-          <p class="body-copy">Moved into fintech product and operations: launched a point-of-sale lending product and ran multiple business lines. Learned what it takes to ship.</p>
-        </div>
-        <div>
-          <div class="story-year">2021 — BUILD</div>
-          <p class="body-copy">Led global customer-support automation at a food delivery platform — from rule-based workflows to LLM-driven systems, with $35M+ of measured annual impact.</p>
-        </div>
-      </div>
-      <p class="story-close">Cadence is that arc, offered as a service: consulting rigor, operator pragmatism, and hands-on builds — for companies that can't hire it in-house.</p>
-    </section>
-
-    <section class="section" id="services">
-      <div class="eyebrow">SERVICES</div>
-      <h2 class="h2-section">Three ways to work together.</h2>
-      <div class="card-grid">
-        <div class="card">
-          <div class="card-index">01</div>
-          <div class="card-title">Process &amp; automation audit</div>
-          <p class="card-copy">A structured scan of sales, planning, reporting, operations, finance, marketing, and support — mapping where automation and LLMs create real leverage, quantified.</p>
-        </div>
-        <div class="card">
-          <div class="card-index">02</div>
-          <div class="card-title">Build vs. buy</div>
-          <p class="card-copy">An audit of your SaaS stack: what's underused, what's overpriced, and what can be replaced by simpler tools built internally — with the business case for each.</p>
-        </div>
-        <div class="card">
-          <div class="card-index">03</div>
-          <div class="card-title">AI project advisory</div>
-          <p class="card-copy">Roadmap, evaluation frameworks, and rollout guidance for major internal AI initiatives — from someone who has shipped them at global scale.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="method-grid">
-        <div>
-          <div class="eyebrow">METHOD</div>
-          <h2 class="h2-section">Scan. Pilot. Scale.</h2>
-          <div class="steps">
-            <div class="step">
-              <div class="step-index">01</div>
-              <div>
-                <div class="step-title">Scan</div>
-                <p>Two to three weeks inside your processes. Output: a ranked list of automation opportunities with expected savings, not a slide deck.</p>
-              </div>
-            </div>
-            <div class="step">
-              <div class="step-index">02</div>
-              <div>
-                <div class="step-title">Pilot</div>
-                <p>Build the highest-leverage item first, measured against a baseline. If it doesn't move the number, we stop.</p>
-              </div>
-            </div>
-            <div class="step">
-              <div class="step-index">03</div>
-              <div>
-                <div class="step-title">Scale</div>
-                <p>Roll out what works, instrument it, and transfer ownership to your team — documentation, evals, and training included.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="terminal">
-          <div class="terminal-dots" aria-hidden="true">
-            <span class="dot-red"></span>
-            <span class="dot-amber"></span>
-            <span class="dot-green"></span>
-          </div>
-          <div>$ cadence scan --ops</div>
-          <div class="terminal-out">found: 14 automatable workflows</div>
-          <div class="terminal-out">est. savings: $2.1M / yr</div>
-          <div>$ cadence pilot support-triage</div>
-          <div class="terminal-out">CSAT +20% · contact volume −34%</div>
-          <div>$ cadence scale --global</div>
-          <div class="terminal-out">rollout: 12 markets · owner: your team</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-head">
-        <h2 class="h2-section">Selected work</h2>
-        <a class="link-muted" href="work.html">All five case studies →</a>
-      </div>
-      <div class="work-grid">
-        <a class="work-teaser" href="work.html">
-          <div class="work-teaser-tag">CUSTOMER SUPPORT · GLOBAL FOOD DELIVERY</div>
-          <div class="work-teaser-title">From workflows to LLMs: automating post-order support at global scale</div>
-          <div class="work-teaser-metric">~$15M/yr saved · CSAT +20%</div>
-        </a>
-        <a class="work-teaser" href="work.html">
-          <div class="work-teaser-tag">PLANNING · $2B APPAREL RETAILER</div>
-          <div class="work-teaser-title">A capacity planning tool that retired the Excel files</div>
-          <div class="work-teaser-metric">manual process → internal tool</div>
-        </a>
-        <a class="work-teaser" href="work.html">
-          <div class="work-teaser-tag">SAAS STACK · MULTIPLE COMPANIES</div>
-          <div class="work-teaser-title">Full-stack SaaS audits: what to cut, what to rebuild internally</div>
-          <div class="work-teaser-metric">build vs. buy, quantified</div>
-        </a>
-      </div>
-    </section>
-
-    <section class="section section-tail center">
-      <h2 class="h2-cta">Let's find your leverage.</h2>
-      <p class="cta-copy">One email. I'll reply with three questions and a first hypothesis.</p>
-      <a class="btn btn-primary btn-lg cta-button" href="mailto:otmankettani5@gmail.com">otmankettani5@gmail.com</a>
-    </section>
-
-  </main>
-
-  <footer class="site-footer">
-    <div class="shell footer-inner">
-      <div class="footer-mark">Cadence</div>
-      <div class="footer-links">
-        <a href="https://linkedin.com/in/otmaneekettani" rel="me noopener" target="_blank">LinkedIn</a>
-        <a href="mailto:otmankettani5@gmail.com">otmankettani5@gmail.com</a>
+      <div>
+        <p class="eyebrow">Promesse</p>
+        <p>Une solution que vos équipes maîtrisent, sans dépendance.</p>
       </div>
     </div>
-  </footer>
-</div>
+  </div>
+</header>
+
+<!-- À propos -->
+<section class="section" id="apropos">
+  <div class="shell two">
+    <div class="rail">
+      <p class="eyebrow">Qui je suis</p>
+      <h2 class="display">J'opère l'un des plus grands systèmes d'IA de support client au monde.</h2>
+      <figure class="portrait-figure">
+        <img src="assets/portrait.webp" alt="Portrait d'Otman Ech Cherif El Kettani" width="760" height="760" loading="lazy">
+        <figcaption class="caption"><strong>Otman Ech Cherif El Kettani</strong><br>Fondateur, Cadence</figcaption>
+      </figure>
+    </div>
+    <div>
+      <p>Je dirige l'automatisation du support client d'Uber Eats après commande&nbsp;: un système d'IA en production dans 51&nbsp;pays et 11&nbsp;langues, que j'ai conçu, déployé et que j'opère au quotidien.</p>
+      <p>Je ne vends pas des idées. J'ai porté personnellement la responsabilité d'un système dont dépendent des millions de commandes, avec les erreurs, les arbitrages et les corrections que cela implique.</p>
+      <p>Je sais mesurer si l'IA fonctionne. Et je sais surtout quand ne pas l'utiliser&nbsp;: la moitié de mon travail consiste à refuser des projets qui ne rapporteraient pas leur coût.</p>
+      <dl class="stats">
+        <div><dt class="stat-num">51</dt><dd><p>pays — système en production, opéré au quotidien</p></dd></div>
+        <div><dt class="stat-num">11</dt><dd><p>langues, dont le français et l'arabe</p></dd></div>
+        <div><dt class="stat-num">15&nbsp;M$</dt><dd><p>d'économies annuelles, impact mesuré sur le périmètre que j'opère</p></dd></div>
+        <div><dt class="stat-num">20&nbsp;M$</dt><dd><p>de volume incrémental, chiffre d'affaires additionnel mesuré</p></dd></div>
+      </dl>
+      <p class="who-foot caption">École Centrale Paris · Universidad Politécnica de Madrid. Français, arabe&nbsp;/&nbsp;darija, espagnol, anglais.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Méthode -->
+<section class="thesis" id="methode">
+  <div class="shell two">
+    <div class="rail">
+      <p class="eyebrow">La méthode</p>
+      <h2 class="display">Commencer par le résultat. La technologie vient ensuite.</h2>
+    </div>
+    <div>
+      <p>Une technologie n'a de valeur que si elle améliore un chiffre qui compte&nbsp;: marge, temps récupéré, vitesse commerciale ou capacité opérationnelle.</p>
+      <p>Je travaille sur le sujet de bout en bout&nbsp;: comprendre l'opération, chiffrer le potentiel, définir la bonne solution et accélérer sa mise en œuvre. Selon le chantier, je travaille avec vos équipes, construis moi-même ou fais intervenir le bon spécialiste.</p>
+      <p>La technologie vient ensuite. Il peut s'agir d'un outil existant, d'un développement interne, d'un partenaire spécialisé — ou de rien du tout. <strong>Si les chiffres ne justifient pas le projet, je ne le recommande pas.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- La règle des 5x -->
+<section class="section" id="regle">
+  <div class="shell two">
+    <div class="rail">
+      <p class="eyebrow">La règle des 5×</p>
+      <h2 class="display">Je ne recommande un chantier que si le gain attendu la première année vaut au moins cinq fois son coût total.</h2>
+    </div>
+    <div>
+      <p>Mon prix, votre temps, les outils et le coût du changement&nbsp;: tout compte. Les estimations sont toujours optimistes. La marge de sécurité est volontaire&nbsp;: un projet qui rapporte «&nbsp;peut-être un peu&nbsp;» ne mérite pas votre attention.</p>
+      <p>Conséquence&nbsp;: je refuse des missions. C'est le prix de la confiance.</p>
+      <div class="ledger">
+        <span class="eyebrow">La décision, en pratique — exemple illustratif</span>
+        <div class="ledger-row">
+          <span class="ledger-label">Gain annuel réaliste</span>
+          <span class="ledger-value">70&nbsp;000&nbsp;€</span>
+        </div>
+        <div class="ledger-row">
+          <span class="ledger-label">Coût total du chantier</span>
+          <span class="ledger-value">10&nbsp;000&nbsp;€</span>
+        </div>
+        <div class="ledger-row total">
+          <span class="ledger-label">Retour année&nbsp;1</span>
+          <span class="ledger-value">7×</span>
+        </div>
+        <p class="ledger-note caption">Chiffres fictifs. Le coût total inclut mon prix, votre temps et les outils. En dessous de 5×, je ne recommande pas le chantier.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--
+  Démo vidéo — à réactiver lorsque assets/cadence-demo.mp4 sera disponible.
+  <section class="section" id="demo">
+    <div class="shell">
+      <p class="eyebrow">La démo</p>
+      <h2 class="display">Une minute pour comprendre la méthode.</h2>
+      <video controls preload="metadata" playsinline style="width:100%;aspect-ratio:16/9;border:1px solid var(--line)">
+        <source src="assets/cadence-demo.mp4" type="video/mp4">
+        Votre navigateur ne lit pas les vidéos HTML5.
+      </video>
+    </div>
+  </section>
+-->
+
+<!-- L'offre -->
+<section class="section" id="offre">
+  <div class="shell">
+    <div class="offer-head">
+      <p class="eyebrow">L'offre</p>
+      <h2 class="display">Trois étapes, dans l'ordre. Vous pouvez vous arrêter après chacune.</h2>
+    </div>
+    <div class="offer">
+      <div class="offer-row">
+        <div class="offer-num">01</div>
+        <div>
+          <h3 class="title">Audit</h3>
+          <p class="caption">2–3&nbsp;semaines&nbsp;· prix fixe</p>
+        </div>
+        <div>
+          <p>Je passe du temps dans votre opération, avec vos chiffres et vos équipes. Le livrable garde sa valeur même si nous ne travaillons plus jamais ensemble.</p>
+          <ul class="offer-list">
+            <li>Décomposition chiffrée des pertes</li>
+            <li>2–3 chantiers qui passent la règle des 5×</li>
+            <li>Coût, gain et effort pour chacun</li>
+            <li>Recommandation&nbsp;: construire, acheter, déléguer ou ne rien faire</li>
+          </ul>
+        </div>
+      </div>
+      <div class="offer-row">
+        <div class="offer-num">02</div>
+        <div>
+          <h3 class="title">Conception</h3>
+          <p class="caption">Durée selon chantier&nbsp;· prix fixe</p>
+        </div>
+        <div>
+          <p>Pour le chantier retenu&nbsp;: définition de la solution, critères de réussite mesurables, choix entre développement interne, outil existant ou partenaire, et prototype lorsque cela permet de réduire le risque.</p>
+          <ul class="offer-list">
+            <li>Critères de réussite définis avant le code</li>
+            <li>Prototype sur données réelles, lorsque pertinent</li>
+            <li>Plan de mise en œuvre</li>
+            <li>Décision claire&nbsp;: déployer ou arrêter</li>
+          </ul>
+        </div>
+      </div>
+      <div class="offer-row">
+        <div class="offer-num">03</div>
+        <div>
+          <h3 class="title">Mise en œuvre</h3>
+          <p class="caption">Durée selon chantier&nbsp;· fixe&nbsp;+ part au résultat</p>
+        </div>
+        <div>
+          <p>J'accompagne la mise en œuvre jusqu'au résultat. Selon le chantier, je construis moi-même, travaille avec vos équipes ou fais intervenir le bon spécialiste. Mon rôle reste le même&nbsp;: garder le cap sur le résultat et faire avancer le projet plus vite.</p>
+          <ul class="offer-list">
+            <li>Pilotage et accélération de la mise en œuvre</li>
+            <li>Construction, coordination ou sélection du bon partenaire</li>
+            <li>Mesure des résultats contre les critères définis</li>
+            <li>Transfert aux équipes, sans dépendance</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="offer-foot">
+      <p class="caption">Chaque étape est autonome. Prix annoncé avant de commencer, aucun engagement sur l'étape suivante.</p>
+      <a class="link-arrow" href="#contact">Parler de votre opération</a>
+    </div>
+  </div>
+</section>
+
+<!-- Chantiers types -->
+<section class="section" id="chantiers">
+  <div class="shell two">
+    <div class="rail">
+      <p class="eyebrow">Chantiers types</p>
+      <h2 class="display">Là où l'automatisation change le compte de résultat.</h2>
+    </div>
+    <div class="domains">
+      <div class="domain">
+        <p class="eyebrow">Marge</p>
+        <h3 class="title">Prévision et pertes</h3>
+        <p class="caption">Food, retail, multi-sites</p>
+        <p>Prévoir la demande par site et par jour pour réduire les invendus sans créer de ruptures.</p>
+      </div>
+      <div class="domain">
+        <p class="eyebrow">Vitesse</p>
+        <h3 class="title">Réponse commerciale</h3>
+        <p class="caption">B2B, logistique, négoce</p>
+        <p>Automatiser cotation et traitement documentaire pour répondre en heures, pas en jours.</p>
+      </div>
+      <div class="domain">
+        <p class="eyebrow">Temps</p>
+        <h3 class="title">Support client</h3>
+        <p class="caption">Volume de demandes récurrentes</p>
+        <p>Traiter automatiquement les demandes répétitives et router le reste vers la bonne personne, en français et en darija.</p>
+      </div>
+      <div class="domain">
+        <p class="eyebrow">Temps</p>
+        <h3 class="title">Back-office documentaire</h3>
+        <p class="caption">Douane, facturation, conformité</p>
+        <p>Extraire, vérifier et saisir automatiquement les documents qui occupent aujourd'hui des personnes entières.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Ce que je ne fais pas -->
+<section class="section" id="limites">
+  <div class="shell two">
+    <div class="rail">
+      <p class="eyebrow">Ce que je ne fais pas</p>
+      <h2 class="display">Les limites font partie de l'offre.</h2>
+    </div>
+    <div class="limits">
+      <div class="limit">
+        <h3>Pas de «&nbsp;transformation digitale&nbsp;».</h3>
+        <p>Des chantiers délimités, avec un chiffre à la fin.</p>
+      </div>
+      <div class="limit">
+        <h3>Pas d'équipe de juniors.</h3>
+        <p>La personne que vous rencontrez est celle qui fait le travail.</p>
+      </div>
+      <div class="limit">
+        <h3>Pas d'outil à pousser.</h3>
+        <p>Je ne touche aucune commission de fournisseur.</p>
+      </div>
+      <div class="limit">
+        <h3>Pas de promesse invérifiable.</h3>
+        <p>Chaque système a un critère de réussite et une mesure.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="section final" id="contact">
+  <div class="shell">
+    <p class="eyebrow">Première étape</p>
+    <h2 class="display">Trente minutes. Votre opération, pas une présentation.</h2>
+    <p class="lead">Vous me montrez comment l'entreprise fonctionne, où les équipes passent leur temps et où le chiffre se perd.</p>
+    <p class="lead">Si je vois un chantier qui passe la règle des 5×, je vous propose un audit. Si je ne vois rien, je vous le dis — et je vous aurai au moins posé de meilleures questions.</p>
+    <div class="cta-row">
+      <a class="btn btn-fill" href="mailto:otman.echcherifelkettani@gmail.com">Parler de votre opération</a>
+    </div>
+    <p class="contact-line caption">Ou par écrit&nbsp;: <a href="mailto:otman.echcherifelkettani@gmail.com">otman.echcherifelkettani@gmail.com</a></p>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="shell">
+    <div class="footer-col">
+      <span class="wordmark">Cadence</span>
+      <span>Un conseiller, pas une agence.</span>
+      <span>Casablanca&nbsp;·&nbsp;Amsterdam</span>
+    </div>
+    <div class="footer-col">
+      <span class="col-label">Navigation</span>
+      <a href="#apropos">À&nbsp;propos</a>
+      <a href="#methode">Méthode</a>
+      <a href="#offre">Offre</a>
+      <a href="#chantiers">Chantiers</a>
+    </div>
+    <div class="footer-col">
+      <span class="col-label">Contact</span>
+      <span>Otman Ech Cherif El Kettani</span>
+      <a href="mailto:otman.echcherifelkettani@gmail.com">otman.echcherifelkettani@gmail.com</a>
+    </div>
+  </div>
+  <div class="shell footer-bottom">
+    <span class="caption">© 2026 Cadence, opéré par ARCIV&nbsp;LLC. Tous droits réservés.</span>
+  </div>
+</footer>
+
+<script>
+  var nav = document.getElementById('siteNav');
+  new IntersectionObserver(function(entries){
+    nav.classList.toggle('scrolled', !entries[0].isIntersecting);
+  }).observe(document.getElementById('topSentinel'));
+
+  if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    var targets = document.querySelectorAll('.section .rail, .section .two > div:not(.rail), .thesis .rail, .thesis .two > div:not(.rail), .offer-head, .offer-row, .offer-foot, .final .shell > *');
+    var revealer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          revealer.unobserve(entry.target);
+        }
+      });
+    }, {threshold: .1, rootMargin: '0px 0px -30px 0px'});
+    targets.forEach(function(el){
+      el.classList.add('reveal');
+      revealer.observe(el);
+    });
+  }
+</script>
+
 </body>
 </html>
