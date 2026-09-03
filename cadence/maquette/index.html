@@ -124,7 +124,7 @@ img { display: block; max-width: 100%; }
 .hero .who { font-size: var(--text-body-sm); line-height: 1.2; color: var(--onyx); display: flex; flex-wrap: wrap; gap: var(--sp-8) var(--sp-12); }
 .hero .who span + span::before { content: "·"; color: var(--slate); margin-right: var(--sp-12); }
 .hero h1 { max-width: 13ch; color: var(--onyx); }
-.dissolve { background: linear-gradient(90deg, var(--onyx) 0%, rgba(12, 16, 24, 0.55) 55%, rgba(12, 16, 24, 0.12) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.dissolve { background: linear-gradient(90deg, var(--onyx) 0%, rgba(12, 16, 24, 0.8) 60%, rgba(12, 16, 24, 0.5) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero .lead { font-size: var(--text-sub); line-height: 1.3; color: var(--onyx); max-width: 40ch; font-weight: 300; }
 .hero .actions { display: flex; flex-wrap: wrap; gap: var(--sp-10); margin-top: var(--sp-8); }
 @media (prefers-reduced-motion: no-preference) {
@@ -132,7 +132,7 @@ img { display: block; max-width: 100%; }
   .hero-inner > :nth-child(2) { animation-delay: 60ms; }
   .hero-inner > :nth-child(3) { animation-delay: 120ms; }
   .hero-inner > :nth-child(4) { animation-delay: 180ms; }
-  @keyframes rise { from { transform: translateY(12px); opacity: 0.6; } to { transform: none; opacity: 1; } }
+  @keyframes rise { from { transform: translateY(12px); opacity: 0.85; } to { transform: none; opacity: 1; } }
 }
 
 /* ------------------------------------------------------------------ sections — whitespace rhythm 64 / 96 */
@@ -143,6 +143,33 @@ img { display: block; max-width: 100%; }
 .section-head .label { padding-top: 14px; }
 .section-head .sub { color: var(--slate); margin-top: var(--sp-12); max-width: 42ch; font-weight: 300; }
 @media (max-width: 820px) { .section-head { grid-template-columns: 1fr; gap: var(--sp-8); } .section-head .label { padding-top: 0; } }
+
+.hero .avail { font-size: var(--text-body-sm); line-height: 1.3; color: var(--onyx); display: flex; align-items: center; gap: var(--sp-8); }
+.hero .avail::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--onyx); }
+
+/* start strip — availability, first step, format */
+.start { margin-top: var(--sp-64); border-top: 1px solid var(--ash); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-32); }
+.start > div { padding-top: var(--sp-16); display: grid; gap: var(--sp-8); align-content: start; }
+.start .copy { font-size: var(--text-body-sm); line-height: 1.4; max-width: none; }
+@media (max-width: 820px) { .start { grid-template-columns: 1fr; gap: var(--sp-16); } }
+
+/* mid-page invitation */
+.invite { margin-top: var(--sp-48); padding: var(--sp-24) var(--sp-32); background: var(--card); border-radius: var(--r-card); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-16); }
+.invite p { font-size: var(--text-sub); line-height: 1.2; letter-spacing: var(--tracking); max-width: 36ch; }
+
+/* disclosure for the full method */
+details.more { margin-top: var(--sp-24); }
+details.more summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: var(--sp-8); font-size: var(--text-body); font-weight: 500; padding: var(--sp-12) var(--sp-20); border: 1px solid var(--ash); border-radius: var(--r-pill); }
+details.more summary::-webkit-details-marker { display: none; }
+details.more summary::after { content: "+"; font-weight: 300; }
+details.more[open] summary::after { content: "–"; }
+details.more summary:hover { border-color: var(--onyx); }
+details.more .ledger { margin-top: var(--sp-24); }
+
+/* market cases — compact, clearly not mine */
+.market .case { padding-top: var(--sp-32); }
+.market .case + .case { padding-top: var(--sp-32); margin-top: var(--sp-16); }
+.market .num { font-size: var(--text-h-sm); }
 
 /* thesis — a section-opening statement in the display serif */
 .thesis { display: grid; grid-template-columns: var(--rail) 1fr; gap: var(--sp-16) var(--sp-32); align-items: start; }
@@ -259,6 +286,7 @@ img { display: block; max-width: 100%; }
   <div class="shell header-inner">
     <a class="wordmark" href="#top">Cadence</a>
     <nav class="site-nav" aria-label="Primary">
+      <a class="link" href="#start">Start</a>
       <a class="link" href="#expertise">Expertise</a>
       <a class="link" href="#ways">Ways of working</a>
       <a class="link" href="#about">About</a>
@@ -278,8 +306,9 @@ img { display: block; max-width: 100%; }
       <p class="who"><span>Otman Kettani</span><span>Technology advisory</span><span>Amsterdam</span></p>
       <h1 class="display-lg">Find where technology can create value — <span class="dissolve">and make it happen.</span></h1>
       <p class="lead">5 years deploying AI, automation and product technology at Uber.</p>
+      <p class="avail">Taking on a small number of engagements · Amsterdam, working across Europe</p>
       <div class="actions">
-        <a class="pill" href="mailto:otmankettani5@gmail.com">Get in touch</a>
+        <a class="pill" href="mailto:otmankettani5@gmail.com?subject=Cadence%20%E2%80%94%20intro%20call&body=Hi%20Otman%2C%0A%0AI%20run%20%5Bcompany%5D%20and%20I%27d%20like%20to%20talk%20about%20%5Bwhat%20you%27re%20dealing%20with%5D.%0A%0AA%20good%20time%20for%20a%20call%3A%20">Get in touch</a>
         <a class="pill ghost" href="#expertise">How I work</a>
       </div>
     </div>
@@ -295,6 +324,20 @@ img { display: block; max-width: 100%; }
           <p class="copy quiet">Too many tools. Too many AI experiments. Too little clarity on where technology can actually create value.</p>
           <p class="copy">I help companies find the opportunities that matter, decide what is actually worth doing, and get it into production.</p>
         </div>
+      </div>
+    </div>
+    <div class="start" id="start">
+      <div>
+        <span class="label">Availability</span>
+        <p class="copy">A small number of engagements at a time, alongside my role at Uber Eats. Based in Amsterdam, working remotely across Europe.</p>
+      </div>
+      <div>
+        <span class="label">First step</span>
+        <p class="copy">A two-week diagnostic inside your operation. You get a ranked list of opportunities with their expected value, and a recommendation on what to do first.</p>
+      </div>
+      <div>
+        <span class="label">Format</span>
+        <p class="copy">Advisor or operator, scoped and priced upfront before we start. You keep ownership; I bring the outside view and the operating experience.</p>
       </div>
     </div>
   </section>
@@ -321,8 +364,7 @@ img { display: block; max-width: 100%; }
           <h3 class="h-sm">What is worth doing?</h3>
           <p class="copy quiet">Not every problem needs AI.</p>
           <p class="copy quiet">For each opportunity, I determine the simplest intervention that can materially improve the economics of the work.</p>
-          <p class="list">Process redesign <i>·</i> Automation <i>·</i> AI <i>·</i> Software <i>·</i> Third-party solution <i>·</i> Human intervention</p>
-          <p class="copy quiet">The objective isn't the most advanced technology.</p>
+          <p class="copy quiet">Process redesign, automation, AI, software, a third-party solution or a person. The objective isn't the most advanced technology.</p>
         </div>
         <div class="cap"><p class="ask"><span>It's knowing when technology is worth using — and making it work.</span></p></div>
       </article>
@@ -369,6 +411,10 @@ img { display: block; max-width: 100%; }
         </div>
       </article>
     </div>
+    <div class="invite">
+      <p>Not sure which one you need? Start with the two-week diagnostic and decide after.</p>
+      <a class="pill" href="mailto:otmankettani5@gmail.com?subject=Cadence%20%E2%80%94%20intro%20call&body=Hi%20Otman%2C%0A%0AI%20run%20%5Bcompany%5D%20and%20I%27d%20like%20to%20talk%20about%20%5Bwhat%20you%27re%20dealing%20with%5D.%0A%0AA%20good%20time%20for%20a%20call%3A%20">Get in touch</a>
+    </div>
   </section>
 
   <!-- ============================================================ about -->
@@ -400,13 +446,49 @@ img { display: block; max-width: 100%; }
   <!-- ============================================================ methodology -->
   <section class="shell section" id="method">
     <div class="section-head">
-      <span class="label">10 steps · Value first</span>
+      <span class="label">Four steps · Value first</span>
       <div>
         <h2 class="display">The methodology</h2>
         <p class="sub">One value-first approach, from opportunity to impact.</p>
       </div>
     </div>
 
+    <div class="ledger">
+      <article class="step">
+        <div class="idx">01<small>Diagnose</small></div>
+        <h3 class="h-sm">Define the ambition and understand the operating reality</h3>
+        <div class="body">
+          <p class="copy">Start with the business result to improve: cost, revenue, speed, quality, capacity, customer experience or risk. Then map how the work actually happens today.</p>
+          <div class="output"><span class="label">Output</span><span>Clear objective, success metrics and a current-state view of the operation.</span></div>
+        </div>
+      </article>
+      <article class="step">
+        <div class="idx">02<small>Identify</small></div>
+        <h3 class="h-sm">Find where value is lost and where technology changes the economics</h3>
+        <div class="body">
+          <p class="copy">Look for manual effort, bottlenecks, handoffs, errors and fragmented systems, then trace them to their cause. Ask where technology could create a fundamentally better way of producing the outcome, not where AI could be used.</p>
+          <div class="output"><span class="label">Output</span><span>Defined opportunities with a clear value hypothesis.</span></div>
+        </div>
+      </article>
+      <article class="step">
+        <div class="idx">03<small>Decide</small></div>
+        <h3 class="h-sm">Choose the simplest solution and build the business case</h3>
+        <div class="body">
+          <p class="copy">Process change, traditional automation, an AI workflow, an agentic system, new software, a third-party product, or no change. Weigh value, feasibility, time-to-value and risk, and prioritize what is both valuable and practical.</p>
+          <div class="output"><span class="label">Output</span><span>Recommended solution, prioritized roadmap and business cases.</span></div>
+        </div>
+      </article>
+      <article class="step">
+        <div class="idx">04<small>Ship</small></div>
+        <h3 class="h-sm">Design, validate, deploy and measure</h3>
+        <div class="body">
+          <p class="copy">Design the future state around what the new capability makes possible. Pilot it against the business case before scaling. Move it to production, then measure the actual outcome and scale, iterate, redesign or stop.</p>
+          <div class="output"><span class="label">Output</span><span>Working solution in production, with measured impact.</span></div>
+        </div>
+      </article>
+    </div>
+    <details class="more">
+      <summary>The full ten-step method</summary>
     <div class="ledger">
 
       <article class="step">
@@ -526,17 +608,18 @@ img { display: block; max-width: 100%; }
       </article>
 
     </div>
+    </details>
   </section>
 
   <!-- ============================================================ in practice -->
   <section class="shell section" id="work">
     <div class="section-head">
-      <span class="label">Three cases</span>
+      <span class="label">My work · Uber Eats</span>
       <h2 class="display">What this looks like in practice</h2>
     </div>
 
     <article class="case">
-      <div class="who">Uber Eats<small>Customer support</small></div>
+      <div class="who">Uber Eats<small>Customer support · My engagement</small></div>
       <div class="main">
         <h3 class="h-sm">Rebuilding customer support around LLMs</h3>
         <p class="copy">Uber Eats had a fragmented post-order support experience built around legacy intent detection and workflows.</p>
@@ -552,29 +635,35 @@ img { display: block; max-width: 100%; }
       </div>
     </article>
 
+  </section>
+
+  <!-- ============================================================ market -->
+  <section class="shell section market" id="market">
+    <div class="section-head">
+      <span class="label">Two public cases · Not my engagements</span>
+      <div>
+        <h2 class="display">What the market is doing</h2>
+        <p class="sub">Two published examples of the same principle, from companies I have not worked with.</p>
+      </div>
+    </div>
     <article class="case">
-      <div class="who">Cars24<small>Sales</small></div>
+      <div class="who">Cars24<small>Sales · Public case</small></div>
       <div class="main">
-        <h3 class="h-sm">Using AI to reshape the sales process</h3>
-        <p class="copy">Cars24 deployed AI voice and chat agents across buying, selling, financing and follow-up, starting in parts of the funnel where customer conversations directly influence conversion.</p>
-        <p class="copy">The company also expanded AI internally across <strong>engineering, finance, legal, marketing and operations</strong>, with around <strong>600 employees</strong> using ChatGPT Enterprise and Codex; OpenAI reports <strong>85–90% daily active usage</strong> among that group.</p>
-        <p class="copy">The interesting part is not simply that Cars24 deployed AI. It embedded AI into a <strong>revenue-generating workflow</strong>, changing how customer interactions were handled across the funnel.</p>
+        <h3 class="h-sm">AI embedded in a revenue-generating workflow</h3>
+        <p class="copy">Cars24 deployed AI voice and chat agents across buying, selling, financing and follow-up, starting where customer conversations directly influence conversion, and rolled AI out internally across engineering, finance, legal, marketing and operations.</p>
         <div class="lesson"><span class="label">The lesson</span><p class="copy">Some of the highest-value opportunities are not about automating a task. They are about <strong>changing how an entire commercial workflow operates.</strong></p></div>
       </div>
       <div class="results">
-        <span class="label">Adoption</span>
+        <span class="label">Reported by OpenAI</span>
         <div class="result"><div class="num">~600</div><div class="lab">Employees on ChatGPT Enterprise and Codex</div></div>
-        <div class="result"><div class="num">85–90%</div><div class="lab">Daily active usage, as reported by OpenAI</div></div>
+        <div class="result"><div class="num">85–90%</div><div class="lab">Daily active usage among that group</div></div>
       </div>
     </article>
-
     <article class="case">
-      <div class="who">Procurement<small>McKinsey case</small></div>
+      <div class="who">Procurement<small>Sourcing · Public case</small></div>
       <div class="main">
-        <h3 class="h-sm">AI uncovering 20–29% savings opportunities</h3>
-        <p class="copy">McKinsey describes a technology company using linked AI agents to rethink external-services procurement.</p>
-        <p class="copy">The system combined spend and market data, identified pricing trends and savings opportunities, and modelled demand under different market scenarios to support sourcing decisions.</p>
-        <p class="copy">Procurement is not traditionally viewed as an "AI department." The opportunity emerged from examining the <strong>economics of the workflow</strong> and identifying where AI could materially improve spend analysis, market intelligence, demand modelling and supplier decisions.</p>
+        <h3 class="h-sm">AI agents rethinking external-services spend</h3>
+        <p class="copy">McKinsey describes a technology company using linked AI agents to combine spend and market data, spot pricing trends and savings, and model demand under different scenarios. Procurement is not an "AI department"; the opportunity came from examining the economics of the workflow.</p>
         <div class="lesson"><span class="label">The lesson</span><p class="copy">Some of the biggest technology opportunities may be hiding in parts of the business that don't look "AI-native" at all.</p></div>
       </div>
       <div class="results">
@@ -614,9 +703,10 @@ img { display: block; max-width: 100%; }
         <span class="label">Contact</span>
         <div>
           <h2 class="display-lg">Let's find where technology can create real value.</h2>
+          <p class="copy" style="margin-top: var(--sp-16); color: rgba(255,255,255,0.85);">Start with a two-week diagnostic. Send a few lines about what you're dealing with, and I'll reply with whether I can help and what the first step would look like.</p>
           <div class="actions">
-            <a class="pill inverse" href="mailto:otmankettani5@gmail.com">Get in touch</a>
-            <a class="mail" href="mailto:otmankettani5@gmail.com">otmankettani5@gmail.com</a>
+            <a class="pill inverse" href="mailto:otmankettani5@gmail.com?subject=Cadence%20%E2%80%94%20intro%20call&body=Hi%20Otman%2C%0A%0AI%20run%20%5Bcompany%5D%20and%20I%27d%20like%20to%20talk%20about%20%5Bwhat%20you%27re%20dealing%20with%5D.%0A%0AA%20good%20time%20for%20a%20call%3A%20">Get in touch</a>
+            <a class="mail" href="mailto:otmankettani5@gmail.com?subject=Cadence%20%E2%80%94%20intro%20call&body=Hi%20Otman%2C%0A%0AI%20run%20%5Bcompany%5D%20and%20I%27d%20like%20to%20talk%20about%20%5Bwhat%20you%27re%20dealing%20with%5D.%0A%0AA%20good%20time%20for%20a%20call%3A%20">otmankettani5@gmail.com</a>
           </div>
         </div>
       </div>
@@ -624,7 +714,7 @@ img { display: block; max-width: 100%; }
     <footer class="site-footer">
       <div class="shell footer-grid">
         <div><span class="label">Cadence</span><br>Otman Kettani<br>Technology advisory</div>
-        <div><span class="label">Contact</span><br><a href="mailto:otmankettani5@gmail.com">otmankettani5@gmail.com</a><br>Amsterdam</div>
+        <div><span class="label">Contact</span><br><a href="mailto:otmankettani5@gmail.com?subject=Cadence%20%E2%80%94%20intro%20call&body=Hi%20Otman%2C%0A%0AI%20run%20%5Bcompany%5D%20and%20I%27d%20like%20to%20talk%20about%20%5Bwhat%20you%27re%20dealing%20with%5D.%0A%0AA%20good%20time%20for%20a%20call%3A%20">otmankettani5@gmail.com</a><br>Amsterdam</div>
         <div><span class="label">Languages</span><br>French · Arabic · Darija<br>Spanish · English</div>
       </div>
     </footer>
