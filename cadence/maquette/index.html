@@ -5,67 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cadence</title>
 <meta name="description" content="Cadence — Otman Kettani. Find where technology can create value, and make it happen. Technology, AI and automation advisory for founder-led businesses.">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 /* ------------------------------------------------------------------ tokens
-   Maquette tokens. The design reference (styles.refero.design) could not be
-   fetched from the build environment, so this block is the single place to
-   swap palette / type once the reference DESIGN.md is available. */
+   From the INVERSA style reference (styles.refero.design). Single dark theme
+   by design. NB International Pro is not on Google Fonts; Inter is the
+   reference's named substitute. Swap --sans if the licensed face is added. */
 :root {
-  --ground: #f5f6f3;
-  --surface: #eceee9;
-  --surface-2: #e2e5df;
-  --ink: #101417;
-  --ink-2: #4a5259;
-  --ink-3: #7c858c;
-  --line: #d3d8d2;
-  --line-strong: #aeb5b0;
-  --accent: #0e6b62;
-  --accent-ink: #ffffff;
-  --accent-soft: rgba(14, 107, 98, 0.10);
+  --canvas: #13140e;        /* Obsidian Loam */
+  --ink: #f4f3e8;           /* Bone Vellum */
+  --line: #404040;          /* Iron Filings */
+  --muted: #84837b;         /* Drift Ash */
+  --lime: #ebfc72;          /* Lime Surveyor */
+  --olive: #bacd31;         /* Marsh Olive */
 
-  --display: 'Bricolage Grotesque', 'Helvetica Neue', Arial, sans-serif;
-  --body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: 'Inter', 'NB International Pro', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --shell: 1160px;
-  --gutter: clamp(20px, 4vw, 48px);
-  --rail: 168px;
-  --measure: 64ch;
+  --text-caption: 13px;  --leading-caption: 1.2;
+  --text-body: 18px;     --leading-body: 1.62;   --tracking-body: -0.03em;
+  --text-sub: 29px;      --leading-sub: 1.28;
+  --text-heading: 58px;  --leading-heading: 1.06;
+  --text-display: 72px;  --leading-display: 0.9;
+  --tracking: -0.03em;
 
-  --s-1: 8px; --s-2: 16px; --s-3: 24px; --s-4: 40px; --s-5: 64px; --s-6: 104px; --s-7: 152px;
-  --r: 4px;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --ground: #0f1315;
-    --surface: #161b1e;
-    --surface-2: #1d2427;
-    --ink: #e9ece7;
-    --ink-2: #a9b1b0;
-    --ink-3: #757e7d;
-    --line: #262d30;
-    --line-strong: #3b4448;
-    --accent: #4cc9b8;
-    --accent-ink: #0b1513;
-    --accent-soft: rgba(76, 201, 184, 0.12);
-  }
-}
-:root[data-theme="dark"] {
-  --ground: #0f1315;
-  --surface: #161b1e;
-  --surface-2: #1d2427;
-  --ink: #e9ece7;
-  --ink-2: #a9b1b0;
-  --ink-3: #757e7d;
-  --line: #262d30;
-  --line-strong: #3b4448;
-  --accent: #4cc9b8;
-  --accent-ink: #0b1513;
-  --accent-soft: rgba(76, 201, 184, 0.12);
+  --sp-5: 5px; --sp-7: 7px; --sp-14: 14px; --sp-18: 18px; --sp-21: 21px; --sp-29: 29px;
+  --sp-59: 59px; --sp-86: 86px; --sp-104: 104px; --sp-119: 119px;
+
+  --page: 1200px;
+  --gutter: clamp(18px, 4vw, 40px);
+  --rail: 180px;
+  --radius: 3.6px;
 }
 
 /* ------------------------------------------------------------------ base */
@@ -74,221 +47,207 @@ html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body {
   margin: 0;
-  background: var(--ground);
+  background: var(--canvas);
   color: var(--ink);
-  font-family: var(--body);
-  font-size: 17px;
-  line-height: 1.55;
+  font-family: var(--sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 a { color: inherit; text-decoration: none; }
-p { margin: 0; }
-h1, h2, h3, h4 { margin: 0; font-weight: 500; text-wrap: balance; }
+p, h1, h2, h3, h4, ol, ul { margin: 0; }
+h1, h2, h3 { font-weight: 400; text-wrap: balance; letter-spacing: var(--tracking); }
 strong { font-weight: 500; color: var(--ink); }
 img { display: block; max-width: 100%; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+:focus-visible { outline: 1px solid var(--lime); outline-offset: 3px; }
 
-.shell { max-width: var(--shell); margin: 0 auto; padding-left: var(--gutter); padding-right: var(--gutter); width: 100%; }
+.shell { max-width: var(--page); margin: 0 auto; padding-left: var(--gutter); padding-right: var(--gutter); width: 100%; }
 
-/* type roles */
-.display-xl { font-family: var(--display); font-size: clamp(40px, 6.4vw, 84px); line-height: 0.98; letter-spacing: -0.03em; font-weight: 500; }
-.display-l  { font-family: var(--display); font-size: clamp(32px, 4.2vw, 54px); line-height: 1.02; letter-spacing: -0.025em; font-weight: 500; }
-.display-m  { font-family: var(--display); font-size: clamp(24px, 2.6vw, 32px); line-height: 1.12; letter-spacing: -0.02em; font-weight: 500; }
-.display-s  { font-family: var(--display); font-size: clamp(20px, 2vw, 24px); line-height: 1.2; letter-spacing: -0.015em; font-weight: 500; }
-.lead  { font-size: clamp(19px, 1.7vw, 22px); line-height: 1.45; color: var(--ink-2); max-width: 42ch; }
-.copy  { max-width: var(--measure); color: var(--ink-2); }
-.copy + .copy { margin-top: var(--s-2); }
-.mono  { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
-.eyebrow b { color: var(--accent); font-weight: 500; }
+/* type roles (reference scale, clamped for small screens) */
+.display { font-size: clamp(42px, 6vw, var(--text-display)); line-height: var(--leading-display); letter-spacing: var(--tracking); }
+.heading { font-size: clamp(34px, 4.6vw, var(--text-heading)); line-height: var(--leading-heading); letter-spacing: var(--tracking); }
+.sub     { font-size: clamp(22px, 2.4vw, var(--text-sub)); line-height: var(--leading-sub); letter-spacing: var(--tracking); }
+.copy    { max-width: 62ch; color: var(--ink); }
+.copy.muted { color: var(--muted); }
+.copy + .copy { margin-top: var(--sp-18); }
+.mono { font-family: var(--mono); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.label { font-family: var(--mono); font-size: var(--text-caption); line-height: var(--leading-caption); letter-spacing: 0; text-transform: uppercase; color: var(--muted); }
+.label.lime { color: var(--lime); }
+.callout { font-family: var(--mono); font-weight: 300; font-size: clamp(38px, 5vw, 65px); line-height: 1.2; letter-spacing: 0; color: var(--ink); font-variant-numeric: tabular-nums; }
 
-/* tick rule — the cadence motif: a hairline with metronome ticks every 32px */
-.tick-rule {
-  height: 10px;
-  background:
-    linear-gradient(var(--line-strong), var(--line-strong)) 0 0 / 100% 1px no-repeat,
-    repeating-linear-gradient(to right, var(--line-strong) 0 1px, transparent 1px 32px) 0 0 / 100% 6px no-repeat;
+/* data tags — the survey markers */
+.tags { display: flex; flex-wrap: wrap; gap: var(--sp-7); }
+.tag {
+  display: inline-block; font-family: var(--mono); font-size: var(--text-caption); line-height: var(--leading-caption);
+  letter-spacing: 0; text-transform: uppercase; padding: var(--sp-5) var(--sp-7); border-radius: var(--radius);
+  border: 1px solid var(--line); color: var(--ink); white-space: nowrap;
 }
-.tick-rule.accent {
-  background:
-    linear-gradient(var(--accent), var(--accent)) 0 0 / 100% 1px no-repeat,
-    repeating-linear-gradient(to right, var(--accent) 0 1px, transparent 1px 32px) 0 0 / 100% 6px no-repeat;
-}
+.tag.lime { border-color: var(--lime); color: var(--ink); }
+.tag.fill { background: var(--lime); border-color: var(--lime); color: var(--canvas); }
 
-/* ------------------------------------------------------------------ header */
-.site-header {
-  position: sticky; top: 0; z-index: 10;
-  background: color-mix(in srgb, var(--ground) 88%, transparent);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--line);
-}
-.header-inner { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); height: 60px; }
-.wordmark { font-family: var(--display); font-weight: 600; font-size: 18px; letter-spacing: -0.02em; display: inline-flex; align-items: center; gap: 10px; }
-.wordmark .beat { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-.site-nav { display: flex; gap: var(--s-3); align-items: center; }
-.site-nav a { font-size: 14px; font-weight: 500; color: var(--ink-2); }
-.site-nav a:hover { color: var(--ink); }
-@media (max-width: 820px) { .site-nav .link { display: none; } }
-
+/* buttons */
 .btn {
   display: inline-flex; align-items: center; gap: 10px;
-  font-family: var(--body); font-weight: 500; font-size: 15px;
-  padding: 12px 18px; border-radius: var(--r);
-  background: var(--ink); color: var(--ground);
-  transition: transform .15s ease, background-color .15s ease;
+  font-family: var(--mono); font-size: 14px; line-height: 1.2; letter-spacing: 0.02em; text-transform: uppercase;
+  padding: var(--sp-14) var(--sp-18); border-radius: var(--radius); border: 1px solid transparent;
+  background: var(--lime); color: var(--canvas);
 }
-.btn:hover { background: var(--accent); color: var(--accent-ink); }
-.btn.sm { padding: 8px 14px; font-size: 14px; }
-.btn.lg { padding: 16px 24px; font-size: 17px; }
-.btn .beat { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .7; }
+.btn:hover { background: var(--olive); border-color: var(--olive); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { background: transparent; border-color: var(--ink); }
+.btn.sm { padding: 9px var(--sp-14); font-size: 13px; }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 
-/* ------------------------------------------------------------------ sections */
-.section { padding-top: var(--s-6); padding-bottom: var(--s-6); }
-.section-head { display: grid; grid-template-columns: var(--rail) 1fr; gap: var(--s-3); align-items: start; margin-bottom: var(--s-5); }
-.section-head .eyebrow { padding-top: 10px; }
-.section-head .sub { margin-top: var(--s-2); }
-@media (max-width: 820px) { .section-head { grid-template-columns: 1fr; gap: var(--s-1); } .section-head .eyebrow { padding-top: 0; } }
+/* ------------------------------------------------------------------ nav — floats on the image, no fill, no border */
+.site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 10; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.wordmark { font-family: var(--sans); font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
+.site-nav { display: flex; align-items: center; gap: var(--sp-21); }
+.site-nav a { font-family: var(--mono); font-size: var(--text-caption); letter-spacing: 0; color: var(--ink); display: inline-flex; align-items: center; gap: 8px; }
+.site-nav a .dot { width: 4px; height: 4px; background: var(--ink); }
+.site-nav a:hover { color: var(--lime); }
+.site-nav a:hover .dot { background: var(--lime); }
+@media (max-width: 900px) { .site-nav .link { display: none; } }
 
-/* ------------------------------------------------------------------ hero */
-.hero { padding-top: clamp(56px, 9vw, 120px); padding-bottom: var(--s-6); }
-.hero-grid { display: grid; grid-template-columns: var(--rail) 1fr; gap: var(--s-3); }
-.hero-meta { display: flex; flex-direction: column; gap: 10px; padding-top: 12px; }
-.hero-meta .name { font-family: var(--display); font-weight: 500; font-size: 15px; color: var(--ink); }
-.hero h1 { max-width: 17ch; }
-.hero .lead { margin-top: var(--s-3); }
-.thesis { margin-top: var(--s-5); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); align-items: end; }
-.thesis-claim { font-family: var(--display); font-size: clamp(22px, 2.4vw, 30px); line-height: 1.18; letter-spacing: -0.02em; color: var(--ink-2); max-width: 22ch; }
-.thesis-claim strong { color: var(--ink); font-weight: 600; }
-.thesis-claim em { font-style: normal; color: var(--accent); }
-@media (max-width: 820px) { .hero-grid { grid-template-columns: 1fr; } .thesis { grid-template-columns: 1fr; } }
+/* ------------------------------------------------------------------ image bands — full-bleed, no radius, no border, no overlay.
+   .field canvases are generated contour placeholders for aerial photography. */
+.band { position: relative; width: 100%; overflow: hidden; background: var(--canvas); }
+.band canvas.field { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.band .coords { position: absolute; z-index: 1; display: flex; gap: var(--sp-7); }
+.band .photo-note { position: absolute; z-index: 1; right: var(--gutter); bottom: var(--sp-18); }
+.band .photo-note .tag { color: var(--muted); }
 
-/* ------------------------------------------------------------------ questions (3 up) */
-.q-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line-strong); }
-.q { padding: var(--s-4) var(--s-4) var(--s-4) 0; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: var(--s-3); }
-.q + .q { padding-left: var(--s-4); }
-.q:last-child { border-right: 0; padding-right: 0; }
-.q .num { font-family: var(--mono); font-size: 13px; color: var(--accent); }
-.q .copy { max-width: none; }
-.q .ask { font-family: var(--display); font-size: 19px; line-height: 1.3; letter-spacing: -0.01em; color: var(--ink); padding-left: 14px; border-left: 2px solid var(--accent); margin-top: auto; }
+/* hero — full viewport, headline bottom-left */
+.hero { min-height: 100vh; min-height: 100svh; display: flex; align-items: flex-end; }
+.hero-inner { position: relative; z-index: 1; padding-top: 140px; padding-bottom: var(--sp-59); display: grid; gap: var(--sp-18); }
+.hero .coords { position: static; margin-bottom: var(--sp-21); }
+.hero h1 { max-width: 15ch; }
+.hero .lead { color: var(--ink); max-width: 54ch; margin-top: var(--sp-5); }
+.hero .actions { display: flex; flex-wrap: wrap; gap: var(--sp-14); margin-top: var(--sp-14); }
+
+/* interstitial band */
+.band.interstitial { height: clamp(320px, 48vh, 560px); margin-top: var(--sp-104); }
+.band.interstitial .coords { left: var(--gutter); bottom: var(--sp-18); }
+
+/* ------------------------------------------------------------------ sections — whitespace, not dividers */
+.section { padding-top: var(--sp-104); }
+.section-head { display: grid; grid-template-columns: var(--rail) 1fr; gap: var(--sp-18); align-items: start; margin-bottom: var(--sp-59); }
+.section-head .label { padding-top: 12px; }
+.section-head .sub { color: var(--muted); margin-top: var(--sp-18); max-width: 40ch; }
+@media (max-width: 820px) { .section-head { grid-template-columns: 1fr; gap: var(--sp-7); } .section-head .label { padding-top: 0; } }
+
+/* thesis block */
+.thesis { display: grid; grid-template-columns: var(--rail) 1fr 1fr; gap: var(--sp-18) var(--sp-29); align-items: start; }
+.thesis .claim { max-width: 20ch; }
+.thesis .claim strong { font-weight: 400; color: var(--lime); }
+.thesis .body { padding-top: 8px; }
+@media (max-width: 900px) { .thesis { grid-template-columns: 1fr; } .thesis .body { padding-top: 0; } }
+
+/* expertise — three questions, narrow columns, no chrome */
+.questions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-29); }
+.q { display: flex; flex-direction: column; gap: var(--sp-18); }
+.q .num { font-family: var(--mono); font-size: var(--text-caption); color: var(--lime); letter-spacing: 0; }
+.q .ask { margin-top: auto; padding-top: var(--sp-14); border-top: 1px solid var(--line); font-family: var(--mono); font-weight: 400; font-size: 15px; line-height: 1.5; letter-spacing: 0; color: var(--ink); }
 .q .ask span { display: block; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { font-family: var(--mono); font-size: 12.5px; padding: 6px 10px; border: 1px solid var(--line-strong); border-radius: 999px; color: var(--ink-2); white-space: nowrap; }
-@media (max-width: 900px) { .q-grid { grid-template-columns: 1fr; } .q, .q + .q { padding: var(--s-4) 0; border-right: 0; border-bottom: 1px solid var(--line); } .q:last-child { border-bottom: 0; } }
+@media (max-width: 900px) { .questions { grid-template-columns: 1fr; gap: var(--sp-59); } }
 
-/* ------------------------------------------------------------------ two ways */
-.ways { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-3); }
-.way { background: var(--surface); border-radius: 6px; padding: var(--s-4); display: flex; flex-direction: column; gap: var(--s-3); border: 1px solid var(--line); }
-.way .role { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-2); }
-.way .role .eyebrow { color: var(--accent); }
-.way h3.display-m { max-width: 18ch; }
-.way .fit { color: var(--ink); font-family: var(--display); font-size: 21px; line-height: 1.25; letter-spacing: -0.015em; }
+/* two ways — two text columns */
+.ways { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-29); }
+.way { display: flex; flex-direction: column; gap: var(--sp-18); }
 .way .fit span { display: block; }
-.way .copy { max-width: none; }
-.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-family: var(--mono); font-size: 13.5px; color: var(--ink); }
-.flow .arrow { color: var(--accent); }
-.way .panel { border-top: 1px solid var(--line-strong); padding-top: var(--s-3); display: flex; flex-direction: column; gap: var(--s-2); }
-.way .panel .eyebrow { color: var(--ink-3); }
-.way .punch { font-family: var(--display); font-size: 21px; letter-spacing: -0.015em; line-height: 1.25; color: var(--ink); }
-@media (max-width: 900px) { .ways { grid-template-columns: 1fr; } }
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-5) 10px; font-family: var(--mono); font-size: 14px; letter-spacing: 0; color: var(--ink); }
+.flow .arrow { color: var(--lime); }
+.way .engagement { margin-top: var(--sp-7); padding-top: var(--sp-18); border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: var(--sp-14); }
+.way .punch { color: var(--lime); }
+@media (max-width: 900px) { .ways { grid-template-columns: 1fr; gap: var(--sp-59); } }
 
-/* ------------------------------------------------------------------ about */
-.about-grid { display: grid; grid-template-columns: var(--rail) 1fr 300px; gap: var(--s-4); align-items: start; }
-.about-grid .copy { max-width: var(--measure); }
-.portrait { width: 100%; max-width: 300px; aspect-ratio: 1; object-fit: cover; border-radius: 6px; filter: grayscale(1) contrast(1.05); }
-.about-facts { margin-top: var(--s-3); display: grid; gap: 10px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
-.about-facts div { display: flex; justify-content: space-between; gap: var(--s-2); border-top: 1px solid var(--line); padding-top: 8px; }
-.about-facts span:last-child { color: var(--ink); text-align: right; }
-.about-close { margin-top: var(--s-4); padding-top: var(--s-3); border-top: 1px solid var(--line-strong); font-family: var(--display); font-size: clamp(20px, 2vw, 25px); line-height: 1.28; letter-spacing: -0.015em; max-width: 34ch; }
-@media (max-width: 1000px) { .about-grid { grid-template-columns: 1fr 260px; } .about-grid .eyebrow { grid-column: 1 / -1; } }
-@media (max-width: 720px) { .about-grid { grid-template-columns: 1fr; } .portrait { max-width: 220px; } }
+/* about */
+.about { display: grid; grid-template-columns: var(--rail) 1fr 280px; gap: var(--sp-29); align-items: start; }
+.portrait { width: 100%; max-width: 280px; aspect-ratio: 1; object-fit: cover; border-radius: 0; filter: grayscale(1) contrast(1.05); }
+.facts { margin-top: var(--sp-18); display: grid; gap: var(--sp-7); font-family: var(--mono); font-size: var(--text-caption); letter-spacing: 0; }
+.facts div { display: flex; justify-content: space-between; gap: var(--sp-14); padding-top: var(--sp-7); border-top: 1px solid var(--line); }
+.facts span:first-child { color: var(--muted); text-transform: uppercase; }
+.facts span:last-child { text-align: right; }
+.about-close { margin-top: var(--sp-29); max-width: 34ch; }
+@media (max-width: 1000px) { .about { grid-template-columns: 1fr 260px; } .about > .label { grid-column: 1 / -1; } }
+@media (max-width: 700px) { .about { grid-template-columns: 1fr; } .portrait { max-width: 220px; } }
 
-/* ------------------------------------------------------------------ methodology ledger */
-.ledger { border-top: 1px solid var(--line-strong); }
-.step { display: grid; grid-template-columns: var(--rail) 1fr 1fr; gap: var(--s-3); padding: var(--s-4) 0; border-bottom: 1px solid var(--line); }
-.step .idx { font-family: var(--mono); font-size: 13px; color: var(--accent); padding-top: 6px; }
-.step .idx small { display: block; color: var(--ink-3); margin-top: 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+/* methodology — a logbook ledger; hairlines are internal rules, not section dividers */
+.ledger { border-top: 1px solid var(--line); }
+.step { display: grid; grid-template-columns: var(--rail) 1fr 1fr; gap: var(--sp-18) var(--sp-29); padding: var(--sp-29) 0; border-bottom: 1px solid var(--line); }
+.step .idx { font-family: var(--mono); font-size: var(--text-caption); letter-spacing: 0; color: var(--lime); padding-top: 8px; }
+.step .idx small { display: block; font-size: var(--text-caption); color: var(--muted); text-transform: uppercase; margin-top: var(--sp-5); }
 .step h3 { max-width: 16ch; }
-.step .body { display: flex; flex-direction: column; gap: var(--s-2); }
+.step .body { display: flex; flex-direction: column; gap: var(--sp-18); }
 .step .copy { max-width: none; }
-.step .list { color: var(--ink); font-weight: 500; line-height: 1.6; }
-.step .output { margin-top: 6px; display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: baseline; font-size: 15px; padding-top: 12px; border-top: 1px dashed var(--line-strong); }
-.step .output .k { font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
-.step .output .v { color: var(--ink); }
-.stack { display: grid; gap: 4px; font-family: var(--mono); font-size: 14px; color: var(--ink); }
+.step .ask { color: var(--ink); }
+.step .ask span { display: block; }
+.step .output { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-14); align-items: center; padding-top: var(--sp-14); border-top: 1px solid var(--line); }
+.stack { display: grid; gap: 4px; font-family: var(--mono); font-size: 14px; letter-spacing: 0; color: var(--ink); }
 .stack div { display: flex; align-items: center; gap: 12px; }
-.stack .t { color: var(--accent); width: 14px; text-align: center; }
-.quote-pair { display: grid; gap: 12px; }
-.quote-pair .not { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--line-strong); text-decoration-thickness: 1px; }
-.quote-pair .but { font-family: var(--display); font-size: 21px; line-height: 1.3; letter-spacing: -0.015em; color: var(--ink); padding-left: 14px; border-left: 2px solid var(--accent); }
-.step.final .list { display: flex; flex-wrap: wrap; gap: 8px 14px; font-family: var(--mono); font-weight: 400; font-size: 14px; }
+.stack .t { color: var(--lime); width: 14px; text-align: center; }
+.quote-pair { display: grid; gap: var(--sp-14); }
+.quote-pair .not { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+.quote-pair .but { color: var(--ink); }
+.step.final .close { display: flex; flex-wrap: wrap; gap: var(--sp-7); }
 @media (max-width: 900px) { .step { grid-template-columns: var(--rail) 1fr; } .step .body { grid-column: 2; } }
-@media (max-width: 640px) { .step { grid-template-columns: 1fr; gap: var(--s-2); } .step .body { grid-column: 1; } .step .idx { padding-top: 0; } }
+@media (max-width: 640px) { .step { grid-template-columns: 1fr; gap: var(--sp-14); } .step .body { grid-column: 1; } .step .idx { padding-top: 0; } }
 
-/* ------------------------------------------------------------------ cases */
-.case { display: grid; grid-template-columns: var(--rail) 1fr 320px; gap: var(--s-4); padding: var(--s-5) 0; border-top: 1px solid var(--line-strong); }
-.case .who { font-family: var(--mono); font-size: 13px; color: var(--accent); }
-.case .who small { display: block; color: var(--ink-3); font-size: 12px; margin-top: 6px; letter-spacing: .04em; }
-.case .main { display: flex; flex-direction: column; gap: var(--s-2); }
-.case h3 { margin-bottom: var(--s-1); }
-.case .copy { max-width: var(--measure); }
-.case .lesson { margin-top: var(--s-2); padding: var(--s-3); background: var(--surface); border-radius: 6px; border-left: 2px solid var(--accent); color: var(--ink-2); max-width: var(--measure); }
-.case .lesson b { font-family: var(--mono); font-weight: 500; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 6px; }
-.results { display: grid; gap: var(--s-2); align-content: start; }
-.results .eyebrow { margin-bottom: 4px; }
-.result { padding-top: 12px; border-top: 1px solid var(--line-strong); }
-.result .fig { font-family: var(--display); font-size: clamp(28px, 3vw, 40px); line-height: 1; letter-spacing: -0.03em; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
-.result .lab { margin-top: 6px; font-size: 14px; color: var(--ink-2); }
-@media (max-width: 1000px) { .case { grid-template-columns: var(--rail) 1fr; } .case .results { grid-column: 2; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-3); } .results .eyebrow { grid-column: 1 / -1; } }
-@media (max-width: 640px) { .case { grid-template-columns: 1fr; gap: var(--s-3); } .case .results { grid-column: 1; grid-template-columns: 1fr; } }
+/* in practice — cases with mono data callouts */
+.case { display: grid; grid-template-columns: var(--rail) 1fr 300px; gap: var(--sp-29); padding: var(--sp-59) 0 0; }
+.case + .case { margin-top: var(--sp-29); padding-top: var(--sp-59); border-top: 1px solid var(--line); }
+.case .who { font-family: var(--mono); font-size: var(--text-caption); letter-spacing: 0; color: var(--lime); padding-top: 8px; }
+.case .who small { display: block; font-size: var(--text-caption); color: var(--muted); text-transform: uppercase; margin-top: var(--sp-5); }
+.case .main { display: flex; flex-direction: column; gap: var(--sp-18); }
+.case .lesson { padding-top: var(--sp-14); border-top: 1px solid var(--line); max-width: 62ch; display: grid; gap: var(--sp-7); }
+.results { display: grid; gap: var(--sp-18); align-content: start; }
+.result { display: grid; gap: var(--sp-5); }
+.result .callout { font-size: clamp(34px, 4vw, 52px); line-height: 1.1; }
+.result .lab { font-family: var(--mono); font-size: var(--text-caption); letter-spacing: 0; color: var(--muted); }
+@media (max-width: 1000px) { .case { grid-template-columns: var(--rail) 1fr; } .case .results { grid-column: 2; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-21); } .results > .label { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .case { grid-template-columns: 1fr; gap: var(--sp-18); } .case .results { grid-column: 1; grid-template-columns: 1fr; } }
 
-/* ------------------------------------------------------------------ principle */
-.principle { background: var(--ink); color: var(--ground); }
-.principle .shell { padding-top: var(--s-6); padding-bottom: var(--s-6); display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-5); align-items: start; }
-.principle .eyebrow { color: color-mix(in srgb, var(--ground) 55%, transparent); }
-.principle h2 { color: var(--ground); margin-top: var(--s-2); }
-.principle .copy { color: color-mix(in srgb, var(--ground) 75%, transparent); margin-top: var(--s-3); }
-.principle .copy strong { color: var(--ground); }
-.chain { display: grid; gap: 0; counter-reset: link; }
-.chain li { list-style: none; position: relative; padding: 18px 0 18px 40px; font-family: var(--display); font-size: clamp(22px, 2.4vw, 30px); letter-spacing: -0.02em; line-height: 1.1; }
-.chain li::before { content: ""; position: absolute; left: 6px; top: 50%; width: 10px; height: 10px; margin-top: -5px; border-radius: 50%; background: var(--accent); }
-.chain li + li::after { content: ""; position: absolute; left: 10px; top: -50%; height: 100%; border-left: 1px solid color-mix(in srgb, var(--ground) 30%, transparent); z-index: 0; }
-.chain li:last-child { color: var(--accent); }
-.chain { margin: 0; padding: 0; }
-.chain-close { margin-top: var(--s-3); padding-left: 40px; font-family: var(--mono); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: color-mix(in srgb, var(--ground) 60%, transparent); }
-@media (max-width: 820px) { .principle .shell { grid-template-columns: 1fr; } }
+/* principle — chain of survey markers */
+.principle { display: grid; grid-template-columns: var(--rail) 1fr 1fr; gap: var(--sp-29); align-items: start; }
+.chain { list-style: none; display: grid; }
+.chain li { position: relative; padding: var(--sp-14) 0 var(--sp-14) 36px; font-size: clamp(22px, 2.4vw, var(--text-sub)); line-height: 1.2; letter-spacing: var(--tracking); }
+.chain li::before { content: ""; position: absolute; left: 4px; top: 50%; width: 9px; height: 9px; margin-top: -4.5px; border-radius: 50%; background: var(--lime); }
+.chain li + li::after { content: ""; position: absolute; left: 8px; bottom: 50%; height: 100%; border-left: 1px solid var(--line); }
+.chain li:last-child { color: var(--lime); }
+.chain-close { margin-top: var(--sp-18); padding-left: 36px; }
+@media (max-width: 900px) { .principle { grid-template-columns: 1fr; } }
 
-/* ------------------------------------------------------------------ cta + footer */
-.cta { padding-top: var(--s-7); padding-bottom: var(--s-7); }
-.cta-inner { display: grid; grid-template-columns: var(--rail) 1fr; gap: var(--s-3); }
+/* contact */
+.cta { padding-top: var(--sp-119); padding-bottom: var(--sp-119); }
+.cta-inner { display: grid; grid-template-columns: var(--rail) 1fr; gap: var(--sp-18); }
 .cta h2 { max-width: 16ch; }
-.cta .actions { margin-top: var(--s-4); display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center; }
-.cta .mail { font-family: var(--mono); font-size: 14px; color: var(--ink-2); }
+.cta .actions { margin-top: var(--sp-29); display: flex; flex-wrap: wrap; gap: var(--sp-14); align-items: center; }
+.cta .mail { font-family: var(--mono); font-size: 14px; letter-spacing: 0; color: var(--muted); }
 @media (max-width: 820px) { .cta-inner { grid-template-columns: 1fr; } }
-.site-footer { border-top: 1px solid var(--line); padding: var(--s-3) 0; }
-.footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-2); font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
-.footer-inner a:hover { color: var(--ink); }
 
-/* motion — a single orchestrated moment on load, from a visible resting state */
-@media (prefers-reduced-motion: no-preference) {
-  .hero > * { animation: rise .7s cubic-bezier(.2,.7,.2,1) both; }
-  .hero .thesis { animation-delay: .12s; }
-  @keyframes rise { from { transform: translateY(10px); } to { transform: none; } }
-}
+/* footer */
+.site-footer { border-top: 1px solid var(--line); padding-top: var(--sp-86); padding-bottom: var(--sp-29); }
+.footer-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-29); font-family: var(--mono); font-size: var(--text-caption); letter-spacing: 0; line-height: 1.8; }
+.footer-grid .label { margin-bottom: var(--sp-5); }
+.footer-grid a:hover { color: var(--lime); }
+@media (max-width: 700px) { .footer-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
 <header class="site-header">
   <div class="shell header-inner">
-    <a class="wordmark" href="#top"><span class="beat" aria-hidden="true"></span>Cadence</a>
+    <a class="wordmark" href="#top">Cadence</a>
     <nav class="site-nav" aria-label="Primary">
       <a class="link" href="#expertise">Expertise</a>
       <a class="link" href="#ways">Ways of working</a>
       <a class="link" href="#about">About</a>
       <a class="link" href="#method">Method</a>
       <a class="link" href="#work">In practice</a>
-      <a class="btn sm" href="mailto:otmankettani5@gmail.com">Get in touch</a>
+      <a href="#contact"><span class="dot" aria-hidden="true"></span>Contact</a>
     </nav>
   </div>
 </header>
@@ -296,57 +255,64 @@ img { display: block; max-width: 100%; }
 <main id="top">
 
   <!-- ============================================================ hero -->
-  <section class="shell hero">
-    <div class="hero-grid">
-      <div class="hero-meta">
-        <span class="name">Otman Kettani</span>
-        <span class="eyebrow">Technology advisory</span>
-        <span class="eyebrow">Amsterdam · <b>Available</b></span>
+  <section class="band hero">
+    <canvas class="field" data-seed="7" aria-hidden="true"></canvas>
+    <div class="shell hero-inner">
+      <div class="coords">
+        <span class="tag lime">52.3676° N · 4.9041° E</span>
+        <span class="tag">Amsterdam</span>
+        <span class="tag">Otman Kettani</span>
       </div>
-      <div>
-        <h1 class="display-xl">Find where technology can create value&nbsp;— and make it happen.</h1>
-        <p class="lead">5 years deploying AI, automation and product technology at Uber.</p>
+      <h1 class="display">Find where technology can create value — and make it happen.</h1>
+      <p class="lead">5 years deploying AI, automation and product technology at Uber.</p>
+      <div class="actions">
+        <a class="btn" href="mailto:otmankettani5@gmail.com"><span class="dot" aria-hidden="true"></span>Get in touch</a>
+        <a class="btn ghost" href="#expertise">How I work</a>
       </div>
     </div>
+    <div class="photo-note"><span class="tag">Placeholder · aerial photograph</span></div>
+  </section>
+
+  <!-- ============================================================ thesis -->
+  <section class="shell section">
     <div class="thesis">
-      <p class="thesis-claim">Most companies don't have a technology problem. They have a <strong>prioritization problem.</strong></p>
-      <div>
+      <span class="label">Thesis</span>
+      <p class="sub claim">Most companies don't have a technology problem. They have a <strong>prioritization problem.</strong></p>
+      <div class="body">
         <p class="copy">Too many tools. Too many AI experiments. Too little clarity on where technology can actually create value.</p>
-        <p class="copy"><strong>I help companies find the opportunities that matter, decide what is actually worth doing, and get it into production.</strong></p>
+        <p class="copy">I help companies find the opportunities that matter, decide what is actually worth doing, and get it into production.</p>
       </div>
     </div>
   </section>
 
-  <div class="shell"><div class="tick-rule accent" role="presentation"></div></div>
-
   <!-- ============================================================ expertise -->
   <section class="shell section" id="expertise">
     <div class="section-head">
-      <span class="eyebrow">Expertise</span>
-      <h2 class="display-l">My expertise in 3&nbsp;questions</h2>
+      <span class="label">Expertise</span>
+      <h2 class="heading">My expertise in 3&nbsp;questions</h2>
     </div>
-    <div class="q-grid">
+    <div class="questions">
       <article class="q">
         <span class="num">01</span>
-        <h3 class="display-m">Where is the value?</h3>
+        <h3 class="sub">Where is the value?</h3>
         <p class="copy">I start with the business, not the technology.</p>
         <p class="copy">I identify where the company is losing <strong>time, money, capacity, quality or revenue</strong>, then trace those problems back to the workflows, systems and decisions that create them.</p>
         <p class="ask"><span>What matters?</span><span>Where are the biggest constraints?</span><span>Where is value being lost?</span></p>
       </article>
       <article class="q">
         <span class="num">02</span>
-        <h3 class="display-m">What is worth doing?</h3>
+        <h3 class="sub">What is worth doing?</h3>
         <p class="copy">Not every problem needs AI.</p>
         <p class="copy">For each opportunity, I determine the simplest intervention that can materially improve the economics of the work.</p>
-        <div class="chips" aria-label="Types of intervention">
-          <span class="chip">Process redesign</span><span class="chip">Automation</span><span class="chip">AI</span><span class="chip">Software</span><span class="chip">Third-party solution</span><span class="chip">Human intervention</span>
+        <div class="tags" aria-label="Types of intervention">
+          <span class="tag">Process redesign</span><span class="tag">Automation</span><span class="tag">AI</span><span class="tag">Software</span><span class="tag">Third-party solution</span><span class="tag">Human intervention</span>
         </div>
         <p class="copy">The objective isn't the most advanced technology.</p>
         <p class="ask"><span>It's knowing when technology is worth using — and making it work.</span></p>
       </article>
       <article class="q">
         <span class="num">03</span>
-        <h3 class="display-m">How do we ship it?</h3>
+        <h3 class="sub">How do we ship it?</h3>
         <p class="copy">A good idea is worthless if it never reaches production.</p>
         <p class="copy">I turn the opportunity into a working solution — defining what needs to change, selecting the right technology, building or sourcing what is needed, coordinating implementation, and measuring the result.</p>
         <p class="ask"><span>From opportunity</span><span>→ to working system</span><span>→ to measurable impact.</span></p>
@@ -354,61 +320,57 @@ img { display: block; max-width: 100%; }
     </div>
   </section>
 
-  <div class="shell"><div class="tick-rule" role="presentation"></div></div>
-
   <!-- ============================================================ two ways -->
   <section class="shell section" id="ways">
     <div class="section-head">
-      <span class="eyebrow">Engagement</span>
-      <h2 class="display-l">Two ways I work with companies</h2>
+      <span class="label">Engagement</span>
+      <h2 class="heading">Two ways I work with companies</h2>
     </div>
     <div class="ways">
       <article class="way">
-        <div class="role"><span class="eyebrow">Advisor</span><span class="eyebrow">You retain ownership</span></div>
-        <p class="fit"><span>You are already investing in AI.</span><span>You need to know what is actually worth pursuing.</span></p>
-        <p class="copy">Maybe you're dealing with:</p>
-        <div class="chips">
-          <span class="chip">Too many initiatives</span><span class="chip">Unclear ROI</span><span class="chip">Fragmented ownership</span><span class="chip">Vendor sprawl</span><span class="chip">Pilots that don't scale</span><span class="chip">Technology-first decisions</span>
+        <div class="tags"><span class="tag fill">Advisor</span><span class="tag">You retain ownership</span></div>
+        <p class="sub fit"><span>You are already investing in AI.</span><span>You need to know what is actually worth pursuing.</span></p>
+        <p class="copy muted">Maybe you're dealing with:</p>
+        <div class="tags">
+          <span class="tag">Too many initiatives</span><span class="tag">Unclear ROI</span><span class="tag">Fragmented ownership</span><span class="tag">Vendor sprawl</span><span class="tag">Pilots that don't scale</span><span class="tag">Technology-first decisions</span>
         </div>
         <p class="copy">I step in to bring structure, challenge assumptions, prioritize the portfolio and help get the programme back on track.</p>
-        <div class="panel">
-          <span class="eyebrow">The engagement</span>
+        <div class="engagement">
+          <span class="label">The engagement</span>
           <div class="flow"><span>Diagnose</span><span class="arrow">→</span><span>Prioritize</span><span class="arrow">→</span><span>Decide</span><span class="arrow">→</span><span>Guide</span></div>
           <p class="copy">You retain ownership. I bring the outside perspective, technology expertise and practical operating experience to make better decisions.</p>
         </div>
       </article>
       <article class="way">
-        <div class="role"><span class="eyebrow">Operator</span><span class="eyebrow">End-to-end or alongside your team</span></div>
-        <p class="fit"><span>You know there is an opportunity.</span><span>You haven't figured out what the solution should be.</span></p>
-        <p class="copy">I work from the beginning to:</p>
+        <div class="tags"><span class="tag fill">Operator</span><span class="tag">End-to-end or alongside your team</span></div>
+        <p class="sub fit"><span>You know there is an opportunity.</span><span>You haven't figured out what the solution should be.</span></p>
+        <p class="copy muted">I work from the beginning to:</p>
         <div class="flow"><span>Diagnose the business</span><span class="arrow">→</span><span>identify opportunities</span><span class="arrow">→</span><span>quantify the value</span><span class="arrow">→</span><span>define the solution</span><span class="arrow">→</span><span>build or source it</span><span class="arrow">→</span><span>deploy it</span><span class="arrow">→</span><span>measure the impact</span></div>
         <p class="copy">I can lead the initiative end-to-end or work alongside your existing team.</p>
-        <div class="panel">
+        <div class="engagement">
           <p class="copy">You don't need to know whether the answer is an AI agent, an automation, a new workflow or an off-the-shelf product.</p>
-          <p class="punch">That's what I'm there to figure out.</p>
+          <p class="sub punch">That's what I'm there to figure out.</p>
         </div>
       </article>
     </div>
   </section>
 
-  <div class="shell"><div class="tick-rule" role="presentation"></div></div>
-
   <!-- ============================================================ about -->
   <section class="shell section" id="about">
-    <div class="about-grid">
-      <span class="eyebrow">About</span>
+    <div class="about">
+      <span class="label" style="padding-top: 12px;">About</span>
       <div>
-        <h2 class="display-l">About</h2>
-        <div style="margin-top: var(--s-3);">
+        <h2 class="heading">About</h2>
+        <div style="margin-top: var(--sp-29);">
           <p class="copy">I'm a Global Product &amp; Operations Lead at Uber Eats, based in Amsterdam, where I own post-order customer support automation — an LLM-powered system running in production across 51 countries and 11 languages, with measurable impact in the tens of millions of dollars.</p>
           <p class="copy">I built the deterministic version of that system, then led the global effort to replace it with LLM agents — owning the roadmap, policy design, evaluation and rollout end-to-end. Earlier, I worked across strategy consulting and fintech.</p>
           <p class="copy">I hold a double degree from École Centrale Paris and Universidad Politécnica de Madrid, and work across French, Arabic, Darija, Spanish and English.</p>
         </div>
-        <p class="about-close">Cadence is where that experience becomes available to companies who aren't Uber-sized — the same rigor, applied at the scale and speed a founder-led business actually needs.</p>
+        <p class="sub about-close">Cadence is where that experience becomes available to companies who aren't Uber-sized — the same rigor, applied at the scale and speed a founder-led business actually needs.</p>
       </div>
       <div>
-        <img class="portrait" src="../assets/portrait.webp" width="300" height="300" alt="Portrait of Otman Kettani">
-        <div class="about-facts">
+        <img class="portrait" src="../assets/portrait.webp" width="280" height="280" alt="Portrait of Otman Kettani">
+        <div class="facts">
           <div><span>Role</span><span>Global Product &amp; Ops Lead, Uber Eats</span></div>
           <div><span>In production</span><span>51 countries · 11 languages</span></div>
           <div><span>Education</span><span>Centrale Paris · UPM</span></div>
@@ -419,15 +381,20 @@ img { display: block; max-width: 100%; }
     </div>
   </section>
 
-  <div class="shell"><div class="tick-rule accent" role="presentation"></div></div>
+  <!-- ============================================================ image band -->
+  <div class="band interstitial" role="presentation">
+    <canvas class="field" data-seed="23" aria-hidden="true"></canvas>
+    <div class="coords"><span class="tag lime">Sheet 02 · The methodology</span><span class="tag">10 steps · value first</span></div>
+    <div class="photo-note"><span class="tag">Placeholder · aerial photograph</span></div>
+  </div>
 
   <!-- ============================================================ methodology -->
   <section class="shell section" id="method">
     <div class="section-head">
-      <span class="eyebrow">Method · 10 steps</span>
+      <span class="label">Method</span>
       <div>
-        <h2 class="display-l">The methodology</h2>
-        <p class="lead sub">One value-first approach, from opportunity to impact.</p>
+        <h2 class="heading">The methodology</h2>
+        <p class="sub">One value-first approach, from opportunity to impact.</p>
       </div>
     </div>
 
@@ -435,52 +402,52 @@ img { display: block; max-width: 100%; }
 
       <article class="step">
         <div class="idx">01<small>Ambition</small></div>
-        <h3 class="display-m">Define the ambition</h3>
+        <h3 class="sub">Define the ambition</h3>
         <div class="body">
           <p class="copy">Start with the outcome.</p>
-          <p class="list">What business result are we trying to improve?</p>
-          <div class="chips"><span class="chip">Cost</span><span class="chip">Revenue</span><span class="chip">Speed</span><span class="chip">Quality</span><span class="chip">Capacity</span><span class="chip">Customer experience</span><span class="chip">Risk</span></div>
-          <div class="output"><span class="k">Output</span><span class="v">Clear business objective and success metrics.</span></div>
+          <p class="copy">What business result are we trying to improve?</p>
+          <div class="tags"><span class="tag">Cost</span><span class="tag">Revenue</span><span class="tag">Speed</span><span class="tag">Quality</span><span class="tag">Capacity</span><span class="tag">Customer experience</span><span class="tag">Risk</span></div>
+          <div class="output"><span class="tag fill">Output</span><span>Clear business objective and success metrics.</span></div>
         </div>
       </article>
 
       <article class="step">
         <div class="idx">02<small>Reality</small></div>
-        <h3 class="display-m">Understand the operating reality</h3>
+        <h3 class="sub">Understand the operating reality</h3>
         <div class="body">
           <p class="copy">Understand how the work actually happens today.</p>
           <p class="copy">Map the <strong>workflows, systems, people, decisions and constraints</strong> shaping the outcome.</p>
-          <div class="output"><span class="k">Output</span><span class="v">Current-state view of the operation.</span></div>
+          <div class="output"><span class="tag fill">Output</span><span>Current-state view of the operation.</span></div>
         </div>
       </article>
 
       <article class="step">
         <div class="idx">03<small>Constraints</small></div>
-        <h3 class="display-m">Identify the constraints</h3>
+        <h3 class="sub">Identify the constraints</h3>
         <div class="body">
           <p class="copy">Find where value is being lost. Look for:</p>
-          <div class="chips"><span class="chip">Manual effort</span><span class="chip">Bottlenecks</span><span class="chip">Waiting</span><span class="chip">Repetitive work</span><span class="chip">Knowledge gaps</span><span class="chip">Errors</span><span class="chip">Poor decisions</span><span class="chip">Handoffs</span><span class="chip">Fragmented systems</span><span class="chip">Exception handling</span></div>
+          <div class="tags"><span class="tag">Manual effort</span><span class="tag">Bottlenecks</span><span class="tag">Waiting</span><span class="tag">Repetitive work</span><span class="tag">Knowledge gaps</span><span class="tag">Errors</span><span class="tag">Poor decisions</span><span class="tag">Handoffs</span><span class="tag">Fragmented systems</span><span class="tag">Exception handling</span></div>
           <p class="copy">Then identify the underlying cause.</p>
-          <div class="output"><span class="k">Output</span><span class="v">High-value opportunity areas.</span></div>
+          <div class="output"><span class="tag fill">Output</span><span>High-value opportunity areas.</span></div>
         </div>
       </article>
 
       <article class="step">
         <div class="idx">04<small>Economics</small></div>
-        <h3 class="display-m">Identify where technology can change the economics</h3>
+        <h3 class="sub">Identify where technology can change the economics</h3>
         <div class="body">
           <p class="copy">Ask where technology could materially change the way the work gets done.</p>
           <div class="quote-pair">
             <p class="not">"Where can we use AI?"</p>
-            <p class="but">"Where could technology create a fundamentally better way of producing this outcome?"</p>
+            <p class="but sub">"Where could technology create a fundamentally better way of producing this outcome?"</p>
           </div>
-          <div class="output"><span class="k">Output</span><span class="v">Defined opportunities with a clear value hypothesis.</span></div>
+          <div class="output"><span class="tag fill">Output</span><span>Defined opportunities with a clear value hypothesis.</span></div>
         </div>
       </article>
 
       <article class="step">
         <div class="idx">05<small>Solution</small></div>
-        <h3 class="display-m">Determine the right solution</h3>
+        <h3 class="sub">Determine the right solution</h3>
         <div class="body">
           <p class="copy">For every opportunity, determine the simplest intervention capable of achieving the desired outcome.</p>
           <div class="stack" aria-label="Interventions, simplest first">
@@ -494,130 +461,128 @@ img { display: block; max-width: 100%; }
             <div><span class="t">→</span>No change</div>
           </div>
           <p class="copy">Technology is a means, not the objective.</p>
-          <div class="output"><span class="k">Output</span><span class="v">Recommended solution.</span></div>
+          <div class="output"><span class="tag fill">Output</span><span>Recommended solution.</span></div>
         </div>
       </article>
 
       <article class="step">
         <div class="idx">06<small>Business case</small></div>
-        <h3 class="display-m">Build the business case</h3>
+        <h3 class="sub">Build the business case</h3>
         <div class="body">
           <p class="copy">Not every opportunity deserves investment. I assess:</p>
-          <div class="chips"><span class="chip">Economic value</span><span class="chip">Expected impact</span><span class="chip">Feasibility</span><span class="chip">Time-to-value</span><span class="chip">Strategic importance</span><span class="chip">Risk</span><span class="chip">Complexity</span></div>
+          <div class="tags"><span class="tag">Economic value</span><span class="tag">Expected impact</span><span class="tag">Feasibility</span><span class="tag">Time-to-value</span><span class="tag">Strategic importance</span><span class="tag">Risk</span><span class="tag">Complexity</span></div>
           <p class="copy">Then prioritize the opportunities with the strongest combination of <strong>value and practicality</strong>.</p>
-          <div class="output"><span class="k">Output</span><span class="v">Prioritized roadmap and business cases.</span></div>
+          <div class="output"><span class="tag fill">Output</span><span>Prioritized roadmap and business cases.</span></div>
         </div>
       </article>
 
       <article class="step">
         <div class="idx">07<small>Design</small></div>
-        <h3 class="display-m">Design the solution</h3>
+        <h3 class="sub">Design the solution</h3>
         <div class="body">
           <p class="copy">Design the future state around what the new capability makes possible. Define:</p>
-          <div class="chips"><span class="chip">People</span><span class="chip">Process</span><span class="chip">Technology</span><span class="chip">Data</span><span class="chip">Integrations</span><span class="chip">Controls</span><span class="chip">Human/AI handoffs</span><span class="chip">KPIs</span></div>
-          <div class="output"><span class="k">Output</span><span class="v">Future-state design and implementation plan.</span></div>
+          <div class="tags"><span class="tag">People</span><span class="tag">Process</span><span class="tag">Technology</span><span class="tag">Data</span><span class="tag">Integrations</span><span class="tag">Controls</span><span class="tag">Human/AI handoffs</span><span class="tag">KPIs</span></div>
+          <div class="output"><span class="tag fill">Output</span><span>Future-state design and implementation plan.</span></div>
         </div>
       </article>
 
       <article class="step">
         <div class="idx">08<small>Validate</small></div>
-        <h3 class="display-m">Validate the solution</h3>
+        <h3 class="sub">Validate the solution</h3>
         <div class="body">
           <p class="copy">Prove that it works before scaling. Prototype or pilot the solution and test it against the business case.</p>
-          <p class="list">Does it work?<br>Does it create value?<br>Can people use it?<br>Is it reliable enough to operate?</p>
-          <div class="output"><span class="k">Output</span><span class="v">Evidence to scale, iterate or stop.</span></div>
+          <p class="ask mono" style="font-size: 15px; line-height: 1.5;"><span>Does it work?</span><span>Does it create value?</span><span>Can people use it?</span><span>Is it reliable enough to operate?</span></p>
+          <div class="output"><span class="tag fill">Output</span><span>Evidence to scale, iterate or stop.</span></div>
         </div>
       </article>
 
       <article class="step">
         <div class="idx">09<small>Deploy</small></div>
-        <h3 class="display-m">Deploy</h3>
+        <h3 class="sub">Deploy</h3>
         <div class="body">
           <p class="copy">Move from validated solution to production. Depending on the project, this can involve:</p>
-          <div class="chips"><span class="chip">Building</span><span class="chip">Vendor selection</span><span class="chip">Integration</span><span class="chip">Testing</span><span class="chip">Rollout</span><span class="chip">Change management</span><span class="chip">Operating model</span></div>
-          <div class="output"><span class="k">Output</span><span class="v">Working solution in production.</span></div>
+          <div class="tags"><span class="tag">Building</span><span class="tag">Vendor selection</span><span class="tag">Integration</span><span class="tag">Testing</span><span class="tag">Rollout</span><span class="tag">Change management</span><span class="tag">Operating model</span></div>
+          <div class="output"><span class="tag fill">Output</span><span>Working solution in production.</span></div>
         </div>
       </article>
 
       <article class="step final">
         <div class="idx">10<small>Impact</small></div>
-        <h3 class="display-m">Measure impact and scale</h3>
+        <h3 class="sub">Measure impact and scale</h3>
         <div class="body">
           <p class="copy">A project is not successful because the technology works. It is successful because <strong>the business improves.</strong></p>
           <p class="copy">Measure the actual outcome against the original business case. Then:</p>
-          <p class="list"><span>Scale</span><span>·</span><span>Iterate</span><span>·</span><span>Redesign</span><span>·</span><span>Stop</span></p>
+          <div class="close tags"><span class="tag lime">Scale</span><span class="tag lime">Iterate</span><span class="tag lime">Redesign</span><span class="tag lime">Stop</span></div>
         </div>
       </article>
 
     </div>
   </section>
 
-  <div class="shell"><div class="tick-rule" role="presentation"></div></div>
-
   <!-- ============================================================ in practice -->
   <section class="shell section" id="work">
     <div class="section-head">
-      <span class="eyebrow">In practice</span>
-      <h2 class="display-l">What this looks like in practice</h2>
+      <span class="label">In practice</span>
+      <h2 class="heading">What this looks like in practice</h2>
     </div>
 
     <article class="case">
       <div class="who">01<small>Uber Eats</small></div>
       <div class="main">
-        <h3 class="display-m">Rebuilding customer support around LLMs</h3>
+        <h3 class="sub">Rebuilding customer support around LLMs</h3>
         <p class="copy">Uber Eats had a fragmented post-order support experience built around legacy intent detection and workflows.</p>
         <p class="copy">The opportunity wasn't simply to "add AI."</p>
         <p class="copy">I helped lead the global rebuild of the experience around an LLM-based architecture, from identifying the opportunity and redesigning the workflow through to product, engineering and operations execution.</p>
-        <p class="lesson"><b>The lesson</b>The value came from redesigning the workflow around the technology — not simply introducing an LLM.</p>
+        <div class="lesson"><span class="label lime">The lesson</span><p class="copy">The value came from redesigning the workflow around the technology — not simply introducing an LLM.</p></div>
       </div>
       <div class="results">
-        <span class="eyebrow">Result</span>
-        <div class="result"><div class="fig">+8%</div><div class="lab">issue discoverability vs. baseline</div></div>
-        <div class="result"><div class="fig">+5%</div><div class="lab">CSAT</div></div>
-        <div class="result"><div class="fig">$10Ms</div><div class="lab">tens of millions in cost savings</div></div>
+        <span class="label">Result</span>
+        <div class="result"><div class="callout">+8%</div><div class="lab">Issue discoverability vs. baseline</div></div>
+        <div class="result"><div class="callout">+5%</div><div class="lab">CSAT</div></div>
+        <div class="result"><div class="callout">$10Ms</div><div class="lab">Tens of millions in cost savings</div></div>
       </div>
     </article>
 
     <article class="case">
       <div class="who">02<small>Cars24</small></div>
       <div class="main">
-        <h3 class="display-m">Using AI to reshape the sales process</h3>
+        <h3 class="sub">Using AI to reshape the sales process</h3>
         <p class="copy">Cars24 deployed AI voice and chat agents across buying, selling, financing and follow-up, starting in parts of the funnel where customer conversations directly influence conversion.</p>
         <p class="copy">The company also expanded AI internally across <strong>engineering, finance, legal, marketing and operations</strong>, with around <strong>600 employees</strong> using ChatGPT Enterprise and Codex; OpenAI reports <strong>85–90% daily active usage</strong> among that group.</p>
         <p class="copy">The interesting part is not simply that Cars24 deployed AI. It embedded AI into a <strong>revenue-generating workflow</strong>, changing how customer interactions were handled across the funnel.</p>
-        <p class="lesson"><b>The lesson</b>Some of the highest-value opportunities are not about automating a task. They are about <strong>changing how an entire commercial workflow operates.</strong></p>
+        <div class="lesson"><span class="label lime">The lesson</span><p class="copy">Some of the highest-value opportunities are not about automating a task. They are about <strong>changing how an entire commercial workflow operates.</strong></p></div>
       </div>
       <div class="results">
-        <span class="eyebrow">Adoption</span>
-        <div class="result"><div class="fig">~600</div><div class="lab">employees on ChatGPT Enterprise and Codex</div></div>
-        <div class="result"><div class="fig">85–90%</div><div class="lab">daily active usage, as reported by OpenAI</div></div>
+        <span class="label">Adoption</span>
+        <div class="result"><div class="callout">~600</div><div class="lab">Employees on ChatGPT Enterprise and Codex</div></div>
+        <div class="result"><div class="callout">85–90%</div><div class="lab">Daily active usage, as reported by OpenAI</div></div>
       </div>
     </article>
 
     <article class="case">
       <div class="who">03<small>Procurement</small></div>
       <div class="main">
-        <h3 class="display-m">AI uncovering 20–29% savings opportunities</h3>
+        <h3 class="sub">AI uncovering 20–29% savings opportunities</h3>
         <p class="copy">McKinsey describes a technology company using linked AI agents to rethink external-services procurement.</p>
         <p class="copy">The system combined spend and market data, identified pricing trends and savings opportunities, and modelled demand under different market scenarios to support sourcing decisions.</p>
         <p class="copy">Procurement is not traditionally viewed as an "AI department." The opportunity emerged from examining the <strong>economics of the workflow</strong> and identifying where AI could materially improve spend analysis, market intelligence, demand modelling and supplier decisions.</p>
-        <p class="lesson"><b>The lesson</b>Some of the biggest technology opportunities may be hiding in parts of the business that don't look "AI-native" at all.</p>
+        <div class="lesson"><span class="label lime">The lesson</span><p class="copy">Some of the biggest technology opportunities may be hiding in parts of the business that don't look "AI-native" at all.</p></div>
       </div>
       <div class="results">
-        <span class="eyebrow">Reported opportunity</span>
-        <div class="result"><div class="fig">12–20%</div><div class="lab">savings in contact-center operations</div></div>
-        <div class="result"><div class="fig">20–29%</div><div class="lab">savings in BPO and financial-services spend</div></div>
+        <span class="label">Reported opportunity</span>
+        <div class="result"><div class="callout">12–20%</div><div class="lab">Savings in contact-center operations</div></div>
+        <div class="result"><div class="callout">20–29%</div><div class="lab">Savings in BPO and financial-services spend</div></div>
       </div>
     </article>
   </section>
 
   <!-- ============================================================ principle -->
-  <section class="principle" id="principle">
-    <div class="shell">
+  <section class="shell section" id="principle">
+    <div class="principle">
+      <span class="label" style="padding-top: 12px;">The principle</span>
       <div>
-        <span class="eyebrow">The principle</span>
-        <h2 class="display-l">I don't start with AI.</h2>
-        <p class="copy">I start with <strong>the problem, the economics and the way the work gets done.</strong></p>
+        <h2 class="heading">I don't start with AI.</h2>
+        <p class="copy" style="margin-top: var(--sp-29);">I start with <strong>the problem, the economics and the way the work gets done.</strong></p>
         <p class="copy">Then I determine whether technology can create meaningful value — and what the simplest path is to capture it.</p>
       </div>
       <div>
@@ -628,19 +593,19 @@ img { display: block; max-width: 100%; }
           <li>Working solution</li>
           <li>Measurable impact</li>
         </ol>
-        <p class="chain-close">That's how I work.</p>
+        <p class="chain-close label">That's how I work.</p>
       </div>
     </div>
   </section>
 
-  <!-- ============================================================ cta -->
+  <!-- ============================================================ contact -->
   <section class="shell cta" id="contact">
     <div class="cta-inner">
-      <span class="eyebrow">Contact</span>
+      <span class="label" style="padding-top: 12px;">Contact</span>
       <div>
-        <h2 class="display-l">Let's find where technology can create real value.</h2>
+        <h2 class="heading">Let's find where technology can create real value.</h2>
         <div class="actions">
-          <a class="btn lg" href="mailto:otmankettani5@gmail.com"><span class="beat" aria-hidden="true"></span>Get in touch</a>
+          <a class="btn" href="mailto:otmankettani5@gmail.com"><span class="dot" aria-hidden="true"></span>Get in touch</a>
           <span class="mail">otmankettani5@gmail.com</span>
         </div>
       </div>
@@ -650,12 +615,77 @@ img { display: block; max-width: 100%; }
 </main>
 
 <footer class="site-footer">
-  <div class="shell footer-inner">
-    <span>Cadence · Otman Kettani</span>
-    <span>Amsterdam</span>
-    <a href="mailto:otmankettani5@gmail.com">otmankettani5@gmail.com</a>
+  <div class="shell footer-grid">
+    <div><span class="label">Cadence</span><br>Otman Kettani<br>Technology advisory</div>
+    <div><span class="label">Contact</span><br><a href="mailto:otmankettani5@gmail.com">otmankettani5@gmail.com</a><br>Amsterdam · 52.3676° N, 4.9041° E</div>
+    <div><span class="label">Languages</span><br>French · Arabic · Darija<br>Spanish · English</div>
   </div>
 </footer>
 
+<script>
+/* Generated contour field — placeholder for the reference's full-bleed aerial
+   photography. Bone-vellum isolines on the canvas, one lime survey marker. */
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function rng(seed) { let s = seed >>> 0; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; }
+  function noise2d(seed) {
+    const r = rng(seed), G = 64, g = new Float32Array(G * G);
+    for (let i = 0; i < g.length; i++) g[i] = r();
+    const sm = t => t * t * (3 - 2 * t);
+    return (x, y) => {
+      const xi = Math.floor(x), yi = Math.floor(y), xf = sm(x - xi), yf = sm(y - yi);
+      const at = (a, b) => g[((b % G + G) % G) * G + ((a % G + G) % G)];
+      const a = at(xi, yi), b = at(xi + 1, yi), c = at(xi, yi + 1), d = at(xi + 1, yi + 1);
+      return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
+    };
+  }
+  function draw(cv) {
+    const seed = +cv.dataset.seed || 1, n = noise2d(seed), r = rng(seed * 31 + 7);
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return;
+    cv.width = W * dpr; cv.height = H * dpr;
+    const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+    ctx.fillStyle = '#13140e'; ctx.fillRect(0, 0, W, H);
+    const cell = 7, cols = Math.ceil(W / cell) + 1, rows = Math.ceil(H / cell) + 1, f = new Float32Array(cols * rows);
+    const s = 0.9 / Math.max(cols, rows) * 5.5;
+    for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+      const x = i * s, y = j * s;
+      f[j * cols + i] = 0.55 * n(x, y) + 0.3 * n(x * 2.1 + 9, y * 2.1 + 3) + 0.15 * n(x * 4.3 + 17, y * 4.3 + 11);
+    }
+    const lerp = (p, q, a, b, t) => { const k = (t - a) / (b - a); return [p[0] + (q[0] - p[0]) * k, p[1] + (q[1] - p[1]) * k]; };
+    ctx.lineWidth = 1; ctx.lineCap = 'round';
+    for (let t = 0.28; t < 0.78; t += 0.035) {
+      const major = Math.round((t - 0.28) / 0.035) % 4 === 0;
+      ctx.strokeStyle = major ? 'rgba(244,243,232,0.20)' : 'rgba(244,243,232,0.10)';
+      ctx.beginPath();
+      for (let j = 0; j < rows - 1; j++) for (let i = 0; i < cols - 1; i++) {
+        const a = f[j * cols + i], b = f[j * cols + i + 1], c = f[(j + 1) * cols + i + 1], d = f[(j + 1) * cols + i];
+        const idx = (a > t) | (b > t) << 1 | (c > t) << 2 | (d > t) << 3; if (idx === 0 || idx === 15) continue;
+        const x = i * cell, y = j * cell;
+        const P = [[x, y], [x + cell, y], [x + cell, y + cell], [x, y + cell]];
+        const E = [lerp(P[0], P[1], a, b, t), lerp(P[1], P[2], b, c, t), lerp(P[2], P[3], c, d, t), lerp(P[3], P[0], d, a, t)];
+        const T = { 1: [[3, 0]], 2: [[0, 1]], 3: [[3, 1]], 4: [[1, 2]], 5: [[3, 0], [1, 2]], 6: [[0, 2]], 7: [[3, 2]], 8: [[2, 3]], 9: [[0, 2]], 10: [[0, 1], [2, 3]], 11: [[1, 2]], 12: [[1, 3]], 13: [[0, 1]], 14: [[3, 0]] }[idx];
+        for (const [u, v] of T) { ctx.moveTo(E[u][0], E[u][1]); ctx.lineTo(E[v][0], E[v][1]); }
+      }
+      ctx.stroke();
+    }
+    /* survey marker */
+    const mx = W * (0.58 + r() * 0.3), my = H * (0.22 + r() * 0.4);
+    ctx.strokeStyle = '#ebfc72'; ctx.fillStyle = '#ebfc72'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(mx, my, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(mx, my, 14, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath();
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { ctx.moveTo(mx + dx * 18, my + dy * 18); ctx.lineTo(mx + dx * 30, my + dy * 30); }
+    ctx.stroke();
+    ctx.font = '300 13px "JetBrains Mono", monospace'; ctx.textBaseline = 'middle';
+    ctx.fillText((52.36 + r() * 0.02).toFixed(4) + '° N  ' + (4.89 + r() * 0.03).toFixed(4) + '° E', mx + 40, my);
+  }
+  const fields = document.querySelectorAll('canvas.field');
+  const run = () => fields.forEach(draw);
+  run();
+  let raf; addEventListener('resize', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); });
+  if (!reduce && document.fonts) document.fonts.ready.then(run);
+})();
+</script>
 </body>
 </html>
