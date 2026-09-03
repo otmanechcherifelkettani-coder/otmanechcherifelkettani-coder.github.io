@@ -78,6 +78,11 @@ img { display: block; max-width: 100%; }
 .label.lime { color: var(--lime); }
 .callout { font-family: var(--mono); font-weight: 300; font-size: clamp(38px, 5vw, 65px); line-height: 1.2; letter-spacing: 0; color: var(--ink); font-variant-numeric: tabular-nums; }
 
+/* inventory — a mono list line for enumerations that are not markers */
+.inventory { font-family: var(--mono); font-size: 14px; line-height: 1.7; letter-spacing: 0; color: var(--ink); }
+.inventory i { font-style: normal; color: var(--muted); }
+.step > * { min-width: 0; }
+
 /* data tags — the survey markers */
 .tags { display: flex; flex-wrap: wrap; gap: var(--sp-7); }
 .tag {
@@ -102,7 +107,8 @@ img { display: block; max-width: 100%; }
 .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 
 /* ------------------------------------------------------------------ nav — floats on the image, no fill, no border */
-.site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 10; }
+.site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 10; background: transparent; transition: background-color .25s ease; }
+.site-header.is-scrolled { background: var(--canvas); }
 .header-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
 .wordmark { font-family: var(--sans); font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
 .site-nav { display: flex; align-items: center; gap: var(--sp-21); }
@@ -116,12 +122,13 @@ img { display: block; max-width: 100%; }
    .field canvases are generated contour placeholders for aerial photography. */
 .band { position: relative; width: 100%; overflow: hidden; background: var(--canvas); }
 .band canvas.field { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.band .coords { position: absolute; z-index: 1; display: flex; gap: var(--sp-7); }
+.band .coords { position: absolute; z-index: 1; display: flex; flex-wrap: wrap; gap: var(--sp-7); }
 .band .photo-note { position: absolute; z-index: 1; right: var(--gutter); bottom: var(--sp-18); }
 .band .photo-note .tag { color: var(--muted); }
 
 /* hero — full viewport, headline bottom-left */
 .hero { min-height: 100vh; min-height: 100svh; display: flex; align-items: flex-end; }
+.hero-inner > * { min-width: 0; }
 .hero-inner { position: relative; z-index: 1; padding-top: 140px; padding-bottom: var(--sp-59); display: grid; gap: var(--sp-18); }
 .hero .coords { position: static; margin-bottom: var(--sp-21); }
 .hero h1 { max-width: 15ch; }
@@ -133,7 +140,9 @@ img { display: block; max-width: 100%; }
 .band.interstitial .coords { left: var(--gutter); bottom: var(--sp-18); }
 
 /* ------------------------------------------------------------------ sections — whitespace, not dividers */
-.section { padding-top: var(--sp-104); }
+.section { padding-top: var(--sp-119); }
+.section.tight { padding-top: var(--sp-86); }
+@media (max-width: 700px) { .section { padding-top: var(--sp-86); } .section.tight { padding-top: var(--sp-59); } }
 .section-head { display: grid; grid-template-columns: var(--rail) 1fr; gap: var(--sp-18); align-items: start; margin-bottom: var(--sp-59); }
 .section-head .label { padding-top: 12px; }
 .section-head .sub { color: var(--muted); margin-top: var(--sp-18); max-width: 40ch; }
@@ -150,7 +159,7 @@ img { display: block; max-width: 100%; }
 .questions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-29); }
 .q { display: flex; flex-direction: column; gap: var(--sp-18); }
 .q .num { font-family: var(--mono); font-size: var(--text-caption); color: var(--lime); letter-spacing: 0; }
-.q .ask { margin-top: auto; padding-top: var(--sp-14); border-top: 1px solid var(--line); font-family: var(--mono); font-weight: 400; font-size: 15px; line-height: 1.5; letter-spacing: 0; color: var(--ink); }
+.q .ask { padding-bottom: var(--sp-14); border-bottom: 1px solid var(--line); font-family: var(--mono); font-weight: 400; font-size: 15px; line-height: 1.5; letter-spacing: 0; color: var(--ink); }
 .q .ask span { display: block; }
 @media (max-width: 900px) { .questions { grid-template-columns: 1fr; gap: var(--sp-59); } }
 
@@ -221,7 +230,7 @@ img { display: block; max-width: 100%; }
 @media (max-width: 900px) { .principle { grid-template-columns: 1fr; } }
 
 /* contact */
-.cta { padding-top: var(--sp-119); padding-bottom: var(--sp-119); }
+.cta { padding-top: var(--sp-86); padding-bottom: var(--sp-119); }
 .cta-inner { display: grid; grid-template-columns: var(--rail) 1fr; gap: var(--sp-18); }
 .cta h2 { max-width: 16ch; }
 .cta .actions { margin-top: var(--sp-29); display: flex; flex-wrap: wrap; gap: var(--sp-14); align-items: center; }
@@ -274,9 +283,9 @@ img { display: block; max-width: 100%; }
   </section>
 
   <!-- ============================================================ thesis -->
-  <section class="shell section">
+  <section class="shell section tight">
     <div class="thesis">
-      <span class="label">Thesis</span>
+      <span class="label">Why Cadence</span>
       <p class="sub claim">Most companies don't have a technology problem. They have a <strong>prioritization problem.</strong></p>
       <div class="body">
         <p class="copy">Too many tools. Too many AI experiments. Too little clarity on where technology can actually create value.</p>
@@ -288,42 +297,39 @@ img { display: block; max-width: 100%; }
   <!-- ============================================================ expertise -->
   <section class="shell section" id="expertise">
     <div class="section-head">
-      <span class="label">Expertise</span>
+      <span class="label">Where · What · How</span>
       <h2 class="heading">My expertise in 3&nbsp;questions</h2>
     </div>
     <div class="questions">
       <article class="q">
         <span class="num">01</span>
         <h3 class="sub">Where is the value?</h3>
+<p class="ask"><span>What matters?</span><span>Where are the biggest constraints?</span><span>Where is value being lost?</span></p>
         <p class="copy">I start with the business, not the technology.</p>
-        <p class="copy">I identify where the company is losing <strong>time, money, capacity, quality or revenue</strong>, then trace those problems back to the workflows, systems and decisions that create them.</p>
-        <p class="ask"><span>What matters?</span><span>Where are the biggest constraints?</span><span>Where is value being lost?</span></p>
-      </article>
+        <p class="copy">I identify where the company is losing <strong>time, money, capacity, quality or revenue</strong>, then trace those problems back to the workflows, systems and decisions that create them.</p>      </article>
       <article class="q">
         <span class="num">02</span>
         <h3 class="sub">What is worth doing?</h3>
+<p class="ask"><span>It's knowing when technology is worth using — and making it work.</span></p>
         <p class="copy">Not every problem needs AI.</p>
         <p class="copy">For each opportunity, I determine the simplest intervention that can materially improve the economics of the work.</p>
         <div class="tags" aria-label="Types of intervention">
           <span class="tag">Process redesign</span><span class="tag">Automation</span><span class="tag">AI</span><span class="tag">Software</span><span class="tag">Third-party solution</span><span class="tag">Human intervention</span>
         </div>
-        <p class="copy">The objective isn't the most advanced technology.</p>
-        <p class="ask"><span>It's knowing when technology is worth using — and making it work.</span></p>
-      </article>
+        <p class="copy">The objective isn't the most advanced technology.</p>      </article>
       <article class="q">
         <span class="num">03</span>
         <h3 class="sub">How do we ship it?</h3>
+<p class="ask"><span>From opportunity</span><span>→ to working system</span><span>→ to measurable impact.</span></p>
         <p class="copy">A good idea is worthless if it never reaches production.</p>
-        <p class="copy">I turn the opportunity into a working solution — defining what needs to change, selecting the right technology, building or sourcing what is needed, coordinating implementation, and measuring the result.</p>
-        <p class="ask"><span>From opportunity</span><span>→ to working system</span><span>→ to measurable impact.</span></p>
-      </article>
+        <p class="copy">I turn the opportunity into a working solution — defining what needs to change, selecting the right technology, building or sourcing what is needed, coordinating implementation, and measuring the result.</p>      </article>
     </div>
   </section>
 
   <!-- ============================================================ two ways -->
   <section class="shell section" id="ways">
     <div class="section-head">
-      <span class="label">Engagement</span>
+      <span class="label">Advisor · Operator</span>
       <h2 class="heading">Two ways I work with companies</h2>
     </div>
     <div class="ways">
@@ -358,7 +364,7 @@ img { display: block; max-width: 100%; }
   <!-- ============================================================ about -->
   <section class="shell section" id="about">
     <div class="about">
-      <span class="label" style="padding-top: 12px;">About</span>
+      <span class="label" style="padding-top: 12px;">Otman Kettani · Amsterdam</span>
       <div>
         <h2 class="heading">About</h2>
         <div style="margin-top: var(--sp-29);">
@@ -391,7 +397,7 @@ img { display: block; max-width: 100%; }
   <!-- ============================================================ methodology -->
   <section class="shell section" id="method">
     <div class="section-head">
-      <span class="label">Method</span>
+      <span class="label">10 steps · Value first</span>
       <div>
         <h2 class="heading">The methodology</h2>
         <p class="sub">One value-first approach, from opportunity to impact.</p>
@@ -406,7 +412,7 @@ img { display: block; max-width: 100%; }
         <div class="body">
           <p class="copy">Start with the outcome.</p>
           <p class="copy">What business result are we trying to improve?</p>
-          <div class="tags"><span class="tag">Cost</span><span class="tag">Revenue</span><span class="tag">Speed</span><span class="tag">Quality</span><span class="tag">Capacity</span><span class="tag">Customer experience</span><span class="tag">Risk</span></div>
+          <p class="inventory">Cost <i>·</i> Revenue <i>·</i> Speed <i>·</i> Quality <i>·</i> Capacity <i>·</i> Customer experience <i>·</i> Risk</p>
           <div class="output"><span class="tag fill">Output</span><span>Clear business objective and success metrics.</span></div>
         </div>
       </article>
@@ -426,7 +432,7 @@ img { display: block; max-width: 100%; }
         <h3 class="sub">Identify the constraints</h3>
         <div class="body">
           <p class="copy">Find where value is being lost. Look for:</p>
-          <div class="tags"><span class="tag">Manual effort</span><span class="tag">Bottlenecks</span><span class="tag">Waiting</span><span class="tag">Repetitive work</span><span class="tag">Knowledge gaps</span><span class="tag">Errors</span><span class="tag">Poor decisions</span><span class="tag">Handoffs</span><span class="tag">Fragmented systems</span><span class="tag">Exception handling</span></div>
+          <p class="inventory">Manual effort <i>·</i> Bottlenecks <i>·</i> Waiting <i>·</i> Repetitive work <i>·</i> Knowledge gaps <i>·</i> Errors <i>·</i> Poor decisions <i>·</i> Handoffs <i>·</i> Fragmented systems <i>·</i> Exception handling</p>
           <p class="copy">Then identify the underlying cause.</p>
           <div class="output"><span class="tag fill">Output</span><span>High-value opportunity areas.</span></div>
         </div>
@@ -470,7 +476,7 @@ img { display: block; max-width: 100%; }
         <h3 class="sub">Build the business case</h3>
         <div class="body">
           <p class="copy">Not every opportunity deserves investment. I assess:</p>
-          <div class="tags"><span class="tag">Economic value</span><span class="tag">Expected impact</span><span class="tag">Feasibility</span><span class="tag">Time-to-value</span><span class="tag">Strategic importance</span><span class="tag">Risk</span><span class="tag">Complexity</span></div>
+          <p class="inventory">Economic value <i>·</i> Expected impact <i>·</i> Feasibility <i>·</i> Time-to-value <i>·</i> Strategic importance <i>·</i> Risk <i>·</i> Complexity</p>
           <p class="copy">Then prioritize the opportunities with the strongest combination of <strong>value and practicality</strong>.</p>
           <div class="output"><span class="tag fill">Output</span><span>Prioritized roadmap and business cases.</span></div>
         </div>
@@ -481,7 +487,7 @@ img { display: block; max-width: 100%; }
         <h3 class="sub">Design the solution</h3>
         <div class="body">
           <p class="copy">Design the future state around what the new capability makes possible. Define:</p>
-          <div class="tags"><span class="tag">People</span><span class="tag">Process</span><span class="tag">Technology</span><span class="tag">Data</span><span class="tag">Integrations</span><span class="tag">Controls</span><span class="tag">Human/AI handoffs</span><span class="tag">KPIs</span></div>
+          <p class="inventory">People <i>·</i> Process <i>·</i> Technology <i>·</i> Data <i>·</i> Integrations <i>·</i> Controls <i>·</i> Human/AI handoffs <i>·</i> KPIs</p>
           <div class="output"><span class="tag fill">Output</span><span>Future-state design and implementation plan.</span></div>
         </div>
       </article>
@@ -501,7 +507,7 @@ img { display: block; max-width: 100%; }
         <h3 class="sub">Deploy</h3>
         <div class="body">
           <p class="copy">Move from validated solution to production. Depending on the project, this can involve:</p>
-          <div class="tags"><span class="tag">Building</span><span class="tag">Vendor selection</span><span class="tag">Integration</span><span class="tag">Testing</span><span class="tag">Rollout</span><span class="tag">Change management</span><span class="tag">Operating model</span></div>
+          <p class="inventory">Building <i>·</i> Vendor selection <i>·</i> Integration <i>·</i> Testing <i>·</i> Rollout <i>·</i> Change management <i>·</i> Operating model</p>
           <div class="output"><span class="tag fill">Output</span><span>Working solution in production.</span></div>
         </div>
       </article>
@@ -522,12 +528,12 @@ img { display: block; max-width: 100%; }
   <!-- ============================================================ in practice -->
   <section class="shell section" id="work">
     <div class="section-head">
-      <span class="label">In practice</span>
+      <span class="label">Three cases</span>
       <h2 class="heading">What this looks like in practice</h2>
     </div>
 
     <article class="case">
-      <div class="who">01<small>Uber Eats</small></div>
+      <div class="who">Uber Eats<small>Customer support</small></div>
       <div class="main">
         <h3 class="sub">Rebuilding customer support around LLMs</h3>
         <p class="copy">Uber Eats had a fragmented post-order support experience built around legacy intent detection and workflows.</p>
@@ -544,7 +550,7 @@ img { display: block; max-width: 100%; }
     </article>
 
     <article class="case">
-      <div class="who">02<small>Cars24</small></div>
+      <div class="who">Cars24<small>Sales</small></div>
       <div class="main">
         <h3 class="sub">Using AI to reshape the sales process</h3>
         <p class="copy">Cars24 deployed AI voice and chat agents across buying, selling, financing and follow-up, starting in parts of the funnel where customer conversations directly influence conversion.</p>
@@ -560,7 +566,7 @@ img { display: block; max-width: 100%; }
     </article>
 
     <article class="case">
-      <div class="who">03<small>Procurement</small></div>
+      <div class="who">Procurement<small>McKinsey case</small></div>
       <div class="main">
         <h3 class="sub">AI uncovering 20–29% savings opportunities</h3>
         <p class="copy">McKinsey describes a technology company using linked AI agents to rethink external-services procurement.</p>
@@ -579,7 +585,7 @@ img { display: block; max-width: 100%; }
   <!-- ============================================================ principle -->
   <section class="shell section" id="principle">
     <div class="principle">
-      <span class="label" style="padding-top: 12px;">The principle</span>
+      <span class="label" style="padding-top: 12px;">Value before technology</span>
       <div>
         <h2 class="heading">I don't start with AI.</h2>
         <p class="copy" style="margin-top: var(--sp-29);">I start with <strong>the problem, the economics and the way the work gets done.</strong></p>
@@ -601,7 +607,7 @@ img { display: block; max-width: 100%; }
   <!-- ============================================================ contact -->
   <section class="shell cta" id="contact">
     <div class="cta-inner">
-      <span class="label" style="padding-top: 12px;">Contact</span>
+      <span class="label" style="padding-top: 12px;">Amsterdam · CET</span>
       <div>
         <h2 class="heading">Let's find where technology can create real value.</h2>
         <div class="actions">
@@ -670,7 +676,8 @@ img { display: block; max-width: 100%; }
       ctx.stroke();
     }
     /* survey marker */
-    const mx = W * (0.58 + r() * 0.3), my = H * (0.22 + r() * 0.4);
+    const narrow = W < 720;
+    const mx = W * (narrow ? 0.55 + r() * 0.2 : 0.58 + r() * 0.3), my = H * (narrow ? 0.12 + r() * 0.14 : 0.22 + r() * 0.4);
     ctx.strokeStyle = '#ebfc72'; ctx.fillStyle = '#ebfc72'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.arc(mx, my, 4, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(mx, my, 14, 0, Math.PI * 2); ctx.stroke();
@@ -678,8 +685,14 @@ img { display: block; max-width: 100%; }
     for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { ctx.moveTo(mx + dx * 18, my + dy * 18); ctx.lineTo(mx + dx * 30, my + dy * 30); }
     ctx.stroke();
     ctx.font = '300 13px "JetBrains Mono", monospace'; ctx.textBaseline = 'middle';
-    ctx.fillText((52.36 + r() * 0.02).toFixed(4) + '° N  ' + (4.89 + r() * 0.03).toFixed(4) + '° E', mx + 40, my);
+    const label = (52.36 + r() * 0.02).toFixed(4) + '° N  ' + (4.89 + r() * 0.03).toFixed(4) + '° E';
+    const lw = ctx.measureText(label).width;
+    if (mx + 40 + lw > W - 16) { ctx.textAlign = 'right'; ctx.fillText(label, mx - 40, my); ctx.textAlign = 'left'; }
+    else ctx.fillText(label, mx + 40, my);
   }
+  const header = document.querySelector('.site-header');
+  const onScroll = () => header.classList.toggle('is-scrolled', scrollY > 48);
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
   const fields = document.querySelectorAll('canvas.field');
   const run = () => fields.forEach(draw);
   run();
