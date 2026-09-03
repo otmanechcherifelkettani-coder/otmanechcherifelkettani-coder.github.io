@@ -148,13 +148,13 @@ img { display: block; max-width: 100%; }
 .hero .avail::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--onyx); }
 
 /* start strip — availability, first step, format */
-.start { margin-top: var(--sp-64); border-top: 1px solid var(--ash); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-32); }
+.start { border-top: 1px solid var(--ash); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-32); }
 .start > div { padding-top: var(--sp-16); display: grid; gap: var(--sp-8); align-content: start; }
 .start .copy { font-size: var(--text-body-sm); line-height: 1.4; max-width: none; }
 @media (max-width: 820px) { .start { grid-template-columns: 1fr; gap: var(--sp-16); } }
 
 /* mid-page invitation */
-.invite { margin-top: var(--sp-48); padding: var(--sp-24) var(--sp-32); background: var(--card); border-radius: var(--r-card); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-16); }
+.invite { margin-top: var(--sp-32); padding: var(--sp-24) var(--sp-32); background: var(--card); border-radius: var(--r-card); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-16); }
 .invite p { font-size: var(--text-sub); line-height: 1.2; letter-spacing: var(--tracking); max-width: 36ch; }
 
 /* disclosure for the full method */
@@ -317,27 +317,13 @@ details.more .ledger { margin-top: var(--sp-24); }
   <!-- ============================================================ thesis -->
   <section class="shell section tight">
     <div class="thesis">
-      <span class="label" style="padding-top: 18px;">Why Cadence</span>
+      <span class="label" style="padding-top: 18px;">The problem</span>
       <div>
         <p class="display claim">Most companies don't have a technology problem. They have a <em>prioritization</em> problem.</p>
         <div class="body">
           <p class="copy quiet">Too many tools. Too many AI experiments. Too little clarity on where technology can actually create value.</p>
           <p class="copy">I help companies find the opportunities that matter, decide what is actually worth doing, and get it into production.</p>
         </div>
-      </div>
-    </div>
-    <div class="start" id="start">
-      <div>
-        <span class="label">Availability</span>
-        <p class="copy">A small number of engagements at a time, alongside my role at Uber Eats. Based in Amsterdam, working remotely across Europe.</p>
-      </div>
-      <div>
-        <span class="label">First step</span>
-        <p class="copy">A two-week diagnostic inside your operation. You get a ranked list of opportunities with their expected value, and a recommendation on what to do first.</p>
-      </div>
-      <div>
-        <span class="label">Format</span>
-        <p class="copy">Advisor or operator, scoped and priced upfront before we start. You keep ownership; I bring the outside view and the operating experience.</p>
       </div>
     </div>
   </section>
@@ -410,6 +396,31 @@ details.more .ledger { margin-top: var(--sp-24); }
           <p class="sub punch">That's what I'm there to figure out.</p>
         </div>
       </article>
+    </div>
+  </section>
+
+  <!-- ============================================================ how it starts -->
+  <section class="shell section" id="start">
+    <div class="section-head">
+      <span class="label">Start</span>
+      <div>
+        <h2 class="display">How it starts</h2>
+        <p class="sub">Whichever way we work, the first two weeks look the same.</p>
+      </div>
+    </div>
+    <div class="start">
+      <div>
+        <span class="label">Availability</span>
+        <p class="copy">A small number of engagements at a time, alongside my role at Uber Eats. Based in Amsterdam, working remotely across Europe.</p>
+      </div>
+      <div>
+        <span class="label">First step</span>
+        <p class="copy">A two-week diagnostic inside your operation. You get a ranked list of opportunities with their expected value, and a recommendation on what to do first.</p>
+      </div>
+      <div>
+        <span class="label">Format</span>
+        <p class="copy">Advisor or operator, scoped and priced upfront before we start. You keep ownership; I bring the outside view and the operating experience.</p>
+      </div>
     </div>
     <div class="invite">
       <p>Not sure which one you need? Start with the two-week diagnostic and decide after.</p>
