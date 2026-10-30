@@ -1,0 +1,16 @@
+{
+  "name": "ridenova-safety-console",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "RideNova unified safety case review — AI-assisted triage with human oversight (case exercise prototype).",
+  "scripts": {
+    "start": "node server/server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "evaluate": "node scripts/evaluate.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.70.0"
+  }
+}

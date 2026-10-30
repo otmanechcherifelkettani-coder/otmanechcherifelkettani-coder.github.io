@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RideNova Safety Case</title>
+<meta name="description" content="Case solution: a unified, AI-assisted safety case review tool with human oversight.">
+<link rel="stylesheet" href="assets/base.css">
+<style>
+  .hero { background: var(--black); color: var(--white); }
+  .hero .container { padding-top: 88px; padding-bottom: 96px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: center; }
+  .hero h1 { font-size: clamp(40px, 6vw, 76px); letter-spacing: -0.04em; line-height: 1; }
+  .hero p { color: var(--g300); font-size: 19px; margin-top: 22px; max-width: 600px; }
+  .hero .ctas { display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
+  .hero-card { background: var(--white); color: var(--black); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-lg); }
+  .hero-card h3 { font-size: 20px; margin-bottom: 14px; }
+  .lanecard { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--g100); font-size: 14px; }
+  .lanecard:last-child { border-bottom: 0; }
+  .lanecard b { display: block; font-size: 15px; }
+  section.s { padding: 88px 0; }
+  section.s.gray { background: var(--g50); }
+  .s h2 { font-size: clamp(32px, 4vw, 48px); letter-spacing: -0.035em; max-width: 900px; }
+  .s .intro { font-size: 18px; color: var(--g600); margin-top: 14px; max-width: 760px; }
+  .grid { display: grid; gap: 16px; margin-top: 40px; }
+  .g2 { grid-template-columns: repeat(2, 1fr); } .g3 { grid-template-columns: repeat(3, 1fr); } .g4 { grid-template-columns: repeat(4, 1fr); }
+  .tile { background: var(--white); border: 1px solid var(--g200); border-radius: 16px; padding: 24px; }
+  .gray .tile { border-color: transparent; }
+  .tile h3 { font-size: 20px; margin-bottom: 10px; }
+  .tile p, .tile li { font-size: 15px; color: var(--g700); }
+  .tile ul { padding-left: 18px; margin: 0; } .tile li { margin: 5px 0; }
+  .num { font-size: 52px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+  .num + .lab { color: var(--g600); font-size: 14px; margin: 8px 0 12px; }
+  .tree { margin-top: 40px; display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: stretch; }
+  .tree .root { background: var(--black); color: var(--white); border-radius: 16px; padding: 24px; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; display: flex; align-items: center; }
+  .tree .branch { display: grid; grid-template-columns: 40px 1fr 1.6fr auto; gap: 16px; align-items: center; background: var(--white); border-radius: 12px; padding: 16px 18px; font-size: 15px; margin-bottom: 10px; }
+  .tree .branch .n { width: 32px; height: 32px; border-radius: 50%; background: var(--black); color: var(--white); display: grid; place-items: center; font-weight: 700; }
+  table.req { width: 100%; border-collapse: collapse; margin-top: 36px; font-size: 15px; }
+  table.req th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--g500); border-bottom: 2px solid var(--black); padding: 10px; }
+  table.req td { padding: 12px 10px; border-bottom: 1px solid var(--g200); vertical-align: top; }
+  .ok { color: var(--green); font-weight: 700; } .sim { color: #8a5a00; font-weight: 700; } .no { color: var(--red); font-weight: 700; }
+  pre.cmd { background: var(--black); color: #e8e8e8; border-radius: 12px; padding: 20px; font-family: var(--mono); font-size: 14px; overflow-x: auto; line-height: 1.7; }
+  footer { background: var(--black); color: var(--g400); padding: 40px 0; font-size: 14px; }
+  @media (max-width: 900px) {
+    .hero .container { grid-template-columns: 1fr; padding-top: 56px; padding-bottom: 64px; }
+    .g2, .g3, .g4, .tree { grid-template-columns: 1fr; }
+    .tree .branch { grid-template-columns: 32px 1fr; } .tree .branch > :nth-child(n+3) { grid-column: 2; }
+    section.s { padding: 56px 0; }
+    table.req { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<header class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">RideNova<span>Safety</span></a>
+  <a class="link active hide-sm" href="index.html">Case solution</a>
+  <a class="link hide-sm" href="console.html">Console</a>
+  <a class="link hide-sm" href="deck.html">Exec deck</a>
+  <div class="spacer"></div>
+  <a class="btn btn-white btn-sm" href="console.html">Open console</a>
+</div></header>
+
+<section class="hero"><div class="container">
+  <div>
+    <div class="eyebrow" style="color:var(--g400)">Program Leader, Tech Transformation · Case solution</div>
+    <h1 style="margin-top:14px">Every safety report reviewed on one screen, at the right speed.</h1>
+    <p>A working prototype that unifies six source systems, has AI do the groundwork in 35 languages, enforces the policy with deterministic guardrails and leaves every L2–L4 decision to a human. It triages all 5,000 cases in under a second, with 23 tests on the rules that must never break.</p>
+    <div class="ctas"><a class="btn btn-white" href="console.html">Open the console →</a><a class="btn" style="background:var(--g800);color:#fff" href="deck.html">Executive deck</a><a class="btn" style="background:var(--g800);color:#fff" href="#run">Run it locally</a></div>
+  </div>
+  <div class="hero-card">
+    <h3>Measured on the full dataset</h3>
+    <div class="lanecard"><span class="tier L4">L4</span><div><b>138 critical</b>Duty manager alerted at intake · locked</div><span class="chip tag-measured">138/138 recall</span></div>
+    <div class="lanecard"><span class="tier L3">L3</span><div><b>387 specialist</b>Threats, violence, injection, collisions</div><span class="chip tag-measured">519/523 L3+</span></div>
+    <div class="lanecard"><span class="tier L2">L2</span><div><b>951 standard</b>Violations, plus anything uncertain</div><span class="chip">human</span></div>
+    <div class="lanecard"><span class="tier L1">L1</span><div><b>3,524 auto-resolvable</b>SP-1 allow-list, 5% QA</div><span class="chip tag-measured">0 unsafe</span></div>
+    <p class="muted" style="font-size:12px;margin-top:10px">Demo provider (no AI key) + guardrails over candidate_cases.json. In-sample: the lexicon was tuned on this file.</p>
+  </div>
+</div></section>
+
+<section class="s"><div class="container">
+  <div class="eyebrow">The answer in 30 seconds</div>
+  <h2>Build the control layer, buy the model, and automate only what measurement earns.</h2>
+  <div class="grid g4">
+    <div class="tile"><div class="num">55%</div><div class="lab">of handling time is spent searching</div><p>The problem is fragmentation, not judgement. Fix information access first: unify the sources with provenance.</p></div>
+    <div class="tile"><div class="num">4</div><div class="lab">severity lanes, not one queue</div><p>Danger signals page a duty manager at intake. Automation can’t close, downgrade or resolve them.</p></div>
+    <div class="tile"><div class="num">~54%</div><div class="lab">fewer reviewer hours <span class="chip tag-estimate">estimate</span></div><p>About half from the unified view and half from gated L1 auto-resolution. Validated in a shadow pilot before any automation.</p></div>
+    <div class="tile"><div class="num">5</div><div class="lab">decisions for leadership</div><p>Pilot budget, vendor strategy, 6 policy rulings, the auto-resolve bar and the privacy sign-off path.</p></div>
+  </div>
+</div></section>
+
+<section class="s gray"><div class="container">
+  <div class="eyebrow">Problem structure (MECE)</div>
+  <h2>Four levers that cover the case lifecycle, ordered by risk removed.</h2>
+  <p class="intro">Each lever maps to one stage: detect, inform, route, reduce. The order is deliberate: the lever that saves the most hours (auto-resolution) also carries the most risk, so it ships last and behind a gate.</p>
+  <div class="tree">
+    <div class="root">Resolve every report at the right speed, with the right human, at lower cost</div>
+    <div>
+      <div class="branch"><span class="n">1</span><b>Never miss danger</b><span class="muted">SOS, stalking telematics, medical and weapon language → L4 + alert, locked</span><span class="chip tag-measured">P0 · built</span></div>
+      <div class="branch"><span class="n">2</span><b>Find information faster</b><span class="muted">6 systems on one screen, fact-level provenance, masking, translation</span><span class="chip tag-measured">P0 · built</span></div>
+      <div class="branch"><span class="n">3</span><b>Route by severity</b><span class="muted">AI proposal → guardrails → tier, action, deadline-ordered lanes</span><span class="chip tag-measured">P1 · built</span></div>
+      <div class="branch"><span class="n">4</span><b>Remove safe low-risk work</b><span class="muted">L1 auto-resolve on an allow-list, confidence gate, 5% QA</span><span class="chip tag-target">P2 · gated</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="s"><div class="container">
+  <div class="eyebrow">Design principles</div>
+  <h2>The AI proposes, rules constrain, and a human decides.</h2>
+  <div class="grid g3">
+    <div class="tile"><h3>Fail toward a human</h3><ul><li>Unrecognised → L2 human, never L1</li><li>Auto-resolve is an allow-list, not the default</li><li>Invalid AI output → safest values</li><li>AI outage → rules keep the queue moving</li></ul></div>
+    <div class="tile"><h3>Guardrails are code, not prompts</h3><ul><li>SP-7 → L4, alert, locked</li><li>SP-8 and threats → L3 floor</li><li>Injection → specialist review (L3), confidence capped</li><li>SP-9, duplicates, missing data</li></ul></div>
+    <div class="tile"><h3>PII never leaves the boundary</h3><ul><li>Structured and free-text redaction before the AI sees anything</li><li>Pseudonymous IDs; the server refuses PII-looking payloads</li><li>Role masking; every reveal logged with a reason</li><li>No PII in logs or exports; retention purge</li></ul></div>
+  </div>
+</div></section>
+
+<section class="s gray"><div class="container">
+  <div class="eyebrow">Brief coverage</div>
+  <h2>What works, what is simulated, and what is incomplete.</h2>
+  <table class="req">
+    <tr><th>Requirement</th><th>Status</th><th>Where / how</th></tr>
+    <tr><td>A · Unify 5 mocked sources, label provenance</td><td class="ok">Works</td><td>Every fact tagged: allegation, system signal, history, evidence, AI interpretation, rule</td></tr>
+    <tr><td>B · Summarise, translate, propose tier/action with confidence and rationale</td><td class="ok">Works <span class="sim">(demo simulated)</span></td><td>Live: Claude via <code>server/server.mjs</code>. Demo: rules + lexicon stand-in, labelled SIMULATED</td></tr>
+    <tr><td>B · Policy Q&amp;A with citations or “Not covered”</td><td class="ok">Works</td><td>Retrieval with a coverage threshold (demo); live model output is citation-validated</td></tr>
+    <tr><td>B · Approve / override / escalate with a reason; no AI closure of L3/L4; danger → alert</td><td class="ok">Works</td><td>Guardrails + Store validation; tested</td></tr>
+    <tr><td>C · Masking, RBAC, redaction, retention, access logging</td><td class="ok">Works <span class="sim">(prototype grade)</span></td><td>Client-side roles (no SSO); localStorage log; regex + known-value redaction (no NER)</td></tr>
+    <tr><td>D · 5,000 cases, severity/deadline queue, filters, translation on demand</td><td class="ok">Works</td><td>&lt;0.5 s triage in the browser; UTC deadline ordering</td></tr>
+    <tr><td>E · Structured records, search, CSV/JSON export</td><td class="ok">Works</td><td>Minimum columns + 14 extras; no PII</td></tr>
+    <tr><td>F · README (~5 commands), AI integration, key-free demo, tests, swappable provider</td><td class="ok">Works</td><td>23 tests; <code>SimulatedProvider</code> / <code>LiveProvider</code></td></tr>
+    <tr><td>Validation on 20–30 self-labelled cases</td><td class="ok">Works</td><td>30 gold labels + 5,000 silver reference; <code>npm run evaluate</code></td></tr>
+    <tr><td>Live AI benchmarked on the gold set</td><td class="no">Not done</td><td>No API key in the build environment. The integration is written and its error paths are handled; run <code>npm start</code> with a key</td></tr>
+    <tr><td>Real integrations, SSO, server-side persistence, paging</td><td class="no">Out of scope</td><td>Mocked; listed as Phase 0 dependencies</td></tr>
+  </table>
+</div></section>
+
+<section class="s" id="run"><div class="container">
+  <div class="eyebrow">Run it</div>
+  <h2>Five commands.</h2>
+  <div class="grid g2">
+    <pre class="cmd">git clone https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io &amp;&amp; cd otmanechcherifelkettani-coder.github.io/ridenova-safety
+npm install            # Anthropic SDK (live mode only)
+npm test               # 23 critical-rule tests
+npm start              # demo mode → localhost:8080/console.html
+ANTHROPIC_API_KEY=… npm start   # live mode</pre>
+    <div class="tile"><h3>Or just open it</h3><p>The console runs on static hosting in demo mode. This page is served from GitHub Pages, so <a href="console.html"><b>open the console</b></a> and the full pipeline runs in your browser with no install.</p><p style="margin-top:12px"><a href="https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io/blob/main/ridenova-safety/README.md">README</a> · <a href="https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io/blob/main/ridenova-safety/docs/AI_LOG.md">AI-use log</a> · <a href="https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io/blob/main/ridenova-safety/docs/VALIDATION.md">Validation</a> · <a href="https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io/blob/main/ridenova-safety/docs/DECISIONS.md">Decisions &amp; assumptions</a></p></div>
+  </div>
+</div></section>
+
+<footer><div class="container">RideNova is fictional. All case data is synthetic and supplied with the exercise; it is treated as real personal data in the design. Built by Otman Kettani with Claude.</div></footer>
+</body>
+</html>
