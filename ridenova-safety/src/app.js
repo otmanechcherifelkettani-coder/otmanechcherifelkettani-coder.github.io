@@ -313,13 +313,22 @@ function l4Panel(c, r) {
 
 const maskAddr = (a) => (a ? '•••, ' + a.split(',').slice(-1)[0].replace('(fictional)', '').trim() : '—');
 
+// In-page dialog (sandboxed viewers block window.prompt).
 function reveal(part, field) {
-  const reason = prompt('Reason for viewing personal data (logged):');
-  if (!reason || reason.trim().length < 5) { toast('A reason is required to view personal data'); return; }
-  if (part === 'text' || part === 'addr') S.revealed[part] = true;
-  else S.revealed[part] = { ...(S.revealed[part] || {}), [field]: true };
-  S.store.log(S.role, 'pii_reveal', S.sel, { part, field: field || null, reason: reason.trim() });
-  renderDetail();
+  const dlg = $('#reveal-dlg');
+  $('#reveal-reason').value = ''; $('#reveal-err').textContent = '';
+  $('#reveal-what').textContent = part === 'text' ? 'the unmasked report text' : part === 'addr' ? 'the pickup and drop-off addresses' : `the ${part === 'reporter' ? 'reporter' : 'reported party'}’s ${field.replace('_', ' ')}`;
+  dlg.classList.add('on'); $('#reveal-reason').focus();
+  $('#reveal-cancel').onclick = () => dlg.classList.remove('on');
+  $('#reveal-ok').onclick = () => {
+    const reason = $('#reveal-reason').value.trim();
+    if (reason.length < 5) { $('#reveal-err').textContent = 'A reason (5+ characters) is required.'; return; }
+    dlg.classList.remove('on');
+    if (part === 'text' || part === 'addr') S.revealed[part] = true;
+    else S.revealed[part] = { ...(S.revealed[part] || {}), [field]: true };
+    S.store.log(S.role, 'pii_reveal', S.sel, { part, field: field || null, reason });
+    renderDetail();
+  };
 }
 
 async function runLive() {

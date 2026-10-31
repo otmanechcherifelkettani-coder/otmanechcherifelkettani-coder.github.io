@@ -149,6 +149,10 @@
   #drawer .db { padding: 20px 24px; overflow-y: auto; flex: 1; }
   .qa-ans { margin-top: 16px; border-radius: var(--radius); padding: 16px; background: var(--g50); white-space: pre-wrap; font-size: 14px; }
   .qa-ans.nc { background: #fff3d6; }
+  #reveal-dlg { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; place-items: center; z-index: 250; padding: 16px; }
+  #reveal-dlg.on { display: grid; }
+  #reveal-dlg .dlg { background: var(--white); border-radius: var(--radius); padding: 22px; width: min(440px, 100%); box-shadow: var(--shadow-lg); }
+  #reveal-dlg h3 { font-size: 20px; }
   #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--black); color: var(--white); padding: 12px 20px; border-radius: var(--pill); font-weight: 600; font-size: 14px; transition: transform .25s; z-index: 200; }
   #toast.on { transform: translateX(-50%) translateY(0); }
   #loader { position: fixed; inset: 0; background: var(--white); display: grid; place-items: center; z-index: 300; }
@@ -234,6 +238,15 @@
     <div class="chips" id="qa-samples"></div>
     <button class="btn btn-black" style="margin-top:14px" id="qa-go">Ask</button>
     <div id="qa-out"></div>
+  </div>
+</div>
+<div id="reveal-dlg" role="dialog" aria-modal="true" aria-label="Reason for viewing personal data">
+  <div class="dlg">
+    <h3>View personal data</h3>
+    <p class="muted" style="font-size:14px;margin:6px 0 12px">You are about to view <b id="reveal-what"></b>. Your reason is written to the access log.</p>
+    <textarea id="reveal-reason" class="field" style="min-height:70px;font-size:14px;padding:10px" placeholder="e.g. Calling the reporter back"></textarea>
+    <div class="err" id="reveal-err"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn btn-gray btn-sm" id="reveal-cancel">Cancel</button><button class="btn btn-black btn-sm" id="reveal-ok">Reveal and log</button></div>
   </div>
 </div>
 <div id="toast"></div>
