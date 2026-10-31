@@ -82,3 +82,34 @@ test('invalid model output falls back to the safest values', () => {
   assert.equal(v.tier, 'L3'); assert.equal(v.action, 'ROUTE_L3_REVIEW'); assert.equal(v.confidence, 0.3);
   assert.deepEqual(v.policy_refs, ['SP-1']); assert.ok(v.flags.includes('ai_output_invalid'));
 });
+
+test('L4 response: ordered, timestamped steps; cannot close until reporter handled; closes with reason', () => {
+  let now = Date.parse('2026-03-01T00:00:00Z');
+  const s = new Store(mem(), () => now);
+  const l4 = finalize(get('SC-0001'), simulateTriage(get('SC-0001')));
+  assert.equal(s.respond(l4, 'ack', {}, 'agent').ok, false);                       // agents cannot respond to L4
+  assert.equal(s.respond(l4, 'contact', { value: 'reached' }, 'duty').ok, false);  // must acknowledge first
+  assert.equal(s.respond(l4, 'ack', {}, 'duty').ok, true);
+  now += 4 * 60e3;
+  assert.equal(s.respond(l4, 'contact', { value: 'no_answer' }, 'duty').ok, true);
+  assert.equal(s.respond(l4, 'emergency', { value: 'contacted' }, 'duty').ok, true);
+  assert.equal(s.respond(l4, 'protect', { value: 'account_suspended' }, 'duty').ok, true);
+  assert.equal(s.respond(l4, 'outcome', { value: 'action_taken', reason: 'Police attended, rider safe' }, 'duty').ok, false); // reporter not reached
+  assert.equal(s.respond(l4, 'contact', { value: 'reached' }, 'duty').ok, true);
+  assert.equal(s.respond(l4, 'outcome', { value: 'action_taken', reason: '' }, 'duty').ok, false);
+  assert.equal(s.respond(l4, 'outcome', { value: 'action_taken', reason: 'Police attended, rider safe' }, 'duty').ok, true);
+  assert.equal(s.state.decisions['SC-0001'].human_decision, 'l4_response_closed');
+  assert.equal(s.state.decisions['SC-0001'].final_tier, 'L4');
+  const row = s.row(l4);
+  assert.equal(row.l4_acknowledged_at, '2026-03-01T00:00:00.000Z');
+  assert.equal(row.l4_emergency_services, 'contacted');
+  assert.equal(row.l4_outcome, 'action_taken');
+  assert.equal(s.respond(l4, 'protect', { value: 'none_needed' }, 'duty').ok, false); // closed
+  assert.ok(s.state.audit.some((e) => e.event === 'alert_ack'));
+});
+
+test('L4 response checklist does not apply to non-L4 cases', () => {
+  const s = new Store(mem());
+  const l1 = finalize(get('SC-0009'), simulateTriage(get('SC-0009')));
+  assert.equal(s.respond(l1, 'ack', {}, 'duty').ok, false);
+});

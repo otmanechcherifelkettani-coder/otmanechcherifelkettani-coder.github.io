@@ -3,14 +3,14 @@ import { triageAll, finalize, queueCompare, buildDuplicateIndex } from './triage
 import { detectProvider } from './ai.js';
 import { unifiedFacts, SOURCES } from './signals.js';
 import { redactText, displayParty, ROLES } from './pii.js';
-import { Store, toCSV } from './store.js';
+import { Store, toCSV, L4_STEPS } from './store.js';
 import { policyById, TIERS, ACTIONS } from './policy.js';
 import { CATEGORY_GLOSS } from './simulated.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const fmtUtc = (iso) => { const d = new Date(iso); return d.toLocaleString('en-GB', { timeZone: 'UTC', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' }) + ' UTC'; };
-const LANE_LABEL = { all: 'All', critical: 'Critical', priority: 'Priority', standard: 'Standard', auto: 'Auto-resolved', decided: 'Decided' };
+const LANE_LABEL = { all: 'All', critical: 'Critical', priority: 'Priority', standard: 'Standard', decided: 'Decided', auto: 'Auto-resolved · QA view' };
 const KIND_CLASS = { allegation: 'k-allegation', system: 'k-system', history: 'k-history', evidence: 'k-evidence', ai: 'k-ai', pii: 'k-pii', rule: 'k-rule' };
 const KIND_LABEL = { allegation: 'Reported allegation', system: 'System signal', history: 'Historical', evidence: 'Submitted evidence', ai: 'AI interpretation', pii: 'Personal data', rule: 'Deterministic rule' };
 
@@ -20,6 +20,8 @@ const S = {
   revealed: {}, translations: {}, precomputed: {}, results: null, view: 'queue', choice: 'approve',
 };
 const record = (id) => S.live.get(id) || S.rec.get(id);
+const fmtAgo = (ms) => { const m = Math.max(0, Math.floor(ms / 60000)); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`; };
+const acked = (id) => !!S.store.state.responses[id]?.ack;
 
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2600); }
 
@@ -34,6 +36,7 @@ async function init() {
   const t0 = performance.now();
   S.rec = triageAll(cases);
   S.triageMs = Math.round(performance.now() - t0);
+  S.alertRaisedAt = Date.now(); // demo: the intake service ran when the console loaded
   S.provider = await detectProvider(pre);
   const info = S.provider.info();
   const m = $('#mode');
@@ -112,7 +115,7 @@ function renderQueue() {
   $('#qlist').innerHTML = show.map((r) => {
     const c = S.byId.get(r.case_id);
     const d = S.store.state.decisions[r.case_id];
-    const st = d ? `✓ ${d.human_decision}` : r.auto_resolved ? 'auto' : r.alert ? '<span style="color:var(--red)">● alert</span>' : '';
+    const st = d ? (d.human_decision === 'l4_response_closed' ? '✓ closed' : `✓ ${d.human_decision}`) : r.auto_resolved ? 'auto' : r.alert ? (acked(r.case_id) ? '<span style="color:var(--red)">● responding</span>' : '<span style="color:var(--red)">● alert</span>') : '';
     const icons = (r.flags.includes('injection_detected') ? ' ⚑' : '') + (r.flags.includes('conflicting_signals') ? ' ⇄' : '') + (r.flags.includes('duplicate') ? ' ⧉' : '') + (S.live.has(r.case_id) ? ' ✦' : '');
     return `<div class="qitem ${S.sel === r.case_id ? 'sel' : ''}" data-id="${r.case_id}">
       <span class="tier ${r.predicted_tier}">${r.predicted_tier}</span>
@@ -126,7 +129,7 @@ function renderQueue() {
 }
 
 function renderAlerts() {
-  const open = [...S.rec.values()].filter((r) => r.alert && !S.store.state.decisions[r.case_id] && !S.store.state.audit.some((e) => e.event === 'alert_ack' && e.case_id === r.case_id));
+  const open = [...S.rec.values()].filter((r) => r.alert && !S.store.state.decisions[r.case_id] && !acked(r.case_id));
   $('#alertbar').classList.toggle('on', open.length > 0);
   $('#v-queue').classList.toggle('alerting', open.length > 0);
   $('#alerttext').textContent = `${open.length} critical (L4) cases — duty manager alerted, awaiting human acknowledgement. Automation will not close, downgrade or resolve these.`;
@@ -177,9 +180,9 @@ function renderDetail() {
         First response due <b>${fmtUtc(r.deadline_utc)}</b> (SLA ${TIERS[r.predicted_tier].slaMin >= 60 ? TIERS[r.predicted_tier].slaMin / 60 + 'h' : TIERS[r.predicted_tier].slaMin + ' min'}) · lane <b>${r.lane}</b>${r.parent_case ? ` · follow-up of <a href="#" data-goto="${r.parent_case}">${r.parent_case}</a>` : ''}</div></div>
       <div class="right"><button class="btn btn-gray btn-sm" id="prev">↑ Prev</button><button class="btn btn-gray btn-sm" id="next">Next ↓</button></div>
     </div>
-    ${r.alert ? `<div class="banner red"><span class="pulse"></span><div class="grow"><strong>Duty manager alerted — SP-7 danger signal</strong>Locked: automation cannot close, downgrade or resolve. Contact the reporter now; consider emergency services.</div>${S.role === 'duty' ? '<button class="btn btn-white btn-sm" id="ack">Acknowledge</button>' : '<span class="chip" style="background:rgba(255,255,255,.2);color:#fff">Duty manager only</span>'}</div>` : ''}
+    ${r.alert ? `<div class="banner red"><span class="pulse"></span><div class="grow"><strong>Already escalated at intake: duty manager paged (SP-7)</strong>Escalation is done. What’s needed now is action: acknowledge, contact the reporter, decide on emergency services. Automation cannot close, downgrade or resolve this case.</div>${acked(c.case_id) ? '<span class="chip" style="background:rgba(255,255,255,.2);color:#fff">Acknowledged</span>' : ['duty', 'specialist'].includes(S.role) ? '<button class="btn btn-white btn-sm" data-step="ack">Acknowledge</button>' : ''}</div>` : ''}
     ${r.flags.includes('injection_detected') ? '<div class="banner amber"><b>⚑</b><div class="grow"><strong>Prompt injection detected in report text</strong>The text contains instructions aimed at the triage system. They were treated as data and ignored; the case is routed to a specialist.</div></div>' : ''}
-    ${r.auto_resolved ? `<div class="banner gray"><b>✓</b><div class="grow"><strong>Auto-resolved under SP-1${r.qa_sample ? ' · selected for 5% QA sample' : ''}</strong>Every gate passed: L1, confidence ≥ 0.75, no safety, history, injection or missing-data flags. A reviewer can still override.</div></div>` : ''}
+    ${r.auto_resolved ? `<div class="banner gray"><b>✓</b><div class="grow"><strong>Resolved upstream at intake under SP-1${r.qa_sample ? ' · selected for the 5% QA sample' : ''}</strong>Every gate passed: L1, confidence ≥ 0.75, no safety, history, injection or missing-data flags. In production this never reaches a work queue; it is shown here for QA sampling and audit. A reviewer can still override.</div></div>` : ''}
     <div class="grid2">
       <div class="stack">
         <div class="panel"><div class="ph">${srcBadge('ticket')}<h3>Report</h3><div class="r"><span class="chip">${esc(c.language)}</span><span class="chip">${esc(c.channel)}</span>
@@ -213,7 +216,7 @@ function renderDetail() {
           <div class="chips">${r.policy_refs.map((p) => `<span class="chip cite" title="${esc(policyById[p]?.text)}">${p}</span>`).join('')}${r.flags.map((f) => `<span class="chip flag ${['safety_feature_used', 'prior_flags', 'duplicate', 'auto_resolve_blocked'].includes(f) ? 'info' : ''}">${esc(f.replace(/_/g, ' '))}</span>`).join('')}</div>
           ${r.guardrail_changes.length ? `<div class="changes"><div class="srcrow" style="margin:4px 0 0">${srcBadge('rules')}<b>Guardrail adjustments</b></div>${r.guardrail_changes.map((g) => `<div class="change"><code>${esc(g.rule)}</code><span>${esc(g.from)} → <b>${esc(g.to)}</b> — ${esc(g.why)}</span></div>`).join('')}</div>` : ''}
           </div></div>
-        <div class="panel decision"><div class="ph"><h3>Human decision</h3><div class="r"><span class="muted" style="font-size:12px">as ${esc(role.label)}</span></div></div><div class="pb">
+        ${r.alert ? l4Panel(c, r) : `<div class="panel decision"><div class="ph"><h3>Human decision</h3><div class="r"><span class="muted" style="font-size:12px">as ${esc(role.label)}</span></div></div><div class="pb">
           ${d ? `<div class="decided"><b>${esc(d.human_decision.toUpperCase())}</b> → ${esc(d.final_tier)} / ${esc(d.final_action)} · ${esc(d.decided_by_role)} · ${fmtUtc(d.decided_at)}<br><span class="muted">“${esc(d.human_reason)}”</span></div>` : ''}
           ${canDecide ? `
           <div class="opts">
@@ -229,7 +232,7 @@ function renderDetail() {
           <div class="err" id="derr"></div>
           <button class="btn btn-black" id="submit">Record decision</button>`
           : `<div class="muted" style="font-size:14px">${S.role === 'auditor' ? 'Auditors review decisions but cannot make them.' : `${esc(role.label)} cannot decide ${r.predicted_tier} cases. Switch role to Specialist or Duty manager.`}</div>`}
-        </div></div>
+        </div></div>`}
         <div class="panel"><div class="pb"><details class="json"><summary>Structured record (exported fields, no PII)</summary><pre>${esc(JSON.stringify({ ...S.store.row(r), guardrail_changes: r.guardrail_changes, ai: { ...r.ai, translation: undefined } }, null, 2))}</pre></details></div></div>
       </div>
     </div></div>`;
@@ -246,8 +249,24 @@ function renderDetail() {
   };
   $('#reveal-text') && ($('#reveal-text').onclick = () => reveal('text'));
   $('#detail').querySelectorAll('.reveal').forEach((b) => b.addEventListener('click', () => reveal(b.dataset.p, b.dataset.f)));
-  $('#ack') && ($('#ack').onclick = () => { S.store.log(S.role, 'alert_ack', c.case_id); renderAlerts(); toast('Alert acknowledged and logged'); });
+  $('#detail').querySelectorAll('[data-step]').forEach((b) => b.addEventListener('click', () => {
+    const step = b.dataset.step;
+    const res = S.store.respond(r, step, { value: b.dataset.v, reason: $('#l4-reason')?.value }, S.role);
+    if (!res.ok) { const e = $('#l4err'); if (e) e.textContent = res.error; toast(res.error); return; }
+    toast(step === 'ack' ? 'Acknowledged — you own this case' : step === 'outcome' ? 'Case closed and recorded' : `${L4_STEPS[step].label}: recorded`);
+    renderAlerts(); renderQueue(); renderDetail();
+  }));
+  $('#l4-close') && ($('#l4-close').onclick = () => {
+    const res = S.store.respond(r, 'outcome', { value: $('#l4-outcome').value, reason: $('#l4-reason').value }, S.role);
+    if (!res.ok) { $('#l4err').textContent = res.error; return; }
+    toast('Case closed and recorded'); renderAlerts(); renderQueue(); renderDetail();
+  });
   $('#runlive') && ($('#runlive').onclick = runLive);
+  $('#downgrade') && ($('#downgrade').onclick = () => {
+    const res = S.store.decide(r, { decision: 'override', tier: $('#o-tier').value, action: $('#o-action').value, reason: $('#reason').value }, S.role);
+    if (!res.ok) { $('#derr').textContent = res.error; return; }
+    toast(`Downgraded to ${res.decision.final_tier} — logged`); renderAlerts(); renderQueue(); renderDetail();
+  });
   $('#detail').querySelectorAll('.opt').forEach((b) => b.addEventListener('click', () => { S.choice = b.dataset.c; renderDetail(); }));
   $('#submit') && ($('#submit').onclick = () => {
     const res = S.store.decide(r, { decision: S.choice, tier: $('#o-tier')?.value, action: $('#o-action')?.value, reason: $('#reason').value }, S.role);
@@ -255,6 +274,41 @@ function renderDetail() {
     toast(`Decision recorded: ${res.decision.final_tier} / ${res.decision.final_action}`);
     renderAlerts(); renderQueue(); renderDetail();
   });
+}
+
+// L4: escalation already happened upstream. The human acts; the checklist records what they did and when.
+function l4Panel(c, r) {
+  const resp = S.store.state.responses[c.case_id] || {};
+  const canAct = ['duty', 'specialist'].includes(S.role) && !resp.outcome;
+  const elapsed = Date.now() - S.alertRaisedAt;
+  const late = !resp.ack && elapsed > 15 * 60e3;
+  const done = (k) => resp[k] ? `<span class="sdone">✓ ${esc(k === 'ack' ? 'Acknowledged' : L4_STEPS[k].options[resp[k].value])} · ${esc(resp[k].role)} · ${fmtUtc(resp[k].at)}</span>` : '';
+  const optBtns = (k) => Object.entries(L4_STEPS[k].options).map(([v, l]) => `<button class="btn btn-sm ${resp[k]?.value === v ? 'btn-black' : 'btn-gray'}" data-step="${k}" data-v="${v}" ${canAct && resp.ack ? '' : 'disabled'}>${esc(l)}</button>`).join('');
+  const row = (n, k, body) => `<div class="step ${resp[k] ? 'is-done' : ''} ${k !== 'ack' && !resp.ack ? 'is-locked' : ''}"><span class="sn">${resp[k] ? '✓' : n}</span><div><b>${esc(L4_STEPS[k].label)}</b>${done(k)}${body}</div></div>`;
+  const ackBody = resp.ack ? '' : `<div class="sopts"><button class="btn btn-red btn-sm" data-step="ack" ${canAct ? '' : 'disabled'}>Acknowledge — I own this case</button></div>`;
+  const outcomeBody = resp.outcome
+    ? `<div class="muted" style="font-size:13px;margin-top:4px">“${esc(resp.outcome.reason)}”</div>`
+    : `<div class="sopts" style="display:grid;gap:8px;grid-template-columns:1fr"><select id="l4-outcome" class="field" ${canAct && resp.ack ? '' : 'disabled'}>${Object.entries(L4_STEPS.outcome.options).map(([v, l]) => `<option value="${v}">${esc(l)}</option>`).join('')}</select>
+       <textarea id="l4-reason" class="field" style="min-height:64px;font-size:13px;padding:10px" placeholder="What happened and what you did (required)" ${canAct && resp.ack ? '' : 'disabled'}></textarea>
+       <button class="btn btn-black btn-sm" id="l4-close" ${canAct && resp.ack ? '' : 'disabled'}>Close case</button></div>`;
+  return `<div class="panel decision"><div class="ph"><h3>Respond</h3><div class="r"><span class="chip ${late ? 'flag' : ''}">${resp.ack ? `Acknowledged after ${fmtAgo(Date.parse(resp.ack.at) - S.alertRaisedAt)}` : `Alert open ${fmtAgo(elapsed)} · SLA 15 min`}</span></div></div><div class="pb">
+    <p class="muted" style="font-size:13px;margin-bottom:12px">This case was escalated automatically at intake. Your job is to act, not to re-triage. Each step is timestamped into the record and export.${S.role === 'agent' || S.role === 'auditor' ? ` <b>${esc(ROLES[S.role].label)}: read-only.</b>` : ''}</p>
+    <div class="steps">
+      ${row(1, 'ack', ackBody)}
+      ${row(2, 'contact', resp.contact?.value === 'reached' ? '' : `<div class="sopts">${optBtns('contact')}</div>`)}
+      ${row(3, 'emergency', `<div class="sopts">${resp.emergency ? '' : optBtns('emergency')}</div>`)}
+      ${row(4, 'protect', `<div class="sopts">${resp.protect ? '' : optBtns('protect')}</div>`)}
+      ${row(5, 'outcome', outcomeBody)}
+    </div>
+    <div class="err" id="l4err"></div>
+    <details style="margin-top:10px"><summary style="cursor:pointer;font-size:13px;font-weight:600">Downgrade this case (duty manager only)</summary>
+      <div class="ovr on" style="margin-top:10px"><select id="o-tier" class="field">${['L1', 'L2', 'L3'].map((t) => `<option>${t}</option>`).join('')}</select>
+      <select id="o-action" class="field">${ACTIONS.filter((a) => a !== 'ESCALATE_L4_IMMEDIATE').map((a) => `<option>${a}</option>`).join('')}</select></div>
+      <textarea id="reason" placeholder="Why this is not a danger case (required, logged)"></textarea>
+      <div class="err" id="derr"></div>
+      <button class="btn btn-gray btn-sm" id="downgrade" ${S.role === 'duty' && !resp.outcome ? '' : 'disabled'}>Record downgrade</button>
+    </details>
+  </div></div>`;
 }
 
 const maskAddr = (a) => (a ? '•••, ' + a.split(',').slice(-1)[0].replace('(fictional)', '').trim() : '—');

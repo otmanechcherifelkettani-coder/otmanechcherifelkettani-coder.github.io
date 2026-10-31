@@ -18,7 +18,7 @@ Requires Node ≥ 20.
 ```bash
 cd ridenova-safety
 npm install                      # only needed for live AI (Anthropic SDK)
-npm test                         # 23 tests on the critical rules
+npm test                         # 25 tests on the critical rules
 npm start                        # DEMO mode → http://localhost:8080/console.html
 ANTHROPIC_API_KEY=sk-... npm start   # LIVE mode (key stays server-side)
 ```
@@ -65,14 +65,24 @@ candidate_cases.json ──► unifiedFacts()  (6 mocked source systems, fact-le
 | `server/server.mjs` | Static server + `/api/ai` proxy (key never reaches the browser) |
 | `validation/` | Gold labels (30), silver reference labeller (5,000), results |
 
+## Where things run
+
+| Upstream: intake service (on ticket creation) | Reviewer console (humans only) |
+|---|---|
+| Unify sources → redact → AI proposal → guardrails → route | **L4 · Respond**: acknowledge → contact reporter → emergency services → protect → outcome (timestamped) |
+| L4: page the duty manager immediately | **L2–L3 · Decide**: approve / override / escalate the proposal, with a reason |
+| L1 that passes every gate: closed with a message or credit, never queued | **QA & audit**: auto-resolved sample, access log, exports |
+
+In the prototype the intake step runs in the browser so the demo works without a server. In production it is a service in the ticketing pipeline, so paging and L1 closure never wait for someone to open the console.
+
 ## Severity paths
 
 | Lane | Tier | What happens |
 |---|---|---|
-| **Critical** | L4 | Duty manager alerted at intake. Locked: automation cannot close, downgrade or resolve. Only a duty manager can downgrade, with a reason. |
+| **Critical** | L4 | Escalated and duty manager paged at intake. In the console the human *acts* through a response checklist rather than re-triaging. Locked: automation cannot close, downgrade or resolve; only a duty manager can downgrade, with a reason. |
 | **Priority** | L3 | Specialist review. AI never closes. Threats, violence/sexual allegations and injection attempts floor here. |
 | **Standard** | L2 (+ blocked L1) | Agent review. Also gets anything uncertain, conflicting, with missing evidence, or not on the SP-1 allow-list. |
-| **Auto** | L1 | Auto-resolved only if L1 **and** an SP-1 category **and** confidence ≥ 0.75 **and** no blocking flags. 5% QA sample. Reviewers can still override. |
+| **Auto (QA view)** | L1 | Resolved upstream, not a work queue. Auto-resolved only if L1 **and** an SP-1 category **and** confidence ≥ 0.75 **and** no blocking flags. 5% QA sample. Reviewers can still override. |
 
 ## Protecting personal information
 
@@ -84,7 +94,7 @@ candidate_cases.json ──► unifiedFacts()  (6 mocked source systems, fact-le
 
 ## Tests
 
-`npm test` runs 23 tests: SP-7 escalation and locking (including against a hostile AI proposal), stalking via telematics, no AI closure of L3/L4, SP-8 with counter-evidence, prompt injection (English and Japanese wrappers), the SP-1 auto-resolve gate and confidence threshold, SP-9 at three levels, missing data, duplicates, full-dataset invariants, queue ordering, PII redaction over 500 cases, masking, decision validation and role limits, export columns without PII, retention, policy Q&A “Not covered”, and invalid model output.
+`npm test` runs 25 tests: SP-7 escalation and locking (including against a hostile AI proposal), stalking via telematics, no AI closure of L3/L4, SP-8 with counter-evidence, prompt injection (English and Japanese wrappers), the SP-1 auto-resolve gate and confidence threshold, SP-9 at three levels, missing data, duplicates, full-dataset invariants, queue ordering, PII redaction over 500 cases, masking, decision validation and role limits, the L4 response checklist (order, timestamps, close conditions), export columns without PII, retention, policy Q&A “Not covered”, and invalid model output.
 
 ## Known limitations and next steps
 

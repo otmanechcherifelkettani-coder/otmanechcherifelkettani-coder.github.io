@@ -63,7 +63,7 @@
   <div>
     <div class="eyebrow" style="color:var(--g400)">Program Leader, Tech Transformation · Case solution</div>
     <h1 style="margin-top:14px">Every safety report reviewed on one screen, at the right speed.</h1>
-    <p>A working prototype that unifies six source systems, has AI do the groundwork in 35 languages, enforces the policy with deterministic guardrails and leaves every L2–L4 decision to a human. It triages all 5,000 cases in under a second, with 23 tests on the rules that must never break.</p>
+    <p>A working prototype that unifies six source systems, has AI do the groundwork in 35 languages, enforces the policy with deterministic guardrails and leaves every L2–L4 decision to a human. It triages all 5,000 cases in under a second, with 25 tests on the rules that must never break.</p>
     <div class="ctas"><a class="btn btn-white" href="console.html">Open the console →</a><a class="btn" style="background:var(--g800);color:#fff" href="deck.html">Executive deck</a><a class="btn" style="background:var(--g800);color:#fff" href="#run">Run it locally</a></div>
   </div>
   <div class="hero-card">
@@ -105,7 +105,8 @@
 <section class="s"><div class="container">
   <div class="eyebrow">Design principles</div>
   <h2>The AI proposes, rules constrain, and a human decides.</h2>
-  <div class="grid g3">
+  <div class="grid g2">
+    <div class="tile"><h3>Automate upstream, decide in the console</h3><ul><li>Triage, paging and L1 closure run at intake, before any queue</li><li>The console holds only human work: respond (L4), decide (L2–L3)</li><li>Auto-resolved cases appear only as a QA and audit view</li></ul></div>
     <div class="tile"><h3>Fail toward a human</h3><ul><li>Unrecognised → L2 human, never L1</li><li>Auto-resolve is an allow-list, not the default</li><li>Invalid AI output → safest values</li><li>AI outage → rules keep the queue moving</li></ul></div>
     <div class="tile"><h3>Guardrails are code, not prompts</h3><ul><li>SP-7 → L4, alert, locked</li><li>SP-8 and threats → L3 floor</li><li>Injection → specialist review (L3), confidence capped</li><li>SP-9, duplicates, missing data</li></ul></div>
     <div class="tile"><h3>PII never leaves the boundary</h3><ul><li>Structured and free-text redaction before the AI sees anything</li><li>Pseudonymous IDs; the server refuses PII-looking payloads</li><li>Role masking; every reveal logged with a reason</li><li>No PII in logs or exports; retention purge</li></ul></div>
@@ -120,11 +121,11 @@
     <tr><td>A · Unify 5 mocked sources, label provenance</td><td class="ok">Works</td><td>Every fact tagged: allegation, system signal, history, evidence, AI interpretation, rule</td></tr>
     <tr><td>B · Summarise, translate, propose tier/action with confidence and rationale</td><td class="ok">Works <span class="sim">(demo simulated)</span></td><td>Live: Claude via <code>server/server.mjs</code>. Demo: rules + lexicon stand-in, labelled SIMULATED</td></tr>
     <tr><td>B · Policy Q&amp;A with citations or “Not covered”</td><td class="ok">Works</td><td>Retrieval with a coverage threshold (demo); live model output is citation-validated</td></tr>
-    <tr><td>B · Approve / override / escalate with a reason; no AI closure of L3/L4; danger → alert</td><td class="ok">Works</td><td>Guardrails + Store validation; tested</td></tr>
+    <tr><td>B · Approve / override / escalate with a reason; no AI closure of L3/L4; danger → alert</td><td class="ok">Works</td><td>L2–L3: approve/override/escalate. L4 is already escalated at intake, so the console gives a timestamped response checklist instead. Tested</td></tr>
     <tr><td>C · Masking, RBAC, redaction, retention, access logging</td><td class="ok">Works <span class="sim">(prototype grade)</span></td><td>Client-side roles (no SSO); localStorage log; regex + known-value redaction (no NER)</td></tr>
     <tr><td>D · 5,000 cases, severity/deadline queue, filters, translation on demand</td><td class="ok">Works</td><td>&lt;0.5 s triage in the browser; UTC deadline ordering</td></tr>
     <tr><td>E · Structured records, search, CSV/JSON export</td><td class="ok">Works</td><td>Minimum columns + 14 extras; no PII</td></tr>
-    <tr><td>F · README (~5 commands), AI integration, key-free demo, tests, swappable provider</td><td class="ok">Works</td><td>23 tests; <code>SimulatedProvider</code> / <code>LiveProvider</code></td></tr>
+    <tr><td>F · README (~5 commands), AI integration, key-free demo, tests, swappable provider</td><td class="ok">Works</td><td>25 tests; <code>SimulatedProvider</code> / <code>LiveProvider</code></td></tr>
     <tr><td>Validation on 20–30 self-labelled cases</td><td class="ok">Works</td><td>30 gold labels + 5,000 silver reference; <code>npm run evaluate</code></td></tr>
     <tr><td>Live AI benchmarked on the gold set</td><td class="no">Not done</td><td>No API key in the build environment. The integration is written and its error paths are handled; run <code>npm start</code> with a key</td></tr>
     <tr><td>Real integrations, SSO, server-side persistence, paging</td><td class="no">Out of scope</td><td>Mocked; listed as Phase 0 dependencies</td></tr>
@@ -137,7 +138,7 @@
   <div class="grid g2">
     <pre class="cmd">git clone https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io &amp;&amp; cd otmanechcherifelkettani-coder.github.io/ridenova-safety
 npm install            # Anthropic SDK (live mode only)
-npm test               # 23 critical-rule tests
+npm test               # 25 critical-rule tests
 npm start              # demo mode → localhost:8080/console.html
 ANTHROPIC_API_KEY=… npm start   # live mode</pre>
     <div class="tile"><h3>Or just open it</h3><p>The console runs on static hosting in demo mode. This page is served from GitHub Pages, so <a href="console.html"><b>open the console</b></a> and the full pipeline runs in your browser with no install.</p><p style="margin-top:12px"><a href="https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io/blob/main/ridenova-safety/README.md">README</a> · <a href="https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io/blob/main/ridenova-safety/docs/AI_LOG.md">AI-use log</a> · <a href="https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io/blob/main/ridenova-safety/docs/VALIDATION.md">Validation</a> · <a href="https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io/blob/main/ridenova-safety/docs/DECISIONS.md">Decisions &amp; assumptions</a></p></div>
