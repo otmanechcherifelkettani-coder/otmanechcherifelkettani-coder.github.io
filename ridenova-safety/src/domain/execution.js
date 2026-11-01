@@ -1,0 +1,16 @@
+// SIMULATED execution adapter. Nothing real is sent, charged, suspended or notified.
+// Outcomes are deterministic per (case, action) so demos and tests are reproducible; a small
+// share fails on purpose so the exception path is exercised. Emergency notifications are never
+// executed by the system at all: a duty manager records what they did.
+
+import { EXEC_ACTIONS } from './catalog.js';
+
+export const SIM_FAIL_PCT = Number(process.env?.SIM_FAIL_PCT ?? 5);
+
+const hash = (s) => { let h = 2166136261; for (const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; };
+
+export function simulateExecution(caseId, action, failPct = SIM_FAIL_PCT) {
+  if (!EXEC_ACTIONS[action]) return { ok: false, error: `Unknown action ${action}` };
+  const fail = hash(`${caseId}:${action}`) % 100 < failPct;
+  return fail ? { ok: false, error: 'Simulated downstream failure (messaging service timeout)' } : { ok: true, receipt: `SIM-${hash(caseId + action).toString(36).toUpperCase()}` };
+}

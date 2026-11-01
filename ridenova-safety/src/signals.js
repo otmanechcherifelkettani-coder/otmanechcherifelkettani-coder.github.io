@@ -88,7 +88,7 @@ export function extractSignals(c) {
     shortDrop: /short of destination/i.test(t) || /ended_early; drop-off .* before destination/i.test(st),
     accountMismatch: /account profile:.*reports/i.test(t) || /login from new device/i.test(t),
     plateColourMismatch: /plate matches; profile vehicle colou?r/i.test(t),
-    counterEvidence: /no raised voices|no contact indicators|closed no-violation|filed a .*report against reporter|no handheld-use/i.test(t + ' ' + att),
+    counterEvidence: /no raised voices|no contact indicators|filed a .*report against reporter|no handheld-use/i.test(t + " " + att), // never the reporter's report frequency
     tripShared: /shared? (the )?trip|trip shared/i.test(k),
     endedEarly: /ended (the )?trip .*early|ended trip early|early/i.test(k) || /ended_early/.test(st),
     checkInOk: /check-in prompt answered 'I'm OK'/i.test(k),
