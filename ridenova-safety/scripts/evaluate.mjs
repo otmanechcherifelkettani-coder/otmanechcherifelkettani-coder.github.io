@@ -1,61 +1,51 @@
-// Runs the full pipeline (simulated provider + guardrails) over all 5,000 cases and compares
-// with (a) silver scenario labels for all cases and (b) the hand-labelled gold set.
-// Writes validation/results.json and prints a summary. `npm run evaluate`
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { triageAll } from '../src/triage.js';
+// Evaluation of the CURRENT operating model (Workbench intake + routing) on all 5,000 cases.
+//   npm run evaluate   -> prints a summary and writes validation/results.json
+// Reference sets, kept separate:
+//   silver   : scenario-level labels for all 5,000 (validation/silver.mjs) — AI-assisted, candidate to review
+//   ai_draft : 30 case-level labels drafted by AI (reference_labels_ai_drafted.json) — NOT independent
+//   adjudicated : rows the candidate has filled in candidate_adjudication.json (none until reviewed)
+import { readFileSync, writeFileSync } from 'node:fs';
+import { Workbench } from '../src/domain/workbench.js';
+import { automationEligibility } from '../src/domain/routing.js';
 import { silverLabels } from '../validation/silver.mjs';
-import { rank } from '../src/policy.js';
 
+const R = { L1: 1, L2: 2, L3: 3, L4: 4 };
 const cases = JSON.parse(readFileSync(new URL('../data/candidate_cases.json', import.meta.url), 'utf8'));
+const mem = () => ({ append() {}, readAll: () => [] });
 const t0 = performance.now();
-const rec = triageAll(cases);
-const ms = performance.now() - t0;
-const silver = silverLabels(cases);
-
-const cnt = (arr, f) => arr.reduce((m, x) => ((m[f(x)] = (m[f(x)] || 0) + 1), m), {});
-const all = [...rec.values()];
-const summary = {
-  cases: all.length, ms: Math.round(ms),
-  tiers: cnt(all, (r) => r.predicted_tier), actions: cnt(all, (r) => r.predicted_action), lanes: cnt(all, (r) => r.lane),
-  alerts: all.filter((r) => r.alert).length, auto_resolved: all.filter((r) => r.auto_resolved).length,
-  flags: cnt(all.flatMap((r) => r.flags), (f) => f),
-};
+const wb = new Workbench({ cases, log: mem(), audit: mem(), now: () => Date.parse('2026-03-08T08:00:00Z') });
+const bootMs = Math.round(performance.now() - t0);
+const S = (id) => wb.states.get(id);
 
 function compare(labels) {
-  const m = { n: 0, tier_exact: 0, under: 0, over: 0, unsafe_auto: 0, l4_recall: [0, 0], l3plus_recall: [0, 0], action_exact: 0, confusion: {}, errors: [] };
-  for (const [id, L] of labels) {
-    const r = rec.get(id); if (!r || !L.tier) continue;
-    m.n++;
-    const d = rank(r.predicted_tier) - rank(L.tier);
-    if (d === 0) m.tier_exact++; else if (d < 0) m.under++; else m.over++;
-    if (r.predicted_action === L.action) m.action_exact++;
-    if (r.auto_resolved && L.tier !== 'L1') m.unsafe_auto++;
-    if (L.tier === 'L4') { m.l4_recall[1]++; if (r.predicted_tier === 'L4') m.l4_recall[0]++; }
-    if (rank(L.tier) >= 3) { m.l3plus_recall[1]++; if (rank(r.predicted_tier) >= 3) m.l3plus_recall[0]++; }
-    const key = `${L.tier}->${r.predicted_tier}`; m.confusion[key] = (m.confusion[key] || 0) + 1;
-    if (d !== 0) m.errors.push({ id, scenario: L.scenario, label: L.tier, got: r.predicted_tier, lang: cases.find((c) => c.case_id === id).language, cat: r.ai.category });
+  const m = { n: 0, tier_exact: 0, under: 0, over: 0, l4_to_manager: [0, 0], l3plus_recall: [0, 0], automation_eligible_but_not_L1: 0, misses: [] };
+  for (const L of labels) {
+    if (!L.tier) continue;
+    const s = S(L.case_id); m.n++;
+    const d = R[s.severity.current] - R[L.tier];
+    if (d === 0) m.tier_exact++; else if (d < 0) { m.under++; m.misses.push({ case_id: L.case_id, label: L.tier, got: s.severity.current, lane: s.lane, language: s.language, category: s.ai.category }); } else m.over++;
+    if (L.tier === 'L4') { m.l4_to_manager[1]++; if (s.lane === 'manager') m.l4_to_manager[0]++; }
+    if (R[L.tier] >= 3) { m.l3plus_recall[1]++; if (R[s.severity.current] >= 3) m.l3plus_recall[0]++; }
+    if (automationEligibility(s).eligible && L.tier !== 'L1') m.automation_eligible_but_not_L1++;
   }
   return m;
 }
-const silverRes = compare(silver);
-const bySc = {};
-for (const e of silverRes.errors) { const k = `${e.scenario} ${e.label}->${e.got}`; bySc[k] = (bySc[k] || 0) + 1; }
-// L1 handling: share of silver-L1 cases auto-resolved vs sent to humans
-const l1 = [...silver].filter(([, L]) => L.tier === 'L1');
-const l1Auto = l1.filter(([id]) => rec.get(id).auto_resolved).length;
-
-let gold = null;
-const goldPath = new URL('../validation/gold_labels.json', import.meta.url);
-if (existsSync(goldPath)) {
-  const g = JSON.parse(readFileSync(goldPath, 'utf8'));
-  gold = compare(new Map(g.map((x) => [x.case_id, x])));
-  gold.rows = g.map((x) => { const r = rec.get(x.case_id); return { ...x, predicted_tier: r.predicted_tier, predicted_action: r.predicted_action, confidence: r.confidence, flags: r.flags, ai_category: r.ai.category }; });
-}
-
-const out = { generated_at: new Date().toISOString(), summary, silver: { ...silverRes, errors_by_scenario: bySc, errors: silverRes.errors.slice(0, 400), l1_total: l1.length, l1_auto: l1Auto }, gold };
+const silver = [...silverLabels(cases)].map(([case_id, v]) => ({ case_id, ...v }));
+const aiDraft = JSON.parse(readFileSync(new URL('../validation/reference_labels_ai_drafted.json', import.meta.url), 'utf8')).labels;
+const adj = JSON.parse(readFileSync(new URL('../validation/candidate_adjudication.json', import.meta.url), 'utf8')).labels.filter((l) => l.tier);
+const cnt = (f) => { const o = {}; for (const s of wb.states.values()) { const k = f(s); o[k] = (o[k] || 0) + 1; } return o; };
+const shadow = { lanes: cnt((s) => s.lane), current: cnt((s) => s.severity.current), proposed: cnt((s) => s.severity.proposed), automation: cnt((s) => s.automation.state), alerts: [...wb.states.values()].filter((s) => s.danger.alerts.length).length };
+const silverRes = compare(silver), draftRes = compare(aiDraft), adjRes = adj.length ? compare(adj) : null;
+wb.setAutomationMode({ id: 'eval', role: 'duty_manager' }, 'enabled');
+const enabled = { automation: cnt((s) => s.automation.state), resolved: cnt((s) => s.workflow).resolved || 0 };
+const silverTier = new Map(silver.map((x) => [x.case_id, x.tier]));
+enabled.automated_but_silver_not_L1 = [...wb.states.values()].filter((s) => ['completed', 'sent_to_review'].includes(s.automation.state) && silverTier.get(s.case_id) !== 'L1').length;
+const out = { generated_at: new Date().toISOString(), boot_ms: bootMs, shadow_mode: shadow, demo_automation_enabled: enabled, silver: silverRes, ai_drafted_reference: draftRes, candidate_adjudicated: adjRes || 'none yet' };
 writeFileSync(new URL('../validation/results.json', import.meta.url), JSON.stringify(out, null, 1));
-const pct = (a, b) => (b ? ((100 * a) / b).toFixed(1) + '%' : 'n/a');
-console.log(JSON.stringify(summary, null, 1));
-console.log(`SILVER n=${silverRes.n} tier-exact ${pct(silverRes.tier_exact, silverRes.n)} under ${silverRes.under} over ${silverRes.over} | L4 recall ${silverRes.l4_recall.join('/')} | L3+ recall ${silverRes.l3plus_recall.join('/')} | unsafe auto-resolve ${silverRes.unsafe_auto} | L1 auto ${l1Auto}/${l1.length}`);
-console.log(bySc);
-if (gold) console.log(`GOLD n=${gold.n} tier-exact ${pct(gold.tier_exact, gold.n)} action-exact ${pct(gold.action_exact, gold.n)} under ${gold.under} over ${gold.over} unsafe-auto ${gold.unsafe_auto}`);
+const pct = (a, b) => `${((100 * a) / b).toFixed(1)}%`;
+console.log(`boot ${bootMs} ms · lanes ${JSON.stringify(shadow.lanes)} · current ${JSON.stringify(shadow.current)}`);
+console.log(`SILVER (n=${silverRes.n}): tier match ${pct(silverRes.tier_exact, silverRes.n)} · under ${silverRes.under} · over ${silverRes.over} · L4→manager ${silverRes.l4_to_manager.join('/')} · L3+ recall ${silverRes.l3plus_recall.join('/')} · eligible-but-not-L1 ${silverRes.automation_eligible_but_not_L1}`);
+console.log(`AI-DRAFTED REFERENCE (n=${draftRes.n}, not independent): tier match ${draftRes.tier_exact}/${draftRes.n} · under ${draftRes.under} · over ${draftRes.over}`);
+console.log(`CANDIDATE-ADJUDICATED: ${adjRes ? `${adjRes.tier_exact}/${adjRes.n}` : 'none yet'}`);
+console.log(`Demo automation enabled: ${JSON.stringify(enabled)}`);
+console.log('Under-triage:', silverRes.misses.map((m) => `${m.case_id} ${m.label}->${m.got}`).join(', '));

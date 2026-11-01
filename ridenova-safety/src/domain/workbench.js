@@ -101,8 +101,7 @@ export class Workbench {
   reroute(s, at, { persist = true, reason = null, clearOwner = false } = {}) {
     if (s.workflow === 'resolved') return;
     const r = route(s, this.mode);
-    const recState = { ...s, lane: r.lane, queue: r.queue, automation: { ...s.automation, eligible: r.lane === 'automation' } };
-    const rec = recommend(recState);
+    const rec = recommend({ ...s, lane: r.lane, queue: r.queue });
     if (s.lane === r.lane && s.queue === r.queue && !reason) { s.recommendation = rec; return; }
     this.emit(s, 'routed', at, 'system:router', { lane: r.lane, queue: r.queue, reason: reason || r.reason, eligibility: r.eligibility, mode: this.mode, recommendation: rec, clear_owner: clearOwner || s.lane !== r.lane },
       { persist, summary: `Routed to ${QUEUES[r.queue].label}${r.eligibility?.eligible && r.lane !== 'automation' ? ' (automation-eligible, shadow mode)' : ''}` });
@@ -181,11 +180,11 @@ export class Workbench {
         break;
       case 'approve':
       case 'choose_action': {
-        const action = type === 'approve' ? s.recommendation?.exec_actions?.[0] : p.action;
+        const action = type === 'approve' ? recommend(s).exec_actions[0] : p.action;
         if (!EXEC_ACTIONS[action]) return fail('Choose a valid action.');
         if (type === 'choose_action' && !needReason()) return fail('A reason is required when choosing a different action.');
         if (!s.owner) E('case.assigned', { owner: user.id, accept_handoff: true });
-        E('decision.recorded', { decision: type === 'approve' ? 'approve_recommendation' : 'chose_alternative_action', action, recommended: s.recommendation?.exec_actions?.[0], reason: (p.reason || '').trim() || null }, { summary: `Decision: ${EXEC_ACTIONS[action].label}` });
+        E('decision.recorded', { decision: type === 'approve' ? 'approve_recommendation' : 'chose_alternative_action', action, recommended: recommend(s).exec_actions[0], reason: (p.reason || '').trim() || null }, { summary: `Decision: ${EXEC_ACTIONS[action].label}` });
         const ok = exec(action, s.decisions.length);
         if (ok && EXEC_ACTIONS[action].resolves) E('case.resolved', { outcome: action, reason: (p.reason || '').trim() || 'Approved recommendation executed' }, { summary: 'Resolved after confirmed execution' });
         if (rank(s.severity.current) >= 1 && !s.severity.reviewed) E('severity.reviewed', { tier: s.severity.current });

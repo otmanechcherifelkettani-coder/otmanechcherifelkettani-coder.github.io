@@ -58,6 +58,8 @@ function conditions(s, proposal) {
   if (s.cleaningUsd != null) add('SP-2', `Cleaning quote ≈ USD ${s.cleaningUsd} (${s.cleaningUsd > 50 ? 'over' : 'under'} USD 50)`, 'evidence', 'submitted evidence');
   if (s.vapor) add('SP-2', 'Vaping after a request to stop', 'evidence', 'submitted evidence');
   if ((proposal.flags || []).includes('prior_same_behaviour')) add('SP-9', `Prior flag for the same behaviour: ${s.priorFlags}`, 'history', 'historical');
+  if (s.plateColourMismatch) add('SP-1', 'Vehicle colour differs from profile (plate matches): not an SP-1 category, needs verification', 'telematics', 'system observation');
+  if (s.singleBrake) add('SP-3', 'One 0.6g brake at a pedestrian crossing — not confirmed harsh driving', 'telematics', 'system observation');
   if (s.minorSystem) add('SP-1', 'System data explains a minor/lateness/route/service complaint', 'telematics', 'system observation');
   else if (s.minorText && SP1_CATEGORIES.has(proposal.category)) add('SP-1', 'Minor conduct / comfort complaint, no safety signal', 'ticket', 'allegation');
   return C;
@@ -90,7 +92,12 @@ export function recommend(state) {
   const t = severity.current;
   const cat = ai.category;
   if (danger.status === 'detected' || danger.status === 'ongoing' || t === 'L4') {
-    return { next_step: 'Acknowledge and own the alert, call the reporter now, and decide on emergency services. Restrict contact between the parties while the situation is unclear.',
+    const acked = !!state.clocks?.alert_acknowledged_at && !state.danger.alerts.some((a) => !a.acknowledged_at);
+    const contacted = (state.steps || []).some((x) => x.step === 'contact_reporter' && x.value === 'reached');
+    const next = !acked ? 'Acknowledge and own the alert, then call the reporter immediately and decide on emergency services.'
+      : !contacted ? 'Call the reporter now. If you cannot reach them or danger is ongoing, contact emergency services and record it. Restrict contact between the parties.'
+      : 'Reporter reached. Record the emergency-services decision and protective action, then reassess or resolve with a reason.';
+    return { next_step: next,
       actor: 'duty_manager', urgency: 'immediate', approval_required: false, destination: 'duty-managers', proposed_action: 'ESCALATE_L4_IMMEDIATE', exec_actions: ['restrict_rematch', 'suspend_reported_party'] };
   }
   if (state.links.candidates.length && /follow|waiting|earlier/i.test(state.report_text_hint || '')) {
@@ -136,8 +143,8 @@ export function recommend(state) {
     const [next, act] = map[cat] || ['Review the report and choose an action.', 'send_feedback_note'];
     return { next_step: next, actor: 'agent', urgency: '24h', approval_required: false, destination: 'general-review', proposed_action: 'ROUTE_L2_REVIEW', exec_actions: [act] };
   }
-  return { next_step: 'Send a feedback / no-violation note to the reporter (SP-1). Optionally add a goodwill credit.', actor: state.automation?.eligible ? 'automation' : 'agent', urgency: '48h',
-    approval_required: false, destination: state.automation?.eligible ? 'automation' : 'general-review', proposed_action: 'AUTO_RESOLVE_L1', exec_actions: ['send_feedback_note'] };
+  return { next_step: 'Send a feedback / no-violation note to the reporter (SP-1). Optionally add a goodwill credit.', actor: state.lane === 'automation' ? 'automation' : 'agent', urgency: '48h',
+    approval_required: false, destination: state.lane === 'automation' ? 'automation' : 'general-review', proposed_action: 'AUTO_RESOLVE_L1', exec_actions: ['send_feedback_note'] };
 }
 
 // Full intake assessment for one case with a given provider proposal (simulated or live).

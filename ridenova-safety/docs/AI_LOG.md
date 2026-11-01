@@ -1,36 +1,27 @@
 # AI-use log
 
 ## Tools and models
+- **Claude Code (Anthropic)** was the main development partner: data exploration, code, tests, docs and both decks.
+- **In the product:** Claude via the Anthropic SDK behind a replaceable provider interface (`server/providers.mjs`). The default model is `claude-opus-5-5`, configurable. The key stays server-side, and the model only receives `redactForAI(case)`.
 
-* **Claude Code (Anthropic Claude, Opus-class model)**: main development partner for exploration, code, tests, docs and the deck.
-* **Inside the product:** Claude via the official Anthropic SDK (`@anthropic-ai/sdk`) behind `src/ai.js`’s provider interface. The default is `claude-opus-5-5`, configurable.
-
-## What I delegated to AI
-
-| Area | Delegated | Checked by me |
+## What was delegated to AI
+| Area | AI did | Still requires the candidate |
 |---|---|---|
-| Data exploration | Scripts to cluster cases by system-field signatures and print samples per cluster and language | Read the samples; decided which clusters are real scenarios |
-| Scenario labels (silver) | Drafting the scenario → tier table | Every tier/action call against SP-1..SP-9; the 6 policy-gap defaults |
-| Gold labels | Pulling a stratified sample | Read all 30 cases and wrote each label and rationale |
-| Translations | English translations of the 23 non-English gold cases (shown as *precomputed*) | Spot-checked es, fr, pt, ar, de |
-| Lexicons | First drafts of multilingual terms | Every term that caused a false positive in evaluation |
-| Code | First drafts of the engine, UI, server, tests | Guardrail precedence, auto-resolve gate, role checks, redaction, test assertions |
-| Deck and docs | Drafting and layout | Every number, traced to `validation/results.json` or the annex A1 formula |
+| Data exploration | Clustering cases by system-field signatures; per-language samples | Confirm the scenario interpretation |
+| Reference labels | **Drafted** the scenario table (silver) and the 30 case-level reference labels with rationales | **Adjudicate** them in `validation/candidate_adjudication.json`. Until then they are not independent validation. |
+| Translations | English fixtures for the 23 non-English reference cases (labelled “fixture” in the UI) | Spot-check |
+| Lexicon | Multilingual term drafts | Review false-positive terms |
+| Code, tests, docs, decks | First drafts and iterations | Be able to explain every choice and number |
 
-## What AI got wrong
+## What AI got wrong (caught by evaluation or tests)
+- Over-broad lexicon terms (`minor`, `kind`, `child`, `bateu`, the Arabic substring `لمس`) produced 250+ false escalations.
+- `\bSOS\b` matched “no SOS”, producing 25 false L4s.
+- “Reporter has 4 reports in 90 days” was treated as counter-evidence. That penalises frequent reporters; it was removed.
+- In the first build, L1 meant auto-resolve by default and severity, lane and status were mixed in one record. Both were rebuilt.
+- The earlier AI-use log claimed the candidate had labelled the 30 reference cases. They were AI-drafted; this log corrects that.
+- Timing assumptions in the browser tests: assertions ran before server responses arrived.
 
-* Over-broad lexicon terms: `minor`, `kind`, `child`, `bateu`, `geschlagen`, `agarró`, `golpe`, Arabic `لمس` (a substring of “help”), `numéro`/`番号`/`電話`. Together these caused 250+ false escalations, caught by the evaluation loop.
-* `\bSOS\b` matched “no SOS” in a toolkit log, which produced 25 false L4s.
-* It assumed `node --test tests/` would glob the directory; on Node 22 it does not.
-* An early draft let SP-9 raise *unrecognised* cases (L2 → L3), which over-escalated.
-* A layout bug: an element’s `hidden` attribute was overridden by `display: grid`.
-
-## What I chose not to delegate
-
-* The interpretation of the policy, especially SP-9 into L4, injection → L3, and the auto-resolve allow-list.
-* The decision to keep the silver signatures out of the engine, so validation is not circular.
-* What to claim. Live AI is reported as not benchmarked because it was not run.
-
-## Data handling
-
-Only the supplied synthetic dataset was used. No real customer or employee data was pasted into any AI tool. Inside the product, the model only ever receives `redactForAI(case)`.
+## Not delegated / guarded
+- Policy interpretation, routing precedence and reassessment rules are written as code and checked by tests, not left to prompts.
+- Nothing claims live-model accuracy or historical SLA performance.
+- No real customer or employee data was used anywhere.

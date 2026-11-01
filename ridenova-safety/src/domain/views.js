@@ -7,6 +7,7 @@ import { requiredCapability, automationEligibility } from './routing.js';
 import { QUEUES, USERS, EXEC_ACTIONS, CAPABILITIES, POLICY_VERSION } from './catalog.js';
 import { redactText, maskName, maskPhone, maskEmail, maskPlate } from '../pii.js';
 import { policyById } from '../policy.js';
+import { recommend } from './assess.js';
 
 const DAY = 864e5;
 const userName = (id) => USERS[id]?.name || id || null;
@@ -103,7 +104,7 @@ export function caseView(s, raw, user, now, revealed = {}) {
   const party = (x, key) => x ? { name: revealed[`${key}.name`] ? x.name : maskName(x.name), phone: revealed[`${key}.phone`] ? x.phone : maskPhone(x.phone), email: revealed[`${key}.email`] ? x.email : maskEmail(x.email),
     ...(x.vehicle_plate ? { vehicle_plate: revealed[`${key}.vehicle_plate`] ? x.vehicle_plate : maskPlate(x.vehicle_plate) } : {}) } : null;
   const sla = slaStatus(s, now);
-  const rec = s.recommendation;
+  const rec = s.workflow === 'resolved' ? s.recommendation : recommend(s);
   return {
     case_id: s.case_id, trip_id: s.trip_id, incident_id: s.incident_id, version: s.version,
     region: s.region, country: s.country, country_name: s.country_name, city: s.city, product: s.product, channel: s.channel, language: s.language,

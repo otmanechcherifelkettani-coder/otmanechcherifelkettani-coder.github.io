@@ -1,0 +1,217 @@
+{
+ "_instructions": "For each case, read the report and evidence, then record YOUR label. Leave a row out if you have not reviewed it. `npm run evaluate` reports adjudicated results separately from AI-drafted ones.",
+ "reviewer": "",
+ "reviewed_at": "",
+ "labels": [
+  {
+   "case_id": "SC-0020",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-1453",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0726",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0666",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0023",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-1197",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-1587",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-2642",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-1375",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-1909",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-2143",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-2486",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0543",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0704",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-2039",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-1314",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-2978",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0498",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0647",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0064",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0055",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0198",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0463",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0328",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0334",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-1516",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0094",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-1209",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0683",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  },
+  {
+   "case_id": "SC-0467",
+   "tier": null,
+   "action": null,
+   "agrees_with_ai_draft": null,
+   "note": ""
+  }
+ ]
+}

@@ -3,253 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RideNova Safety Console</title>
-<meta name="description" content="Unified safety case review: one screen, AI groundwork, human decisions.">
+<title>RideNova Safety Workbench</title>
+<meta name="description" content="Role-based safety investigation console: automate the groundwork, not the accountability.">
 <link rel="stylesheet" href="assets/base.css">
-<style>
-  body { background: var(--g50); }
-  [hidden] { display: none !important; }
-  aside.queue, #detail { min-width: 0; }
-  .nav-inner { max-width: none; }
-  .mode { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: var(--pill); font-size: 12px; font-weight: 700; background: var(--g800); white-space: nowrap; }
-  .mode .dot { background: var(--amber); } .mode.live .dot { background: #3ccf7a; }
-  .nav select { background: var(--g800); color: var(--white); border: 0; border-radius: var(--pill); padding: 8px 12px; font-size: 13px; font-weight: 600; }
-  .subnav { background: var(--white); border-bottom: 1px solid var(--g200); }
-  .subnav-inner { padding: 0 24px; display: flex; gap: 4px; align-items: center; height: 52px; }
-  .tab { white-space: nowrap; background: none; border: 0; padding: 8px 14px; border-radius: var(--pill); font-weight: 600; font-size: 14px; cursor: pointer; color: var(--g600); }
-  .tab.active { background: var(--black); color: var(--white); }
-  .subnav .spacer { flex: 1; }
-  #alertbar { display: none; background: var(--red); color: var(--white); }
-  #alertbar.on { display: block; }
-  #alertbar .in { padding: 10px 24px; display: flex; align-items: center; gap: 14px; font-weight: 600; font-size: 14px; }
-  .pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--white); animation: p 1.2s infinite; }
-  @keyframes p { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,.8);} 100% { box-shadow: 0 0 0 10px rgba(255,255,255,0);} }
-
-  .layout { display: grid; grid-template-columns: 400px 1fr; height: calc(100vh - 116px); }
-  .layout.alerting { height: calc(100vh - 160px); }
-  aside.queue { background: var(--white); border-right: 1px solid var(--g200); display: flex; flex-direction: column; min-height: 0; }
-  .qhead { padding: 16px; border-bottom: 1px solid var(--g100); display: grid; gap: 10px; }
-  .search { width: 100%; border: 0; background: var(--g100); border-radius: var(--pill); padding: 11px 16px; font-size: 14px; }
-  .search:focus, .field:focus { outline: 2px solid var(--black); }
-  .lanes { display: flex; gap: 6px; flex-wrap: wrap; }
-  .lane { border: 0; background: var(--g100); border-radius: var(--pill); padding: 6px 11px; font-size: 12px; font-weight: 600; cursor: pointer; }
-  .lane.active { background: var(--black); color: var(--white); }
-  .lane[data-lane=auto] { background: var(--white); border: 1px dashed var(--g300); }
-  .lane[data-lane=auto].active { background: var(--black); border-color: var(--black); }
-  .lane b { font-weight: 700; opacity: .7; margin-left: 2px; }
-  .filters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-  .field { width: 100%; border: 1px solid var(--g200); background: var(--white); border-radius: var(--radius-sm); padding: 7px 8px; font-size: 12px; }
-  .qmeta { display: flex; justify-content: space-between; font-size: 12px; color: var(--g500); }
-  .qlist { overflow-y: auto; flex: 1; }
-  .qitem { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--g100); cursor: pointer; align-items: start; }
-  .qitem:hover { background: var(--g50); }
-  .qitem.sel { background: #f0f0f0; box-shadow: inset 3px 0 0 var(--black); }
-  .qitem .t1 { font-weight: 600; font-size: 14px; display: flex; gap: 8px; align-items: center; }
-  .qitem .t2 { font-size: 13px; color: var(--g600); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 250px; }
-  .qitem .t3 { font-size: 11px; color: var(--g500); margin-top: 2px; }
-  .qitem .st { font-size: 11px; font-weight: 600; color: var(--g500); text-align: right; }
-  .more { margin: 14px auto; display: block; }
-
-  #detail { overflow-y: auto; min-height: 0; }
-  .detail-inner { padding: 24px 28px 60px; max-width: 1240px; }
-  .dhead { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
-  .dhead h1 { font-size: 34px; }
-  .dhead .sub { color: var(--g600); font-size: 14px; margin-top: 6px; }
-  .dhead .right { margin-left: auto; display: flex; gap: 8px; }
-  .bigtier { font-size: 18px; height: 40px; min-width: 56px; border-radius: 10px; }
-  .banner { border-radius: var(--radius); padding: 16px 18px; display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
-  .banner.red { background: var(--red); color: var(--white); }
-  .banner.amber { background: #fff3d6; color: #5c3d00; }
-  .banner.gray { background: var(--g100); }
-  .banner .grow { flex: 1; font-size: 14px; }
-  .banner strong { display: block; font-size: 15px; }
-  .grid2 { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; align-items: start; }
-  .stack { display: grid; gap: 16px; }
-  .panel { background: var(--white); border-radius: var(--radius); border: 1px solid var(--g200); }
-  .panel > .ph { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--g100); }
-  .panel > .ph h3 { font-size: 15px; letter-spacing: -0.01em; }
-  .panel > .ph .r { margin-left: auto; display: flex; gap: 6px; align-items: center; }
-  .panel > .pb { padding: 16px 18px; }
-  .src { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; letter-spacing: .02em; }
-  .k-allegation { background: #fde7e3; color: #a3130a; } .k-system { background: #e8eefc; color: #1e54b7; } .k-history { background: #efe9fb; color: #5a3fa6; }
-  .k-evidence { background: #fff3d6; color: #8a5a00; } .k-ai { background: var(--black); color: var(--white); } .k-pii { background: #e6f2ec; color: #03703c; } .k-rule { background: var(--g200); color: var(--black); }
-  .report { font-size: 18px; line-height: 1.55; letter-spacing: -0.005em; white-space: pre-wrap; word-break: break-word; }
-  .tok { background: var(--g200); border-radius: 4px; padding: 0 4px; font-family: var(--mono); font-size: .78em; }
-  .translation { margin-top: 14px; border-left: 3px solid var(--black); padding: 8px 0 8px 14px; }
-  .translation .lab { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--g500); margin-bottom: 4px; }
-  .facts { display: grid; grid-template-columns: 1fr; }
-  .fact { display: grid; grid-template-columns: 140px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--g100); font-size: 14px; }
-  .fact:last-child { border-bottom: 0; }
-  .fact .l { color: var(--g500); font-size: 13px; }
-  .srcrow { display: flex; align-items: center; gap: 8px; margin: 14px 0 4px; }
-  .srcrow:first-child { margin-top: 0; }
-  .srcrow b { font-size: 13px; }
-  .party { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .party .box { background: var(--g50); border-radius: var(--radius-sm); padding: 12px; font-size: 13px; }
-  .party .box div { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; }
-  .reveal { border: 0; background: none; font-size: 11px; font-weight: 700; color: var(--blue); cursor: pointer; padding: 0; }
-  .ai-sum { font-size: 16px; font-weight: 500; line-height: 1.45; }
-  .proposal { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
-  .proposal .cell { background: var(--g50); border-radius: var(--radius-sm); padding: 10px 12px; }
-  .proposal .cell .l { font-size: 11px; color: var(--g500); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
-  .proposal .cell .v { font-weight: 700; font-size: 14px; margin-top: 4px; word-break: break-word; }
-  .meter { height: 6px; background: var(--g200); border-radius: 3px; margin-top: 8px; overflow: hidden; }
-  .meter i { display: block; height: 100%; background: var(--black); }
-  .rationale { font-size: 14px; color: var(--g700); line-height: 1.55; }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-  .cite { background: var(--black); color: var(--white); cursor: help; }
-  .flag { background: #fde7e3; color: #a3130a; }
-  .flag.info { background: var(--g100); color: var(--g700); }
-  .changes { margin-top: 14px; display: grid; gap: 6px; }
-  .change { font-size: 13px; background: var(--g50); border-radius: var(--radius-sm); padding: 8px 10px; display: flex; gap: 8px; align-items: baseline; }
-  .change code { font-weight: 700; }
-  .decision .opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .opt { border: 2px solid var(--g200); background: var(--white); border-radius: var(--radius-sm); padding: 12px; text-align: left; cursor: pointer; }
-  .opt b { display: block; font-size: 14px; } .opt span { font-size: 12px; color: var(--g500); }
-  .opt.on { border-color: var(--black); background: var(--g50); }
-  .decision textarea { width: 100%; min-height: 76px; border: 1px solid var(--g300); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 14px; resize: vertical; margin-top: 12px; }
-  .ovr { display: none; grid-template-columns: 1fr 2fr; gap: 8px; margin-top: 12px; }
-  .ovr.on { display: grid; }
-  .err { color: var(--red); font-size: 13px; font-weight: 600; margin-top: 8px; min-height: 18px; }
-  .steps { display: grid; gap: 0; }
-  .step { display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--g100); }
-  .step:last-child { border-bottom: 0; }
-  .step .sn { width: 26px; height: 26px; border-radius: 50%; background: var(--black); color: var(--white); display: grid; place-items: center; font-weight: 700; font-size: 12px; }
-  .step.is-done .sn { background: var(--green); }
-  .step.is-locked { opacity: .45; }
-  .step b { font-size: 14px; display: block; }
-  .sdone { display: block; font-size: 12px; color: var(--green); font-weight: 600; margin-top: 2px; }
-  .sopts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .decided { background: #e6f2ec; border-radius: var(--radius-sm); padding: 12px; font-size: 13px; margin-bottom: 12px; }
-  details.json summary { cursor: pointer; font-weight: 600; font-size: 14px; }
-  details.json pre { background: var(--black); color: #e8e8e8; border-radius: var(--radius-sm); padding: 14px; font-size: 11.5px; overflow: auto; max-height: 360px; }
-  .empty { display: grid; place-items: center; height: 100%; color: var(--g500); text-align: center; padding: 40px; }
-
-  /* overview + audit */
-  .view { padding: 28px; max-width: 1320px; overflow-y: auto; height: calc(100vh - 116px); }
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 18px 0 24px; }
-  .kpi { background: var(--white); border: 1px solid var(--g200); border-radius: var(--radius); padding: 18px; }
-  .kpi .v { font-size: 32px; font-weight: 700; letter-spacing: -0.03em; }
-  .kpi .l { font-size: 13px; color: var(--g600); margin-top: 2px; }
-  .kpi .chip { margin-top: 10px; }
-  .bars { display: grid; gap: 10px; }
-  .bar { display: grid; grid-template-columns: 48px 1fr 150px; gap: 12px; align-items: center; font-size: 13px; }
-  .bar .track { background: var(--g100); height: 26px; border-radius: 6px; overflow: hidden; }
-  .bar .fill { height: 100%; border-radius: 6px; }
-  table.t { width: 100%; border-collapse: collapse; font-size: 13px; }
-  table.t th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--g500); padding: 8px 10px; border-bottom: 1px solid var(--g200); }
-  table.t td { padding: 8px 10px; border-bottom: 1px solid var(--g100); vertical-align: top; }
-  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-  /* drawer */
-  #drawer { position: fixed; top: 0; right: 0; height: 100vh; width: min(520px, 100vw); background: var(--white); box-shadow: var(--shadow-lg); transform: translateX(105%); transition: transform .25s ease; z-index: 100; display: flex; flex-direction: column; }
-  #drawer.on { transform: none; }
-  #drawer .dh { padding: 20px 24px; border-bottom: 1px solid var(--g100); display: flex; align-items: center; }
-  #drawer .dh h2 { font-size: 22px; }
-  #drawer .db { padding: 20px 24px; overflow-y: auto; flex: 1; }
-  .qa-ans { margin-top: 16px; border-radius: var(--radius); padding: 16px; background: var(--g50); white-space: pre-wrap; font-size: 14px; }
-  .qa-ans.nc { background: #fff3d6; }
-  #reveal-dlg { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; place-items: center; z-index: 250; padding: 16px; }
-  #reveal-dlg.on { display: grid; }
-  #reveal-dlg .dlg { background: var(--white); border-radius: var(--radius); padding: 22px; width: min(440px, 100%); box-shadow: var(--shadow-lg); }
-  #reveal-dlg h3 { font-size: 20px; }
-  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--black); color: var(--white); padding: 12px 20px; border-radius: var(--pill); font-weight: 600; font-size: 14px; transition: transform .25s; z-index: 200; }
-  #toast.on { transform: translateX(-50%) translateY(0); }
-  #loader { position: fixed; inset: 0; background: var(--white); display: grid; place-items: center; z-index: 300; }
-  #loader h2 { font-size: 28px; } #loader p { color: var(--g500); margin-top: 8px; }
-
-  @media (max-width: 1100px) { .grid2 { grid-template-columns: 1fr; } }
-  @media (max-width: 860px) {
-    .layout { grid-template-columns: 1fr; height: auto; }
-    aside.queue { max-height: 55vh; }
-    #detail { overflow: visible; }
-    .detail-inner { padding: 16px; }
-    .proposal, .decision .opts, .two { grid-template-columns: 1fr; }
-    .fact { grid-template-columns: 110px 1fr; }
-    .view { height: auto; padding: 16px; }
-    .subnav-inner { padding: 0 12px; overflow-x: auto; }
-    .filters { grid-template-columns: 1fr 1fr; }
-    .nav-inner { flex-wrap: wrap; height: auto; padding: 10px 16px; row-gap: 8px; }
-    .nav .spacer { display: none; }
-    .nav select { flex: 1; min-width: 0; }
-    #alertbar .in { padding: 10px 16px; font-size: 12px; }
-    #alertbar .in .btn { display: none; }
-    .dhead h1 { font-size: 26px; } .dhead .right { margin-left: 0; }
-    .party { grid-template-columns: 1fr; }
-    .report { font-size: 16px; }
-  }
-</style>
+<link rel="stylesheet" href="assets/workbench.css">
 </head>
 <body>
-<div id="loader"><div style="text-align:center"><h2>Loading 5,000 cases…</h2><p>Unifying sources, triaging, applying guardrails</p></div></div>
-
+<a class="skip" href="#main">Skip to content</a>
 <header class="nav">
   <div class="nav-inner">
-    <a class="brand" href="index.html">RideNova<span>Safety</span></a>
-    <a class="link active hide-sm" href="console.html">Console</a>
-    <a class="link hide-sm" href="index.html">Case solution</a>
-    <a class="link hide-sm" href="deck.html">Exec deck</a>
+    <a class="brand" href="index.html">RideNova<span>Safety Workbench</span></a>
+    <nav id="tabs" class="tabs-top" aria-label="Screens"></nav>
     <div class="spacer"></div>
-    <span id="mode" class="mode"><i class="dot"></i><span>Demo</span></span>
-    <select id="role" aria-label="Role">
-      <option value="agent">Safety agent (L1/L2)</option>
-      <option value="specialist" selected>Specialist (L3/L4)</option>
-      <option value="duty">Duty manager</option>
-      <option value="auditor">Auditor</option>
-    </select>
+    <span id="aimode" class="mode" title="AI provider"></span>
+    <button id="who" class="who" hidden></button>
   </div>
 </header>
-<div class="subnav"><div class="subnav-inner">
-  <button class="tab active" data-view="queue">Queue</button>
-  <button class="tab" data-view="overview">Overview</button>
-  <button class="tab" data-view="audit">Access log</button>
-  <div class="spacer"></div>
-  <button class="btn btn-gray btn-sm" id="btn-policy">Policy assistant</button>
-  <button class="btn btn-gray btn-sm" id="btn-csv">Export CSV</button>
-  <button class="btn btn-gray btn-sm hide-sm" id="btn-json">Export JSON</button>
-</div></div>
-<div id="alertbar"><div class="in"><span class="pulse"></span><span id="alerttext"></span><span style="flex:1"></span><button class="btn btn-white btn-sm" id="btn-critical">Open critical lane</button></div></div>
+<div class="notice" role="note"><span><b>Synthetic demo</b> · fictional company, data and policy · simulated sign-in and execution · <span id="clock"></span></span><button id="limits" class="linkbtn">Limitations</button></div>
+<main id="main" tabindex="-1"><div class="loading">Loading…</div></main>
 
-<main id="v-queue" class="layout">
-  <aside class="queue">
-    <div class="qhead">
-      <input id="q" class="search" placeholder="Search case ID, text, city, category…" aria-label="Search">
-      <div class="lanes" id="lanes"></div>
-      <div class="filters">
-        <select id="f-region" class="field" aria-label="Region"></select>
-        <select id="f-country" class="field" aria-label="Country"></select>
-        <select id="f-language" class="field" aria-label="Language"></select>
-        <select id="f-tier" class="field" aria-label="Tier"></select>
-      </div>
-      <div class="qmeta"><span id="qcount"></span><span>Severity → deadline (UTC)</span></div>
-    </div>
-    <div class="qlist" id="qlist"></div>
-  </aside>
-  <section id="detail"><div class="empty">Select a case</div></section>
-</main>
-<main id="v-overview" class="view" hidden></main>
-<main id="v-audit" class="view" hidden></main>
-
-<div id="drawer" role="dialog" aria-label="Policy assistant">
-  <div class="dh"><h2>Policy assistant</h2><span style="flex:1"></span><button class="btn btn-gray btn-sm" id="drawer-close">Close</button></div>
-  <div class="db">
-    <p class="muted" style="font-size:14px">Answers only from SP-1 to SP-9, with citations. If the policy does not support an answer it says <b>Not covered</b>.</p>
-    <textarea id="qa-in" class="field" style="min-height:90px;margin-top:14px;font-size:14px;padding:12px" placeholder="e.g. Does a USD 40 cleaning fee count as L2 damage?"></textarea>
-    <div class="chips" id="qa-samples"></div>
-    <button class="btn btn-black" style="margin-top:14px" id="qa-go">Ask</button>
-    <div id="qa-out"></div>
-  </div>
-</div>
-<div id="reveal-dlg" role="dialog" aria-modal="true" aria-label="Reason for viewing personal data">
-  <div class="dlg">
-    <h3>View personal data</h3>
-    <p class="muted" style="font-size:14px;margin:6px 0 12px">You are about to view <b id="reveal-what"></b>. Your reason is written to the access log.</p>
-    <textarea id="reveal-reason" class="field" style="min-height:70px;font-size:14px;padding:10px" placeholder="e.g. Calling the reporter back"></textarea>
-    <div class="err" id="reveal-err"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn btn-gray btn-sm" id="reveal-cancel">Cancel</button><button class="btn btn-black btn-sm" id="reveal-ok">Reveal and log</button></div>
-  </div>
-</div>
-<div id="toast"></div>
-<script type="module" src="src/app.js"></script>
+<dialog id="dlg"><form method="dialog" id="dlg-form"><h3 id="dlg-title"></h3><div id="dlg-body"></div><div class="err" id="dlg-err" role="alert"></div>
+  <div class="dlg-actions"><button value="cancel" class="btn btn-gray btn-sm" formnovalidate>Cancel</button><button id="dlg-ok" value="ok" class="btn btn-black btn-sm">Confirm</button></div></form></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="src/ui/workbench.js"></script>
 </body>
 </html>

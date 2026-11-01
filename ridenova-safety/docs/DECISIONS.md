@@ -1,60 +1,60 @@
-# Decisions, assumptions and policy interpretation
+# Decisions and assumptions
 
-## Scope choices (prioritisation)
+## Principle
+Automate the groundwork, not the accountability. Severity, danger, handling lane, workflow status, ownership and permissions are separate concepts with separate fields (see README).
 
-| Built (P0–P1) | Built, gated (P2) | Deliberately not built |
-|---|---|---|
-| Danger detection + duty-manager alert, locked lane | L1 auto-resolve (allow-list, confidence gate, 5% QA) | Real system integrations, SSO |
-| One-screen case view with fact-level provenance | | Server-side persistence / audit DB |
-| Guardrails, lanes, deadline ordering, filters | | In-boundary NER for free-text PII |
-| Human decisions with reasons + role checks | | Outbound messaging to reporters |
-| PII redaction, masking, access log, retention, export | | Batch live inference |
-| Swappable AI provider, live Claude path, key-free demo | | |
+## Smallest coherent change set (what was rebuilt vs reused)
+- **Reused:** the multilingual lexicon, signal extraction, simulated provider, deterministic floors (`guardrails.js`), policy data, PII masking and redaction, policy Q&A, the timezone map, and the silver reference labeller.
+- **Rebuilt:** case state (now event-sourced), routing (three lanes), the server-side API with scoped views, execution tracking, and the UI (sign-in, Overview, Agent workspace, Duty-manager workspace).
+- **Removed:** the browser-only pipeline (`app.js`, `store.js`, `triage.js`). It sent all data to the browser and mixed severity with lane and status.
 
-**Why this order:** the riskiest failure is a missed or auto-closed danger case, so the safety floor is built first. The biggest cost is search time, so unification comes next. Automation saves the most hours but carries the most risk, so it comes last and behind a gate.
+## Routing precedence
+1. **Duty manager (Lane A):** current severity is L4, *or any* danger signal (structured, text or AI).
+   - Structured checks (live SOS, the reported party's GPS near the reporter's home after the trip, a report filed mid-trip with the vehicle stopped) run at receipt, *before* AI preparation.
+   - A hostile or wrong AI proposal cannot lower the lane (test D4).
+2. **Automation (Lane B):** every gate must pass. The gates are:
+   - L1, with an explicit SP-1 category (minor conduct, rating-only threat);
+   - complete material evidence;
+   - a supported language;
+   - no protected allegation, active or past danger, repeat-conduct history, policy gap, injection, conflict or candidate link;
+   - no safety-feature use;
+   - confidence ≥ 0.75;
+   - no prior human reassessment or failed automation (each needs an explicit release).
 
-## How overlapping rules resolve
+   **Default: shadow mode.** Eligibility is recorded but cases go to agents. Duty managers can enable it for the fictional SP-1 demo.
+3. **Agent (Lane C):** everything else. L3 needs a capability: violence and sexual misconduct; threats and exposure; or safety incidents. Low confidence or missing evidence blocks automation but does not make a case a manager emergency.
 
-The most protective outcome wins, in this order:
+## Controlled reassessment (manager)
+- Requires: an acknowledged alert, being the accountable owner, a new tier, a danger assessment (ongoing / no longer present / incorrectly detected), at least one cited evidence source, a policy clause, a reason of 20+ characters, and a human destination queue matched to the tier.
+- "Ongoing" danger cannot leave L4.
+- **Preserved:** the AI proposal and its history, danger signals, every alert and acknowledgement, prior decisions, the receipt time and the deadline. `max_held` never decreases, so breaches stay breaches.
+- **Outcome:** the severity becomes the human-reviewed value and the case is handed off (pending acceptance) to a human queue. It is never resolved and never released to automation (`release_required`).
+- **Second approval:** a hook exists (`requiresSecondApproval`). It returns false because no fictional policy clause requires one.
 
-1. **SP-7 danger** (SOS, stalking telematics, medical or weapon language, a report filed mid-trip with the vehicle stopped roadside) → L4, `ESCALATE_L4_IMMEDIATE`, alert, locked.
-2. **SP-8** violence or sexual-misconduct allegation → floor L3, human review, even with counter-evidence (which is flagged `conflicting_signals`).
-3. **SP-6** harm-threat language → floor L3. Rating or deactivation threats with no harm are *not* SP-6 threats.
-4. **Prompt injection** → floor L3 (specialist), confidence capped at 0.5. Text written to manipulate triage cannot be trusted to be minor.
-5. **SP-9** prior flag for the *same* behaviour → +1 tier. Applied only when the current behaviour is positively recognised.
-6. **Missing evidence** → `REQUEST_MORE_INFO` (unless danger is present), confidence capped.
-7. **Duplicates** (same reporter + same trip, later submission) → `MERGE_DUPLICATE`, inheriting the parent’s tier; an L3+ parent gets a `priority` flag.
-8. **Auto-resolve gate** → otherwise `ROUTE_L2_REVIEW` with `auto_resolve_blocked`.
+## SLA and clocks
+- Deadline = receipt + SLA of the **highest tier ever held**. Escalation tightens it, a downgrade never loosens it, and a late escalation can be breached immediately.
+- Linked follow-ups take the earliest applicable deadline in their link group.
+- Awaiting information does **not** pause the clock; the policy allows no pause.
+- The clock stops at the first **substantive** response: a reporter-facing action that actually executed, or a manager recording "reporter reached". An acknowledgement is not a response.
+- Tracked separately: receipt, alert created, alert acknowledged, assigned, first response, decided, executed, resolved.
+- **Replay clock:** the data has naive local timestamps (converted per city to UTC, `src/tz.js`) and no response history. "Now" starts at `REPLAY_NOW` (default 2026-03-08 08:00 UTC, after the last submission) and advances in real time. No historical SLA performance is claimed.
 
-When candidate rules disagree on tier, the highest tier is taken and the alternatives appear in the rationale as “Also noted”.
+## Permissions (enforced server-side)
+- **Agent:** sees agent-lane cases in its regions whose required capability it holds, plus cases it owns.
+  - For cases it handed off, it sees **status only**.
+  - It acts only on unowned or own agent-lane cases.
+  - It reveals personal data only on cases it owns, with a logged reason. No export.
+- **Duty manager:** sees all regions; acts on manager-lane cases; reopens resolved cases; changes the automation mode; exports. Reveals personal data with a logged reason.
+- Sign-in is simulated (a profile picker that issues a session token). The browser receives only scoped, masked data. The raw dataset file is not served.
 
-## Uncertain, missing and conflicting
+## Policy interpretation and gaps (unchanged, need a policy-owner ruling)
+- SP-9 lifting L3 → L4 (38 cases).
+- Service animals (treated under SP-5).
+- Unregistered passenger, and account takeover (L3).
+- Safety-feature use with no alleged act (L2, not SP-1-eligible).
+- Rating-only threats (L1).
+- Not understood → provisional L2 for human review, never L1.
 
-* **Uncertain:** nothing recognised → L2 human with low confidence and an `uncertain` flag. Never L1.
-* **Missing:** trip-record errors or an unknown party → request more information; never blocks escalation.
-* **Conflicting:** shown side by side with their sources (allegation vs. system signal) and flagged. The tier is never lowered because of counter-evidence when SP-8 applies.
-
-## Policy gaps (conservative defaults — need a policy-owner ruling)
-
-| Gap | Cases | Default | Question |
-|---|---|---|---|
-| SP-9 lifting L3 → L4 (location exposure + prior post-trip contact) | 38 | L4 (policy-literal) | Can history alone create an L4? (+760 L4/week at ×20) |
-| Service-animal refusal | 50 | L2 via SP-5 | Add an explicit accessibility clause |
-| Unregistered passenger boarded mid-trip | 76 | L3 (vulnerable situation) | L2 violation or L3? |
-| Account takeover / rider ≠ profile | 20 | L3 | Also route to fraud? |
-| Safety-feature use, no act alleged | 50 | L2 (not SP-1-eligible) | Does trip-sharing count as a “safety signal”? |
-| Rating / deactivation threats | 51 | L1 | Confirm SP-6 means threats of harm |
-
-## Assumptions
-
-1. `submitted_at` is local city time. UTC offsets are valid for 1–7 Mar 2026: before US DST (8 Mar) and EU DST (29 Mar); southern-hemisphere DST active in AU-SE, NZ and CL. Per-city mapping is in `src/tz.js`.
-2. The first-response deadline is `submitted_at` (UTC) + the tier SLA. There is no first-response timestamp in the data, so SLA attainment cannot be measured here.
-3. Weekly figures are sample × 20 (per the brief).
-4. Handling times for the capacity estimate are my assumptions: L1 6, L2 15, L3 35, L4 45 minutes. 55% of that time is search, and the unified view halves it.
-5. “Credible” (SP-9) is assumed true unless counter-evidence exists. Counter-evidence lowers confidence, not tier.
-6. The 30 reports with an unknown product and missing trip data are the brief’s “require more information” cases.
-
-## Model and vendor
-
-* **Default model:** `claude-opus-5-5` at `effort: low` for triage. It is configurable via `AI_MODEL` / `AI_EFFORT`; a cheaper model can be evaluated on the gold set before switching. Structured JSON output via `output_config.format`, server-side refusal fallback enabled, `stop_reason: refusal` handled.
-* **Build vs. buy:** build the control layer (guardrails, lanes, console, evals); buy the model via API behind the provider interface; avoid end-to-end black-box triage vendors.
+## Data and evidence
+- Each nested block is treated as a separate mocked source with id, status, version and retrieval time, recorded at the replay receipt time.
+- A reporter's number of past reports is **never** counter-evidence. That earlier signal was removed.

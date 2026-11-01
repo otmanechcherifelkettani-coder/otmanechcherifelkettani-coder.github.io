@@ -1,0 +1,426 @@
+{
+ "_status": "AI-DRAFTED reference labels (written by Claude during development). NOT candidate-adjudicated. Do not cite as independent validation until reviewed and copied into candidate_adjudication.json.",
+ "labels": [
+  {
+   "case_id": "SC-0020",
+   "tier": "L4",
+   "action": "ESCALATE_L4_IMMEDIATE",
+   "policy": [
+    "SP-7"
+   ],
+   "rationale": "Live SOS during an in-progress trip; rider says the driver will not let her out and is taking another route; telematics confirms route deviation.",
+   "region": "US&C",
+   "country": "US",
+   "language": "es",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-1453",
+   "tier": "L4",
+   "action": "ESCALATE_L4_IMMEDIATE",
+   "policy": [
+    "SP-7"
+   ],
+   "rationale": "Driver still parked outside rider's home 40 min after drop-off, app online, rider alone at night: stalking in progress.",
+   "region": "APAC",
+   "country": "JP",
+   "language": "ja",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0726",
+   "tier": "L4",
+   "action": "ESCALATE_L4_IMMEDIATE",
+   "policy": [
+    "SP-7"
+   ],
+   "rationale": "Passenger not responding and looks very ill; vehicle stopped roadside mid-trip: medical emergency.",
+   "region": "EMEA",
+   "country": "SA",
+   "language": "ar",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0666",
+   "tier": "L4",
+   "action": "ESCALATE_L4_IMMEDIATE",
+   "policy": [
+    "SP-6",
+    "SP-9"
+   ],
+   "rationale": "Post-trip message revealing the driver knows the reporter's building (SP-6, L3); screenshot corroborates; prior L2 flag for post-trip contact 5 months ago -> SP-9 raises to L4. Policy-literal reading; flag for policy owner.",
+   "region": "EMEA",
+   "country": "AT",
+   "language": "de",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0023",
+   "tier": "L3",
+   "action": "ROUTE_L3_REVIEW",
+   "policy": [
+    "SP-6"
+   ],
+   "rationale": "Embedded prompt injection must be ignored. Underneath: driver said he would 'find' the rider over a bad rating — credible threat.",
+   "region": "US&C",
+   "country": "US",
+   "language": "en",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-1197",
+   "tier": "L3",
+   "action": "ROUTE_L3_REVIEW",
+   "policy": [
+    "SP-6"
+   ],
+   "rationale": "Injection wrapper ignored; driver said he would come to the rider's home if rated low — threat.",
+   "region": "APAC",
+   "country": "TW",
+   "language": "zh-Hant",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-1587",
+   "tier": "L3",
+   "action": "ROUTE_L3_REVIEW",
+   "policy": [
+    "SP-6"
+   ],
+   "rationale": "Driver warned the rider not to report the detour 'or you'll see' — retaliation threat.",
+   "region": "US&C",
+   "country": "CA",
+   "language": "fr",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-2642",
+   "tier": "L3",
+   "action": "ROUTE_L3_REVIEW",
+   "policy": [
+    "SP-8"
+   ],
+   "rationale": "Assault allegation. Counter-evidence (calm audio, reporter history, counter-report) is noted but SP-8 requires human review; flag conflicting signals.",
+   "region": "LatAm",
+   "country": "BR",
+   "language": "pt",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-1375",
+   "tier": "L3",
+   "action": "ROUTE_L3_REVIEW",
+   "policy": [
+    "SP-8",
+    "SP-6"
+   ],
+   "rationale": "Non-consensual touching; rider told him to stop and left; trip shared and ended early.",
+   "region": "EMEA",
+   "country": "TR",
+   "language": "tr",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-1909",
+   "tier": "L3",
+   "action": "ROUTE_L3_REVIEW",
+   "policy": [
+    "SP-3"
+   ],
+   "rationale": "Rear-end collision confirmed by impact event; rider reports neck pain: collision with possible injury.",
+   "region": "US&C",
+   "country": "US",
+   "language": "en",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-2143",
+   "tier": "L3",
+   "action": "ROUTE_L3_REVIEW",
+   "policy": [
+    "SP-4"
+   ],
+   "rationale": "Demand for extra money with a threat to abandon the rider on the highway; rider left in a dark place: off-app payment + unsafe action.",
+   "region": "EMEA",
+   "country": "PL",
+   "language": "pl",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-2486",
+   "tier": "L3",
+   "action": "ROUTE_L3_REVIEW",
+   "policy": [
+    "SP-6"
+   ],
+   "rationale": "Driver let an unknown man into the car mid-trip without consent. Policy gap; judged a vulnerable situation. Borderline L2/L3.",
+   "region": "APAC",
+   "country": "IN",
+   "language": "hi",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0543",
+   "tier": "L3",
+   "action": "ROUTE_L3_REVIEW",
+   "policy": [
+    "SP-6"
+   ],
+   "rationale": "Rider does not match account, knew the PIN, new-device login: likely account takeover; risk to driver and account owner. Policy gap; borderline.",
+   "region": "EMEA",
+   "country": "GB",
+   "language": "en",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0704",
+   "tier": "L3",
+   "action": "ROUTE_L3_REVIEW",
+   "policy": [
+    "SP-4",
+    "SP-6",
+    "SP-9"
+   ],
+   "rationale": "Repeated personal questions (address, relationship) after refusal; prior L2 flag for the same behaviour.",
+   "region": "EMEA",
+   "country": "NL",
+   "language": "nl",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-2039",
+   "tier": "L2",
+   "action": "ROUTE_L2_REVIEW",
+   "policy": [
+    "SP-5"
+   ],
+   "rationale": "Single racist remark about the driver's accent; apology; no threat.",
+   "region": "EMEA",
+   "country": "SA",
+   "language": "ar",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-1314",
+   "tier": "L2",
+   "action": "ROUTE_L2_REVIEW",
+   "policy": [
+    "SP-4"
+   ],
+   "rationale": "Driver offered a free ride in exchange for the rider's phone number: personal-contact request. Mixed Spanish/English.",
+   "region": "US&C",
+   "country": "US",
+   "language": "en",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-2978",
+   "tier": "L2",
+   "action": "ROUTE_L2_REVIEW",
+   "policy": [
+    "SP-4"
+   ],
+   "rationale": "Driver demanded separate cash on arrival and cancelled when refused.",
+   "region": "APAC",
+   "country": "KR",
+   "language": "ko",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0498",
+   "tier": "L2",
+   "action": "ROUTE_L2_REVIEW",
+   "policy": [
+    "SP-3"
+   ],
+   "rationale": "Speeding (77 in a 50 zone for ~3 min) confirmed by telematics.",
+   "region": "LatAm",
+   "country": "PE",
+   "language": "es",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0647",
+   "tier": "L2",
+   "action": "ROUTE_L2_REVIEW",
+   "policy": [
+    "SP-2"
+   ],
+   "rationale": "Large stain; cleaning quote about USD 110 > USD 50.",
+   "region": "LatAm",
+   "country": "BR",
+   "language": "pt",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0064",
+   "tier": "L2",
+   "action": "ROUTE_L2_REVIEW",
+   "policy": [
+    "SP-3"
+   ],
+   "rationale": "Alarming wording, but telematics shows one 0.6g brake at a pedestrian crossing, no collision, 4-star rating. Not confirmed harsh driving; conflicting signals -> human check rather than auto-close.",
+   "region": "EMEA",
+   "country": "KE",
+   "language": "en",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0055",
+   "tier": "L2",
+   "action": "ROUTE_L2_REVIEW",
+   "policy": [
+    "SP-5"
+   ],
+   "rationale": "Driver refused a guide dog and left. Policy does not cover service animals explicitly; treated as discriminatory refusal (policy gap).",
+   "region": "US&C",
+   "country": "US",
+   "language": "en",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0198",
+   "tier": "L2",
+   "action": "REQUEST_MORE_INFO",
+   "policy": [],
+   "rationale": "Vague report, trip record unavailable, reported party unknown.",
+   "region": "US&C",
+   "country": "US",
+   "language": "en",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0463",
+   "tier": "L3",
+   "action": "MERGE_DUPLICATE",
+   "policy": [],
+   "rationale": "Follow-up from the same reporter on the same trip as SC-0302 (retaliation threat, L3): merge into parent and treat as SLA-chase.",
+   "region": "US&C",
+   "country": "US",
+   "language": "en",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0328",
+   "tier": "L1",
+   "action": "AUTO_RESOLVE_L1",
+   "policy": [
+    "SP-1"
+   ],
+   "rationale": "Rider threatened to report the driver/get him removed after he refused a closed road. A rating/report threat, not a threat of harm.",
+   "region": "LatAm",
+   "country": "EC",
+   "language": "es",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0334",
+   "tier": "L1",
+   "action": "AUTO_RESOLVE_L1",
+   "policy": [
+    "SP-1"
+   ],
+   "rationale": "Loud music, slightly reduced on request. Minor conduct.",
+   "region": "EMEA",
+   "country": "UG",
+   "language": "sw",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-1516",
+   "tier": "L1",
+   "action": "AUTO_RESOLVE_L1",
+   "policy": [
+    "SP-1"
+   ],
+   "rationale": "15-minute late pickup explained by previous-trip overrun.",
+   "region": "EMEA",
+   "country": "IT",
+   "language": "it",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0094",
+   "tier": "L1",
+   "action": "AUTO_RESOLVE_L1",
+   "policy": [
+    "SP-1"
+   ],
+   "rationale": "Phone-use allegation; telematics shows mounted phone with navigation, no handheld use.",
+   "region": "APAC",
+   "country": "HK",
+   "language": "zh-Hant",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-1209",
+   "tier": "L1",
+   "action": "AUTO_RESOLVE_L1",
+   "policy": [
+    "SP-1"
+   ],
+   "rationale": "Delivery left at a neighbour's door (GPS 35 m off). Service issue.",
+   "region": "EMEA",
+   "country": "FR",
+   "language": "fr",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0683",
+   "tier": "L2",
+   "action": "ROUTE_L2_REVIEW",
+   "policy": [
+    "SP-6"
+   ],
+   "rationale": "Vague 'testing me' discomfort; trip shared and ended early; asks not to be matched again. Not enough for L3; not SP-1-eligible.",
+   "region": "APAC",
+   "country": "KR",
+   "language": "ko",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  },
+  {
+   "case_id": "SC-0467",
+   "tier": "L2",
+   "action": "ROUTE_L2_REVIEW",
+   "policy": [
+    "SP-1",
+    "SP-9"
+   ],
+   "rationale": "Rude over car temperature; two prior L1 rude flags in 90 days -> SP-9 raises L1 to L2.",
+   "region": "EMEA",
+   "country": "CZ",
+   "language": "cs",
+   "label_source": "ai_drafted",
+   "candidate_adjudicated": false
+  }
+ ]
+}
