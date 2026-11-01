@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RideNova Safety Workbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #ffffff; --fg: #000000; --muted: #545454; --card: #f6f6f6; --line: #e2e2e2; --code: #000000; --codefg: #e8e8e8; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0e0e0e; --fg: #f2f2f2; --muted: #b0b0b0; --card: #1a1a1a; --line: #2c2c2c; --code: #1a1a1a; --codefg: #e8e8e8; } }
+  :root[data-theme="dark"] { --bg: #0e0e0e; --fg: #f2f2f2; --muted: #b0b0b0; --card: #1a1a1a; --line: #2c2c2c; --code: #1a1a1a; --codefg: #e8e8e8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; line-height: 1.5; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 40px 16px 64px; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  h1 { font-size: clamp(30px, 5vw, 46px); letter-spacing: -0.03em; line-height: 1.05; margin: 10px 0 12px; }
+  h2 { font-size: 22px; letter-spacing: -0.02em; margin: 40px 0 6px; }
+  p { color: var(--muted); margin: 0 0 12px; max-width: 760px; }
+  .note { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 14px; margin: 20px 0; }
+  pre { background: var(--code); color: var(--codefg); border-radius: 12px; padding: 16px; overflow-x: auto; font-size: 14px; }
+  figure { margin: 14px 0 0; }
+  img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); display: block; }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Fictional case study · synthetic data · preview</div>
+  <h1>RideNova Safety Workbench</h1>
+  <p>A role-based investigation console: automate the groundwork, not the accountability. Cases route to a duty manager (L4 or any danger), eligible upstream automation (shadow mode by default) or a qualified agent.</p>
+  <div class="note">The workbench enforces permissions and masking on its server, so it can't run inside this page. These are screenshots of the real app; run it locally to use it.</div>
+  <pre>cd ridenova-safety
+npm install
+npm test            # 34 unit + API tests
+npm run test:e2e    # 5 browser workflow tests
+npm start           # http://localhost:8080/console.html</pre>
+  <h2>Overview</h2><p>Every breakdown reconciles to the filtered population. Severity is labelled by basis: AI-proposed, current or human-reviewed.</p>
+  <figure><img src="overview.png" alt="Overview screen with filters, population counts, severity distribution and handling lanes"><figcaption>Duty-manager scope, replay clock, automation in shadow mode.</figcaption></figure>
+  <h2>Agent workspace</h2><p>Five questions (what happened, evidence, policy, uncertainty, next step) and one primary action.</p>
+  <figure><img src="agent.png" alt="Agent workspace showing a case summary, the redacted report and evidence sources with their status"></figure>
+  <h2>Duty-manager workspace</h2><p>Why it is dangerous, the timing strip, accountable owner and policy next steps. Acknowledging is not a response.</p>
+  <figure><img src="manager.png" alt="Duty-manager workspace with a danger banner, five timestamps and the response checklist"></figure>
+  <h2>Controlled reassessment</h2><p>Evidence, policy, a reason and a human destination are required. Alerts, clocks and the AI proposal are preserved, and a downgrade never closes or automates the case.</p>
+  <figure><img src="reassess.png" alt="Reassessment dialog with new severity, danger assessment, evidence checkboxes, policy clause, destination queue and reason"></figure>
+</div>
+</body>
+</html>
