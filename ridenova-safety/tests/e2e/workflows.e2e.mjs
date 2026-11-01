@@ -28,9 +28,11 @@ test('e2e · (c) urgent manager escalation: acknowledge, contact, decide, protec
   await page.waitForSelector('.danger');
   await page.click('#ack'); await page.waitForSelector('[data-step=contact_reporter]');
   assert.match(await page.textContent('.statusbar'), /Under review/);
-  await page.click('[data-step=contact_reporter][data-v=reached]'); await page.waitForTimeout(200);
-  await page.click('[data-step=emergency_services][data-v=not_needed]'); await page.waitForTimeout(200);
-  await page.click('[data-step=protect][data-v=restrict_rematch]'); await page.waitForTimeout(300);
+  const stepDone = (n) => page.waitForFunction((k) => document.querySelectorAll('.step.done').length >= k, n);
+  await page.click('[data-step=contact_reporter][data-v=reached]'); await stepDone(1);
+  await page.click('[data-step=emergency_services][data-v=not_needed]'); await stepDone(2);
+  await page.click('[data-step=protect][data-v=restrict_rematch]'); await stepDone(3);
+  await page.waitForFunction(() => /Execution · (completed|failed)/.test(document.querySelector('#detail').textContent));
   const t = await page.textContent('#detail');
   assert.match(t, /Execution · (completed|failed)/); assert.match(t, /simulated/);
 });
@@ -69,17 +71,17 @@ test('e2e · (a) upstream automation and an exception', { skip: !chromium && 'pl
 test('e2e · (b) agent investigation: five questions, one primary action, distinct execution', { skip: !chromium && 'playwright not installed' }, async () => {
   for (const q of ['What happened?', 'What evidence is available?', 'What does policy imply?', 'What is uncertain or missing?', 'What should I do next?']) assert.ok((await page.textContent('#detail')).includes(q));
   if (await page.$('#p-take')) { await page.click('#p-take'); await page.waitForSelector('#p-approve'); }
-  await page.click('#p-approve'); await page.waitForTimeout(400);
+  await page.click('#p-approve'); await page.waitForFunction(() => /Decision/.test(document.querySelector('#detail').textContent));
   const t = await page.textContent('#detail');
   assert.match(t, /Decision/); assert.match(t, /Execution · (completed|failed)/);
   // agents cannot open manager-lane cases
-  await page.goto(`${base}/console.html#work/SC-0002`); await page.waitForTimeout(400);
+  await page.goto(`${base}/console.html#work/SC-0002`); await page.waitForFunction(() => /not authorised|Not available|not found/i.test(document.querySelector('#detail')?.textContent || ''));
   assert.match(await page.textContent('#detail'), /not authorised|Not available|not found/i);
 });
 
 test('e2e · (e) overview reconciles to the filtered population; no page errors', { skip: !chromium && 'playwright not installed' }, async () => {
   await signIn('u-dm-2'); await page.click('a[href="#overview"]'); await page.waitForSelector('.stats');
-  await page.selectOption('[data-f=region]', 'LatAm'); await page.waitForTimeout(500);
+  await page.selectOption('[data-f=region]', 'LatAm'); await page.waitForFunction(() => document.querySelector('[data-f=region]')?.value === 'LatAm' && document.querySelector('.stat .v').textContent !== '5,000');
   const pop = Number((await page.textContent('.stat .v')).replace(/,/g, ''));
   const bars = await page.$$eval('.card:first-child .bar span:last-child', (els) => els.map((e) => Number(e.textContent.replace(/,/g, ''))));
   assert.equal(bars.reduce((a, b) => a + b, 0), pop);

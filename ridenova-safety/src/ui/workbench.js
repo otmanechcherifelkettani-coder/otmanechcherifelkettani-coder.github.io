@@ -213,8 +213,8 @@ function drawList() {
   $('.seg').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.m === S.listMode)));
   $('#lcount').textContent = `${S.listTotal.toLocaleString()} open case${S.listTotal === 1 ? '' : 's'}${S.listTotal > S.list.length ? ` · showing ${S.list.length}` : ''} · severity, then deadline`;
   $('#items').innerHTML = S.list.length ? S.list.map((i) => `<button class="item" data-id="${i.case_id}" aria-current="${i.case_id === S.sel}">
-      ${sev(i.severity, i.provisional).replace(' · provisional', ' · prov.')}
-      <span style="min-width:0"><span class="l1">${i.case_id}${i.unacked ? '<span class="tag red">unacknowledged</span>' : ''}${i.handoff === 'pending' ? '<span class="tag blue">handoff</span>' : ''}</span>
+      ${sev(i.severity)}
+      <span style="min-width:0"><span class="l1">${i.case_id}${i.provisional ? '<span class="tag amber">provisional</span>' : ''}${i.unacked ? '<span class="tag red">unacknowledged</span>' : ''}${i.handoff === 'pending' ? '<span class="tag blue">handoff</span>' : ''}</span>
       <span class="l2">${esc(i.summary)}</span>
       <span class="l3"><span>${esc(i.city)}, ${i.country} · ${i.language}</span><span>${i.owner_name ? 'Owner ' + esc(i.owner_name) : 'Unowned'}</span>${slaTag(i.sla)}</span></span></button>`).join('')
     : `<div class="empty">${S.listMode === 'mine' ? 'Nothing assigned to you. Switch to your queues.' : 'No open cases in your scope.'}</div>`;

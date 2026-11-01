@@ -18,6 +18,7 @@ test('free-text names, phones, emails and plates are redacted; masking hides mos
   const c = get('SC-0001');
   const s = redactText(`It was ${c.pii.reported_party.name}, call +61 491 570 999 or x.y@example.test. Plate ${c.pii.reported_party.vehicle_plate}.`, c);
   assert.ok(!s.includes(c.pii.reported_party.name.split(' ')[0])); assert.match(s, /\[PHONE\]/); assert.match(s, /\[EMAIL\]/); assert.match(s, /\[PLATE\]/);
+  assert.equal(redactText('Submitted 2026-03-01 05:01 at 07:53', c), 'Submitted 2026-03-01 05:01 at 07:53');
   assert.equal(maskName('Hao Huang'), 'H•• H••••'); assert.ok(!maskPhone('+61 491 570 476').includes('491'));
 });
 test('public text is data: injection wrappers are detected in several languages', () => {

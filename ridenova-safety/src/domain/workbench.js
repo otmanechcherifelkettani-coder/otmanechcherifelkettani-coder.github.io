@@ -166,7 +166,7 @@ export class Workbench {
       const id = `${s.case_id}-X${s.executions.length + 1}`;
       E('execution.queued', { exec_id: id, action, key });
       E('execution.running', { exec_id: id });
-      const r = simulateExecution(s.case_id, action, this.failPct);
+      const r = simulateExecution(s.case_id, action, this.failPct, s.executions.filter((x) => x.action === action).length);
       if (r.ok) E('execution.completed', { exec_id: id, receipt: r.receipt, reporter_facing: EXEC_ACTIONS[action].reporter_facing }, { summary: `${EXEC_ACTIONS[action].label} — completed (simulated)` });
       else E('execution.failed', { exec_id: id, error: r.error }, { summary: `${EXEC_ACTIONS[action].label} — FAILED: ${r.error}` });
       return r.ok;
