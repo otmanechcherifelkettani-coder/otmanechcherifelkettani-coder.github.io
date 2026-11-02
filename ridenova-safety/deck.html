@@ -77,7 +77,7 @@
   <div class="kicker">RideNova · Tech Transformation · Field Operations</div>
   <h1 style="max-width:1000px;margin-top:120px">One screen.<br>AI does the groundwork.<br>Humans make the call.</h1>
   <p class="lead">A unified, AI-assisted safety case review console, with the guardrails, data protections and rollout plan to put it into production safely.</p>
-  <div style="margin-top:auto;display:flex;gap:40px;font-size:14px;color:var(--g400)"><span>Otman Kettani</span><span>Working prototype · 5,000 cases · 39 acceptance tests</span></div>
+  <div style="margin-top:auto;display:flex;gap:40px;font-size:14px;color:var(--g400)"><span>Otman Kettani</span><span>Working prototype · 5,000 cases · 45 acceptance tests</span></div>
 </section>
 
 <!-- 1 INTRO -->
@@ -100,7 +100,7 @@
   <div class="body cols3">
     <div class="box"><h4>Today</h4><ul><li>4+ tools, each with its own login and search</li><li>Reports in 35 languages, often mixed</li><li>PII scattered across systems</li><li>One mixed-severity queue: an SOS can sit behind a fare dispute</li></ul></div>
     <div class="box"><h4>Future state</h4><ul><li><b>One screen</b> with every source, each fact labelled by origin</li><li><b>AI groundwork</b>: summary, translation, proposed tier and action, policy citations</li><li><b>Deterministic guardrails</b> the AI cannot override</li><li><b>Four lanes</b> by severity; humans decide L2–L4</li></ul></div>
-    <div class="box black"><h4>Why it’s worth it</h4><div class="big" style="margin:8px 0">~48%</div>fewer reviewer hours per week <span class="pill e">Estimate</span><br><br><div class="big" style="margin:8px 0">0 min</div>to flag 138/138 L4 cases for a duty-manager alert at intake <span class="pill m">Measured</span></div>
+    <div class="box black"><h4>Why it’s worth it</h4><div class="big" style="margin:8px 0">~42%</div>fewer reviewer hours per week <span class="pill e">Estimate</span><br><br><div class="big" style="margin:8px 0">0 min</div>to flag 138/138 L4 cases for a duty-manager alert at intake <span class="pill m">Measured</span></div>
   </div>
   <div class="foot"><span>Estimate: annex A1 (assumed handling times, to validate in pilot). Measured: prototype on the supplied 5,000 cases.</span><span>3</span></div>
 </section>
@@ -179,7 +179,7 @@
         <tr><td>Unsafe auto-resolutions (non-L1 closed)</td><td><b>0</b></td><td><span class="pill m">Measured</span></td></tr>
         <tr><td>Tier agreement, scenario reference set (AI-assisted)</td><td><b>91.8%</b> (404 over-triaged: unsupported languages go to humans)</td><td><span class="pill m">Measured</span></td></tr>
         <tr><td>AI-drafted reference set, 30 cases (16 languages, 4 regions)</td><td><b>29 / 30</b>, not independent until I adjudicate</td><td><span class="pill e">Pending</span></td></tr>
-        <tr><td>Automation-eligible (shadow mode, nothing auto-closed)</td><td><b>64.5%</b> of all cases</td><td><span class="pill m">Measured</span></td></tr>
+        <tr><td>Automation-eligible (shadow mode, nothing auto-closed)</td><td><b>49.1%</b> (after the second key)</td><td><span class="pill m">Measured</span></td></tr>
         <tr><td>Triage of all 5,000 in the browser</td><td><b>&lt;0.5 s</b></td><td><span class="pill m">Measured</span></td></tr>
       </table>
       <div class="small">Caveat: the demo lexicon was tuned on this same file, so these numbers are in-sample. Live Claude output was not benchmarked here (no key in the build environment).</div>
@@ -306,20 +306,20 @@
 <!-- ANNEX A1 -->
 <section class="slide">
   <div class="kicker">Annex A1 · Capacity estimate</div>
-  <h2>Where the ~48% comes from. Every input is an assumption to validate.</h2>
+  <h2>Where the ~42% comes from. Every input is an assumption to validate.</h2>
   <div class="body cols2">
     <table class="d">
       <tr><th>Tier</th><th>Weekly (×20)</th><th>AHT today*</th><th>Hours today</th><th>Hours future</th></tr>
-      <tr><td>L1</td><td>70,000</td><td>6 min</td><td>7,000</td><td>161 <span class="small">(5% QA × 3 min of 64.5k automated)</span></td></tr>
+      <tr><td>L1</td><td>70,000</td><td>6 min</td><td>7,000</td><td>1,241 <span class="small">(QA 5% × 3 min of 49.1k automated + 15.4k text-only one-click confirms)</span></td></tr>
       <tr><td>L2</td><td>20,000 → 24,960</td><td>15 min</td><td>5,000</td><td>4,524</td></tr>
       <tr><td>L3</td><td>8,000 → 7,740</td><td>35 min</td><td>4,667</td><td>3,273</td></tr>
       <tr><td>L4</td><td>2,000 → 2,760</td><td>45 min</td><td>1,500</td><td>1,501</td></tr>
-      <tr><td><b>Total</b></td><td>100,000</td><td></td><td><b>18,167</b></td><td><b>9,459 (−48%)</b></td></tr>
+      <tr><td><b>Total</b></td><td>100,000</td><td></td><td><b>18,167</b></td><td><b>10,539 (−42%)</b></td></tr>
     </table>
     <div style="display:grid;gap:12px;align-content:start">
       <div class="box"><b>Lever A: unified view only:</b> 55% of AHT is search; assume it halves → AHT ×0.725 → <b>−27.5%</b> (13,171 h). <span class="pill e">Estimate</span></div>
-      <div class="box"><b>Lever B: upstream SP-1 automation, once it passes shadow mode:</b> 64.5% of cases are eligible (measured share), with 5% QA. <b>A further ~−20 points</b>. <span class="pill e">Estimate</span></div>
-      <div class="box"><b>≈ 606 → 315 FTE</b> at 30 productive hours a week. Future volumes use the prototype’s measured tier mix (×20); L4 rises because of the SP-9 reading. <span class="pill e">Estimate</span></div>
+      <div class="box"><b>Lever B: upstream SP-1 automation, once it passes shadow mode:</b> 49.1% of cases are eligible (measured share), with 5% QA; text-only L1s still get a one-click human (or live-AI) confirmation. <b>A further −14 points</b>. <span class="pill e">Estimate</span></div>
+      <div class="box"><b>≈ 606 → 351 FTE</b> at 30 productive hours a week. Future volumes use the prototype’s measured tier mix (×20); L4 rises because of the SP-9 reading. <span class="pill e">Estimate</span></div>
       <div class="small">*AHT values are my assumptions (not in the brief). Phase 0 replaces them with measured baselines.</div>
     </div>
   </div>

@@ -15,7 +15,7 @@ Requires Node ≥ 20.
 ```bash
 cd ridenova-safety
 npm install                 # Anthropic SDK, used only if you set a key
-npm test                    # 34 unit + API acceptance tests
+npm test                    # 40 unit + API acceptance tests
 npm run test:e2e            # 5 real-browser workflow tests (needs Playwright + Chromium)
 npm start                   # http://localhost:8080/console.html  (simulated AI, automation in shadow mode)
 ```
@@ -23,7 +23,7 @@ npm start                   # http://localhost:8080/console.html  (simulated AI,
 Optional settings:
 - `ANTHROPIC_API_KEY=… npm start` enables live AI for re-assessment, translation and policy Q&A.
 - `npm run evaluate` re-runs validation over all 5,000 cases.
-- Other settings (`REPLAY_NOW`, `AUTOMATION_MODE`, `AI_MODEL`, `SIM_FAIL_PCT`, `RETENTION_DAYS`) are listed in `server/server.mjs`.
+- Other settings (`REPLAY_NOW`, `AUTOMATION_MODE`, `AI_MODEL`, `SIM_FAIL_PCT`, `RETENTION_L1_DAYS`…`RETENTION_L4_DAYS`, `ACCESS_LOG_RETENTION_DAYS`) are listed in `server/server.mjs`.
 
 Records persist in `data/runtime/*.jsonl` (gitignored). Delete that folder to reset the demo.
 
@@ -43,6 +43,12 @@ The workbench **needs its server**, because permissions and masking are enforced
 | Links | `incident_id` + candidate links. Same reporter and trip is a *candidate*, never an automatic merge. |
 
 Every change is an event. State is the fold of the event list, and the full history is shown on each case.
+
+**Also:**
+- The access log is hash-chained (tamper-evident) and verified on the Overview.
+- Work records are retained by tier after resolution.
+- Instructions aimed at the triage system are removed before any model sees the text.
+- Text-only SP-1 cases need a live model's agreement before automation (the "second key").
 
 **Routing precedence:**
 1. **Lane A, duty manager:** current severity is L4, *or any* danger signal, whatever the AI proposed.

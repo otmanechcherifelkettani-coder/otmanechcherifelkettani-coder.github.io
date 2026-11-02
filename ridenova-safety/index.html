@@ -63,7 +63,7 @@
   <div>
     <div class="eyebrow" style="color:var(--g400)">Program Leader, Tech Transformation · Case solution</div>
     <h1 style="margin-top:14px">Every safety report reviewed on one screen, at the right speed.</h1>
-    <p>A working prototype that unifies six source systems, has AI do the groundwork in 35 languages, enforces the policy with deterministic guardrails and leaves every L2–L4 decision to a human. It triages all 5,000 cases in about a second and is covered by 39 acceptance tests.</p>
+    <p>A working prototype that unifies six source systems, has AI do the groundwork in 35 languages, enforces the policy with deterministic guardrails and leaves every L2–L4 decision to a human. It triages all 5,000 cases in about a second and is covered by 45 acceptance tests.</p>
     <div class="ctas"><a class="btn btn-white" href="#run">Run the workbench →</a><a class="btn" style="background:var(--g800);color:#fff" href="deck.html">Executive deck</a><a class="btn" style="background:var(--g800);color:#fff" href="#run">Run it locally</a></div>
   </div>
   <div class="hero-card">
@@ -71,7 +71,7 @@
     <div class="lanecard"><span class="tier L4">L4</span><div><b>138 critical</b>Duty manager alerted at intake · locked</div><span class="chip tag-measured">138/138 recall</span></div>
     <div class="lanecard"><span class="tier L3">L3</span><div><b>387 specialist</b>Threats, violence, injection, collisions</div><span class="chip tag-measured">519/523 L3+</span></div>
     <div class="lanecard"><span class="tier L2">L2</span><div><b>951 standard</b>Violations, plus anything uncertain</div><span class="chip">human</span></div>
-    <div class="lanecard"><span class="tier L1">L1</span><div><b>3,227 automation-eligible</b>Shadow mode: still reviewed by agents</div><span class="chip tag-measured">0 unsafe</span></div>
+    <div class="lanecard"><span class="tier L1">L1</span><div><b>2,456 automation-eligible</b>Shadow mode: still reviewed by agents</div><span class="chip tag-measured">0 unsafe</span></div>
     <p class="muted" style="font-size:12px;margin-top:10px">Demo provider (no AI key) + guardrails over candidate_cases.json. In-sample: the lexicon was tuned on this file.</p>
   </div>
 </div></section>
@@ -82,7 +82,7 @@
   <div class="grid g4">
     <div class="tile"><div class="num">55%</div><div class="lab">of handling time is spent searching</div><p>The problem is fragmentation, not judgement. Fix information access first: unify the sources with provenance.</p></div>
     <div class="tile"><div class="num">4</div><div class="lab">severity lanes, not one queue</div><p>Danger signals page a duty manager at intake. Automation can’t close, downgrade or resolve them.</p></div>
-    <div class="tile"><div class="num">~48%</div><div class="lab">fewer reviewer hours <span class="chip tag-estimate">estimate</span></div><p>About half from the unified view and half from gated L1 auto-resolution. Validated in a shadow pilot before any automation.</p></div>
+    <div class="tile"><div class="num">~42%</div><div class="lab">fewer reviewer hours <span class="chip tag-estimate">estimate</span></div><p>About two-thirds from the unified view and one-third from gated upstream SP-1 automation. Validated in a shadow pilot before any automation.</p></div>
     <div class="tile"><div class="num">5</div><div class="lab">decisions for leadership</div><p>Pilot budget, vendor strategy, 6 policy rulings, the auto-resolve bar and the privacy sign-off path.</p></div>
   </div>
 </div></section>
@@ -125,7 +125,7 @@
     <tr><td>C · Masking, RBAC, redaction, retention, access logging</td><td class="ok">Works <span class="sim">(prototype grade)</span></td><td>Client-side roles (no SSO); localStorage log; regex + known-value redaction (no NER)</td></tr>
     <tr><td>D · 5,000 cases, severity/deadline queue, filters, translation on demand</td><td class="ok">Works</td><td>&lt;0.5 s triage in the browser; UTC deadline ordering</td></tr>
     <tr><td>E · Structured records, search, CSV/JSON export</td><td class="ok">Works</td><td>Minimum columns + 14 extras; no PII</td></tr>
-    <tr><td>F · README (~5 commands), AI integration, key-free demo, tests, swappable provider</td><td class="ok">Works</td><td>34 unit/API + 5 browser tests; <code>SimulatedProvider</code> / <code>AnthropicProvider</code></td></tr>
+    <tr><td>F · README (~5 commands), AI integration, key-free demo, tests, swappable provider</td><td class="ok">Works</td><td>40 unit/API + 5 browser tests; <code>SimulatedProvider</code> / <code>AnthropicProvider</code></td></tr>
     <tr><td>Validation on 20–30 self-labelled cases</td><td class="sim">Partial</td><td>30 AI-drafted reference labels + 5,000 silver; candidate adjudication pending; <code>npm run evaluate</code></td></tr>
     <tr><td>Live AI benchmarked on the reference set</td><td class="no">Not done</td><td>No API key in the build environment. The integration is written and its error paths are handled; run <code>npm start</code> with a key</td></tr>
     <tr><td>Real integrations, SSO, server-side persistence, paging</td><td class="no">Out of scope</td><td>Mocked; listed as Phase 0 dependencies</td></tr>
@@ -138,7 +138,7 @@
   <div class="grid g2">
     <pre class="cmd">git clone https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io &amp;&amp; cd otmanechcherifelkettani-coder.github.io/ridenova-safety
 npm install            # Anthropic SDK (live mode only)
-npm test               # 34 unit + API tests
+npm test               # 40 unit + API tests
 npm start              # simulated AI, shadow automation → localhost:8080/console.html
 ANTHROPIC_API_KEY=… npm start   # live mode</pre>
     <div class="tile"><h3>Server required</h3><p>The workbench enforces permissions and masking on its server, so it runs locally with <code>npm start</code>, not on static hosting. This page and the executive deck are static. Sign in as any of the fictional profiles (simulated sign-in) to see agent and duty-manager views.</p><p style="margin-top:12px"><a href="https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io/blob/main/ridenova-safety/README.md">README</a> · <a href="https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io/blob/main/ridenova-safety/docs/AI_LOG.md">AI-use log</a> · <a href="https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io/blob/main/ridenova-safety/docs/VALIDATION.md">Validation</a> · <a href="https://github.com/otmanechcherifelkettani-coder/otmanechcherifelkettani-coder.github.io/blob/main/ridenova-safety/docs/DECISIONS.md">Decisions &amp; assumptions</a></p></div>

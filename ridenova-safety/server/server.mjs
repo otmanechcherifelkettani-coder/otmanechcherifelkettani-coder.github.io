@@ -1,7 +1,8 @@
 // Entry point.   npm start            -> simulated AI, automation in SHADOW mode
 //                ANTHROPIC_API_KEY=… npm start -> live AI for re-assessment, translation, policy Q&A
 // Env: PORT (8080), REPLAY_NOW (2026-03-08T08:00:00Z), AUTOMATION_MODE (shadow|enabled),
-//      AI_MODEL (claude-opus-5-5), AI_EFFORT (low), SIM_FAIL_PCT (5), RETENTION_DAYS (365)
+//      AI_MODEL (claude-opus-5-5), AI_EFFORT (low), SIM_FAIL_PCT (5),
+//      RETENTION_L1_DAYS (180), RETENTION_L2_DAYS (365), RETENTION_L3_DAYS / RETENTION_L4_DAYS (730), ACCESS_LOG_RETENTION_DAYS (1095)
 import { createApp } from './app.mjs';
 
 const PORT = Number(process.env.PORT || 8080);

@@ -22,7 +22,10 @@ const STATIC_DENY = /[/\\](server|node_modules|tests|data[/\\]runtime|validation
 
 export function createApp({
   dataDir = join(ROOT, 'data', 'runtime'), replayNow = process.env.REPLAY_NOW || '2026-03-08T08:00:00Z', fixedNow = null,
-  provider = null, automationMode = process.env.AUTOMATION_MODE || 'shadow', failPct, retentionDays = Number(process.env.RETENTION_DAYS || 365),
+  provider = null, automationMode = process.env.AUTOMATION_MODE || 'shadow', failPct, realNow = () => Date.now(),
+  // Retention after resolution, per tier (assumptions to set with Legal per country), and for the access log.
+  retention = { L1: Number(process.env.RETENTION_L1_DAYS || 180), L2: Number(process.env.RETENTION_L2_DAYS || 365), L3: Number(process.env.RETENTION_L3_DAYS || 730), L4: Number(process.env.RETENTION_L4_DAYS || 730) },
+  accessRetentionDays = Number(process.env.ACCESS_LOG_RETENTION_DAYS || 1095),
 } = {}) {
   const cases = JSON.parse(readFileSync(join(ROOT, 'data', 'candidate_cases.json'), 'utf8'));
   const fixtures = JSON.parse(readFileSync(join(ROOT, 'data', 'precomputed_translations.json'), 'utf8'));
@@ -33,9 +36,20 @@ export function createApp({
   const now = fixedNow ? () => fixedNow : () => replay0 + (Date.now() - bootReal);
   const ai = provider || (process.env.ANTHROPIC_API_KEY ? new AnthropicProvider({ model: process.env.AI_MODEL, effort: process.env.AI_EFFORT }) : new SimulatedProvider(fixtures));
   const local = new SimulatedProvider(fixtures);
-  const log = new JsonlLog(join(dataDir, 'events.jsonl'), { retentionDays });
-  const audit = new JsonlLog(join(dataDir, 'access.jsonl'), { retentionDays: Number(process.env.AUDIT_RETENTION_DAYS || 400) });
-  const wb = new Workbench({ cases, log, audit, now, automationMode, failPct });
+  const log = new JsonlLog(join(dataDir, 'events.jsonl'));
+  const audit = new JsonlLog(join(dataDir, 'access.jsonl'), { chained: true, retentionDays: accessRetentionDays, nowMs: realNow });
+  let wb = new Workbench({ cases, log, audit, now, automationMode, failPct });
+  // Retention by tier: replace an expired case's work records with a tombstone, then rebuild state.
+  const due = wb.retentionDue(realNow(), retention);
+  if (due.length) {
+    const ids = new Set(due.map((d) => d.case_id));
+    const kept = log.readAll().filter((e) => !ids.has(e.case_id));
+    let seq = kept.reduce((m, e) => Math.max(m, e.seq || 0), 0);
+    log.writeAll(kept);
+    for (const d of due) log.append({ seq: ++seq, type: 'record.purged', case_id: d.case_id, at: new Date(now()).toISOString(), actor: 'system:retention', payload: d, recorded_at: new Date(realNow()).toISOString() });
+    wb = new Workbench({ cases, log, audit, now, automationMode, failPct });
+    wb.auditLog(null, 'retention_purge', null, { cases: due.length, by_tier: due.reduce((m, d) => ((m[d.tier] = (m[d.tier] || 0) + 1), m), {}) });
+  }
   const sessions = new Map(); // token -> { user, revealed: Map(case_id -> {field:true}) }
 
   const send = (res, code, body, type = 'application/json; charset=utf-8') => {
@@ -138,6 +152,10 @@ export function createApp({
       wb.auditLog(user, 'export', null, { rows: rows.length, format: url.searchParams.get('format') || 'json' });
       return url.searchParams.get('format') === 'csv' ? send(res, 200, toCSV(rows), 'text/csv; charset=utf-8') : send(res, 200, rows);
     }
+    if (path === '/api/audit/verify') {
+      if (user.role !== 'duty_manager') return send(res, 403, { error: 'Duty managers only.' });
+      return send(res, 200, { ...audit.verify(), retention_days: { ...retention, access_log: accessRetentionDays } });
+    }
     if (path === '/api/audit') {
       if (user.role !== 'duty_manager') return send(res, 403, { error: 'Duty managers only.' });
       return send(res, 200, audit.tail(400).reverse());
@@ -160,5 +178,5 @@ export function createApp({
       send(res, e.code === 413 ? 413 : 500, { error: e.message });
     }
   });
-  return { server, wb, now, ai };
+  return { server, get wb() { return wb; }, now, ai, audit, log };
 }

@@ -13,12 +13,16 @@
 | Lexicon | Multilingual term drafts | Review false-positive terms |
 | Code, tests, docs, decks | First drafts and iterations | Be able to explain every choice and number |
 
+## Ideas taken from another build
+A second, separately built version of this exercise (a Python prototype) was compared against this one. Four of its ideas were re-implemented here, with their own tests: the hash-chained access log, retention by tier, removing injection text from model input, and the "second key" for text-only automation. No code was copied; the designs were adapted to this event-sourced model.
+
 ## What AI got wrong (caught by evaluation or tests)
 - Over-broad lexicon terms (`minor`, `kind`, `child`, `bateu`, the Arabic substring `لمس`) produced 250+ false escalations.
 - `\bSOS\b` matched “no SOS”, producing 25 false L4s.
 - “Reporter has 4 reports in 90 days” was treated as counter-evidence. That penalises frequent reporters; it was removed.
 - In the first build, L1 meant auto-resolve by default and severity, lane and status were mixed in one record. Both were rebuilt.
 - The earlier AI-use log claimed the candidate had labelled the 30 reference cases. They were AI-drafted; this log corrects that.
+- The first injection stripper's placeholder text itself triggered the injection detector, and Hindi sentence endings (।) weren't recognised, which left one directive in place. Caught by the tests.
 - Timing assumptions in the browser tests: assertions ran before server responses arrived.
 
 ## Not delegated / guarded

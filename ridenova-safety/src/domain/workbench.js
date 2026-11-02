@@ -328,6 +328,17 @@ export class Workbench {
     this.emit(s, 'ai.failed', this.now(), 'ai:live', { error }, { summary: `AI unavailable: ${error}. Human review continues with the existing assessment.` });
   }
 
+  // Resolved cases whose tier-specific retention period has elapsed since resolution (real time).
+  retentionDue(nowRealMs, days) {
+    const out = [];
+    for (const s of this.states.values()) {
+      if (s.workflow !== 'resolved' || !s.resolution?.recorded_at || s.flags.includes('retention_purged')) continue;
+      const d = days[s.severity.max_held];
+      if (d != null && nowRealMs - Date.parse(s.resolution.recorded_at) > d * 864e5) out.push({ case_id: s.case_id, tier: s.severity.max_held, retention_days: d, resolved_at: s.clocks.resolved_at });
+    }
+    return out;
+  }
+
   auditLog(user, event, caseId, detail) {
     this.audit?.append({ at: new Date(this.now()).toISOString(), recorded_at: new Date().toISOString(), user: user?.id || null, role: user?.role || null, event, case_id: caseId, detail });
   }

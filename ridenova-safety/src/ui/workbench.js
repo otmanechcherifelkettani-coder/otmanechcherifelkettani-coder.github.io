@@ -147,8 +147,10 @@ async function renderOverview() {
         ${isDM ? `<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn btn-sm ${o.automation_mode === 'enabled' ? 'btn-gray' : 'btn-black'}" id="automode">${o.automation_mode === 'enabled' ? 'Return automation to shadow mode' : 'Enable SP-1 automation (demo)'}</button>
           <a class="btn btn-gray btn-sm" href="#" id="csv">Export CSV</a><a class="btn btn-gray btn-sm" href="#" id="json">Export JSON</a></div>` : ''}</div>
     </div>
+    ${isDM ? '<p class="recon" id="chain">Checking access-log integrity…</p>' : ''}
     <p class="recon">Evidence gaps: ${o.evidence_gaps.missing_material} missing material evidence · ${o.evidence_gaps.language_not_understood} not understood (language). Confidence bands (uncalibrated): ${Object.entries(o.confidence_bands).map(([k, v]) => `${k} ${v}`).join(' · ')}.</p>
   </div>`;
+  if (isDM) api('api/audit/verify').then((x) => { const el = $('#chain'); if (!el) return; el.innerHTML = x.body.ok ? `Access log: hash chain <b>verified</b> (${x.body.entries.toLocaleString()} entries${x.body.purged_by_retention ? `, ${x.body.purged_by_retention} purged by retention` : ''}). Tamper-evident, not tamper-proof.` : `<b style="color:var(--red)">Access log integrity check FAILED</b> at entry ${x.body.broken_at}: ${esc(x.body.reason)}`; });
   $('#main').querySelectorAll('[data-f]').forEach((el) => el.onchange = () => { S.filters[el.dataset.f] = el.value; renderOverview(); });
   $('#advbtn').onclick = () => { S.adv = !S.adv; renderOverview(); };
   $('#clear').onclick = () => { S.filters = {}; renderOverview(); };
@@ -304,6 +306,8 @@ function uncertaintyHtml(v) {
     <div><span class="k">Evidence</span><span class="tag ${v.evidence_completeness === 'complete' ? 'green' : 'red'}">${esc(v.evidence_completeness.replace(/_/g, ' '))}</span></div>
     <div><span class="k">Understanding</span><span class="tag ${v.understanding.supported ? 'green' : 'red'}">${v.understanding.supported ? 'language supported' : `“${esc(v.language)}” not understood`}</span></div></div>
     ${items.length ? `<ul class="plain">${items.map(([k, x]) => `<li><b>${k}:</b> ${esc(x)}</li>`).join('')}</ul>` : '<div class="small">No conflicts or gaps detected. Absence of a flag is not proof.</div>'}
+    ${v.model_input?.injection_removed ? `<div style="margin-top:8px"><span class="tag red">Injection</span> <span class="small">${v.model_input.injection_removed} instruction(s) aimed at the triage system were removed from what any model sees. The rules still read the original text.</span></div>` : ''}
+    ${v.severity.current === 'L1' && v.lane === 'agent' ? `<div style="margin-top:8px"><b style="font-size:13px">Automation eligibility</b> ${v.automation.live_eligibility.eligible ? `<span class="tag green">eligible${v.automation.state === 'shadow_eligible' ? ' · shadow mode' : ''}</span>` : v.automation.live_eligibility.reasons.map((r) => `<span class="tag ${r === 'text_only_needs_live_ai_confirmation' ? 'amber' : ''}">${esc(r === 'text_only_needs_live_ai_confirmation' ? 'second key: only the reporter’s words support SP-1, so a live model must agree (or you confirm)' : r.replace(/_/g, ' '))}</span>`).join(' ')}</div>` : ''}
     ${v.links.candidates.length ? `<div style="margin-top:8px"><b style="font-size:13px">Candidate links</b> ${v.links.candidates.map((l) => `<span class="tag blue">${l.case_id} · ${esc(l.basis)} · ${l.status}</span>`).join(' ')} <span class="small">Same IDs are a candidate link, not proof of a duplicate.</span></div>` : ''}`;
 }
 

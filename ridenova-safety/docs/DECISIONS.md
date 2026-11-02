@@ -19,7 +19,8 @@ Automate the groundwork, not the accountability. Severity, danger, handling lane
    - no protected allegation, active or past danger, repeat-conduct history, policy gap, injection, conflict or candidate link;
    - no safety-feature use;
    - confidence ≥ 0.75;
-   - no prior human reassessment or failed automation (each needs an explicit release).
+   - no prior human reassessment or failed automation (each needs an explicit release);
+   - **second key:** if only the reporter's words support SP-1 (no system observation such as an ETA slip, route tolerance or a no-damage photo), a *live* model must independently agree it is L1. Otherwise a human confirms with one click. This affects 771 of the 3,227 L1 cases.
 
    **Default: shadow mode.** Eligibility is recorded but cases go to agents. Duty managers can enable it for the fictional SP-1 demo.
 3. **Agent (Lane C):** everything else. L3 needs a capability: violence and sexual misconduct; threats and exposure; or safety incidents. Low confidence or missing evidence blocks automation but does not make a case a manager emergency.
@@ -58,3 +59,10 @@ Automate the groundwork, not the accountability. Severity, danger, handling lane
 ## Data and evidence
 - Each nested block is treated as a separate mocked source with id, status, version and retrieval time, recorded at the replay receipt time.
 - A reporter's number of past reports is **never** counter-evidence. That earlier signal was removed.
+
+## Ported from the alternative build
+Four ideas were taken from a separately built version of this exercise and re-implemented here with tests (`tests/ports.test.mjs`):
+1. **Hash-chained access log** (`server/eventlog.mjs`, `/api/audit/verify`). It is tamper-evident; retention purges only a prefix and records the anchor the chain resumes from.
+2. **Retention by tier** after resolution: L1 180 d, L2 365 d, L3/L4 730 d (env `RETENTION_L*_DAYS`); access log 3 years (`ACCESS_LOG_RETENTION_DAYS`). Expired work records become a `record.purged` tombstone, so the case never re-enters a queue.
+3. **Injection removed from model input** (`src/sanitize.js`). Delimited directives and directive clauses are replaced by "⟪instruction removed⟫" unless the clause also carries harm, danger or violence language. The rules and floors still read the original text.
+4. **Second key for text-only SP-1 automation** (`routing.automationEligibility`), as described above.

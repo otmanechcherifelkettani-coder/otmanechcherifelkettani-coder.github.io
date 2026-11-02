@@ -5,7 +5,7 @@ import { slaStatus } from './sla.js';
 import { viewLevel } from './permissions.js';
 import { requiredCapability, automationEligibility } from './routing.js';
 import { QUEUES, USERS, EXEC_ACTIONS, CAPABILITIES, POLICY_VERSION } from './catalog.js';
-import { redactText, maskName, maskPhone, maskEmail, maskPlate } from '../pii.js';
+import { redactText, maskName, maskPhone, maskEmail, maskPlate, redactForAI } from '../pii.js';
 import { policyById } from '../policy.js';
 import { recommend } from './assess.js';
 
@@ -122,6 +122,7 @@ export function caseView(s, raw, user, now, revealed = {}) {
     lane: s.lane, queue: s.queue, queue_label: QUEUES[s.queue]?.label, required_capability: requiredCapability(s), capability_label: CAPABILITIES[requiredCapability(s)],
     owner: s.owner, owner_name: userName(s.owner), workflow: s.workflow, escalation_reason: s.escalation_reason, handoff: { ...s.handoff, from_name: userName(s.handoff.from), accepted_by_name: userName(s.handoff.accepted_by) },
     automation: { ...s.automation, live_eligibility: automationEligibility(s) },
+    model_input: { injection_removed: redactForAI(raw).injection_removed },
     decisions: s.decisions.map((d) => ({ ...d, by_name: userName(d.by) })), executions: s.executions.map((x) => ({ ...x, label: EXEC_ACTIONS[x.action]?.label })),
     steps: s.steps.map((x) => ({ ...x, by_name: userName(x.by) })), reassessments: s.reassessments.map((x) => ({ ...x, by_name: userName(x.by) })),
     clocks: s.clocks, sla, links: s.links, resolution: s.resolution || null,

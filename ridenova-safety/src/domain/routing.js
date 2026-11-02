@@ -29,6 +29,11 @@ export function automationEligibility(state) {
   if (f.has('safety_feature_used')) r.push('safety_feature_used');
   if (state.severity.reviewed && state.severity.reviewed !== state.severity.proposed) r.push('human_reassessed');
   if (state.automation.release_required) r.push('automation_not_released_after_reassessment');
+  // Second key: when only the reporter's words (no system observation) support SP-1, a live model
+  // must independently agree it is L1. Otherwise a human confirms with one click.
+  const sp1 = state.policy.conditions.filter((c) => c.policy === 'SP-1');
+  const systemBacked = sp1.some((c) => c.basis !== 'allegation');
+  if (!systemBacked && !(state.ai.mode === 'live' && state.ai.severity === 'L1')) r.push('text_only_needs_live_ai_confirmation');
   return { eligible: r.length === 0, reasons: r };
 }
 

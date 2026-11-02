@@ -10,8 +10,8 @@ Setup: `rm -rf data/runtime && npm start`, then open http://localhost:8080/conso
 5. Explain the SLA table. Tier means the highest tier the case has held. The replay clock is 8 March, 08:00 UTC, and the data contains no real responses, so this is **not** historical performance.
 
 ## a) Upstream automation and an exception (1.5 min)
-1. Under *Automation and exceptions*: 3,227 cases are **shadow-eligible**, but nothing is automated yet.
-2. Click **Enable SP-1 automation (demo)** and confirm. About 3,074 are completed by the **simulated** adapter and about 153 fail by design and are *sent to review*. None of them entered an agent queue first.
+1. Under *Automation and exceptions*: 2,456 cases are **shadow-eligible**, but nothing is automated yet. Another 771 L1 cases are supported only by the reporter’s words, so the second key keeps them with a human (one-click confirm) unless a live model agrees.
+2. Click **Enable SP-1 automation (demo)** and confirm. About 2,342 are completed by the **simulated** adapter and about 114 fail by design and are *sent to review*. None of them entered an agent queue first.
 3. Sign in as **Alex Moreau (agent, EMEA)**. Open a case flagged **Automation exception**: the failed execution is visible, and the case is in human review, not resolved.
 
 ## b) Agent investigation (2 min)

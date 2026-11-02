@@ -76,7 +76,7 @@ function arrow(s, x1, y1, x2, y2, color = HEX.g500) { s.addShape(pres.shapes.LIN
   text(s, 'Product thesis', 4.3, 1.85, 4.4, 0.35, { fontSize: 15, bold: true, color: C.background1 });
   steps.forEach((t, i) => { circleNum(s, i + 1, 4.3, 2.3 + i * 0.66, HEX.white, HEX.black); text(s, t, 4.85, 2.33 + i * 0.66, 3.9, 0.4, { fontSize: 14, color: C.background1, valign: 'middle' }); });
   text(s, 'Intended outcomes', 9.1, 1.85, 3.8, 0.35, { fontSize: 15, bold: true, color: C.background1 });
-  const outs = [['< 5 min', 'L4 time to acknowledgement (p95)', 'Target'], ['0', 'L3+ cases found in the automation lane by QA', 'Target'], ['≈ −48%', 'reviewer hours per 1,000 cases', 'Estimate'], ['100%', 'active cases with an accountable queue or owner', 'Implemented']];
+  const outs = [['< 5 min', 'L4 time to acknowledgement (p95)', 'Target'], ['0', 'L3+ cases found in the automation lane by QA', 'Target'], ['≈ −42%', 'reviewer hours per 1,000 cases', 'Estimate'], ['100%', 'active cases with an accountable queue or owner', 'Implemented']];
   outs.forEach(([v, l, k], i) => { box(s, 9.1, 2.3 + i * 1.08, 3.75, 0.95, HEX.g800 || '1F1F1F'); text(s, v, 9.28, 2.38 + i * 1.08, 1.6, 0.5, { fontSize: 22, bold: true, color: C.background1 }); text(s, l, 9.28, 2.82 + i * 1.08, 3.4, 0.35, { fontSize: 12, color: 'CBCBCB' }); tag(s, k, 11.6, 2.43 + i * 1.08); });
 }
 
@@ -109,7 +109,7 @@ function arrow(s, x1, y1, x2, y2, color = HEX.g500) { s.addShape(pres.shapes.LIN
   text(s, 'Structured danger checks run immediately: SOS, GPS at home, live stop', 0.5, 3.25, 2.2, 1.0, { fontSize: 11, color: '545454' });
   const lanes = [
     ['A', 'Duty manager', 'L4 OR any danger signal, whatever the AI proposed', 'Alert + explicit ownership; no auto close / downgrade', '138', 'FDE7E3', 'A3130A'],
-    ['B', 'Eligible automation', 'Explicit SP-1 + complete evidence + supported language + no exclusion', 'Upstream; states eligible → completed / failed → review', '0 now · 3,227 shadow-eligible', 'E6F2EC', '03703C'],
+    ['B', 'Eligible automation', 'Explicit SP-1 + complete evidence + supported language + no exclusion', 'Upstream; states eligible → completed / failed → review', '0 now · 2,456 shadow-eligible', 'E6F2EC', '03703C'],
     ['C', 'Agent review', 'Everything else; L3 → specialist capability queue', 'Smart summary, next step, one primary action', '4,862', 'EEEEEE', '000000'],
   ];
   lanes.forEach(([k, name, entry, beh, count, bg, fg], i) => {
@@ -122,7 +122,7 @@ function arrow(s, x1, y1, x2, y2, color = HEX.g500) { s.addShape(pres.shapes.LIN
     text(s, beh, 8.75, y + 0.18, 2.4, 1.1, { fontSize: 12, color: '333333' });
     text(s, count, 11.2, y + 0.18, 1.5, 0.9, { fontSize: count.length > 6 ? 13 : 24, bold: true, color: fg, align: 'right' });
   });
-  text(s, 'Exclusions from B: protected allegation · danger (now or past) · repeat-conduct history · policy gap · injection · conflict · candidate link · safety-feature use · confidence < 0.75 · human reassessment', 0.5, 6.62, 9.8, 0.4, { fontSize: 11, color: '545454' });
+  text(s, 'Exclusions from B: protected allegation · danger (now or past) · repeat-conduct history · policy gap · injection · conflict · candidate link · safety-feature use · confidence < 0.75 · human reassessment · text-only SP-1 without live-AI agreement (second key)', 0.5, 6.55, 10.6, 0.45, { fontSize: 11, color: '545454' });
   legend(s, ['Measured'], 6.72);
 }
 
@@ -183,7 +183,7 @@ function arrow(s, x1, y1, x2, y2, color = HEX.g500) { s.addShape(pres.shapes.LIN
   box(s, 6.55, 1.85, 3.0, 1.4, 'FDE7E3'); text(s, 'Structured danger checks', 6.7, 1.95, 2.7, 0.35, { fontSize: 14, bold: true, color: 'A3130A' }); text(s, 'At receipt, no AI: SOS · GPS near home after trip · live stop → alert + route A', 6.7, 2.32, 2.75, 0.9, { fontSize: 12 });
   card(s, 6.55, 3.4, 3.0, 2.9, 'AI preparation', ['Smart summary', 'Translation (labelled live / fixture / none)', 'Triage: tier, confidence, uncertainty', 'Policy: conditions, checks, “not covered”', 'Recommendation: step, actor, urgency'], { size: 12 });
   arrow(s, 9.6, 4.0, 10.0, 4.0);
-  card(s, 10.0, 1.85, 2.85, 4.45, 'Validate, then floor', ['Schema + allowed values; invalid → safest (L3 review)', 'Citations must be SP-1..9', 'Deterministic floors: SP-7, SP-8, SP-6, injection', 'Unsupported language → provisional L2, never L1', 'Outage → keep last assessment; humans continue'], { size: 12, fill: 'F6F6F6' });
+  card(s, 10.0, 1.85, 2.85, 4.45, 'Validate, then floor', ['Schema + allowed values; invalid → safest (L3 review)', 'Citations must be SP-1..9', 'Injection text removed before any model sees it; rules read the original', 'Deterministic floors: SP-7, SP-8, SP-6, injection', 'Unsupported language → provisional L2, never L1', 'Outage → keep last assessment; humans continue'], { size: 12, fill: 'F6F6F6' });
   legend(s, ['Implemented', 'Simulated', 'Open'], 6.72);
   text(s, 'Open: live Claude path implemented but not run or benchmarked here', 0.5, 6.62, 8, 0.35, { fontSize: 11, color: 'A3130A' });
 }
@@ -193,8 +193,8 @@ function arrow(s, x1, y1, x2, y2, color = HEX.g500) { s.addShape(pres.shapes.LIN
   const s = slide('CONTENT', null, '8 · Safety, privacy, automation and execution controls', 'Controls are code and tests, not prompts, and nothing claims to have happened unless it executed',
     'Four groups of controls. Execution goes through a clearly labelled simulated adapter; about 5% of actions fail deterministically so the exception path is exercised. Redaction is pattern-based, not anonymisation; local JSONL is durable but not tamper-proof.');
   card(s, 0.5, 1.85, 6.05, 2.25, 'Safety', ['SP-7 danger → manager lane + alert, whatever the AI says', 'SP-8 violence / sexual → human review despite counter-evidence', 'SP-9 same-behaviour history → +1 tier', 'Report text is data: injection flagged → specialist', 'A reporter’s report count is never counter-evidence'], { size: 12 });
-  card(s, 6.8, 1.85, 6.05, 2.25, 'Privacy', ['Server-side scopes; browser never gets raw PII to hide', 'Masked by default; reveal needs ownership + logged reason', 'Redaction + pseudonymous IDs before external AI', 'Exports: duty managers only, no PII, logged · retention purge'], { size: 12 });
-  card(s, 0.5, 4.25, 6.05, 2.3, 'Automation', ['Shadow by default; demo switch for fictional SP-1 only', 'States: eligible → queued → running → completed / failed → sent to review → reopened', 'Failure or reopen requires explicit release before re-automation'], { size: 12 });
+  card(s, 6.8, 1.85, 6.05, 2.25, 'Privacy', ['Server-side scopes; browser never gets raw PII to hide', 'Masked by default; reveal needs ownership + logged reason', 'Redaction + injection removal + pseudonymous IDs before external AI', 'Hash-chained access log (tamper-evident) · exports: managers only, no PII', 'Retention by tier: L1 180 d · L2 365 d · L3/L4 730 d · log 3 yrs'], { size: 12 });
+  card(s, 0.5, 4.25, 6.05, 2.3, 'Automation', ['Shadow by default; demo switch for fictional SP-1 only', 'Second key: text-only SP-1 needs a live model to agree; else one-click human confirm', 'States: eligible → queued → running → completed / failed → sent to review → reopened', 'Failure or reopen requires explicit release before re-automation'], { size: 12 });
   card(s, 6.8, 4.25, 6.05, 2.3, 'Execution', ['Recommendation → decision → execution → confirmed outcome', 'Idempotency keys on every command; execution keys per decision', 'Draft ≠ sent · approved escalation ≠ acknowledged handoff · attempt ≠ resolved'], { size: 12 });
   legend(s, ['Implemented', 'Simulated']);
 }
@@ -205,7 +205,7 @@ function arrow(s, x1, y1, x2, y2, color = HEX.g500) { s.addShape(pres.shapes.LIN
     'Measured on the prototype with the simulated provider. Silver labels are scenario-level and AI-assisted; the 30 reference labels were drafted by AI and await the candidate’s adjudication, so no independent validation is claimed. Over-triage rose because unsupported languages now go to humans.');
   const rows = [
     ['L4 cases routed to duty manager', '138 / 138', 'Measured'], ['L3+ recall (silver)', '519 / 523 (misses → human L2)', 'Measured'], ['Automated cases whose label isn’t L1', '0 (demo automation on)', 'Measured'],
-    ['Over-triage vs silver', '404 (mostly not-understood languages)', 'Measured'], ['Acceptance tests', '34/34 unit+API · 5/5 browser', 'Measured'], ['AI-drafted reference set (30)', '29/30, not independent', 'Open'],
+    ['Over-triage vs silver', '404 (mostly not-understood languages)', 'Measured'], ['Acceptance tests', '40/40 unit+API · 5/5 browser', 'Measured'], ['AI-drafted reference set (30)', '29/30, not independent', 'Open'],
   ];
   rows.forEach(([k, v, t], i) => { const y = 1.9 + i * 0.6; box(s, 0.5, y, 7.4, 0.5, i % 2 ? HEX.white : HEX.g50); text(s, k, 0.65, y, 3.4, 0.5, { fontSize: 13, valign: 'middle' }); text(s, v, 4.0, y, 2.8, 0.5, { fontSize: 13, bold: true, valign: 'middle' }); tag(s, t, 6.85, y + 0.12); });
   text(s, 'Tests prove coded rules behave as specified, not policy completeness or production safety.', 0.5, 5.6, 7.4, 0.5, { fontSize: 12, color: '545454' });

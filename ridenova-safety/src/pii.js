@@ -6,6 +6,8 @@
 // stranger's name that appears only in free text. Production would add an NER model running
 // inside the boundary.
 
+import { stripInjection } from './sanitize.js';
+
 export const ROLES = {
   agent:      { label: 'Safety agent (L1/L2)', reveal: false, maxTier: 'L2', note: 'Masked PII. Cannot reveal.' },
   specialist: { label: 'Safety specialist (L3/L4)', reveal: true, maxTier: 'L4', note: 'Masked by default. Reveal per field with a logged reason.' },
@@ -67,7 +69,12 @@ export function pseudonym(id) {
 
 // The ONLY object that may be sent to an external AI provider. No PII block, pseudonymous IDs,
 // free text redacted. Unit-tested in tests/pii.test.mjs.
+// Text sent to a model: PII redacted first, then instructions aimed at the triage system removed
+// (src/sanitize.js). The deterministic rules always scan the original text.
 export function redactForAI(c) {
+  const clean = (t) => stripInjection(redactText(t, c));
+  const report = clean(c.report_text);
+  const atts = (c.attachments || []).map(clean);
   return {
     case_ref: c.case_id,
     reporter_ref: pseudonym(c.reporter_id),
@@ -75,10 +82,11 @@ export function redactForAI(c) {
     region: c.region_group, country: c.country, city: c.city,
     channel: c.channel, language: c.language,
     reporter_role: c.reporter_role, reported_party_role: c.reported_party_role,
-    report_text: redactText(c.report_text, c),
+    report_text: report.text,
+    injection_removed: report.removed.length + atts.reduce((n, a) => n + a.removed.length, 0),
     trip_context: { product: c.trip_context?.product, local_time: c.trip_context?.local_time, trip_status: c.trip_context?.trip_status },
     history: c.history,
-    attachments: (c.attachments || []).map((a) => redactText(a, c)),
+    attachments: atts.map((a) => a.text),
     safety_toolkit_log: c.safety_toolkit_log ? redactText(c.safety_toolkit_log, c) : null,
     telematics_summary: redactText(c.telematics_summary, c),
   };

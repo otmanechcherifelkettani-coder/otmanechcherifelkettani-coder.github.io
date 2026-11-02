@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-11-01T13:53:28.470Z",
- "boot_ms": 798,
+ "generated_at": "2026-11-02T09:12:10.777Z",
+ "boot_ms": 711,
  "shadow_mode": {
   "lanes": {
    "manager": 138,
@@ -19,18 +19,18 @@
    "L3": 355
   },
   "automation": {
-   "not_applicable": 1773,
-   "shadow_eligible": 3227
+   "not_applicable": 2544,
+   "shadow_eligible": 2456
   },
   "alerts": 138
  },
  "demo_automation_enabled": {
   "automation": {
-   "not_applicable": 1773,
-   "completed": 3074,
-   "sent_to_review": 153
+   "not_applicable": 2544,
+   "completed": 2342,
+   "sent_to_review": 114
   },
-  "resolved": 3074,
+  "resolved": 2342,
   "automated_but_silver_not_L1": 0
  },
  "silver": {

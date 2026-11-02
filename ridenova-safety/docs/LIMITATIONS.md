@@ -9,11 +9,12 @@
 **Security and privacy**
 - Sign-in is **simulated**: you pick a profile, and a session token maps to it. The server enforces scopes on every request, but this is not real authentication, SSO or production RBAC.
 - Redaction is pattern-based plus known-value matching. A stranger's name that appears only in free text is not caught. This is not complete anonymisation.
-- Records live in local append-only JSONL files. They are durable across refresh and restart but are **not tamper-proof or immutable audit storage**.
-- Retention purges by real recording time on server start. No legal retention schedule exists yet.
+- Records live in local JSONL files that survive refresh and restart. The access log is **hash-chained**, so an edited, inserted or deleted entry is detected (`/api/audit/verify`). That makes it tamper-evident, **not tamper-proof**: someone with file access could rewrite the whole chain. Production would anchor the head hash in storage the operator cannot write. The case-event log is not chained.
+- Retention runs on server start. Resolved cases' work records are replaced by a tombstone after **L1 180 / L2 365 / L3–L4 730 days** from resolution, and the access log keeps **3 years**. These periods are assumptions to set with Legal per country; no legal schedule exists yet.
 - Exports have no personal data and are restricted to duty managers. They are still downloadable files that need governance.
 
 **AI**
+- Injection removal is pattern-based. It removes all 50 directives in this dataset without cutting the reported threat, but new phrasings can slip through. The rules always read the original text, and the case is still flagged and sent to a specialist.
 - Without `ANTHROPIC_API_KEY`, all AI output is **simulated** (rules plus a multilingual lexicon). The lexicon was tuned on this same file, so its results are in-sample.
 - The live Claude path (re-assessment, translation, policy Q&A) is implemented with validation and failure handling but was **not run** in the build environment (no key). It has not been benchmarked.
 - Confidence scores are **uncalibrated**.
@@ -22,6 +23,7 @@
 **Execution and automation**
 - Every action goes through a **simulated adapter**. Nothing is sent, charged or suspended. Failures are deterministic (about 5%) to exercise the exception path.
 - Emergency services are never contacted by the system. Managers record what they did themselves.
+- The second-key rule means the 771 text-only L1 cases can only be automated with a live model, which has not been run here.
 - Automation starts in shadow mode. "Enable" is a demo switch for fictional SP-1 cases only, with no gradual or per-market rollout control.
 
 **Validation**

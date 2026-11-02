@@ -127,6 +127,13 @@ export function applyEvent(s, ev) {
       s.automation.release_required = true; s.automation.eligible = false;
       s.severity.max_held = maxTier(s.severity.max_held, p.to); // never loosens the clock
       break;
+    case 'record.purged':
+      // Retention: the case's work records were deleted; only this tombstone remains.
+      s.workflow = 'resolved'; s.clocks.resolved_at = p.resolved_at; s.owner = null;
+      s.resolution = { outcome: 'purged_by_retention', reason: `Retention period for ${p.tier} (${p.retention_days} days) elapsed`, by: ev.actor, at: p.resolved_at, recorded_at: ev.recorded_at };
+      for (const a of s.danger.alerts) if (!a.acknowledged_at) { a.acknowledged_at = p.resolved_at; a.acknowledged_by = 'record purged'; }
+      s.flags = [...new Set([...s.flags, 'retention_purged'])];
+      break;
     case 'severity.reviewed':
       s.severity.reviewed = p.tier;
       break;
@@ -136,7 +143,7 @@ export function applyEvent(s, ev) {
       break;
     }
     case 'case.resolved':
-      s.workflow = 'resolved'; setOnce(s.clocks, 'resolved_at', ev.at); s.resolution = { outcome: p.outcome, reason: p.reason, by: ev.actor, at: ev.at };
+      s.workflow = 'resolved'; setOnce(s.clocks, 'resolved_at', ev.at); s.resolution = { outcome: p.outcome, reason: p.reason, by: ev.actor, at: ev.at, recorded_at: ev.recorded_at };
       if (p.danger_status) s.danger.status = p.danger_status;
       break;
     case 'case.reopened':

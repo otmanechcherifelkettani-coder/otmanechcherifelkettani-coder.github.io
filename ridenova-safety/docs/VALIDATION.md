@@ -18,7 +18,7 @@ Reproduce with `npm run evaluate` (writes `validation/results.json`). The figure
 | L3+ recall (silver) | **519 / 523**. The 4 misses (SC-3570, SC-4268, SC-4275, SC-4278) are L2 human review, not automated. |
 | Tier agreement (silver) | 91.8%, with 4 under-triaged and **404 over-triaged** |
 | Automation-eligible cases whose silver label is not L1 | **0** |
-| With demo automation enabled: automated cases whose silver label is not L1 | **0** (3,074 completed and 153 failed → human review; failures are simulated) |
+| With demo automation enabled: automated cases whose silver label is not L1 | **0** (2,342 completed and 114 failed → human review; failures are simulated) |
 | AI-drafted reference (30) | 29/30 tier (1 over-triaged: a Swahili music complaint sent to a human) |
 | Full intake of 5,000 cases | ~0.7–1.1 s |
 
@@ -29,4 +29,4 @@ Reproduce with `npm run evaluate` (writes `validation/results.json`). The figure
 - **No calibration:** confidence is a heuristic score.
 
 ## What tests prove
-The 34 unit/API tests and 5 browser tests show that the coded rules behave as specified: routing precedence, permissions, reassessment controls, clocks, idempotency, redaction and persistence. They are not proof of complete policy coverage, model accuracy or production safety.
+The 40 unit/API tests and 5 browser tests show that the coded rules behave as specified: routing precedence, permissions, reassessment controls, clocks, idempotency, redaction and persistence. They are not proof of complete policy coverage, model accuracy or production safety.

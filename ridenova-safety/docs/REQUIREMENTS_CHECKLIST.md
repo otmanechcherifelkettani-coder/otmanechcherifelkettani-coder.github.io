@@ -2,7 +2,7 @@
 
 Status key: **Implemented** (works, tested) · **Simulated** (works against a labelled simulation) · **Partial** · **Not done**.
 Test IDs: `D` = tests/domain.test.mjs, `A` = tests/api.test.mjs, `P` = tests/pii_ai.test.mjs, `E` = tests/e2e/workflows.e2e.mjs.
-Last run: 34/34 unit and API tests and 5/5 browser tests passing.
+Last run: 40/40 unit and API tests and 5/5 browser tests passing. `T` = tests/ports.test.mjs.
 
 ## Original brief (authoritative)
 
@@ -14,7 +14,7 @@ Last run: 34/34 unit and API tests and 5/5 browser tests passing.
 | Approve, override (choose action) or escalate with a reason, on the same screen | Implemented | Agent workspace; D15, E(b) |
 | L1 auto-resolution follows policy; AI never closes L3/L4; danger → immediate alert, never auto-closed or downgraded | Implemented | `routing.js`; D4, D7, D10b |
 | SP-8: violence or sexual allegations need human review despite counter-evidence | Implemented | D “policy · SP-8” |
-| Masking, role-based access, redaction before external AI, retention, access logging | Implemented (prototype grade) | `views.caseView`, `/reveal`, `eventlog` retention; A18/19, P1–2, D19b |
+| Masking, role-based access, redaction before external AI, retention, access logging | Implemented (prototype grade): hash-chained access log, retention by tier | T1, T1b, T2,  `views.caseView`, `/reveal`, `eventlog` retention; A18/19, P1–2, D19b |
 | Different paths for low and critical cases; all 5,000 load; queue by severity then deadline; region/country/language filters; on-demand translation | Implemented | D1, D2, A1, E(e) |
 | Structured records, search, CSV/JSON export with the minimum columns | Implemented | `views.exportRow`; D18, A18 |
 | README (~5 commands), working AI integration, key-free demo, no secrets, tests, replaceable provider | Implemented (live path unrun) | README; `providers.mjs` |
@@ -43,14 +43,14 @@ Last run: 34/34 unit and API tests and 5/5 browser tests passing.
 | 8 | Summary separates allegation, observation, history and AI interpretation | Implemented | Agent workspace labels |
 | 8 | Triage, policy assessment and recommendation outputs; translation labelled; unsupported translation is never low risk | Implemented | D14, A14 |
 | 8 | Replaceable provider, structured validation, citation validation, explicit failures | Implemented | `providers.mjs`, `ai.validateTriage`; P5, A13 |
-| 9 | SP-7, SP-8, SP-9; frequent reporters not penalised; public text treated as data | Implemented | D policy tests, P3 |
+| 9 | SP-7, SP-8, SP-9; frequent reporters not penalised; public text treated as data (and directives removed from model input, T3); second key for text-only automation (T4) | Implemented | D policy tests, P3 |
 | 9 | Outage, malformed output, gaps and missing evidence leave a human path | Implemented | A13, P5 |
 | 9 | Recommendation → decision → execution → confirmed outcome kept distinct | Implemented | D15 |
 | 9 | Automation states; idempotency; simulated adapter | Implemented / Simulated | D8, D19a, A19 |
 | 10 | Every active case has a queue or owner; lifecycle with escalation and reopening | Implemented | `case.js`, `workbench.command` |
 | 10 | Separate timestamps; clocks never reset; escalation tightens; no pause while awaiting information | Implemented | `sla.js`; D10/11, D “SLA” |
 | 10 | Replay and timezone assumptions documented; no historical SLA claimed | Implemented | DECISIONS.md, Overview copy |
-| 11 | Backend boundaries, masking, minimisation, access and decision logging, persistent versioned records, retention, protected exports | Implemented (prototype grade; see LIMITATIONS) | A17, A18/19 |
+| 11 | Backend boundaries, masking, minimisation (incl. injection removal before inference), tamper-evident access log, decision logging, persistent versioned records, tier-based retention, protected exports | Implemented (prototype grade; see LIMITATIONS) | A17, A18/19 |
 | 11 | Overrides and errors captured for QA; no automatic retraining | Partial: captured in the event log; no QA sampling UI | — |
 | 12 | Accessibility: keyboard navigation, labelled controls, text labels with colours, responsive layout | Partial: skip link, focus styles, j/k navigation, labelled controls, text labels; no formal WCAG audit | — |
 | 13 | Tests 1–20 | Implemented: see the mapping in the test titles | all test files |
