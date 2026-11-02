@@ -36,11 +36,11 @@ npm test            # 40 unit + API tests
 npm run test:e2e    # 5 browser workflow tests
 npm start           # http://localhost:8080/console.html</pre>
   <h2>Overview</h2><p>Every breakdown reconciles to the filtered population. Severity is labelled by basis: AI-proposed, current or human-reviewed.</p>
-  <figure><img src="overview.png" alt="Overview screen with filters, population counts, severity distribution and handling lanes"><figcaption>Duty-manager scope, replay clock, automation in shadow mode.</figcaption></figure>
-  <h2>Agent workspace</h2><p>Five questions (what happened, evidence, policy, uncertainty, next step) and one primary action.</p>
-  <figure><img src="agent.png" alt="Agent workspace showing a case summary, the redacted report and evidence sources with their status"></figure>
-  <h2>Duty-manager workspace</h2><p>Why it is dangerous, the timing strip, accountable owner and policy next steps. Acknowledging is not a response.</p>
-  <figure><img src="manager.png" alt="Duty-manager workspace with a danger banner, five timestamps and the response checklist"></figure>
+  <figure><img src="overview.png" alt="Overview screen with filters, population counts, severity distribution and handling lanes"><figcaption>An APAC agent sees 803 of 5,000 cases; the scope banner says so. Duty managers see all 5,000.</figcaption></figure>
+  <h2>Agent workspace</h2><p>Five questions (what happened, evidence, policy, uncertainty, next step) and one primary action. Non-English reports show an English translation prepared in advance (not live AI) under the original.</p>
+  <figure><img src="agent.png" alt="Agent workspace showing a Japanese report with its English translation, the support-ticket reference and evidence sources"></figure>
+  <h2>Duty-manager workspace</h2><p>Why it is dangerous and the on-call page it triggered, the timing strip, accountable owner, then four steps ending in <b>Close the case</b>. Ticketing, paging and enforcement are mock adapters.</p>
+  <figure><img src="manager.png" alt="Duty-manager workspace with a danger banner, the on-call page record, five timestamps and the four-step checklist"></figure>
   <h2>Controlled reassessment</h2><p>Evidence, policy, a reason and a human destination are required. Alerts, clocks and the AI proposal are preserved, and a downgrade never closes or automates the case.</p>
   <figure><img src="reassess.png" alt="Reassessment dialog with new severity, danger assessment, evidence checkboxes, policy clause, destination queue and reason"></figure>
 </div>

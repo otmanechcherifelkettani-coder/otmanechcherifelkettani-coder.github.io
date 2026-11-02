@@ -18,7 +18,7 @@ export class SimulatedProvider {
   async translate(c) {
     if (c.language === 'en') return { status: 'not_needed', text: null, source: 'Already English' };
     const f = this.fixtures[c.case_id];
-    if (f) return { status: 'fixture', text: f.en, source: 'Fixture: precomputed at development time (not live output)' };
+    if (f) return { status: 'fixture', text: f.en, source: f.by };
     return { status: 'unavailable', text: null, source: SUPPORTED_LANGUAGES.has(c.language) ? 'No machine translation in demo mode' : `Language “${c.language}” not supported in demo mode` };
   }
   async policyQA(q) { return answerPolicyLocally(q); }

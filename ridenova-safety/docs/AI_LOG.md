@@ -9,7 +9,7 @@
 |---|---|---|
 | Data exploration | Clustering cases by system-field signatures; per-language samples | Confirm the scenario interpretation |
 | Reference labels | **Drafted** the scenario table (silver) and the 30 case-level reference labels with rationales | **Adjudicate** them in `validation/candidate_adjudication.json`. Until then they are not independent validation. |
-| Translations | English fixtures for the 23 non-English reference cases (labelled “fixture” in the UI) | Spot-check |
+| Translations | English translations of all 2,923 unique non-English reports, produced in advance by ten parallel Claude helpers and merged by script. Number and time alignment was checked automatically for every text. Labelled “prepared in advance, not live AI” in the UI. | Spot-check, especially romanised South Asian languages and dialects |
 | Lexicon | Multilingual term drafts | Review false-positive terms |
 | Code, tests, docs, decks | First drafts and iterations | Be able to explain every choice and number |
 
@@ -24,6 +24,8 @@ A second, separately built version of this exercise (a Python prototype) was com
 - The earlier AI-use log claimed the candidate had labelled the 30 reference cases. They were AI-drafted; this log corrects that.
 - The first injection stripper's placeholder text itself triggered the injection detector, and Hindi sentence endings (।) weren't recognised, which left one directive in place. Caught by the tests.
 - Timing assumptions in the browser tests: assertions ran before server responses arrived.
+- The first translation fixtures were labelled “reviewed by the candidate”. They had not been reviewed; the label now says so.
+- The translation helpers shared one scratch folder and overwrote each other's intermediate files. Each helper rebuilt its output and checked it against its own input ids, and the merge re-checked number and time alignment for every text.
 
 ## Not delegated / guarded
 - Policy interpretation, routing precedence and reassessment rules are written as code and checked by tests, not left to prompts.

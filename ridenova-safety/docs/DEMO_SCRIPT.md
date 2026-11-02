@@ -29,10 +29,11 @@ Setup: `rm -rf data/runtime && npm start`, then open http://localhost:8080/conso
 1. As **Jordan Lee**, open the top unacknowledged case (SC-0001: driver's GPS near the rider's home after the trip).
 2. Show **why this is here**: the structured telematics signal. The alert was created at receipt, before AI preparation (see History).
 3. **Acknowledge and own.** The status becomes *Under review*. First response is still "None yet": acknowledgement is not a response.
-4. Record **Contact the reporter: reached**, **Emergency services: not needed** (recorded by the manager; the system notifies no one) and **Protect: block re-matching** (simulated execution).
+4. Record **Contact the reporter: reached**, **Emergency services: not needed** (recorded by the manager; the system notifies no one) and **Protect: block re-matching** (sent to Account enforcement, a mock adapter). The danger banner shows the on-call page sent to the duty-manager rotation, and the header shows the support-ticket reference.
+5. Step 4 is now **Close the case…**: choose the danger status (for example *no longer present*), the outcome (*reporter confirmed safe*) and a reason. Closing is refused until the reporter has been contacted. To keep SC-0001 for part d, close a different L4 case, such as the next one in the list.
 
 ## d) Justified manager downgrade (1.5 min)
-1. Open **Reassess, hand off or resolve → Reassess severity**.
+1. Open **Not a danger case after all? → Reassess severity**.
 2. Try a short reason: it is rejected. Then complete the form: L2, *incorrectly detected*, evidence = Telematics, policy SP-7, destination General review, and a real reason.
 3. Result: current severity L2, reviewed L2, and AI-proposed **still L4**. Alerts and acknowledgement are kept, and the **deadline and breach are unchanged** (`max_held` stays L4). The case is handed off (pending) to a human queue: not resolved, not automated.
 4. Optional: **Demo: inject a new SOS signal**. A *fresh* alert is created and the case returns to the duty-manager lane, despite the earlier downgrade.

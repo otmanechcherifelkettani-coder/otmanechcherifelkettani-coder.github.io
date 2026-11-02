@@ -3,7 +3,7 @@
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createApp } from '../server/app.mjs';
-import { FailingProvider } from '../server/providers.mjs';
+import { FailingProvider, SimulatedProvider } from '../server/providers.mjs';
 import { tmp, cases } from './helpers.mjs';
 
 const servers = [];
@@ -64,10 +64,12 @@ test('14 · unsupported/failed translation returns no text and a not-low-risk no
   const { as } = await start({ dataDir: tmp() });
   const dm = await as('u-dm-1');
   const sw = cases.find((c) => c.language === 'sw' && c.region_group).case_id;
-  const t = await dm(`/api/cases/${sw}/ai/translate`, { method: 'POST' });
-  assert.equal(t.body.status, 'unavailable'); assert.equal(t.body.text, null); assert.match(t.body.note, /NOT treated as low risk/);
+  // Every case now ships with a stored translation, so the no-translation path is exercised on the provider directly.
+  const t = await new SimulatedProvider({}).translate(cases.find((c) => c.case_id === sw));
+  assert.equal(t.status, 'unavailable'); assert.equal(t.text, null);
   const v = (await dm(`/api/cases/${sw}`)).body;
-  assert.notEqual(v.severity.current, 'L1');
+  assert.equal(v.report.translation.status, 'stored'); // shown to humans…
+  assert.notEqual(v.severity.current, 'L1'); // …but the rules never read it: unsupported language stays out of L1
 });
 
 test('17 · records survive refresh and server restart', async () => {

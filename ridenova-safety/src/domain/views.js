@@ -5,6 +5,7 @@ import { slaStatus } from './sla.js';
 import { viewLevel } from './permissions.js';
 import { requiredCapability, automationEligibility } from './routing.js';
 import { QUEUES, USERS, EXEC_ACTIONS, CAPABILITIES, POLICY_VERSION } from './catalog.js';
+import { caseIntegrations, integrationStats, systemLabel, ACTION_TARGET } from './integrations.js';
 import { redactText, maskName, maskPhone, maskEmail, maskPlate, redactForAI } from '../pii.js';
 import { policyById } from '../policy.js';
 import { recommend } from './assess.js';
@@ -76,6 +77,7 @@ export function overview(states, f, now) {
     exceptions: { automation_exceptions: pop.filter((s) => s.flags.includes('automation_exception')).length, execution_failures: pop.filter((s) => s.executions.some((x) => x.status === 'failed')).length, reopened: pop.filter((s) => s.reopened).length },
     evidence_gaps: { missing_material: pop.filter((s) => s.evidence_completeness === 'missing_material').length, language_not_understood: pop.filter((s) => !s.understanding.supported).length },
     confidence_bands: cnt(pop, (s) => confidenceBand(s.confidence)),
+    integrations: integrationStats(pop),
   };
 }
 
@@ -94,7 +96,7 @@ export function listItem(s, now) {
     unacked: s.danger.alerts.some((a) => !a.acknowledged_at), handoff: s.handoff.status, flags: s.flags };
 }
 
-export function caseView(s, raw, user, now, revealed = {}) {
+export function caseView(s, raw, user, now, revealed = {}, stored = null) {
   const level = viewLevel(user, s);
   if (!level) return null;
   if (level === 'handoff_status') {
@@ -110,7 +112,9 @@ export function caseView(s, raw, user, now, revealed = {}) {
     region: s.region, country: s.country, country_name: s.country_name, city: s.city, product: s.product, channel: s.channel, language: s.language,
     reporter_persona: s.reporter_persona, reported_party_role: s.reported_party_role,
     report: { text: revealed.report_text ? raw.report_text : redactText(raw.report_text, raw), redacted: !revealed.report_text, original_language: raw.language,
-      translation: s.ai?.translation ? { text: s.ai.translation, source: s.ai.mode === 'live' ? `Live: ${s.ai.model}` : 'fixture' } : null },
+      // Stored English translation (prepared in advance, not live AI), redacted like the original.
+      translation: stored?.en ? { status: 'stored', text: revealed.report_text ? stored.en : redactText(stored.en, raw), source: stored.by }
+        : raw.language === 'en' ? null : { status: 'unavailable', text: null, source: 'No stored translation. The case is NOT treated as low risk; it stays in human review.' } },
     parties: { reporter: party(p.reporter, 'reporter'), reported_party: party(p.reported_party, 'reported_party'),
       addresses: p.pickup_address ? (revealed.addresses ? `${p.pickup_address} → ${p.dropoff_address}` : `••• ${p.pickup_address.split(',').pop().replace('(fictional)', '').trim()} → •••`) : null },
     sources: s.sources.map((x) => ({ ...x, facts: x.facts.map((f) => ({ ...f, value: redactText(f.value, raw) })) })),
@@ -123,7 +127,8 @@ export function caseView(s, raw, user, now, revealed = {}) {
     owner: s.owner, owner_name: userName(s.owner), workflow: s.workflow, escalation_reason: s.escalation_reason, handoff: { ...s.handoff, from_name: userName(s.handoff.from), accepted_by_name: userName(s.handoff.accepted_by) },
     automation: { ...s.automation, live_eligibility: automationEligibility(s) },
     model_input: { injection_removed: redactForAI(raw).injection_removed },
-    decisions: s.decisions.map((d) => ({ ...d, by_name: userName(d.by) })), executions: s.executions.map((x) => ({ ...x, label: EXEC_ACTIONS[x.action]?.label })),
+    decisions: s.decisions.map((d) => ({ ...d, by_name: userName(d.by) })), executions: s.executions.map((x) => ({ ...x, label: EXEC_ACTIONS[x.action]?.label, target: systemLabel(ACTION_TARGET[x.action]) })),
+    integrations: caseIntegrations(s),
     steps: s.steps.map((x) => ({ ...x, by_name: userName(x.by) })), reassessments: s.reassessments.map((x) => ({ ...x, by_name: userName(x.by) })),
     clocks: s.clocks, sla, links: s.links, resolution: s.resolution || null,
     history: s.history.map((h) => ({ ...h, actor_name: userName(h.actor) || h.actor })),

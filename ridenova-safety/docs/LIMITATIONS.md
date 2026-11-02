@@ -18,7 +18,7 @@
 - Without `ANTHROPIC_API_KEY`, all AI output is **simulated** (rules plus a multilingual lexicon). The lexicon was tuned on this same file, so its results are in-sample.
 - The live Claude path (re-assessment, translation, policy Q&A) is implemented with validation and failure handling but was **not run** in the build environment (no key). It has not been benchmarked.
 - Confidence scores are **uncalibrated**.
-- Demo translations are fixtures for 23 cases, written by AI during development. Every other non-English case shows "no translation", never a guess.
+- Every non-English report (2,969 cases, 2,923 unique texts) carries an **English translation prepared in advance by AI** (Claude, run as ten parallel helpers at development time). These translations are shown under the original and labelled "prepared in advance, not live AI". A script checked that every number and time in each source appears in its translation; samples were read by eye. **No human translator has checked them.** Romanised Sinhala, Bengali and Nepali, and dialect Arabic and Cantonese, are the least certain. The rules never read the translation: they read the original text, so a translation error cannot lower a severity.
 
 **Execution and automation**
 - Every action goes through a **simulated adapter**. Nothing is sent, charged or suspended. Failures are deterministic (about 5%) to exercise the exception path.
@@ -31,4 +31,4 @@
 - The tests prove the coded rules behave as specified. They are **not** proof of complete policy coverage or production safety.
 
 **Not built**
-- Real integrations, an on-call paging integration, second-approval workflows (the hook exists; the fictional policy requires none), reporter-facing messaging, batch live inference, model monitoring and a QA sampling UI.
+- Real integrations. Ticketing, on-call paging, messaging, payments and account enforcement are **mock adapters** (`src/domain/integrations.js`): the workbench shows the ticket reference, the page sent to the duty-manager rotation and the target system of each action, but nothing leaves the process. Also not built: second-approval workflows (the hook exists; the fictional policy requires none), reporter-facing messaging, batch live inference, model monitoring and a QA sampling UI.

@@ -10,6 +10,8 @@ import { Workbench } from '../src/domain/workbench.js';
 import { USERS, QUEUES, CAPABILITIES, EXEC_ACTIONS, POLICY_VERSION, SLA_MIN } from '../src/domain/catalog.js';
 import { overview, filterOptions, applyFilters, listItem, caseView, exportRow, toCSV, FILTER_KEYS } from '../src/domain/views.js';
 import { viewLevel } from '../src/domain/permissions.js';
+import { redactText } from '../src/pii.js';
+import { SYSTEMS } from '../src/domain/integrations.js';
 import { slaStatus } from '../src/domain/sla.js';
 import { POLICY } from '../src/policy.js';
 import { JsonlLog } from './eventlog.mjs';
@@ -58,7 +60,7 @@ export function createApp({
   };
   const body = async (req) => { let b = ''; for await (const ch of req) { b += ch; if (b.length > 64e3) throw Object.assign(new Error('Payload too large'), { code: 413 }); } return b ? JSON.parse(b) : {}; };
   const filtersFrom = (url) => Object.fromEntries(FILTER_KEYS.map((k) => [k, url.searchParams.get(k) || '']).filter(([, v]) => v));
-  const view = (sess, s) => caseView(s, wb.raw.get(s.case_id), sess.user, now(), sess.revealed.get(s.case_id) || {});
+  const view = (sess, s) => caseView(s, wb.raw.get(s.case_id), sess.user, now(), sess.revealed.get(s.case_id) || {}, fixtures[s.case_id] || null);
 
   async function api(req, res, url) {
     const path = url.pathname;
@@ -78,11 +80,11 @@ export function createApp({
     const user = sess.user;
 
     if (path === '/api/meta') return send(res, 200, { user, queues: QUEUES, capabilities: CAPABILITIES, exec_actions: EXEC_ACTIONS, policy: POLICY, policy_version: POLICY_VERSION, sla_min: SLA_MIN,
-      users: Object.values(USERS).map(({ id, name, role }) => ({ id, name, role })), ai: ai.info(), automation_mode: wb.mode, replay_now: new Date(now()).toISOString() });
+      users: Object.values(USERS).map(({ id, name, role }) => ({ id, name, role })), ai: ai.info(), systems: SYSTEMS, automation_mode: wb.mode, replay_now: new Date(now()).toISOString() });
     if (path === '/api/overview') {
       const scope = wb.visible(user);
       wb.auditLog(user, 'view_overview', null, { scope: scope.length });
-      return send(res, 200, { scope: scope.length, filters: filtersFrom(url), options: filterOptions(scope), replay_now: new Date(now()).toISOString(), automation_mode: wb.mode, ...overview(scope, filtersFrom(url), now()) });
+      return send(res, 200, { scope: scope.length, total: wb.states.size, filters: filtersFrom(url), options: filterOptions(scope), replay_now: new Date(now()).toISOString(), automation_mode: wb.mode, ...overview(scope, filtersFrom(url), now()) });
     }
     if (path === '/api/cases' && req.method === 'GET') {
       const f = filtersFrom(url);
@@ -124,6 +126,7 @@ export function createApp({
         let t;
         try { t = await ai.translate(wb.raw.get(s.case_id)); } catch (e) { t = { status: 'failed', text: null, source: `Translation failed: ${e.message}` }; }
         if ((t.status === 'unavailable' || t.status === 'failed') && ai !== local) { const f = await local.translate(wb.raw.get(s.case_id)); if (f.status === 'fixture') t = f; }
+        if (t.status === 'fixture' && t.text) t = { ...t, text: redactText(t.text, wb.raw.get(s.case_id)) };
         wb.auditLog(user, 'translate', s.case_id, { status: t.status });
         return send(res, 200, { ...t, text: t.text, note: t.status === 'unavailable' || t.status === 'failed' ? 'No translation. The case is NOT treated as low risk; it stays in human review.' : null });
       }

@@ -49,7 +49,7 @@ async function boot() {
   route();
 }
 function save() { try { sessionStorage.setItem('rn.session', JSON.stringify({ token: S.token, user: S.user })); } catch { /* ignore */ } }
-function signOut() { S.token = null; S.user = null; S.meta = null; save(); location.hash = ''; renderSignIn(); }
+function signOut() { S.token = null; S.user = null; S.meta = null; S.filters = {}; S.adv = false; S.translation = {}; save(); location.hash = ''; renderSignIn(); }
 
 function showLimits() {
   dialog('Limitations of this prototype', `<ul class="plain" style="font-size:14px">
@@ -92,12 +92,17 @@ async function renderSignIn() {
     <h2 style="font-size:16px;margin-bottom:10px">Duty managers</h2><div class="ugrid">${users.filter((u) => u.role === 'duty_manager').map(card).join('')}</div></div>`;
   $('#main').querySelectorAll('.ucard').forEach((b) => b.onclick = async () => {
     const r = await api('api/session', { method: 'POST', body: JSON.stringify({ user_id: b.dataset.u }) });
-    S.token = r.body.token; S.user = r.body.user; S.meta = (await api('api/meta')).body; S.sel = null; S.listMode = 'mine'; save();
+    S.token = r.body.token; S.user = r.body.user; S.meta = (await api('api/meta')).body; S.sel = null; S.listMode = 'mine'; S.filters = {}; S.adv = false; S.translation = {}; save();
     location.hash = S.user.role === 'duty_manager' ? 'work' : 'work'; route();
   });
 }
 
 // ---------- overview ----------
+function scopeText(u) {
+  if (u.role === 'duty_manager') return `${u.name} · duty manager · every region and lane`;
+  const caps = u.capabilities.filter((c) => c !== 'general').map((c) => c.replace(/_/g, ' '));
+  return `${u.name} · agent · ${u.regions.join(', ')} · agent-lane cases${caps.length ? ` incl. specialist queues (${caps.join(', ')})` : ' (general review only)'}. Duty-manager and automation cases are not in an agent’s scope`;
+}
 const FILTERS = [['region', 'Region'], ['country', 'Country'], ['product', 'Product'], ['language', 'Language'], ['reporter_persona', 'Reporter persona'], ['workflow', 'Workflow status']];
 const ADV = [['owner', 'Owner'], ['queue', 'Queue'], ['escalation_reason', 'Escalation reason'], ['automation_outcome', 'Automation outcome'], ['policy_version', 'Policy version']];
 
@@ -115,7 +120,9 @@ async function renderOverview() {
   const isDM = S.user.role === 'duty_manager';
   $('#main').innerHTML = `<div class="page">
     <h1>Where is operational attention needed?</h1>
-    <p class="lede">Scope: ${o.scope.toLocaleString()} cases you are authorised to see. Replay clock ${fmt(o.replay_now)}. Every breakdown below sums to the filtered population (${n.toLocaleString()}).</p>
+    <div class="scope"><div><span class="k">Your scope</span><b>${o.scope.toLocaleString()}</b> of ${o.total.toLocaleString()} cases</div>
+      <div class="small">${esc(scopeText(S.user))}. ${o.scope < o.total ? 'Other cases exist but this profile is not authorised to see them; switch profile to compare.' : 'This profile sees every case.'}</div></div>
+    <p class="lede">Replay clock ${fmt(o.replay_now)}. Every breakdown below sums to the filtered population (${n.toLocaleString()}).</p>
     <div class="filters" role="search">
       <label>Date basis<select class="select" data-f="date_basis"><option value="received" ${f.date_basis !== 'decision' ? 'selected' : ''}>Received</option><option value="decision" ${f.date_basis === 'decision' ? 'selected' : ''}>Decision</option></select></label>
       <label>From<input class="input" type="date" data-f="date_from" value="${esc(f.date_from || '')}" min="2026-02-27" max="2026-03-09"></label>
@@ -147,6 +154,12 @@ async function renderOverview() {
         ${isDM ? `<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn btn-sm ${o.automation_mode === 'enabled' ? 'btn-gray' : 'btn-black'}" id="automode">${o.automation_mode === 'enabled' ? 'Return automation to shadow mode' : 'Enable SP-1 automation (demo)'}</button>
           <a class="btn btn-gray btn-sm" href="#" id="csv">Export CSV</a><a class="btn btn-gray btn-sm" href="#" id="json">Export JSON</a></div>` : ''}</div>
     </div>
+    <div class="card" style="margin-top:16px"><h3>Connected company systems</h3><div class="basis">Mock adapters: the workbench sits between these systems instead of replacing them. Nothing is sent to a real system.</div>
+      <div class="sys">${Object.entries(S.meta.systems).map(([k, x]) => `<div><b>${esc(x.label)}</b><span class="tag">${esc(x.direction)}</span><span class="tag amber">mock</span><div class="small">${esc(x.role)}</div></div>`).join('')}</div>
+      <table class="t" style="margin-top:10px"><tbody><tr><td>Tickets kept in sync (status, owner, severity, outcome)</td><td class="num">${o.integrations.tickets_synced.toLocaleString()}</td></tr>
+      <tr><td>On-call pages triggered · acknowledged</td><td class="num">${o.integrations.pages_triggered} · ${o.integrations.pages_acknowledged}</td></tr>
+      <tr><td>Messages sent (messaging service)</td><td class="num">${o.integrations.messaging}</td></tr><tr><td>Credits / fees (payments ledger)</td><td class="num">${o.integrations.payments}</td></tr>
+      <tr><td>Blocks / suspensions (account enforcement)</td><td class="num">${o.integrations.enforcement}</td></tr><tr><td>Failed calls (sent back to a human)</td><td class="num">${o.integrations.failed_calls}</td></tr></tbody></table></div>
     ${isDM ? '<p class="recon" id="chain">Checking access-log integrity…</p>' : ''}
     <p class="recon">Evidence gaps: ${o.evidence_gaps.missing_material} missing material evidence · ${o.evidence_gaps.language_not_understood} not understood (language). Confidence bands (uncalibrated): ${Object.entries(o.confidence_bands).map(([k, v]) => `${k} ${v}`).join(' · ')}.</p>
   </div>`;
@@ -254,7 +267,8 @@ function drawCase() {
 }
 
 function header(v) {
-  return `<div class="chead"><div><h1>${v.case_id}</h1><div class="meta">${esc(v.city)}, ${esc(v.country_name)} · ${esc(v.region)} · ${esc(v.product)} · reporter ${esc(v.reporter_persona)} → reported ${esc(v.reported_party_role)} · trip ${esc(v.trip_id)}${v.incident_id ? ` · incident ${esc(v.incident_id)}` : ''}</div></div></div>
+  return `<div class="chead"><div><h1>${v.case_id}</h1><div class="meta">${esc(v.city)}, ${esc(v.country_name)} · ${esc(v.region)} · ${esc(v.product)} · reporter ${esc(v.reporter_persona)} → reported ${esc(v.reported_party_role)} · trip ${esc(v.trip_id)}${v.incident_id ? ` · incident ${esc(v.incident_id)}` : ''}</div></div>
+      <div class="ticket" title="${esc(v.integrations.ticket.system)}: status, owner, severity and outcome are written back on every change"><span class="small">${esc(v.integrations.ticket.system)}</span><b>${esc(v.integrations.ticket.ref)}</b><span class="tag">${esc(v.integrations.ticket.status)}</span></div></div>
     <div class="statusbar">
       <div><span class="k">Current</span>${sev(v.severity.current, v.severity.provisional)}</div>
       <div><span class="k">AI proposed</span>${sev(v.severity.proposed)}</div>
@@ -282,10 +296,11 @@ function partiesHtml(v) {
 }
 
 function translationHtml(v) {
-  const t = S.translation[v.case_id];
-  const btn = v.language !== 'en' ? `<button class="btn btn-gray btn-sm" id="tr">${t ? 'Translate again' : 'Translate'}</button>` : '';
+  const live = S.meta.ai?.mode === 'live';
+  const t = S.translation[v.case_id] || v.report.translation;
+  const btn = (v.language !== 'en' || v.report.translation) && live ? `<button class="btn btn-gray btn-sm" id="tr">${S.translation[v.case_id] ? 'Translate again (live AI)' : 'Translate with live AI'}</button>` : '';
   if (!t) return { btn, html: '' };
-  const lab = { live: 'Live AI translation', fixture: 'Fixture translation (precomputed, not live)', not_needed: 'Original is English', unavailable: 'No translation available', failed: 'Translation failed' }[t.status];
+  const lab = { live: 'English · live AI translation', stored: 'English translation · prepared in advance, not live AI', fixture: 'English translation · prepared in advance, not live AI', not_needed: 'Original is English', unavailable: 'No English translation', failed: 'Translation failed' }[t.status];
   return { btn, html: `<div class="trans"><div class="lab">${lab}</div>${t.text ? esc(t.text) : `<span class="small">${esc(t.note || '')}</span>`}<div class="small">${esc(t.source)}</div></div>` };
 }
 
@@ -315,7 +330,7 @@ function execHtml(v) {
   if (!v.decisions.length && !v.executions.length && !v.reassessments.length) return '';
   return `<div class="exec">${v.reassessments.map((r) => `<div><span class="tag dark">Reassessment</span>${r.from} → ${r.to} · danger ${esc(r.danger_assessment.replace(/_/g, ' '))} · ${esc(r.policy_ref)} · ${esc(r.by_name)} · ${fmt(r.at)}<span class="small">“${esc(r.reason)}”</span></div>`).join('')}
     ${v.decisions.map((d) => `<div><span class="tag dark">Decision</span>${esc(d.decision.replace(/_/g, ' '))}${d.action ? ` · ${esc(v.meta_exec?.[d.action] || d.action.replace(/_/g, ' '))}` : ''} · ${esc(d.by_name)} · ${fmt(d.at)}${d.reason ? `<span class="small">“${esc(d.reason)}”</span>` : ''}</div>`).join('')}
-    ${v.executions.map((x) => `<div><span class="tag ${x.status === 'completed' ? 'green' : x.status === 'failed' ? 'red' : 'amber'}">Execution · ${x.status}</span>${esc(x.label)} <span class="tag">simulated</span>${x.receipt ? `<span class="small">${esc(x.receipt)}</span>` : ''}${x.error ? `<span class="small">${esc(x.error)}</span>` : ''}</div>`).join('')}
+    ${v.executions.map((x) => `<div><span class="tag ${x.status === 'completed' ? 'green' : x.status === 'failed' ? 'red' : 'amber'}">Execution · ${x.status}</span>${esc(x.label)} <span class="tag">→ ${esc(x.target)}</span>${x.receipt ? `<span class="small">${esc(x.receipt)}</span>` : ''}${x.error ? `<span class="small">${esc(x.error)}</span>` : ''}</div>`).join('')}
     ${v.resolution ? `<div><span class="tag green">Outcome</span>${esc(v.resolution.outcome.replace(/_/g, ' '))} · ${fmt(v.resolution.at)}</div>` : ''}</div>`;
 }
 
@@ -370,9 +385,9 @@ function agentAction(a, v) {
 }
 
 function resolveDialog(manager) {
-  dialog('Resolve case', `${manager ? `<label>Danger now<select class="select" name="danger"><option value="no_longer_present">No longer present</option><option value="incorrectly_detected">Incorrectly detected</option><option value="handed_to_authorities">Handed to authorities</option></select></label>` : ''}
-    <label>Outcome<input class="input" name="outcome" value="${manager ? 'reporter_safe' : 'resolved'}"></label><label>Reason (what happened and what was done)<textarea class="input" name="reason"></textarea></label>`,
-    (fd) => cmd('resolve', { outcome: fd.get('outcome'), reason: fd.get('reason'), danger_status: fd.get('danger') || undefined }), 'Resolve');
+  dialog(manager ? 'Close the case' : 'Resolve case', `${manager ? `<label>Danger now<select class="select" name="danger"><option value="no_longer_present">No longer present</option><option value="incorrectly_detected">Incorrectly detected</option><option value="handed_to_authorities">Handed to authorities</option></select></label>` : ''}
+    ${manager ? `<label>Outcome<select class="select" name="outcome"><option value="reporter_safe">Reporter confirmed safe</option><option value="handed_to_authorities">Handed to authorities</option><option value="action_taken_against_party">Action taken against reported party</option><option value="no_safety_issue_found">No safety issue found</option></select></label>` : '<label>Outcome<input class="input" name="outcome" value="resolved"></label>'}<label>Reason (what happened and what was done)<textarea class="input" name="reason"></textarea></label>`,
+    (fd) => cmd('resolve', { outcome: fd.get('outcome'), reason: fd.get('reason'), danger_status: fd.get('danger') || undefined }), manager ? 'Close the case' : 'Resolve');
 }
 
 // Duty-manager workspace: danger first, timing, ownership, next steps, controlled reassessment.
@@ -386,17 +401,23 @@ function drawManagerCase(v) {
   const tr = translationHtml(v);
   $('#detail').innerHTML = `<div class="detail-inner">${header(v)}
     <div class="danger"><h2>${open.length ? 'Unacknowledged danger alert' : 'Danger case'} — why this is here</h2><ul>${v.danger.signals.map((s) => `<li>${esc(s.label)} <span style="opacity:.8">(${esc(s.kind)} · ${esc(s.source)} · ${fmt(s.detected_at)})</span></li>`).join('') || `<li>${esc(v.escalation_reason || 'L4')}</li>`}</ul>
-      <div style="margin-top:8px;font-size:13px;opacity:.9">Danger status: <b>${esc(v.danger.status.replace(/_/g, ' '))}</b>. Automation cannot close, downgrade or resolve this case.</div></div>
+      <div style="margin-top:8px;font-size:13px;opacity:.9">Danger status: <b>${esc(v.danger.status.replace(/_/g, ' '))}</b>. Automation cannot close, downgrade or resolve this case.</div>
+      ${v.integrations.pages.map((pg) => `<div class="page-rec">${esc(pg.system)} · ${esc(pg.ref)} → ${esc(pg.rotation)} · <b>${pg.status}</b>${pg.acknowledged_at ? ` ${fmt(pg.acknowledged_at)}` : ''}</div>`).join('')}</div>
     <div class="clocks">${clock('Received', fmt(v.clocks.received_at))}${clock('Alert created', fmt(v.clocks.alert_created_at))}${clock('Acknowledged', v.clocks.alert_acknowledged_at ? fmt(v.clocks.alert_acknowledged_at) : 'Not yet', !v.clocks.alert_acknowledged_at)}
-      ${clock('First response', v.clocks.first_response_at ? fmt(v.clocks.first_response_at) : 'None yet', !v.clocks.first_response_at && v.sla.status === 'breached')}${clock('Response due', `${fmt(v.sla.due_at)}`, v.sla.status === 'breached' || v.sla.status === 'missed')}</div>
+      ${clock('First response', v.clocks.first_response_at ? fmt(v.clocks.first_response_at) : 'None yet', !v.clocks.first_response_at && v.sla.status === 'breached')}${clock('Response due', `${fmt(v.sla.due_at)}${v.sla.status === 'breached' || v.sla.status === 'missed' ? ' · past due on the replay clock' : ''}`, v.sla.status === 'breached' || v.sla.status === 'missed')}</div>
     <section class="q"><header><h2>${open.length ? 'Take ownership' : `Accountable owner: ${esc(v.owner_name || 'none')}`}</h2></header><div class="b">
       ${open.length ? `<p style="font-size:14px;margin-bottom:10px">Acknowledging makes you the accountable owner. It is <b>not</b> a response to the reporter and does not stop the clock.</p><button class="btn btn-red" id="ack">Acknowledge and own</button>`
         : owned ? `<div class="small">Next steps from policy (SP-7). Emergency services are recorded by you; this system notifies no one.</div>
           <div class="steps">${stepRow(1, 'contact_reporter', 'Contact the reporter', [['reached', 'Reached'], ['no_answer', 'No answer'], ['no_channel', 'No contact channel']])}
           ${stepRow(2, 'emergency_services', 'Emergency services', [['contacted', 'Contacted (by me)'], ['not_needed', 'Not needed'], ['declined_by_reporter', 'Declined by reporter']])}
-          ${stepRow(3, 'protect', 'Protect the reporter', [['restrict_rematch', 'Block re-matching'], ['suspend_reported_party', 'Suspend reported party'], ['none_needed', 'None needed']], 'Blocking and suspension run through the simulated adapter.')}</div>
-          <details class="more" style="margin-top:12px"><summary style="color:var(--g600)">Reassess, hand off or resolve</summary><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-            <button class="btn btn-gray btn-sm" id="reassess">Reassess severity</button><button class="btn btn-gray btn-sm" id="reassign">Reassign to another duty manager</button><button class="btn btn-black btn-sm" id="resolve">Resolve</button>
+          ${stepRow(3, 'protect', 'Protect the reporter', [['restrict_rematch', 'Block re-matching'], ['suspend_reported_party', 'Suspend reported party'], ['none_needed', 'None needed']], 'Blocking and suspension go to Account enforcement (mock).')}
+          ${(() => { const done = ['contact_reporter', 'emergency_services', 'protect'].filter((k) => step(k)).length; const contact = step('contact_reporter');
+            const blocker = !contact ? 'Contact the reporter (step 1) before closing.' : contact.value === 'no_answer' ? 'Reporter not reached yet. Keep trying before closing.' : v.executions.some((x) => ['queued', 'running'].includes(x.status)) ? 'An action is still executing.' : '';
+            return v.workflow === 'resolved' ? `<div class="step done"><span class="sn">✓</span><div><b>Case closed</b><div class="small">${esc((v.resolution?.outcome || '').replace(/_/g, ' '))} · ${fmt(v.resolution?.at)}</div></div></div>`
+            : `<div class="step"><span class="sn">4</span><div><b>Close the case</b><div class="small">${blocker || (done < 3 ? `${done} of 3 steps recorded. You can close without the others if they do not apply; say why in the reason.` : 'All steps recorded. Confirm the danger status and the outcome. The ticket is marked solved and the protections stay in place.')}</div>
+              <div class="opts"><button class="btn btn-sm ${done === 3 && !blocker ? 'btn-black' : 'btn-gray'}" id="resolve" ${blocker ? 'disabled' : ''}>Close the case…</button></div></div></div>`; })()}</div>
+          <details class="more" style="margin-top:12px"><summary style="color:var(--g600)">Not a danger case after all? Reassess or hand off</summary><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <button class="btn btn-gray btn-sm" id="reassess">Reassess severity (downgrade to a queue)</button><button class="btn btn-gray btn-sm" id="reassign">Reassign to another duty manager</button>
             <button class="btn btn-gray btn-sm" id="demosig" title="Demo control">Demo: inject a new SOS signal</button></div></details>`
         : `<div class="small">Owned by ${esc(v.owner_name || 'nobody')}. Only the owner acts; reassignment is recorded.</div>`}
       ${execHtml(v)}</div></section>

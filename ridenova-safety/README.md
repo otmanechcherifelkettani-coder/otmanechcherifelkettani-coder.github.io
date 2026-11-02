@@ -15,7 +15,7 @@ Requires Node ≥ 20.
 ```bash
 cd ridenova-safety
 npm install                 # Anthropic SDK, used only if you set a key
-npm test                    # 40 unit + API acceptance tests
+npm test                    # 44 unit + API acceptance tests
 npm run test:e2e            # 5 real-browser workflow tests (needs Playwright + Chromium)
 npm start                   # http://localhost:8080/console.html  (simulated AI, automation in shadow mode)
 ```
@@ -57,9 +57,11 @@ Every change is an event. State is the fold of the event list, and the full hist
 
 ## Screens
 
-- **Overview:** "Where is operational attention needed?" Default filters (received or decision date, region, country, product, language, reporter persona, severity with its basis, workflow) plus advanced filters. Every breakdown sums to the filtered population.
+- **Overview:** "Where is operational attention needed?" It opens with *your scope* (for example, Mei Tanaka, an APAC general agent, sees 803 of 5,000 cases; duty managers see all 5,000). Default filters (received or decision date, region, country, product, language, reporter persona, severity with its basis, workflow) plus advanced filters. Every breakdown sums to the filtered population.
 - **Agent workspace:** five questions (what happened, evidence, policy, uncertainty, next step) and one primary action. Secondary actions and deeper evidence open on demand.
-- **Duty-manager workspace:** the danger reason first, then the timing strip, ownership, policy next steps (contact, emergency services, protection), and a controlled reassessment, handoff or resolution.
+- **Duty-manager workspace:** the danger reason first, with the on-call page it triggered. Then the timing strip, ownership, and four numbered steps: contact the reporter, emergency services, protection, and **close the case** (danger status, outcome, reason). Reassessment and handoff sit behind “Not a danger case after all?”.
+- **English by default:** every non-English report shows a stored English translation under the original, labelled as prepared in advance (not live AI).
+- **Company systems:** each case shows its support-ticket reference and each action its target system (messaging, payments, account enforcement). These are mock adapters; see `src/domain/integrations.js`.
 
 ## Docs
 
