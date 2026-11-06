@@ -1,9 +1,9 @@
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
 (async () => {
-  const FPS = 30, DUR = 25.0, N = Math.round(FPS * DUR);
+  const FPS = 30, DUR = +(process.env.DUR || 25.0), N = Math.round(FPS * DUR);
   const b = await chromium.launch();
-  const pg = await b.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+  const pg = await b.newPage({ viewport: { width: +(process.env.W||1920), height: +(process.env.H||1080) }, deviceScaleFactor: 1 });
   await pg.goto('file://' + __dirname + '/' + (process.env.PAGE || 'video.html'));
   await pg.evaluate(() => document.fonts.ready);
   await pg.waitForFunction(() => [...document.images].every(i => i.complete));
