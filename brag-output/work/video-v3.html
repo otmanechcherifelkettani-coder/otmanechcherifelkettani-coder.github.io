@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+/* chapter header */
+.chap { position: absolute; left: 140px; right: 140px; top: 70px; display: flex; align-items: center; justify-content: space-between; }
+.chap .lbl { font-family: "JBM", monospace; font-weight: 600; font-size: 26px; letter-spacing: .18em; text-transform: uppercase; }
+.chap .bars { display: flex; gap: 12px; }
+.chap .bars i { display: block; width: 90px; height: 8px; border-radius: 4px; background: currentColor; opacity: .18; }
+.chap .bars i.on { opacity: 1; }
+.chap.on-ink { color: var(--mint); } .chap.on-cream { color: var(--forest); }
+.tool { position: absolute; left: 36px; font-family: "JBM", monospace; font-size: 22px; font-weight: 500; padding: 10px 18px; border-radius: 10px;
+  background: #dcebdf; color: var(--forest); white-space: nowrap; }
+.tool.bad { background: #ffe1d8; color: #b8432a; }
+.step { position: absolute; top: 480px; width: 380px; height: 290px; background: var(--sand); border-radius: 22px; padding: 32px 32px; color: var(--ink); border: 3px solid transparent; }
+.step .n { font-size: 24px; color: var(--forest); }
+.step .t { font-size: 44px; font-weight: 700; letter-spacing: -0.03em; margin-top: 22px; line-height: 1.08; }
+.step .q { font-size: 28px; color: #3c423d; margin-top: 16px; font-weight: 500; line-height: 1.3; }
+#flow { position: absolute; left: 140px; top: 455px; height: 6px; width: 1640px; background: var(--forest); border-radius: 3px; transform-origin: left; }
+#case { left: 140px; top: 830px; width: 1640px; background: var(--ink); color: #fff; border-radius: 18px; padding: 30px 38px; font-size: 36px; font-weight: 500; }
+#case b { font-family: "JBM", monospace; font-weight: 600; font-size: 24px; letter-spacing: .16em; color: var(--mint); margin-right: 26px; vertical-align: 4px; }
+.djob { position: absolute; top: 640px; width: 520px; height: 220px; border-radius: 24px; padding: 34px 38px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); }
+.djob .n { font-size: 24px; color: var(--mint); }
+.djob .t { font-size: 54px; font-weight: 700; letter-spacing: -0.03em; margin-top: 26px; }
+.dtake { position: absolute; top: 640px; width: 380px; height: 220px; border-radius: 22px; padding: 30px 32px; background: var(--mint); color: var(--ink); }
+.dtake .n { font-size: 22px; color: var(--forest); }
+.dtake .t { font-size: 40px; font-weight: 700; letter-spacing: -0.025em; margin-top: 24px; line-height: 1.1; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- HOOK + CH1a (0 – 5.5): chat -->
+  <div class="layer" id="sA">
+    <div class="abs mono" id="tag" style="left:140px; top:150px; font-size:28px; color:var(--mint);"><span class="dot" style="background:var(--mint)"></span>Agents IA</div>
+    <div class="abs h" id="hA" style="left:140px; top:320px; width:820px; font-size:108px;">Un agent IA ne répond pas. <span style="color:var(--mint)">Il agit.</span></div>
+    <div class="abs h" id="hB" style="left:140px; top:320px; width:820px; font-size:108px;">Quand il agit, <span style="color:var(--coral)">ses erreurs coûtent cher.</span></div>
+    <div class="abs" id="chat">
+      <div id="chatHead">
+        <div class="logo">Sg</div>
+        <div>
+          <div style="font-size:32px; font-weight:700; letter-spacing:-0.02em;">SoukGo · Support</div>
+          <div style="font-size:22px; color:var(--muted); margin-top:4px;"><span class="dot" style="background:var(--forest); width:11px; height:11px; margin-right:10px; vertical-align:1px;"></span>Agent IA · FR · EN · darija</div>
+        </div>
+      </div>
+      <div class="msg user" id="m1" style="top:132px;">Salam, commande dyali wslat naqsa.</div>
+      <div class="tool" id="tl1" style="top:236px;">⚙ rembourser(commande, 249 MAD)</div>
+      <div class="msg agent" id="m2" style="top:300px;">Remboursement de <span class="amt">249 MAD</span> effectué ✓</div>
+      <div class="msg user" id="m3" style="top:400px;">Il manque encore un article.</div>
+      <div class="tool bad" id="tl2" style="top:504px;">⚙ rembourser(commande, 2 490 MAD)</div>
+      <div class="msg agent" id="m4" style="top:568px;">Remboursement de <span class="amt" id="amt2">2&nbsp;490 MAD<span class="strike" id="strike"></span></span> effectué ✓</div>
+      <div class="abs" id="x10" style="top:490px;">×10</div>
+    </div>
+  </div>
+
+  <!-- chapter header for CH1 (ink) -->
+  <div class="chap on-ink" id="chap1"><span class="lbl">01 · Pourquoi c’est important</span><span class="bars"><i class="on"></i><i></i><i></i></span></div>
+
+  <!-- CH1b why now (5.5 – 9.0) -->
+  <div class="layer" id="sB">
+    <div class="abs mono" id="w0" style="left:140px; top:220px; font-size:28px; color:rgba(255,255,255,.7);">Maroc IA 2030</div>
+    <div class="abs h" id="wN" style="left:130px; top:280px; font-size:200px; color:var(--mint); letter-spacing:-0.05em;">200&nbsp;000</div>
+    <div class="abs" id="wL" style="left:140px; top:530px; width:780px; font-size:40px; font-weight:500; line-height:1.3; color:rgba(255,255,255,.88);">talents IA formés et certifiés visés d’ici 2030 : <b style="color:#fff">une priorité nationale.</b></div>
+    <div class="abs" id="wDiv" style="left:1050px; top:270px; width:2px; height:470px; background:rgba(255,255,255,.18); transform-origin:top;"></div>
+    <div class="abs mono" id="w1" style="left:1120px; top:290px; font-size:28px; color:rgba(255,255,255,.7);">Côté recrutement</div>
+    <div class="abs h" id="w2" style="left:1120px; top:350px; width:680px; font-size:84px;">Les agents IA : la compétence IA <span style="color:var(--mint)">qui progresse le plus vite.</span></div>
+    <div class="abs mono" id="w3" style="left:140px; top:900px; font-size:20px; color:rgba(255,255,255,.5); letter-spacing:.12em;">Sources : feuille de route « AI Made in Morocco » · Stanford AI Index 2026</div>
+  </div>
+
+  <!-- CH2 leverage (9.0 – 15.0), cream -->
+  <div class="layer bg-cream" id="bgC"></div>
+  <div class="layer dark" id="sC">
+    <div class="chap on-cream"><span class="lbl">02 · Comment l’exploiter</span><span class="bars"><i class="on"></i><i class="on"></i><i></i></span></div>
+    <div class="abs h" id="c1" style="left:140px; top:190px; font-size:112px;">Du problème au déploiement,<br><span style="color:var(--forest)">en 4 étapes.</span></div>
+    <div id="flow"></div>
+    <div id="steps"></div>
+    <div class="abs" id="case"><b>Cas d’étude</b>SoukGo : 100 000 demandes de remboursement par mois, en FR, EN et darija.</div>
+  </div>
+
+  <!-- CH3 career (15.0 – 21.0), ink -->
+  <div class="layer bg-ink" id="bgI"></div>
+  <div class="layer" id="sD">
+    <div class="chap on-ink" id="chap3"><span class="lbl">03 · Ce que ça change pour votre carrière</span><span class="bars"><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+    <div id="d1g">
+      <div class="abs mono" id="d0" style="left:140px; top:190px; font-size:26px; color:rgba(255,255,255,.7);">Les métiers qui recrutent</div>
+      <div class="abs h" id="d1" style="left:140px; top:250px; font-size:112px;">Utiliser l’IA ne suffit plus.</div>
+      <div class="abs h" id="d2" style="left:140px; top:375px; font-size:112px; color:var(--mint);">Savoir la lancer, si.</div>
+      <div class="djob" id="dj0" style="left:140px;"><div class="n mono">01</div><div class="t">Product manager IA</div></div>
+      <div class="djob" id="dj1" style="left:700px;"><div class="n mono">02</div><div class="t">Ingénieur LLM</div></div>
+      <div class="djob" id="dj2" style="left:1260px;"><div class="n mono">03</div><div class="t">Opérations IA</div></div>
+    </div>
+    <div id="d2g">
+      <div class="abs mono" id="e0" style="left:140px; top:190px; font-size:26px; color:rgba(255,255,255,.7);">Vous repartez avec</div>
+      <div class="abs h" id="e1" style="left:140px; top:250px; width:1640px; font-size:112px;">Un projet concret <span style="color:var(--mint)">à présenter en entretien.</span></div>
+      <div id="takes"></div>
+    </div>
+  </div>
+
+  <!-- OUTRO (21.0 – 25.0) -->
+  <div class="layer" id="sE">
+    <div class="abs mono" id="o0" style="left:140px; top:150px; font-size:28px; color:var(--mint);">Conférence &amp; atelier · Agents IA</div>
+    <div class="abs h" id="o1" style="left:140px; top:210px; font-size:150px;">Shipping AI That Works</div>
+    <div class="abs" id="o2" style="left:140px; top:420px;">
+      <span class="chip dchip">Conférence · 90 min</span><span class="chip dchip">Atelier · 2 jours</span><span class="chip dchip">FR · EN · darija</span><span class="chip dchip">Bac+2 à Bac+5</span>
+    </div>
+    <div class="abs" id="o3" style="left:140px; top:600px; display:flex; align-items:center; gap:40px;">
+      <div id="head"><img src="headshot.png"></div>
+      <div>
+        <div style="font-size:56px; font-weight:700; letter-spacing:-0.03em;">Otman Kettani</div>
+        <div style="font-size:34px; color:rgba(255,255,255,.78); margin-top:10px; font-weight:500;">Pilote des agents LLM dans 51 pays et 11 langues.</div>
+      </div>
+    </div>
+    <div class="abs cta" id="o4" style="left:140px; top:860px;">Réserver une date →</div>
+  </div>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const cl = x => Math.max(0, Math.min(1, x));
+const eo = x => 1 - Math.pow(1 - cl(x), 3);
+const eio = x => { x = cl(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3) / 2; };
+const eback = x => { x = cl(x); const c1 = 1.6, c3 = c1 + 1; return 1 + c3*Math.pow(x-1,3) + c1*Math.pow(x-1,2); };
+const p = (t, a, d) => cl((t - a) / d);
+function S(el, o, tf) { el.style.opacity = o; el.style.transform = tf || 'none'; }
+function rise(el, t, a, dy = 40, din = .35) { const i = eo(p(t, a, din)); S(el, i, `translateY(${(1 - i) * dy}px)`); }
+function pop(el, t, a, din = .3) { const i = eback(p(t, a, din)), f = cl(p(t, a, din * .6)); S(el, f, `translateY(${(1 - i) * 24}px) scale(${.85 + .15 * i})`); }
+function vis(el, on) { el.style.display = on ? '' : 'none'; }
+function wipe(el, t, a, d, dir) { const w = eio(p(t, a, d)); vis(el, t >= a); el.style.clipPath = dir === 'up' ? `inset(${(1 - w) * 100}% 0 0 0)` : `inset(0 0 ${(1 - w) * 100}% 0)`; }
+function exitL(el, t, a, d = .2) { const o = eio(p(t, a, d)); el.style.opacity = 1 - o; el.style.transform = `translateX(${-o * 160}px)`; }
+
+const steps = [['Choisir le bon problème', 'IA ou simple règle ?'], ['Concevoir le système', 'Prompt, outils, données, mémoire'], ['Prouver qu’il marche', 'Tests et seuil de réussite'], ['Déployer par étapes', 'Pilote, puis généralisation']];
+$('steps').innerHTML = steps.map((s, i) => `<div class="step" id="st${i}" style="left:${140 + i*420}px"><div class="n mono">0${i+1}</div><div class="t">${s[0]}</div><div class="q">${s[1]}</div></div>`).join('');
+const takes = ['Un agent qui fonctionne', 'Une batterie de tests', 'Une note de décision', 'Une attestation'];
+$('takes').innerHTML = takes.map((x, i) => `<div class="dtake" id="tk${i}" style="left:${140 + i*416}px"><div class="n mono">0${i+1}</div><div class="t">${x}</div></div>`).join('');
+
+window.render = function (t) {
+  // ---------- HOOK + CH1a chat (0 – 5.5) ----------
+  const sA = t < 5.5; vis($('sA'), sA);
+  if (sA) {
+    const out = eio(p(t, 5.32, .18));
+    { const o = eio(p(t, 2.82, .18)); S($('tag'), 1 - o); }
+    { const i = t < .02 ? 1 : eo(p(t, 0, .3)), o = eio(p(t, 2.82, .18)); S($('hA'), i * (1 - o), `translateY(${(1-i)*40 - o*30}px)`); }
+    { const i = eo(p(t, 3.05, .32)); S($('hB'), i * (1 - out), `translateY(${(1-i)*40 - out*30}px)`); }
+    const ci = t < .02 ? 1 : eo(p(t, 0, .4));
+    const shake = t > 4.5 && t < 4.8 ? Math.sin((t - 4.5) * 90) * 14 * (1 - (t - 4.5) / .3) : 0;
+    S($('chat'), ci * (1 - out), `translateX(${(1 - ci) * 120 + shake + out * 60}px)`);
+    $('chat').style.boxShadow = t >= 4.5 ? `0 0 0 ${6*eo(p(t,4.5,.2))}px var(--coral), 0 40px 120px rgba(0,0,0,.45)` : '';
+    pop($('m1'), t, .3); pop($('tl1'), t, 1.0, .25); pop($('m2'), t, 1.5);
+    pop($('m3'), t, 3.25); pop($('tl2'), t, 3.75, .25); pop($('m4'), t, 4.0);
+    $('strike').style.transform = `scaleX(${eo(p(t, 4.5, .2))})`;
+    $('amt2').style.color = t >= 4.5 ? 'var(--coral)' : '';
+    { const i = eback(p(t, 4.55, .3)); S($('x10'), cl(p(t, 4.55, .1)), `rotate(${-8 + (1-i)*-20}deg) scale(${.4 + .6*i})`); }
+  }
+  // chapter 1 header (3.0 – 9.0)
+  { const on = t >= 3.0 && t < 9.05; vis($('chap1'), on); const i = eo(p(t, 3.0, .35)); S($('chap1'), i, `translateY(${(1 - i) * -20}px)`); }
+
+  // ---------- CH1b why now (5.5 – 9.0) ----------
+  const sB = t >= 5.45 && t < 9.05; vis($('sB'), sB);
+  if (sB) {
+    rise($('w0'), t, 5.5);
+    const ni = eo(p(t, 5.55, .3)); S($('wN'), ni, `translateY(${(1 - ni) * 50}px)`);
+    const c = Math.round(200000 * eo(p(t, 5.55, 1.0)) / 1000) * 1000;
+    $('wN').innerHTML = String(c).replace(/\B(?=(\d{3})+(?!\d))/g, '&nbsp;');
+    rise($('wL'), t, 6.0, 30);
+    $('wDiv').style.transform = `scaleY(${eo(p(t, 6.4, .4))})`;
+    rise($('w1'), t, 6.5); rise($('w2'), t, 6.55, 50);
+    rise($('w3'), t, 7.0, 10);
+  }
+
+  // ---------- CH2 leverage (9.0 – 15.0) ----------
+  wipe($('bgC'), t, 8.75, .25, 'up'); vis($('bgC'), t >= 8.75 && t < 15.05);
+  const sC = t >= 8.95 && t < 15.05; vis($('sC'), sC);
+  if (sC) {
+    const ch = $('sC').querySelector('.chap'); const i = eo(p(t, 9.0, .35)); S(ch, i, `translateY(${(1 - i) * -20}px)`);
+    rise($('c1'), t, 9.05, 50);
+    $('flow').style.transform = `scaleX(${eio(p(t, 9.75, 2.0))})`;
+    steps.forEach((_, k) => {
+      const a = 9.75 + k * .5; pop($('st' + k), t, a, .32);
+      $('st' + k).style.borderColor = t >= a ? 'var(--forest)' : 'transparent';
+    });
+    rise($('case'), t, 12.25, 30);
+  }
+
+  // ---------- CH3 career (15.0 – 21.0) ----------
+  wipe($('bgI'), t, 14.75, .25, 'down'); vis($('bgI'), t >= 14.75);
+  const sD = t >= 14.95 && t < 21.05; vis($('sD'), sD);
+  if (sD) {
+    { const i = eo(p(t, 15.0, .35)), o = eio(p(t, 20.8, .2)); S($('chap3'), i * (1 - o), `translateY(${(1 - i) * -20}px)`); }
+    const g1 = t < 18.05; vis($('d1g'), g1);
+    if (g1) {
+      exitL($('d1g'), t, 17.8);
+      rise($('d0'), t, 15.0); rise($('d1'), t, 15.08, 50); rise($('d2'), t, 15.5, 50);
+      [0, 1, 2].forEach(k => pop($('dj' + k), t, 16.0 + k * .5, .32));
+    }
+    const g2 = t >= 17.95; vis($('d2g'), g2);
+    if (g2) {
+      exitL($('d2g'), t, 20.8);
+      rise($('e0'), t, 18.0); rise($('e1'), t, 18.08, 50);
+      takes.forEach((_, k) => pop($('tk' + k), t, 19.0 + k * .25, .3));
+    }
+  }
+
+  // ---------- OUTRO (21.0 – 25.0) ----------
+  const sE = t >= 20.95; vis($('sE'), sE);
+  if (sE) {
+    rise($('o0'), t, 21.05); rise($('o1'), t, 21.15, 60);
+    $('o2').querySelectorAll('.chip').forEach((c, k) => pop(c, t, 21.5 + k * .25, .28));
+    rise($('o3'), t, 22.5, 40, .45);
+    pop($('o4'), t, 23.0, .35);
+  }
+};
+window.render(0);
+</script>
+</body>
+</html>

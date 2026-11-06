@@ -1,0 +1,5 @@
+Un agent IA ne répond pas : il agit. Et quand il agit, ses erreurs coûtent cher.
+Pourquoi c’est important : le Maroc vise 200 000 talents IA d’ici 2030, et les agents IA sont la compétence IA qui progresse le plus vite au recrutement.
+Comment l’exploiter : choisir le bon problème, concevoir le système, prouver qu’il marche, déployer par étapes.
+Ce que ça change pour votre carrière : un projet concret à présenter en entretien, pour des postes comme product manager IA, ingénieur LLM ou opérations IA.
+« Shipping AI That Works » : conférence de 90 min ou atelier de 2 jours, en FR, EN ou darija.
