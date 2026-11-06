@@ -2,7 +2,7 @@
 import numpy as np, wave
 
 SR = 44100
-DUR = 21.5
+DUR = 25.0
 N = int(SR * DUR)
 BEAT = 0.5
 rng = np.random.default_rng(7)
@@ -88,58 +88,50 @@ def thud(g=1.0):
 # --- arrangement ---
 drums = np.zeros(N); music = np.zeros(N); sfx = np.zeros(N); pads = np.zeros(N)
 # chords per bar (root for bass, pad voicing, arp notes)
-prog = [  # (bar start, bass root, pad, arp)
-    (0, 45, [57, 60, 64], [69, 72, 76, 72]),      # Am
-    (2, 41, [57, 60, 65], [69, 72, 77, 72]),      # F
-    (4, 48, [55, 60, 64], [67, 72, 76, 72]),      # C
-    (6, 43, [55, 59, 62], [67, 71, 74, 71]),      # G
-    (8, 45, [57, 60, 64], [69, 72, 76, 72]),      # Am
-    (10, 41, [57, 60, 65], [69, 72, 77, 72]),     # F
-    (12, 48, [55, 60, 64], [67, 72, 76, 79]),     # C
-    (14, 43, [55, 59, 62], [67, 71, 74, 79]),     # G
-    (16, 41, [57, 60, 65], [69, 72, 77, 81]),     # F
-    (18, 48, [55, 60, 64], [67, 72, 76, 79]),     # C
-    (20, 48, [55, 60, 64, 67], [72, 76, 79, 84]), # C (ring out)
-]
+Am, F, C, G = (45, [57, 60, 64], [69, 72, 76, 72]), (41, [57, 60, 65], [69, 72, 77, 72]), (48, [55, 60, 64], [67, 72, 76, 79]), (43, [55, 59, 62], [67, 71, 74, 79])
+seq = [Am, F, C, G, Am, F, C, G, F, G, C, G]
+prog = [(2 * i, *c) for i, c in enumerate(seq)] + [(24, 48, [55, 60, 64, 67], [72, 76, 79, 84])]
+END = 24.0  # groove stops; final chord rings
 for start, root, pv, arp in prog:
-    blen = 1.5 if start == 20 else 2.0
+    blen = 1.0 if start == 24 else 2.0
     add(pads, pad(pv, blen + .4, 1.0 if start >= 5 else .8), start)
     for k in range(int(blen / .25)):
         t = start + k * .25
-        g = .45 if t < 5 else .8
-        if 15.5 <= t < 16.5: g = .5 + .5 * (t - 15.5)
-        add(music, pluck(arp[k % 4] + (12 if (k % 8) == 7 else 0), g), t)
+        if t >= END: break
+        add(music, pluck(arp[k % 4] + (12 if (k % 8) == 7 else 0), .45 if t < 5 else .8), t)
     for k in range(int(blen / .5)):
         t = start + k * .5
-        if t < 2.5 or 15.5 <= t < 16.5: continue
+        if t < 2.5 or t >= END: continue
         add(music, bass(root, .23, .7 if t < 5 else 1.0), t)
         add(music, bass(root + 12 if k % 2 else root, .2, .55 if t < 5 else .8), t + .25)
 
 for k in range(int(DUR / BEAT)):
     t = k * BEAT
-    if 2.5 <= t < 5.0:  # production: heartbeat kick
+    if 2.5 <= t < 5.0:
         add(drums, kick(.6), t)
-    elif t >= 5.0 and not (15.5 <= t < 16.5) and t < 21.0:
+    elif 5.0 <= t < END:
         add(drums, kick(1.0), t)
         if k % 2 == 1: add(drums, clap(1.0), t)
-    if t >= 1.0 and t < 21.0 and not (15.5 <= t < 16.5):
+    if 1.0 <= t < END:
         add(drums, hat(.7 if t >= 5 else .45), t + .25)
         if t >= 5: add(drums, hat(.35), t)
-# snare roll into the click
-for k in range(8): add(drums, clap(.25 + .1 * k), 15.5 + k * .125)
 
 # sfx (pitched in key)
 for t, nt in [(.45, 76), (1.5, 81), (2.95, 76), (3.5, 81)]: add(sfx, blip(nt), t)
 for t in np.arange(.95, 1.5, .125): add(sfx, tick(.8), t)
 for t in np.arange(3.25, 3.5, .125): add(sfx, tick(.8), t)
 add(sfx, thud(1.0), 4.0)
-add(sfx, whoosh(.5, 1.0), 4.5); add(sfx, whoosh(.3, .7), 7.2); add(sfx, whoosh(.3, .6), 11.2); add(sfx, whoosh(.3, .7), 15.2); add(sfx, whoosh(.3, .6), 17.2)
-for k in range(4): add(sfx, blip(76 + [0, 3, 5, 7][k], .5), 8.0 + k * .25)
-for k in range(4): add(sfx, blip(81 + [0, 3, 5, 7][k], .5), 9.0 + k * .25)
-for k, nt in enumerate([81, 84, 86, 88, 93]): add(sfx, blip(nt, .9), 12.5 + k * .5)
-add(sfx, tick(2.5), 16.5); add(pads, pad([53, 57, 60, 65, 69], 1.0, 2.0), 16.5)
-add(sfx, blip(88, .6), 19.5)
-add(pads, pad([48, 55, 60, 64, 67, 72], 2.0, 1.6), 20.0)
+for t in (4.5, ): add(sfx, whoosh(.5, 1.0), t)
+for t in (8.5, 11.5, 14.0, 17.6, 20.5): add(sfx, whoosh(.3, .65), t)
+for k in range(8): add(sfx, tick(1.2), 5.0 + k * .125)            # counter
+add(sfx, blip(88, .6), 6.0); add(sfx, blip(81, .5), 6.5)
+for k in range(3): add(sfx, blip([76, 79, 81][k], .7), 10.0 + k * .5)  # jobs
+add(pads, pad([57, 60, 64, 69], 1.2, 1.4), 12.0)                       # reveal swell
+for k, nt in enumerate([81, 84, 86, 88, 93]): add(sfx, blip(nt, .9), 15.0 + k * .5)
+add(sfx, tick(2.5), 17.0); add(pads, pad([53, 57, 60, 65, 69], 1.0, 2.0), 17.0)
+for k in range(4): add(sfx, blip([76, 79, 81, 84][k], .55), 19.0 + k * .25)
+add(sfx, blip(88, .6), 23.0)
+add(pads, pad([48, 55, 60, 64, 67, 72], 1.4, 1.6), 24.0)
 
 # reverb on pads + sfx + music (shared space)
 irn = int(1.4 * SR); ti = np.arange(irn) / SR
@@ -151,7 +143,7 @@ wet = fft_conv(wet_src, ir) * .35
 duck = np.ones(N)
 for k in range(int(DUR / BEAT)):
     t = k * BEAT
-    if t >= 5.0 and not (15.5 <= t < 16.5) and t < 21.0:
+    if 5.0 <= t < END:
         i = int(t * SR); n = int(.22 * SR); duck[i:i + n] = np.minimum(duck[i:i + n], .55 + .45 * np.linspace(0, 1, n) ** .7)
 
 mix = drums * .9 + (music * .8 + pads + wet) * duck + sfx * .75

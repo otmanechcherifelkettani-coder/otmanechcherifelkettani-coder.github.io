@@ -13,29 +13,32 @@ Mode: /brag-slim (Opus 5.5). Format: landscape 1920×1080, 30 fps, about 21 s. L
 - **Tone:** `polished` with a `default` pulse: confident, editorial, warm.
 - **Share caption:** see share-copy.txt.
 
-## Angle
-The demo always works, and production is where the agent refunds 10× the order. The workshop is about closing that gap. The video opens with that exact failure.
+## Angle (v2: sell the why)
+v1 sold the format. v2 sells why the skill matters, in this order:
+1. **The gap:** everyone can make an AI demo, but very few can put one in production (the ×10 refund).
+2. **Why now:** 200 000 AI talents targeted by Maroc IA 2030, and AI agents are the fastest-growing AI skill in hiring.
+3. **The jobs:** using AI is no longer enough; AI PM, LLM engineer and AI ops roles hire for shipping it.
+4. **The program**, then **the proof** (readiness grid, the room votes "on lance").
+5. **What students leave with:** a working agent, tests, a decision memo, a certificate, and a real project for interviews.
+Every claim comes from the brochure.
 
 ## Visual identity (sampled from the brochure)
-- Ink #10211b (hero/footer), mint #6fd39f (accent headline), forest #0f6b46 (big numbers), cream #f5f2eb (page), sand #e8e4d9 (cards), light-green chips.
-- Inter bold with tight tracking for headlines; mono uppercase labels with wide tracking (JetBrains Mono stands in for the brochure mono).
-- Recreated the brochure's typographic system (label, rule, headline, chips) rather than panning over the scanned pages.
+Ink #10211b, mint #6fd39f, forest #0f6b46, cream #f5f2eb, sand #e8e4d9. Inter Display bold headlines; mono uppercase labels.
 
 ## Privacy
-- The video shows no email address or phone number. The speaker is the user, credited by name and photo from the brochure.
-- The Uber name is left out of the video and the share copy, since the brochure stresses the talk is independent of Uber. The video keeps the brochure's own line about 51 countries and 11 languages.
-- SoukGo is fictional (per the brochure). The order amount and the darija message are illustrative UI text.
+No email or phone in the video. Uber is not named (the brochure says the talk is independent of Uber). SoukGo is fictional; the chat lines and amounts are illustrative.
 
 ## Music
-120 BPM (beat 0.5 s, bar 2 s), in A minor → C major lift. Every cut falls on a beat.
+120 BPM, Am–F–C–G. Every cut and hit falls on the beat grid; panel wipes land on downbeats.
 
-## Storyboard (21.0 s)
-| # | Time | Scene | On screen | Motion / sound |
-|---|---|---|---|---|
-| 1 | 0.0–2.0 | Hook: demo | Ink bg. Label `DÉMO`. SoukGo chat: user in darija "Salam, commande dyali wslat naqsa." → agent "Remboursement de 249 MAD effectué ✓". Headline: **Une démo répond à une question.** | Bubbles pop on beats, soft blips |
-| 2 | 2.0–4.0 | Hook: production | Same chat, label flips to `PRODUCTION`. Second user msg "Et le reste ?" → agent "Remboursement de 2 490 MAD effectué ✓" → red strike + `×10`. Headline: **Un produit porte une responsabilité.** | Low thud + glitch on the ×10 |
-| 3 | 4.0–7.0 | Reveal | Label `SHIPPING AI THAT WORKS` · **Des agents IA.** / **De la démo à la production.** (mint) | Whoosh, line-by-line rise |
-| 4 | 7.0–11.0 | Highlight 1 | Cream. **Jour 1, on construit. Jour 2, on prouve.** Day-1 chips (prompt, function calling, RAG, human-in-the-loop) and Day-2 chips (evals, LLM-as-judge, guardrails, OWASP LLM) pop in on 8ths | Ticks on chips |
-| 5 | 11.0–15.0 | Highlight 2 | Label `LIVRABLE` · **Prêt pour la production ?** 5 rows: Valeur, Fiabilité, Sécurité, Évaluation, Opérations, each checking on a beat | Rising pitched ticks |
-| 6 | 15.0–17.0 | Punch | **La salle vote : on lance ou pas ?** A cursor clicks the `On lance ✓` button | Click + chord hit |
-| 7 | 17.0–21.0 | Outro | Ink. `SHIPPING AI THAT WORKS`, headshot, **Otman Kettani**, "Pilote des agents LLM dans 51 pays, 11 langues". Chips: Conférence 90 min · Atelier 2 jours · FR / EN / darija. `Réserver une date →` | Pad swell, final hit, fade |
+## Storyboard (25.0 s)
+| # | Time | Scene | On screen |
+|---|---|---|---|
+| 1 | 0.0–2.5 | Gap: demo | `DÉMO` · **Tout le monde sait faire une démo IA.** · SoukGo agent refunds 249 MAD correctly |
+| 2 | 2.5–5.0 | Gap: production | `PRODUCTION` · **Très peu savent la mettre en production.** · agent refunds 2 490 MAD, ×10 |
+| 3 | 5.0–9.0 | Why now | **200 000** counts up · Maroc IA 2030 · **La compétence IA qui progresse le plus vite.** · sources |
+| 4 | 9.0–12.0 | Jobs | **Utiliser l’IA ne suffit plus. Il faut savoir la lancer.** · Product manager IA · Ingénieur LLM · Opérations IA |
+| 5 | 12.0–14.5 | Reveal | Shipping AI That Works · **Des agents IA. De la démo à la production.** |
+| 6 | 14.5–18.0 | Proof | **Prêt pour la production ?** 5 criteria check on the beat · stamp "La salle vote · On lance ✓" |
+| 7 | 18.0–21.0 | Takeaways | **Un projet concret à présenter en entretien.** · agent, tests, decision memo, certificate |
+| 8 | 21.0–25.0 | Outro | Title, formats, Otman Kettani, 51 pays · 11 langues, Réserver une date |

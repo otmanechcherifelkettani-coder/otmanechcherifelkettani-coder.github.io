@@ -1,7 +1,7 @@
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
 (async () => {
-  const FPS = 30, DUR = 21.5, N = Math.round(FPS * DUR);
+  const FPS = 30, DUR = 25.0, N = Math.round(FPS * DUR);
   const b = await chromium.launch();
   const pg = await b.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
   await pg.goto('file://' + __dirname + '/video.html');
