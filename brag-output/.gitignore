@@ -1,0 +1,8 @@
+# Intermediates (regenerable); brochure scans contain contact details
+work/pdf/
+work/fonts/
+work/stills/
+work/*.png
+!work/headshot.png
+work/*.wav
+work/*.mp4

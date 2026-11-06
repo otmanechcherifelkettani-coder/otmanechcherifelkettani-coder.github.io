@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "JBM"; src: url("fonts/package/files/jetbrains-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "JBM"; src: url("fonts/package/files/jetbrains-mono-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+:root {
+  --ink: #10211b; --ink2: #1a3229; --mint: #6fd39f; --forest: #0f6b46;
+  --cream: #f5f2eb; --sand: #e8e4d9; --chip: #dcebdf; --coral: #ff7a59; --muted: #5d625c;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--ink); }
+#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--ink);
+  font-family: "Inter", sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+.layer { position: absolute; inset: 0; }
+.mono { font-family: "JBM", monospace; font-weight: 500; text-transform: uppercase; letter-spacing: .18em; }
+.h { font-family: "Inter Display", "Inter", sans-serif; font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; }
+.abs { position: absolute; }
+.dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 16px; vertical-align: 2px; }
+
+/* chat */
+#chat { left: 1040px; top: 200px; width: 740px; height: 680px; background: var(--cream); border-radius: 36px;
+  box-shadow: 0 40px 120px rgba(0,0,0,.45); overflow: hidden; color: var(--ink); }
+#chatHead { height: 104px; border-bottom: 1px solid #ddd8cc; display: flex; align-items: center; padding: 0 36px; gap: 20px; }
+.logo { width: 56px; height: 56px; border-radius: 16px; background: var(--forest); color: #fff; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; font-size: 26px; letter-spacing: -0.04em; }
+.msg { position: absolute; max-width: 650px; padding: 22px 28px; border-radius: 26px; font-size: 28px; line-height: 1.3; white-space: nowrap; font-weight: 500; }
+.user { right: 36px; background: var(--ink); color: #fff; border-bottom-right-radius: 8px; }
+.agent { left: 36px; background: var(--sand); color: var(--ink); border-bottom-left-radius: 8px; }
+.typing { position: absolute; left: 36px; background: var(--sand); border-radius: 26px; border-bottom-left-radius: 8px; padding: 26px 30px; display: flex; gap: 10px; }
+.typing i { width: 12px; height: 12px; border-radius: 50%; background: #8b8f88; display: block; }
+.amt { position: relative; font-weight: 700; white-space: nowrap; }
+.strike { position: absolute; left: -4px; right: -4px; top: 52%; height: 5px; background: var(--coral); transform-origin: left; border-radius: 3px; }
+#x10 { right: 50px; top: 586px; background: var(--coral); color: #fff; font-weight: 800; font-size: 56px; padding: 6px 24px;
+  border-radius: 16px; letter-spacing: -0.02em; }
+
+/* chips */
+.chip { display: inline-block; font-family: "JBM", monospace; font-weight: 500; font-size: 30px; padding: 12px 22px; border-radius: 10px;
+  background: var(--chip); color: var(--forest); margin: 0 14px 16px 0; }
+.dchip { background: rgba(111,211,159,.12); color: var(--mint); border: 1px solid rgba(111,211,159,.35); }
+.rule { height: 2px; background: var(--ink); opacity: .85; transform-origin: left; }
+.livr { background: var(--ink); color: #fff; border-radius: 14px; padding: 26px 30px; font-size: 30px; font-weight: 500; width: 760px; }
+.livr b { color: var(--mint); font-weight: 600; }
+
+/* grid */
+.card { position: absolute; top: 470px; width: 312px; height: 380px; background: var(--sand); border-radius: 22px; padding: 34px 30px;
+  color: var(--ink); border: 3px solid transparent; }
+.card .n { font-size: 24px; color: var(--muted); }
+.card .t { font-size: 44px; font-weight: 700; letter-spacing: -0.03em; margin-top: 18px; }
+.card .q { font-size: 27px; line-height: 1.32; color: #3c423d; margin-top: 16px; font-weight: 500; }
+.check { position: absolute; left: 30px; bottom: 30px; width: 76px; height: 76px; border-radius: 50%; border: 3px solid #b9b5aa;
+  display: flex; align-items: center; justify-content: center; }
+.check .fill { position: absolute; inset: -3px; border-radius: 50%; background: var(--forest); }
+.check svg { position: relative; width: 42px; height: 42px; }
+
+/* vote */
+.btn { position: absolute; top: 640px; height: 130px; border-radius: 65px; font-size: 46px; font-weight: 700; display: flex;
+  align-items: center; justify-content: center; letter-spacing: -0.02em; }
+#no { left: 470px; width: 420px; border: 3px solid rgba(255,255,255,.35); color: rgba(255,255,255,.8); }
+#yes { left: 1030px; width: 420px; background: var(--mint); color: var(--ink); }
+#ripple { position: absolute; border-radius: 50%; border: 4px solid var(--mint); }
+#cursor { position: absolute; width: 56px; height: 56px; }
+.ray { position: absolute; width: 6px; height: 28px; background: var(--mint); border-radius: 3px; transform-origin: 50% 0; }
+
+#head { width: 170px; height: 170px; border-radius: 50%; overflow: hidden; border: 4px solid var(--mint); }
+#head img { width: 100%; height: 100%; display: block; }
+.cta { background: var(--mint); color: var(--ink); font-weight: 700; font-size: 40px; padding: 26px 46px; border-radius: 60px; letter-spacing: -0.02em; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- S1/S2: hook -->
+  <div class="layer" id="s12">
+    <div class="abs mono" id="tag" style="left:140px; top:150px; font-size:28px;"><span class="dot" id="tagdot"></span><span id="tagtxt">Démo</span></div>
+    <div class="abs h" id="hA" style="left:140px; top:330px; width:820px; font-size:112px;">Une démo répond à une question.</div>
+    <div class="abs h" id="hB" style="left:140px; top:330px; width:840px; font-size:112px;">Un produit porte <span style="color:var(--mint)">une responsabilité.</span></div>
+    <div class="abs" id="chat">
+      <div id="chatHead">
+        <div class="logo">Sg</div>
+        <div>
+          <div style="font-size:32px; font-weight:700; letter-spacing:-0.02em;">SoukGo · Support</div>
+          <div style="font-size:22px; color:var(--muted); margin-top:4px;"><span class="dot" style="background:var(--forest); width:11px; height:11px; margin-right:10px; vertical-align:1px;"></span>Agent IA · FR · EN · darija</div>
+        </div>
+      </div>
+      <div class="msg user" id="m1" style="top:150px;">Salam, commande dyali wslat naqsa.</div>
+      <div class="typing" id="ty1" style="top:262px;"><i></i><i></i><i></i></div>
+      <div class="msg agent" id="m2" style="top:262px;">Remboursement de <span class="amt">249 MAD</span> effectué ✓</div>
+      <div class="msg user" id="m3" style="top:374px;">Il manque encore un article.</div>
+      <div class="typing" id="ty2" style="top:486px;"><i></i><i></i><i></i></div>
+      <div class="msg agent" id="m4" style="top:486px;">Remboursement de <span class="amt" id="amt2">2&nbsp;490 MAD<span class="strike" id="strike"></span></span> effectué ✓</div>
+      <div class="abs" id="x10">×10</div>
+    </div>
+  </div>
+
+  <!-- S3: reveal -->
+  <div class="layer" id="s3">
+    <div class="abs mono" id="r0" style="left:160px; top:270px; font-size:30px; color:var(--mint);">Shipping AI That Works</div>
+    <div class="abs h" id="r1" style="left:160px; top:350px; font-size:136px; white-space:nowrap;">Des agents IA.</div>
+    <div class="abs h" id="r2" style="left:160px; top:495px; font-size:136px; white-space:nowrap; color:var(--mint);">De la démo à la production.</div>
+    <div class="abs mono" id="r3" style="left:160px; top:710px; font-size:28px; color:rgba(255,255,255,.75);">Conférence 90 min · Atelier 2 jours · Écoles post-bac</div>
+  </div>
+
+  <!-- cream panel -->
+  <div class="layer" id="cream" style="background:var(--cream);"></div>
+
+  <!-- S4: two days -->
+  <div class="layer" id="s4" style="color:var(--ink);">
+    <div class="abs mono" id="d0" style="left:140px; top:120px; font-size:26px; color:var(--forest);">Déroulé · Atelier 2 jours · 12 h</div>
+    <div class="abs h" id="d1" style="left:140px; top:180px; font-size:104px;">Jour 1, on construit. <span style="color:var(--forest)">Jour 2, on prouve.</span></div>
+    <div class="abs" style="left:140px; top:400px; width:780px;">
+      <div class="mono" id="c1h" style="font-size:24px; display:flex; justify-content:space-between;"><span>Jour 1 · Décider et construire</span><span>5 h 30</span></div>
+      <div class="rule" id="c1r" style="margin:16px 0 30px;"></div>
+      <div id="c1">
+        <span class="chip">prompt</span><span class="chip">function calling</span><span class="chip">RAG</span><span class="chip">human-in-the-loop</span>
+      </div>
+    </div>
+    <div class="abs" style="left:1000px; top:400px; width:780px;">
+      <div class="mono" id="c2h" style="font-size:24px; display:flex; justify-content:space-between;"><span>Jour 2 · Tester et livrer</span><span>6 h 30</span></div>
+      <div class="rule" id="c2r" style="margin:16px 0 30px;"></div>
+      <div id="c2">
+        <span class="chip">evals</span><span class="chip">LLM-as-judge</span><span class="chip">guardrails</span><span class="chip">OWASP LLM</span>
+      </div>
+    </div>
+    <div class="abs livr" id="l1" style="left:140px; top:720px;"><b>Livrable du jour 1 :</b> un prototype fonctionnel.</div>
+    <div class="abs livr" id="l2" style="left:1000px; top:720px;"><b>Livrable du jour 2 :</b> tests et note de décision.</div>
+  </div>
+
+  <!-- S5: grid -->
+  <div class="layer" id="s5" style="color:var(--ink);">
+    <div class="abs mono" id="g0" style="left:140px; top:150px; font-size:26px; color:var(--forest);">Livrable · une grille d’une page</div>
+    <div class="abs h" id="g1" style="left:140px; top:210px; font-size:120px;">Prêt pour la production ?</div>
+    <div id="cards"></div>
+  </div>
+
+  <!-- ink panel -->
+  <div class="layer" id="inkp" style="background:var(--ink);"></div>
+
+  <!-- S6: vote -->
+  <div class="layer" id="s6">
+    <div class="abs mono" id="v0" style="left:0; right:0; top:300px; text-align:center; font-size:30px; color:var(--mint);">La salle vote</div>
+    <div class="abs h" id="v1" style="left:0; right:0; top:370px; text-align:center; font-size:150px;">On lance ou pas ?</div>
+    <div class="btn" id="no">Pas encore</div>
+    <div id="ripple"></div>
+    <div class="btn" id="yes">On lance ✓</div>
+    <div id="rays"></div>
+    <svg id="cursor" viewBox="0 0 24 24"><path d="M4 2 L4 20 L9 15.5 L12.5 22 L15.5 20.6 L12.2 14.2 L19 14 Z" fill="#fff" stroke="#10211b" stroke-width="1.4" stroke-linejoin="round"/></svg>
+  </div>
+
+  <!-- S7: outro -->
+  <div class="layer" id="s7">
+    <div class="abs mono" id="o0" style="left:140px; top:150px; font-size:28px; color:var(--mint);">Conférence &amp; atelier · Agents IA</div>
+    <div class="abs h" id="o1" style="left:140px; top:210px; font-size:150px;">Shipping AI That Works</div>
+    <div class="abs" id="o2" style="left:140px; top:420px;">
+      <span class="chip dchip">Conférence · 90 min</span><span class="chip dchip">Atelier · 2 jours</span><span class="chip dchip">FR · EN · darija</span><span class="chip dchip">Bac+2 à Bac+5</span>
+    </div>
+    <div class="abs" id="o3" style="left:140px; top:600px; display:flex; align-items:center; gap:40px;">
+      <div id="head"><img src="headshot.png"></div>
+      <div>
+        <div style="font-size:56px; font-weight:700; letter-spacing:-0.03em;">Otman Kettani</div>
+        <div style="font-size:34px; color:rgba(255,255,255,.78); margin-top:10px; font-weight:500;">Pilote des agents LLM dans 51 pays et 11 langues.</div>
+      </div>
+    </div>
+    <div class="abs cta" id="o4" style="left:140px; top:860px;">Réserver une date →</div>
+  </div>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const cl = x => Math.max(0, Math.min(1, x));
+const eo = x => 1 - Math.pow(1 - cl(x), 3);
+const eio = x => { x = cl(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3) / 2; };
+const eback = x => { x = cl(x); const c1 = 1.6, c3 = c1 + 1; return 1 + c3*Math.pow(x-1,3) + c1*Math.pow(x-1,2); };
+const p = (t, a, d) => cl((t - a) / d);
+function S(el, o, tf) { el.style.opacity = o; el.style.transform = tf || 'none'; }
+// rise in at a, out at b (fade up)
+function rise(el, t, a, b, dy = 40, din = .35, dout = .15) {
+  const i = eo(p(t, a, din)), o = eio(p(t, b - dout, dout));
+  S(el, i * (1 - o), `translateY(${(1 - i) * dy - o * 24}px)`);
+}
+function pop(el, t, a, b = 1e9, din = .3) {
+  const i = eback(p(t, a, din)), f = cl(p(t, a, din * .6)), o = eio(p(t, b - .15, .15));
+  S(el, f * (1 - o), `translateY(${(1 - i) * 24}px) scale(${.85 + .15 * i})`);
+}
+function vis(el, on) { el.style.visibility = on ? 'visible' : 'hidden'; }
+
+// build grid cards
+const crit = [['Valeur','Résout-il un vrai problème ?'],['Fiabilité','Le bon résultat à chaque fois ?'],['Sécurité','Et quand il se trompe ?'],['Évaluation','Peut-on prouver qu’il marche ?'],['Opérations','Peut-on le surveiller ?']];
+$('cards').innerHTML = crit.map((c, i) => `<div class="card" id="card${i}" style="left:${140 + i*336}px"><div class="n mono">0${i+1}</div><div class="t">${c[0]}</div><div class="q">${c[1]}</div><div class="check"><div class="fill" id="cf${i}"></div><svg viewBox="0 0 24 24"><path id="ck${i}" d="M5 12.5 L10 17.5 L19 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" pathLength="1" style="stroke-dasharray:1"/></svg></div></div>`).join('');
+$('rays').innerHTML = Array.from({length: 10}, (_, i) => `<div class="ray" id="ray${i}"></div>`).join('');
+
+const B = 0.5; // beat
+window.render = function (t) {
+  // ---------- S1/S2 (0 – 5.0) ----------
+  const s12 = t < 5.0; vis($('s12'), s12);
+  if (s12) {
+    const out = eio(p(t, 4.82, .18));
+    const prod = t >= 2.5;
+    $('tagtxt').textContent = prod ? 'Production' : 'Démo';
+    $('tag').style.color = prod ? 'var(--coral)' : 'var(--mint)';
+    $('tagdot').style.background = prod ? 'var(--coral)' : 'var(--mint)';
+    const tagFlip = prod ? eback(p(t, 2.5, .3)) : 1;
+    S($('tag'), (1 - out), `scale(${.8 + .2 * tagFlip})`); $('tag').style.transformOrigin = 'left center';
+    // headlines
+    { const i = t < .02 ? 1 : eo(p(t, 0, .3)), o = eio(p(t, 2.32, .18)); S($('hA'), i * (1 - o), `translateY(${(1-i)*40 - o*30}px)`); }
+    { const i = eo(p(t, 2.55, .32)); S($('hB'), i * (1 - out), `translateY(${(1-i)*40 - out*30}px)`); }
+    // chat
+    const ci = t < .02 ? 1 : eo(p(t, 0, .4));
+    const shake = t > 4.0 && t < 4.3 ? Math.sin((t - 4.0) * 90) * 14 * (1 - (t - 4.0) / .3) : 0;
+    S($('chat'), ci * (1 - out), `translateX(${(1 - ci) * 120 + shake + out * 60}px)`);
+    $('chat').style.boxShadow = t >= 4.0 ? `0 0 0 ${6*eo(p(t,4.0,.2))}px var(--coral), 0 40px 120px rgba(0,0,0,.45)` : '';
+    pop($('m1'), t, .45);
+    const ty1 = t >= .95 && t < 1.5; vis($('ty1'), ty1); pop($('ty1'), t, .95, 1.5, .2);
+    $('ty1').querySelectorAll('i').forEach((d, k) => d.style.transform = `translateY(${-6 * Math.max(0, Math.sin(t * 12 - k * .9))}px)`);
+    pop($('m2'), t, 1.5);
+    pop($('m3'), t, 2.95);
+    const ty2 = t >= 3.25 && t < 3.5; vis($('ty2'), ty2); pop($('ty2'), t, 3.25, 3.5, .15);
+    $('ty2').querySelectorAll('i').forEach((d, k) => d.style.transform = `translateY(${-6 * Math.max(0, Math.sin(t * 12 - k * .9))}px)`);
+    pop($('m4'), t, 3.5);
+    $('strike').style.transform = `scaleX(${eo(p(t, 4.0, .2))})`;
+    $('amt2').style.color = t >= 4.0 ? 'var(--coral)' : '';
+    { const i = eback(p(t, 4.05, .3)); S($('x10'), cl(p(t, 4.05, .1)), `rotate(${-8 + (1-i)*-20}deg) scale(${.4 + .6*i})`); }
+  }
+
+  // ---------- S3 (5.0 – 7.5) ----------
+  const s3 = t >= 4.95 && t < 7.55; vis($('s3'), s3);
+  if (s3) {
+    rise($('r0'), t, 5.0, 99); rise($('r1'), t, 5.1, 99, 60); rise($('r2'), t, 5.35, 99, 60); rise($('r3'), t, 5.8, 99);
+  }
+  // cream wipe up 7.25–7.5, wipe out (to the top) 15.3–15.5 by ink panel coming down
+  const cw = eio(p(t, 7.22, .28));
+  vis($('cream'), t >= 7.2 && t < 15.55);
+  $('cream').style.transform = `translateY(${(1 - cw) * 100}%)`;
+
+  // ---------- S4 (7.5 – 11.5) ----------
+  const s4 = t >= 7.4 && t < 11.55; vis($('s4'), s4);
+  if (s4) {
+    const out = eio(p(t, 11.3, .2));
+    $('s4').style.transform = `translateX(${-out * 160}px)`; $('s4').style.opacity = 1 - out;
+    rise($('d0'), t, 7.5, 99); rise($('d1'), t, 7.6, 99, 50);
+    rise($('c1h'), t, 7.9, 99, 20); rise($('c2h'), t, 8.9, 99, 20);
+    $('c1r').style.transform = `scaleX(${eo(p(t, 7.9, .4))})`; $('c2r').style.transform = `scaleX(${eo(p(t, 8.9, .4))})`;
+    $('c1').querySelectorAll('.chip').forEach((c, k) => pop(c, t, 8.0 + k * .25, 1e9, .28));
+    $('c2').querySelectorAll('.chip').forEach((c, k) => pop(c, t, 9.0 + k * .25, 1e9, .28));
+    rise($('l1'), t, 10.0, 99, 30); rise($('l2'), t, 10.25, 99, 30);
+  }
+
+  // ---------- S5 (11.5 – 15.5) ----------
+  const s5 = t >= 11.45 && t < 15.55; vis($('s5'), s5);
+  if (s5) {
+    const i = eo(p(t, 11.5, .35));
+    rise($('g0'), t, 11.5, 99); rise($('g1'), t, 11.58, 99, 50);
+    crit.forEach((_, k) => {
+      const c = $('card' + k), a = 11.75 + k * .08;
+      rise(c, t, a, 99, 70, .4);
+      const ct = 12.5 + k * B, f = eback(p(t, ct, .25));
+      $('cf' + k).style.transform = `scale(${f})`; $('cf' + k).style.opacity = cl(p(t, ct, .05));
+      $('ck' + k).style.strokeDashoffset = 1 - eo(p(t, ct + .05, .2));
+      c.style.borderColor = t >= ct ? 'var(--forest)' : 'transparent';
+      c.style.background = t >= ct ? '#e3ece2' : 'var(--sand)';
+    });
+  }
+  // ink panel comes down 15.3–15.5
+  const iw = eio(p(t, 15.25, .25));
+  vis($('inkp'), t >= 15.2);
+  $('inkp').style.transform = `translateY(${-(1 - iw) * 100}%)`;
+
+  // ---------- S6 (15.5 – 17.5) ----------
+  const s6 = t >= 15.45 && t < 17.55; vis($('s6'), s6);
+  if (s6) {
+    const out = eio(p(t, 17.32, .18));
+    $('s6').style.opacity = 1 - out;
+    rise($('v0'), t, 15.5, 99); rise($('v1'), t, 15.58, 99, 50);
+    pop($('no'), t, 15.8, 1e9, .3); pop($('yes'), t, 15.9, 1e9, .3);
+    // cursor path
+    const m = eio(p(t, 16.0, .45));
+    const cx = 1500 + (1300 - 1500) * m, cy = 1010 + (720 - 1010) * m;
+    const press = t >= 16.5 && t < 16.62 ? .82 : 1;
+    S($('cursor'), cl(p(t, 15.95, .1)), `translate(${cx}px, ${cy}px) scale(${press})`);
+    $('cursor').style.left = '0px'; $('cursor').style.top = '0px';
+    const yp = t >= 16.5 ? 1 + .06 * Math.sin(cl(p(t, 16.5, .25)) * Math.PI) * -1 + 0 : 1;
+    if (t >= 16.1) $('yes').style.transform = `scale(${t >= 16.5 && t < 16.62 ? .94 : yp})`;
+    $('yes').style.boxShadow = t >= 16.5 ? `0 0 ${80 * eo(p(t, 16.5, .3))}px rgba(111,211,159,.6)` : '';
+    $('no').style.opacity = t >= 16.5 ? 1 - .6 * eo(p(t, 16.5, .3)) : $('no').style.opacity;
+    // ripple
+    const r = eo(p(t, 16.5, .55)), g = r * 70;
+    $('ripple').style.cssText = `left:${1030 - g}px; top:${640 - g}px; width:${420 + 2*g}px; height:${130 + 2*g}px; border-radius:${65 + g}px; opacity:${t >= 16.5 ? (1 - r) : 0};`;
+    for (let k = 0; k < 10; k++) {
+      const a = k / 10 * Math.PI * 2 + .3, e = eo(p(t, 16.5, .4));
+      const ry = $('ray' + k);
+      ry.style.left = (1240 + Math.cos(a) * (250 + 60 * e)) + 'px'; ry.style.top = (705 + Math.sin(a) * (105 + 40 * e)) + 'px';
+      ry.style.transform = `translate(-3px,0) rotate(${Math.atan2(Math.sin(a)*105, Math.cos(a)*250) * 180 / Math.PI - 90}deg) scaleY(${.2 + .8*(1 - p(t, 16.6, .4))})`;
+      ry.style.opacity = t >= 16.5 ? 1 - p(t, 16.65, .35) : 0;
+    }
+  }
+
+  // ---------- S7 (17.5 – 21.5) ----------
+  const s7 = t >= 17.45; vis($('s7'), s7);
+  if (s7) {
+    rise($('o0'), t, 17.55, 99); rise($('o1'), t, 17.65, 99, 60);
+    $('o2').querySelectorAll('.chip').forEach((c, k) => pop(c, t, 18.0 + k * .25, 1e9, .28));
+    rise($('o3'), t, 19.0, 99, 40, .45);
+    pop($('o4'), t, 19.5, 1e9, .35);
+  }
+};
+window.render(0);
+</script>
+</body>
+</html>
