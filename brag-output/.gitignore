@@ -6,3 +6,5 @@ work/*.png
 !work/headshot.png
 work/*.wav
 work/*.mp4
+work/vo/
+work/vo2/*.wav

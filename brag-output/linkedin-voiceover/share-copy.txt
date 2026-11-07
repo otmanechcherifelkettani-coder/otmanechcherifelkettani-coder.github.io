@@ -1,0 +1,4 @@
+Les agents IA sont partout : ils remboursent, réservent, recrutent, codent, conseillent.
+Tout le monde sait les utiliser. Très peu savent les construire.
+Pour se démarquer, il faut les comprendre et savoir les lancer : choisir le bon problème, concevoir le système, tester, déployer.
+« Shipping AI That Works » : conférence de 90 min ou atelier de 2 jours pour les écoles post-bac, en FR, EN ou darija. Les étudiants repartent avec un vrai projet à montrer en entretien.

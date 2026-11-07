@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="vert.css">
+<style>
+.fly { position: absolute; font-family: "JBM", monospace; font-weight: 500; font-size: 30px; padding: 12px 20px; border-radius: 12px; white-space: nowrap;
+  background: rgba(111,211,159,.08); color: rgba(111,211,159,.55); border: 1px solid rgba(111,211,159,.18); }
+.row { position: absolute; left: 90px; width: 900px; }
+.row .v { font-family: "Inter Display", "Inter", sans-serif; font-weight: 700; font-size: 100px; letter-spacing: -0.04em; line-height: 1; }
+.row .v span { color: var(--mint); }
+.row .k { display: inline-block; margin-top: 18px; font-family: "JBM", monospace; font-size: 28px; font-weight: 500; padding: 9px 18px; border-radius: 10px;
+  background: rgba(111,211,159,.12); color: var(--mint); border: 1px solid rgba(111,211,159,.3); }
+.pdot { position: absolute; width: 44px; height: 44px; border-radius: 50%; background: var(--mint); }
+.big { font-family: "Inter Display", "Inter", sans-serif; font-weight: 800; letter-spacing: -0.05em; line-height: .98; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="layer bg-ink" id="bg0"><div class="dots"></div></div>
+  <div class="layer" id="flyL"></div>
+
+  <!-- S1 hook (0 – 2.5) -->
+  <div class="layer" id="s1">
+    <div class="chap on-ink" id="chap1"><div class="row2" style="display:flex;justify-content:space-between"><span class="lbl">01 · Pourquoi c’est important</span><span class="lbl" style="opacity:.6">1/3</span></div><div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i></div></div>
+    <div class="abs h kw" id="h1" style="left:90px; top:640px; width:900px; font-size:150px;">Les agents IA sont <span class="hl" style="color:var(--mint)">partout.</span></div>
+  </div>
+
+  <!-- S2 what they do (2.5 – 6.5) -->
+  <div class="layer" id="s2">
+    <div class="abs mono" id="l2" style="left:90px; top:330px; font-size:28px; color:rgba(255,255,255,.7);">Aujourd’hui, ils agissent déjà</div>
+    <div id="rows"></div>
+  </div>
+
+  <!-- S3 everyone uses, few build (6.5 – 10.5) -->
+  <div class="layer" id="s3">
+    <div class="abs h kw" id="h3a" style="left:90px; top:330px; width:900px; font-size:104px;">Tout le monde sait les utiliser.</div>
+    <div id="crowd"></div>
+    <div class="abs h kw" id="h3b" style="left:90px; top:1240px; width:900px; font-size:104px;">Très peu savent <span class="hl" style="color:var(--mint)">les construire.</span></div>
+  </div>
+
+  <!-- S4 + S5 cream (10.5 – 19.0) -->
+  <div class="layer lead" id="lead1"></div>
+  <div class="layer bg-cream" id="bgC"><div class="dots"></div></div>
+  <div class="layer dark" id="sC">
+    <div class="chap on-cream" id="chap2"><div style="display:flex;justify-content:space-between"><span class="lbl">02 · Comment se démarquer</span><span class="lbl" style="opacity:.6">2/3</span></div><div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i></div></div>
+    <div id="s4">
+      <div class="abs h kw" id="h4" style="left:90px; top:400px; width:900px; font-size:96px;">Pour vous démarquer, il faut :</div>
+      <div class="abs big" id="b1" style="left:84px; top:690px; font-size:150px;">Comprendre.</div>
+      <div class="abs big" id="b2" style="left:84px; top:860px; font-size:150px; color:var(--forest);">Construire.</div>
+      <div class="abs" id="b3" style="left:90px; top:1080px; width:900px; font-size:46px; font-weight:500; color:#3c423d; line-height:1.3;">Pas seulement utiliser : savoir ce que l’agent décide, ce que le système contrôle, et quand il peut être lancé.</div>
+    </div>
+    <div id="s5">
+      <div class="abs mono" id="l5" style="left:90px; top:330px; font-size:28px; color:var(--forest);">Shipping AI That Works</div>
+      <div class="abs h kw" id="h5" style="left:90px; top:390px; width:900px; font-size:112px;">Ce que vous <span class="hl" style="color:var(--forest)">apprenez.</span></div>
+      <div class="abs" id="rail"></div>
+      <div id="steps"></div>
+      <div class="abs" id="fmt" style="left:90px; top:1420px; width:900px;"><span class="chip" style="background:var(--ink); color:var(--mint); border:0">Conférence · 90 min</span><span class="chip" style="background:var(--ink); color:var(--mint); border:0">Atelier · 2 jours</span></div>
+    </div>
+  </div>
+
+  <!-- S6 career (19.0 – 22.5) -->
+  <div class="layer lead" id="lead2"></div>
+  <div class="layer bg-ink" id="bgI"><div class="dots"></div></div>
+  <div class="layer" id="s6">
+    <div class="chap on-ink" id="chap3"><div style="display:flex;justify-content:space-between"><span class="lbl">03 · Votre carrière</span><span class="lbl" style="opacity:.6">3/3</span></div><div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i></div></div>
+    <div class="abs mono" id="l6" style="left:90px; top:330px; font-size:28px; color:rgba(255,255,255,.7);">Vous repartez avec</div>
+    <div class="abs h kw" id="h6" style="left:90px; top:390px; width:900px; font-size:112px;">Un vrai projet à montrer <span class="hl" style="color:var(--mint)">en entretien.</span></div>
+    <div class="abs mono" id="l6b" style="left:90px; top:960px; font-size:26px; color:rgba(255,255,255,.6);">Pour les métiers qui recrutent</div>
+    <div class="role" id="rl0" style="top:1020px;"><span class="n">01</span><span class="t">Product manager IA</span></div>
+    <div class="role" id="rl1" style="top:1180px;"><span class="n">02</span><span class="t">Ingénieur LLM</span></div>
+    <div class="role" id="rl2" style="top:1340px;"><span class="n">03</span><span class="t">Opérations IA</span></div>
+  </div>
+
+  <!-- S7 outro (22.5 – 25.5) -->
+  <div class="layer lead" id="lead3"></div>
+  <div class="layer bg-ink" id="bgO"><div class="dots"></div></div>
+  <div class="layer" id="sE">
+    <div class="abs mono" id="o0" style="left:90px; top:380px; font-size:30px; color:var(--mint);">Conférence &amp; atelier · Agents IA</div>
+    <div class="abs h kw" id="o1" style="left:90px; top:440px; width:900px; font-size:150px;">Shipping AI <span class="hl" style="color:var(--mint)">That Works</span></div>
+    <div class="abs" id="o2" style="left:90px; top:800px; width:920px;">
+      <span class="chip">Conférence · 90 min</span><span class="chip">Atelier · 2 jours</span><span class="chip">FR · EN · darija</span><span class="chip">Bac+2 à Bac+5</span>
+    </div>
+    <div class="abs" id="o3" style="left:90px; top:1040px; width:900px; display:flex; align-items:center; gap:40px;">
+      <div id="head"><img src="headshot.png"></div>
+      <div>
+        <div style="font-size:60px; font-weight:700; letter-spacing:-0.03em;">Otman Kettani</div>
+        <div style="font-size:36px; color:rgba(255,255,255,.8); margin-top:10px; font-weight:500; line-height:1.3;">Pilote des agents LLM dans 51 pays et 11 langues.</div>
+      </div>
+    </div>
+    <div class="abs cta" id="o4" style="left:90px; top:1380px;">Réserver une date →</div>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const cl = x => Math.max(0, Math.min(1, x));
+const eo = x => 1 - Math.pow(1 - cl(x), 3);
+const eo5 = x => 1 - Math.pow(1 - cl(x), 5);
+const eio = x => { x = cl(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3) / 2; };
+const eback = x => { x = cl(x); const c1 = 1.6, c3 = c1 + 1; return 1 + c3*Math.pow(x-1,3) + c1*Math.pow(x-1,2); };
+const p = (t, a, d) => cl((t - a) / d);
+function S(el, o, tf) { el.style.opacity = o; el.style.transform = tf || 'none'; }
+function rise(el, t, a, dy = 40, din = .35) { const i = eo(p(t, a, din)); S(el, i, `translateY(${(1 - i) * dy}px)`); }
+function pop(el, t, a, din = .3) { const i = eback(p(t, a, din)), f = cl(p(t, a, din * .6)); S(el, f, `translateY(${(1 - i) * 30}px) scale(${.86 + .14 * i})`); }
+function show(el, on) { el.style.display = on ? '' : 'none'; }
+function exitUp(el, t, a, d = .2) { const o = eio(p(t, a, d)); el.style.opacity = 1 - o; el.style.transform = `translateY(${-o * 120}px)`; }
+function wipe2(lead, bg, t, a, d = .3) {
+  const w1 = eio(p(t, a, d)), w2 = eio(p(t, a + .07, d));
+  show(lead, t >= a && w2 < 1); show(bg, t >= a + .07);
+  lead.style.clipPath = `inset(${(1 - w1) * 100}% 0 0 0)`; bg.style.clipPath = `inset(${(1 - w2) * 100}% 0 0 0)`;
+}
+function split(el) {
+  [...el.childNodes].forEach(n => {
+    if (n.nodeType === 3) {
+      const frag = document.createDocumentFragment();
+      n.textContent.split(/(\s+)/).forEach(tok => {
+        if (!tok) return;
+        if (/^\s+$/.test(tok)) frag.appendChild(document.createTextNode(' '));
+        else { const s = document.createElement('span'); s.className = 'w'; s.textContent = tok; frag.appendChild(s); }
+      });
+      n.replaceWith(frag);
+    } else if (n.nodeType === 1) split(n);
+  });
+}
+document.querySelectorAll('.kw').forEach(split);
+function kin(el, t, a, st = .045, din = .4) {
+  const ws = el.querySelectorAll('.w'); el.style.opacity = 1;
+  const settle = a + ws.length * st + .12; let j = 0;
+  ws.forEach((w, i) => {
+    const k = eo5(p(t, a + i * st, din));
+    w.style.opacity = cl(p(t, a + i * st, din * .5));
+    w.style.transform = `translateY(${(1 - k) * 70}px) rotate(${(1 - k) * 4}deg)`;
+    if (w.closest('.hl')) {
+      const c = getComputedStyle(w.closest('.hl')).color.replace('rgb(', 'rgba(').replace(')', ', .22)');
+      const hw = eio(p(t, settle + j * .07, .25)); j++;
+      w.style.backgroundImage = `linear-gradient(${c}, ${c})`; w.style.backgroundSize = `${hw * 100}% .3em`;
+    }
+  });
+}
+function chap(el, t, a, n) {
+  const i = eo(p(t, a, .35)); S(el, i, `translateY(${(1 - i) * -24}px)`);
+  el.querySelectorAll('.bars b').forEach((b, k) => b.style.transform = `scaleX(${k < n - 1 ? 1 : k === n - 1 ? eio(p(t, a, .6)) : 0})`);
+}
+function push(el, t, a, b) { el.style.transform = `scale(${1 + .025 * cl((t - a) / (b - a))})`; el.style.transformOrigin = '50% 40%'; }
+
+// flying tool calls ("everywhere")
+const calls = ['rembourser(commande)', 'reserver(vol)', 'trier(candidatures)', 'ouvrir_pr(correctif)', 'repondre(client)', 'planifier(rdv)', 'analyser(ventes)', 'traduire(darija)', 'recommander(offre)', 'relancer(facture)', 'verifier(identite)', 'resumer(contrat)'];
+$('flyL').innerHTML = calls.map((c, i) => `<div class="fly" id="f${i}">⚙ ${c}</div>`).join('');
+// S2 rows: verb + tool call, timed to the spoken words
+const rows = [['remboursent', 'rembourser(commande)', 2.75], ['réservent', 'reserver(vol)', 3.58], ['recrutent', 'trier(candidatures)', 4.26], ['codent', 'ouvrir_pr(correctif)', 4.99], ['conseillent', 'recommander(offre)', 5.51]];
+$('rows').innerHTML = rows.map((r, i) => `<div class="row" id="rw${i}" style="top:${420 + i * 210}px"><div class="v">Ils <span>${r[0]}.</span></div><div class="k">⚙ ${r[1]}</div></div>`).join('');
+// S3 crowd: 60 people, 3 builders
+const builders = [14, 33, 47];
+$('crowd').innerHTML = Array.from({ length: 60 }, (_, i) => `<div class="pdot" id="pd${i}" style="left:${100 + (i % 10) * 88}px; top:${700 + Math.floor(i / 10) * 84}px"></div>`).join('');
+// S5 steps, timed to the spoken words
+const steps = [['Choisir', 'le bon problème : IA ou simple règle ?', 15.62], ['Concevoir', 'prompt, outils, données, mémoire', 16.38], ['Tester', 'des cas inconnus, un seuil de réussite', 17.24], ['Déployer', 'pilote, puis généralisation', 17.92]];
+$('steps').innerHTML = steps.map((s, i) => `<div class="step" id="st${i}" style="top:${620 + i*180}px"><div class="c" id="sc${i}">0${i+1}</div><div><div class="t">${s[0]}</div><div class="q">${s[1]}</div></div></div>`).join('');
+$('rail').style.cssText = 'left:136px; top:690px; height:540px;';
+
+window.render = function (t) {
+  document.querySelectorAll('.dots').forEach(d => d.style.transform = `translate(${(t * 6) % 44}px, ${(t * 10) % 44}px)`);
+
+  // flying tool calls: drift upward through S1–S2, faint
+  const flyOn = t < 2.75; show($('flyL'), flyOn);
+  if (flyOn) {
+    const fo = 1 - eio(p(t, 2.4, .3));
+    calls.forEach((_, i) => {
+      const el = $('f' + i), sp = 90 + (i * 37) % 70, x = 40 + ((i * 263) % 760), y = 1900 - ((t * sp + i * 173) % 2100);
+      const fi = cl(p(t, i * .12, .4));
+      const edge = cl((y - 260) / 160) * cl((1560 - y) / 160);
+      el.style.opacity = fi * fo * edge;
+      el.style.transform = `translate(${x}px, ${y}px) rotate(${(i % 2 ? -1 : 1) * 3}deg)`;
+    });
+  }
+
+  // ---------- S1 hook (0 – 2.5) ----------
+  // chapter 1 header lives in s1 but stays until 10.5: drawn here
+  show($('s1'), t < 10.55);
+  if (t < 10.55) {
+    chap($('chap1'), t, 0.1, 1);
+    const h = t < 2.5; show($('h1'), h);
+    if (h) { push($('h1'), t, 0, 2.5); kin($('h1'), t, .05, .07); const o = eio(p(t, 2.32, .18)); $('h1').style.opacity = 1 - o; }
+    $('chap1').style.opacity = t > 10.2 ? 1 - p(t, 10.2, .2) : $('chap1').style.opacity;
+  }
+
+  // ---------- S2 what they do (2.5 – 6.5) ----------
+  const s2 = t >= 2.45 && t < 6.55; show($('s2'), s2);
+  if (s2) {
+    exitUp($('s2'), t, 6.32, .18);
+    rise($('l2'), t, 2.5);
+    rows.forEach((r, i) => {
+      const el = $('rw' + i), a = r[2] - .08, k = eo5(p(t, a, .4));
+      const next = i < rows.length - 1 ? rows[i + 1][2] : 99;
+      const dim = 1 - .55 * eio(p(t, next - .08, .25));
+      el.style.opacity = cl(p(t, a, .15)) * dim;
+      el.style.transform = `translateX(${(1 - k) * 140}px)`;
+    });
+  }
+
+  // ---------- S3 everyone uses / few build (6.5 – 10.5) ----------
+  const s3 = t >= 6.45 && t < 10.55; show($('s3'), s3);
+  if (s3) {
+    push($('s3'), t, 6.5, 10.5);
+    kin($('h3a'), t, 6.55, .05); $('h3a').style.opacity = 1 - .55 * eio(p(t, 8.6, .3));
+    for (let i = 0; i < 60; i++) {
+      const el = $('pd' + i), a = 6.9 + ((i * 7) % 60) / 60 * .7, k = eback(p(t, a, .3));
+      const b = builders.includes(i);
+      const fade = b ? 1 : 1 - .85 * eio(p(t, 8.6 + (i % 10) * .015, .35));
+      const grow = b ? 1 + .45 * eback(p(t, 8.75, .4)) : 1;
+      el.style.opacity = cl(p(t, a, .15)) * fade;
+      el.style.transform = `scale(${(.3 + .7 * k) * grow})`;
+      el.style.boxShadow = b && t >= 8.75 ? `0 0 ${40 * eo(p(t, 8.75, .4))}px rgba(111,211,159,.8)` : 'none';
+    }
+    show($('h3b'), t >= 8.65); if (t >= 8.65) kin($('h3b'), t, 8.68, .05);
+  }
+
+  // ---------- S4 + S5 cream (10.5 – 19.0) ----------
+  wipe2($('lead1'), $('bgC'), t, 10.2); if (t >= 19.1) show($('bgC'), false);
+  const sC = t >= 10.45 && t < 19.05; show($('sC'), sC);
+  if (sC) {
+    chap($('chap2'), t, 10.5, 2);
+    const g4 = t < 14.05; show($('s4'), g4);
+    if (g4) {
+      push($('s4'), t, 10.5, 14); exitUp($('s4'), t, 13.82, .18);
+      kin($('h4'), t, 10.6, .05);
+      { const k = eback(p(t, 11.85, .4)); S($('b1'), cl(p(t, 11.85, .12)), `translateY(${(1 - k) * 60}px) scale(${.9 + .1 * k})`); }
+      { const k = eback(p(t, 13.0, .4)); S($('b2'), cl(p(t, 13.0, .12)), `translateY(${(1 - k) * 60}px) scale(${.9 + .1 * k})`); }
+      rise($('b3'), t, 13.25, 30);
+    }
+    const g5 = t >= 13.95; show($('s5'), g5);
+    if (g5) {
+      push($('s5'), t, 14, 19);
+      rise($('l5'), t, 14.0); kin($('h5'), t, 14.05, .06);
+      $('rail').style.transform = `scaleY(${eio(p(t, 15.5, 2.6))})`;
+      steps.forEach((s, k) => {
+        const a = s[2] - .05, i = eo5(p(t, a, .35));
+        S($('st' + k), cl(p(t, a, .15)), `translateX(${(1 - i) * 80}px)`);
+        const done = t >= a + .3; $('sc' + k).classList.toggle('done', done); $('sc' + k).textContent = done ? '✓' : '0' + (k + 1);
+      });
+      $('fmt').querySelectorAll('.chip').forEach((c, k) => pop(c, t, 18.3 + k * .125, .28));
+    }
+  }
+
+  // ---------- S6 career (19.0 – 22.5) ----------
+  wipe2($('lead2'), $('bgI'), t, 18.7); if (t >= 22.6) show($('bgI'), false);
+  const s6 = t >= 18.95 && t < 22.55; show($('s6'), s6);
+  if (s6) {
+    push($('s6'), t, 19, 22.5);
+    chap($('chap3'), t, 19.0, 3);
+    rise($('l6'), t, 19.05); kin($('h6'), t, 19.1, .05);
+    rise($('l6b'), t, 20.0, 20);
+    [0, 1, 2].forEach(k => { const a = 20.2 + k * .25, i = eo5(p(t, a, .35)); S($('rl' + k), cl(p(t, a, .15)), `translateX(${(1 - i) * 120}px)`); });
+  }
+
+  // ---------- S7 outro (22.5 – 25.5) ----------
+  wipe2($('lead3'), $('bgO'), t, 22.2);
+  const sE = t >= 22.45; show($('sE'), sE);
+  if (sE) {
+    rise($('o0'), t, 22.5); kin($('o1'), t, 22.55, .06);
+    $('o2').querySelectorAll('.chip').forEach((c, k) => pop(c, t, 23.0 + k * .125, .28));
+    rise($('o3'), t, 23.5, 40, .4);
+    pop($('o4'), t, 24.0, .35);
+  }
+};
+window.render(0);
+</script>
+</body>
+</html>

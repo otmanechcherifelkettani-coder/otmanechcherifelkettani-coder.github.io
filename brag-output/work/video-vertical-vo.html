@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "JBM"; src: url("fonts/package/files/jetbrains-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "JBM"; src: url("fonts/package/files/jetbrains-mono-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+:root { --ink: #10211b; --mint: #6fd39f; --forest: #0f6b46; --cream: #f5f2eb; --sand: #e8e4d9; --chip: #dcebdf; --coral: #ff7a59; --muted: #5d625c; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: "Inter", sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+.layer { position: absolute; inset: 0; }
+.abs { position: absolute; }
+.mono { font-family: "JBM", monospace; font-weight: 600; text-transform: uppercase; letter-spacing: .18em; }
+.h { font-family: "Inter Display", "Inter", sans-serif; font-weight: 700; letter-spacing: -0.04em; line-height: 1.02; }
+.w { display: inline-block; will-change: transform; padding: 0 .02em; }
+.hl .w { background-repeat: no-repeat; background-position: 0 90%; }
+.dark { color: var(--ink); }
+
+/* backgrounds */
+.bg-ink { background: radial-gradient(900px 700px at 85% 8%, rgba(111,211,159,.16), transparent 60%), radial-gradient(900px 800px at 10% 95%, rgba(15,107,70,.45), transparent 60%), var(--ink); }
+.bg-cream { background: radial-gradient(800px 600px at 90% 0%, rgba(111,211,159,.22), transparent 60%), var(--cream); }
+.dots { position: absolute; inset: -60px; background-image: radial-gradient(rgba(255,255,255,.07) 2px, transparent 2.5px); background-size: 44px 44px; }
+.bg-cream .dots { background-image: radial-gradient(rgba(15,107,70,.09) 2px, transparent 2.5px); }
+.lead { background: var(--mint); }
+
+/* chapter header */
+.chap { position: absolute; left: 90px; right: 90px; top: 150px; }
+.chap .row { display: flex; justify-content: space-between; align-items: center; }
+.chap .lbl { font-family: "JBM", monospace; font-weight: 600; font-size: 28px; letter-spacing: .16em; text-transform: uppercase; }
+.chap .bars { display: flex; gap: 10px; margin-top: 22px; }
+.chap .bars i { display: block; flex: 1; height: 8px; border-radius: 4px; background: currentColor; opacity: .18; position: relative; overflow: hidden; }
+.chap .bars i b { position: absolute; inset: 0; background: currentColor; transform-origin: left; border-radius: 4px; }
+.on-ink { color: var(--mint); } .on-cream { color: var(--forest); }
+
+/* chat */
+#chat { left: 90px; top: 800px; width: 900px; height: 800px; background: var(--cream); border-radius: 40px; box-shadow: 0 50px 140px rgba(0,0,0,.5); overflow: hidden; color: var(--ink); }
+#chatHead { height: 116px; border-bottom: 1px solid #ddd8cc; display: flex; align-items: center; padding: 0 40px; gap: 22px; }
+.logo { width: 64px; height: 64px; border-radius: 18px; background: var(--forest); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 30px; letter-spacing: -0.04em; }
+.msg { position: absolute; padding: 24px 30px; border-radius: 28px; font-size: 33px; line-height: 1.3; font-weight: 500; white-space: nowrap; }
+.user { right: 40px; background: var(--ink); color: #fff; border-bottom-right-radius: 8px; }
+.agent { left: 40px; background: var(--sand); color: var(--ink); border-bottom-left-radius: 8px; }
+.tool { position: absolute; left: 40px; font-family: "JBM", monospace; font-size: 25px; font-weight: 500; padding: 11px 20px; border-radius: 12px; background: #dcebdf; color: var(--forest); white-space: nowrap; }
+.tool.bad { background: #ffe1d8; color: #b8432a; }
+.amt { position: relative; font-weight: 700; white-space: nowrap; }
+.strike { position: absolute; left: -4px; right: -4px; top: 52%; height: 6px; background: var(--coral); transform-origin: left; border-radius: 3px; }
+#x10 { right: 46px; top: 520px; background: var(--coral); color: #fff; font-weight: 800; font-size: 72px; padding: 6px 28px; border-radius: 18px; letter-spacing: -0.02em; box-shadow: 0 16px 40px rgba(255,122,89,.4); }
+
+/* steps */
+.step { position: absolute; left: 90px; width: 900px; height: 150px; display: flex; align-items: center; gap: 34px; }
+.step .c { flex: none; width: 96px; height: 96px; border-radius: 50%; background: var(--cream); border: 4px solid var(--forest); color: var(--forest); display: flex; align-items: center; justify-content: center;
+  font-family: "JBM", monospace; font-weight: 600; font-size: 30px; position: relative; z-index: 1; }
+.step .c.done { background: var(--forest); color: #fff; }
+.step .t { font-size: 52px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; }
+.step .q { font-size: 31px; color: #3c423d; margin-top: 8px; font-weight: 500; }
+#rail { left: 136px; top: 790px; width: 6px; height: 480px; background: var(--forest); transform-origin: top; border-radius: 3px; }
+#case { left: 90px; top: 1390px; width: 900px; background: var(--ink); color: #fff; border-radius: 26px; padding: 36px 40px; font-size: 38px; font-weight: 500; line-height: 1.3; }
+#case .k { font-family: "JBM", monospace; font-weight: 600; font-size: 24px; letter-spacing: .16em; color: var(--mint); display: block; margin-bottom: 12px; }
+#case b { color: var(--mint); font-weight: 700; }
+
+/* roles + takes */
+.role { position: absolute; left: 90px; width: 900px; height: 140px; border-radius: 26px; padding: 0 40px; display: flex; align-items: center; gap: 30px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16); }
+.role .n { font-family: "JBM", monospace; font-weight: 600; font-size: 26px; color: var(--mint); }
+.role .t { font-size: 56px; font-weight: 700; letter-spacing: -0.03em; }
+.take { position: absolute; width: 440px; height: 220px; border-radius: 26px; padding: 30px 32px; background: var(--mint); color: var(--ink); }
+.take .n { font-family: "JBM", monospace; font-weight: 600; font-size: 24px; color: var(--forest); }
+.take .t { font-size: 46px; font-weight: 700; letter-spacing: -0.03em; margin-top: 22px; line-height: 1.05; }
+
+.chip { display: inline-block; font-family: "JBM", monospace; font-weight: 500; font-size: 30px; padding: 12px 22px; border-radius: 12px; margin: 0 12px 14px 0;
+  background: rgba(111,211,159,.12); color: var(--mint); border: 1px solid rgba(111,211,159,.35); }
+#head { width: 200px; height: 200px; border-radius: 50%; overflow: hidden; border: 5px solid var(--mint); flex: none; }
+#head img { width: 100%; height: 100%; display: block; }
+.cta { background: var(--mint); color: var(--ink); font-weight: 700; font-size: 46px; padding: 32px 52px; border-radius: 70px; letter-spacing: -0.02em; box-shadow: 0 20px 60px rgba(111,211,159,.3); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="layer bg-ink" id="bg0"><div class="dots"></div></div>
+
+  <!-- HOOK + 01a: chat (0 – 5.0) -->
+  <div class="layer" id="sA">
+    <div class="abs mono" id="tag" style="left:90px; top:200px; font-size:30px; color:var(--mint);">● Agents IA</div>
+    <div class="abs h kw" id="hA" style="left:90px; top:300px; width:900px; font-size:122px;">Un agent IA ne répond pas. <span class="hl" style="color:var(--mint)">Il agit.</span></div>
+    <div class="abs h kw" id="hB" style="left:90px; top:300px; width:900px; font-size:122px;">Quand il agit, ses erreurs <span class="hl" style="color:var(--coral)">coûtent cher.</span></div>
+    <div class="abs" id="chat">
+      <div id="chatHead">
+        <div class="logo">Sg</div>
+        <div>
+          <div style="font-size:36px; font-weight:700; letter-spacing:-0.02em;">SoukGo · Support</div>
+          <div style="font-size:24px; color:var(--muted); margin-top:4px;">● Agent IA · FR · EN · darija</div>
+        </div>
+      </div>
+      <div class="msg user" id="m1" style="top:146px;">Salam, commande dyali wslat naqsa.</div>
+      <div class="tool" id="tl1" style="top:258px;">⚙ rembourser(commande, 249 MAD)</div>
+      <div class="msg agent" id="m2" style="top:326px;">Remboursement de <span class="amt">249 MAD</span> effectué ✓</div>
+      <div class="msg user" id="m3" style="top:438px;">Il manque encore un article.</div>
+      <div class="tool bad" id="tl2" style="top:550px;">⚙ rembourser(commande, 2 490 MAD)</div>
+      <div class="msg agent" id="m4" style="top:618px;">Remboursement de <span class="amt" id="amt2">2&nbsp;490 MAD<span class="strike" id="strike"></span></span> effectué ✓</div>
+      <div class="abs" id="x10">×10</div>
+    </div>
+  </div>
+
+  <!-- 01b why now (5.0 – 8.5) -->
+  <div class="layer" id="sB">
+    <div class="abs mono" id="w0" style="left:90px; top:330px; font-size:28px; color:rgba(255,255,255,.7);">Maroc IA 2030</div>
+    <div class="abs h" id="wN" style="left:80px; top:380px; font-size:236px; color:var(--mint); letter-spacing:-0.055em;">200&nbsp;000</div>
+    <div class="abs" id="wL" style="left:90px; top:650px; width:900px; font-size:44px; font-weight:500; line-height:1.3; color:rgba(255,255,255,.88);">talents IA formés et certifiés visés d’ici 2030 : <b style="color:#fff">une priorité nationale.</b></div>
+    <div class="abs" id="wDiv" style="left:90px; top:860px; width:900px; height:2px; background:rgba(255,255,255,.2); transform-origin:left;"></div>
+    <div class="abs mono" id="w1" style="left:90px; top:920px; font-size:28px; color:rgba(255,255,255,.7);">Côté recrutement</div>
+    <div class="abs h kw" id="w2" style="left:90px; top:980px; width:900px; font-size:104px;">Les agents IA : la compétence IA <span class="hl" style="color:var(--mint)">qui progresse le plus vite.</span></div>
+    <div class="abs mono" id="w3" style="left:90px; top:1580px; width:900px; font-size:20px; line-height:1.6; color:rgba(255,255,255,.45); letter-spacing:.1em;">Sources : feuille de route « AI Made in Morocco » · Stanford AI Index 2026</div>
+  </div>
+  <div class="chap on-ink" id="chap1"><div class="row"><span class="lbl">01 · Pourquoi c’est important</span><span class="lbl" style="opacity:.6">1/3</span></div><div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i></div></div>
+
+  <!-- 02 leverage (8.5 – 13.0) -->
+  <div class="layer lead" id="lead1"></div>
+  <div class="layer bg-cream" id="bgC"><div class="dots"></div></div>
+  <div class="layer dark" id="sC">
+    <div class="chap on-cream" id="chap2"><div class="row"><span class="lbl">02 · Comment l’exploiter</span><span class="lbl" style="opacity:.6">2/3</span></div><div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i></div></div>
+    <div class="abs h kw" id="c1" style="left:90px; top:330px; width:900px; font-size:116px;">4 étapes pour lancer <span class="hl" style="color:var(--forest)">un agent.</span></div>
+    <div class="abs" id="rail"></div>
+    <div id="steps"></div>
+    <div class="abs" id="case"><span class="k">Cas d’étude · atelier</span>SoukGo : <b>100 000</b> demandes de remboursement par mois, en FR, EN et darija.</div>
+  </div>
+
+  <!-- 03 career (13.0 – 19.0) -->
+  <div class="layer lead" id="lead2"></div>
+  <div class="layer bg-ink" id="bgI"><div class="dots"></div></div>
+  <div class="layer" id="sD">
+    <div class="chap on-ink" id="chap3"><div class="row"><span class="lbl">03 · Votre carrière</span><span class="lbl" style="opacity:.6">3/3</span></div><div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i></div></div>
+    <div id="dA">
+      <div class="abs mono" id="d0" style="left:90px; top:330px; font-size:28px; color:rgba(255,255,255,.7);">Les métiers qui recrutent</div>
+      <div class="abs h kw" id="d1" style="left:90px; top:390px; width:900px; font-size:116px;">Utiliser l’IA ne suffit plus. <span class="hl" style="color:var(--mint)">Savoir la lancer, si.</span></div>
+      <div class="role" id="rl0" style="top:1060px;"><span class="n">01</span><span class="t">Product manager IA</span></div>
+      <div class="role" id="rl1" style="top:1220px;"><span class="n">02</span><span class="t">Ingénieur LLM</span></div>
+      <div class="role" id="rl2" style="top:1380px;"><span class="n">03</span><span class="t">Opérations IA</span></div>
+    </div>
+    <div id="dB">
+      <div class="abs mono" id="e0" style="left:90px; top:330px; font-size:28px; color:rgba(255,255,255,.7);">Vous repartez avec</div>
+      <div class="abs h kw" id="e1" style="left:90px; top:390px; width:900px; font-size:116px;">Un projet concret à présenter <span class="hl" style="color:var(--mint)">en entretien.</span></div>
+      <div id="takes"></div>
+    </div>
+  </div>
+
+  <!-- OUTRO (19.0 – 22.5) -->
+  <div class="layer lead" id="lead3"></div>
+  <div class="layer bg-ink" id="bgO"><div class="dots"></div></div>
+  <div class="layer" id="sE">
+    <div class="abs mono" id="o0" style="left:90px; top:380px; font-size:30px; color:var(--mint);">Conférence &amp; atelier · Agents IA</div>
+    <div class="abs h kw" id="o1" style="left:90px; top:440px; width:900px; font-size:150px;">Shipping AI <span class="hl" style="color:var(--mint)">That Works</span></div>
+    <div class="abs" id="o2" style="left:90px; top:800px; width:920px;">
+      <span class="chip">Conférence · 90 min</span><span class="chip">Atelier · 2 jours</span><span class="chip">FR · EN · darija</span><span class="chip">Bac+2 à Bac+5</span>
+    </div>
+    <div class="abs" id="o3" style="left:90px; top:1040px; width:900px; display:flex; align-items:center; gap:40px;">
+      <div id="head"><img src="headshot.png"></div>
+      <div>
+        <div style="font-size:60px; font-weight:700; letter-spacing:-0.03em;">Otman Kettani</div>
+        <div style="font-size:36px; color:rgba(255,255,255,.8); margin-top:10px; font-weight:500; line-height:1.3;">Pilote des agents LLM dans 51 pays et 11 langues.</div>
+      </div>
+    </div>
+    <div class="abs cta" id="o4" style="left:90px; top:1380px;">Réserver une date →</div>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const cl = x => Math.max(0, Math.min(1, x));
+const eo = x => 1 - Math.pow(1 - cl(x), 3);
+const eo5 = x => 1 - Math.pow(1 - cl(x), 5);
+const eio = x => { x = cl(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3) / 2; };
+const eback = x => { x = cl(x); const c1 = 1.6, c3 = c1 + 1; return 1 + c3*Math.pow(x-1,3) + c1*Math.pow(x-1,2); };
+const p = (t, a, d) => cl((t - a) / d);
+function S(el, o, tf) { el.style.opacity = o; el.style.transform = tf || 'none'; }
+function rise(el, t, a, dy = 40, din = .35) { const i = eo(p(t, a, din)); S(el, i, `translateY(${(1 - i) * dy}px)`); }
+function pop(el, t, a, din = .3) { const i = eback(p(t, a, din)), f = cl(p(t, a, din * .6)); S(el, f, `translateY(${(1 - i) * 30}px) scale(${.86 + .14 * i})`); }
+function show(el, on) { el.style.display = on ? '' : 'none'; }
+function exitUp(el, t, a, d = .2) { const o = eio(p(t, a, d)); el.style.opacity = 1 - o; el.style.transform = `translateY(${-o * 120}px)`; }
+// double wipe: mint lead, then background, rising from the bottom
+function wipe2(lead, bg, t, a, d = .3) {
+  const w1 = eio(p(t, a, d)), w2 = eio(p(t, a + .07, d));
+  show(lead, t >= a && w2 < 1); show(bg, t >= a + .07);
+  lead.style.clipPath = `inset(${(1 - w1) * 100}% 0 0 0)`; bg.style.clipPath = `inset(${(1 - w2) * 100}% 0 0 0)`;
+}
+
+// kinetic words: split every text node into .w spans
+function split(el) {
+  [...el.childNodes].forEach(n => {
+    if (n.nodeType === 3) {
+      const frag = document.createDocumentFragment();
+      n.textContent.split(/(\s+)/).forEach(tok => {
+        if (!tok) return;
+        if (/^\s+$/.test(tok)) frag.appendChild(document.createTextNode(' '));
+        else { const s = document.createElement('span'); s.className = 'w'; s.textContent = tok; frag.appendChild(s); }
+      });
+      n.replaceWith(frag);
+    } else if (n.nodeType === 1) split(n);
+  });
+}
+document.querySelectorAll('.kw').forEach(split);
+function kin(el, t, a, st = .045, din = .4) {
+  const ws = el.querySelectorAll('.w'); el.style.opacity = 1;
+  const settle = a + ws.length * st + .12;
+  let j = 0;
+  ws.forEach((w, i) => {
+    const k = eo5(p(t, a + i * st, din));
+    w.style.opacity = cl(p(t, a + i * st, din * .5));
+    w.style.transform = `translateY(${(1 - k) * 70}px) rotate(${(1 - k) * 4}deg)`;
+    if (w.closest('.hl')) {
+      const c = getComputedStyle(w.closest('.hl')).color;
+      const hw = eio(p(t, settle + j * .07, .25)); j++;
+      w.style.backgroundImage = `linear-gradient(${c.replace('rgb(', 'rgba(').replace(')', ', .22)')}, ${c.replace('rgb(', 'rgba(').replace(')', ', .22)')})`;
+      w.style.backgroundSize = `${hw * 100}% .3em`;
+    }
+  });
+}
+// chapter header bars: segments up to n filled, segment n fills from a
+function chap(el, t, a, n) {
+  const i = eo(p(t, a, .35)); S(el, i, `translateY(${(1 - i) * -24}px)`);
+  el.querySelectorAll('.bars b').forEach((b, k) => b.style.transform = `scaleX(${k < n - 1 ? 1 : k === n - 1 ? eio(p(t, a, .6)) : 0})`);
+}
+function push(el, t, a, b) { const A = outOf(a), Bo = outOf(b); el.style.transform = `scale(${1 + .025 * cl((AMB - A) / (Bo - A))})`; el.style.transformOrigin = '50% 40%'; }
+
+// time map: holds inserted at composition times (voice-over pacing), all whole beats
+const HOLDS = (window.HOLDS_OVERRIDE || [[8.15, 1.0], [12.65, 0.5], [16.3, 0.5], [18.65, 1.0]]);
+let AMB = 0;
+function outOf(tc) { let o = tc; HOLDS.forEach(([c, d]) => { if (tc > c) o += d; }); return o; }
+function compOf(to) { let tc = to; for (const [c, d] of HOLDS) { const oc = outOf(c); if (to <= oc) break; tc = to - (outOf(c) - c) - Math.min(d, to - oc); if (to - oc < d) return c; } return tc; }
+const steps = [['Choisir le bon problème', 'IA ou simple règle ?'], ['Concevoir le système', 'Prompt, outils, données, mémoire'], ['Prouver qu’il marche', 'Tests et seuil de réussite'], ['Déployer par étapes', 'Pilote, puis généralisation']];
+$('steps').innerHTML = steps.map((s, i) => `<div class="step" id="st${i}" style="top:${720 + i*160}px"><div class="c" id="sc${i}">0${i+1}</div><div><div class="t">${s[0]}</div><div class="q">${s[1]}</div></div></div>`).join('');
+const takes = ['Un agent qui fonctionne', 'Une batterie de tests', 'Une note de décision', 'Une attestation'];
+$('takes').innerHTML = takes.map((x, i) => `<div class="take" id="tk${i}" style="left:${90 + (i%2)*460}px; top:${1040 + Math.floor(i/2)*240}px"><div class="n">0${i+1}</div><div class="t">${x}</div></div>`).join('');
+
+window.render = function (t) {
+  document.querySelectorAll('.dots').forEach(d => d.style.transform = `translate(${(AMB * 6) % 44}px, ${(AMB * 10) % 44}px)`);
+
+  // ---------- HOOK + 01a (0 – 5.0) ----------
+  const sA = t < 5.0; show($('sA'), sA);
+  if (sA) {
+    const out = eio(p(t, 4.82, .18));
+    push($('sA'), t, 0, 5);
+    S($('tag'), 1 - eio(p(t, 2.32, .18)));
+    if (t < 2.5) { show($('hA'), true); show($('hB'), false); kin($('hA'), t, 0, .04); const o = eio(p(t, 2.32, .18)); $('hA').style.opacity = 1 - o; }
+    else { show($('hA'), false); show($('hB'), true); kin($('hB'), t, 2.52, .045); $('hB').style.opacity = 1 - out; }
+    const ci = t < .02 ? 1 : eo(p(t, .05, .45));
+    const shake = t > 4.0 && t < 4.3 ? Math.sin((t - 4.0) * 90) * 16 * (1 - (t - 4.0) / .3) : 0;
+    S($('chat'), ci * (1 - out), `translate(${shake}px, ${(1 - ci) * 160 + out * 80}px)`);
+    $('chat').style.boxShadow = t >= 4.0 ? `0 0 0 ${7*eo(p(t,4.0,.2))}px var(--coral), 0 50px 140px rgba(0,0,0,.5)` : '';
+    pop($('m1'), t, .3); pop($('tl1'), t, .9, .25); pop($('m2'), t, 1.3);
+    pop($('m3'), t, 2.75); pop($('tl2'), t, 3.25, .25); pop($('m4'), t, 3.5);
+    $('strike').style.transform = `scaleX(${eo(p(t, 4.0, .2))})`;
+    $('amt2').style.color = t >= 4.0 ? 'var(--coral)' : '';
+    { const i = eback(p(t, 4.02, .32)); S($('x10'), cl(p(t, 4.02, .1)), `rotate(${-8 + (1-i)*-24}deg) scale(${.3 + .7*i})`); }
+  }
+  // chapter 1 header (2.5 – 8.5)
+  show($('chap1'), t >= 2.5 && t < 8.6); if (t >= 2.5) chap($('chap1'), t, 2.5, 1);
+
+  // ---------- 01b why now (5.0 – 8.5) ----------
+  const sB = t >= 4.95 && t < 8.6; show($('sB'), sB);
+  if (sB) {
+    push($('sB'), t, 5, 8.5);
+    rise($('w0'), t, 5.0);
+    const ni = eo(p(t, 5.02, .3)); S($('wN'), ni, `translateY(${(1 - ni) * 60}px)`);
+    const c = Math.round(200000 * eo(p(t, 5.02, .9)) / 1000) * 1000;
+    $('wN').innerHTML = String(c).replace(/\B(?=(\d{3})+(?!\d))/g, '&nbsp;');
+    rise($('wL'), t, 5.4, 30);
+    $('wDiv').style.transform = `scaleX(${eo(p(t, 5.85, .4))})`;
+    rise($('w1'), t, 5.95); kin($('w2'), t, 6.0, .04);
+    rise($('w3'), t, 6.6, 10);
+  }
+
+  // ---------- 02 leverage (8.5 – 13.0) ----------
+  wipe2($('lead1'), $('bgC'), t, 8.2); if (t >= 13.1) show($('bgC'), false);
+  const sC = t >= 8.45 && t < 13.05; show($('sC'), sC);
+  if (sC) {
+    push($('sC'), t, 8.5, 13);
+    chap($('chap2'), t, 8.5, 2);
+    kin($('c1'), t, 8.55, .045);
+    $('rail').style.transform = `scaleY(${eio(p(t, 9.25, 1.6))})`;
+    steps.forEach((_, k) => {
+      const a = 9.25 + k * .5;
+      const i = eo5(p(t, a, .35)); S($('st' + k), cl(p(t, a, .15)), `translateX(${(1 - i) * 80}px)`);
+      $('sc' + k).classList.toggle('done', t >= a + .25);
+      $('sc' + k).textContent = t >= a + .25 ? '✓' : '0' + (k + 1);
+    });
+    pop($('case'), t, 11.5, .35);
+  }
+
+  // ---------- 03 career (13.0 – 19.0) ----------
+  wipe2($('lead2'), $('bgI'), t, 12.7); if (t >= 19.1) show($('bgI'), false);
+  const sD = t >= 12.95 && t < 19.05; show($('sD'), sD);
+  if (sD) {
+    chap($('chap3'), t, 13.0, 3);
+    const gA = t < 16.55; show($('dA'), gA);
+    if (gA) {
+      push($('dA'), t, 13, 16.5); exitUp($('dA'), t, 16.32, .18);
+      rise($('d0'), t, 13.0); kin($('d1'), t, 13.05, .045);
+      [0, 1, 2].forEach(k => { const a = 14.0 + k * .25, i = eo5(p(t, a, .35)); S($('rl' + k), cl(p(t, a, .15)), `translateX(${(1 - i) * 120}px)`); });
+    }
+    const gB = t >= 16.45; show($('dB'), gB);
+    if (gB) {
+      push($('dB'), t, 16.5, 19);
+      rise($('e0'), t, 16.5); kin($('e1'), t, 16.55, .045);
+      takes.forEach((_, k) => pop($('tk' + k), t, 17.25 + k * .25, .3));
+    }
+  }
+
+  // ---------- OUTRO (19.0 – 22.5) ----------
+  wipe2($('lead3'), $('bgO'), t, 18.7);
+  const sE = t >= 18.95; show($('sE'), sE);
+  if (sE) {
+    rise($('o0'), t, 19.0); kin($('o1'), t, 19.05, .06);
+    $('o2').querySelectorAll('.chip').forEach((c, k) => pop(c, t, 19.5 + k * .125, .28));
+    rise($('o3'), t, 20.0, 40, .4);
+    pop($('o4'), t, 20.5, .35);
+  }
+};
+const _render = window.render;
+window.render = to => { AMB = to; _render(compOf(to)); };
+window.render(0);
+</script>
+</body>
+</html>
