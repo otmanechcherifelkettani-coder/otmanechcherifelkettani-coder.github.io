@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="deck.css">
+<style>
+.card { height: 470px; }
+.card .it { font-size: 36px; }
+.card .src { position: absolute; left: 48px; bottom: 30px; font-size: 18px; color: #9a9a90; }
+.dl { position: absolute; top: 430px; width: 540px; height: 300px; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 36px 40px; }
+.dl .n { font-family: "JBM", monospace; font-size: 20px; color: var(--forest); letter-spacing: .1em; }
+.dl .t { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; margin-top: 16px; line-height: 1.15; }
+.dl .d { font-size: 26px; color: var(--muted); margin-top: 14px; line-height: 1.35; }
+.dl .top { position: absolute; left: -1px; right: -1px; top: -1px; height: 4px; background: var(--forest); border-radius: 6px 6px 0 0; }
+.fact { position: absolute; width: 810px; height: 112px; border-top: 1px solid var(--rule); padding-top: 22px; display: flex; }
+.fact .k { width: 230px; font-family: "JBM", monospace; font-size: 20px; letter-spacing: .12em; text-transform: uppercase; color: var(--forest); padding-top: 8px; }
+.fact .v { flex: 1; font-size: 32px; line-height: 1.3; }
+.fact .v small { display: block; font-size: 24px; color: var(--muted); margin-top: 4px; }
+.fact .m { position: absolute; left: -24px; top: 22px; width: 4px; height: 70px; background: var(--forest); transform-origin: top; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="ink"></div>
+  <div id="hdr" class="mono"><span>Shipping AI That Works · Atelier pratique</span><span>Proposition · Écoles de commerce</span></div>
+  <div id="prog"></div>
+  <div id="ftr" class="mono"></div>
+
+  <!-- title -->
+  <div class="slide" id="t0">
+    <div class="abs mono" id="t0a" style="left:120px; top:330px; font-size:24px; color:var(--forest);">Proposition d’atelier · Écoles de commerce et de management</div>
+    <div class="abs h" id="t0b" style="left:120px; top:390px; font-size:150px;">Shipping AI That Works</div>
+    <div class="abs" id="t0c" style="left:120px; top:580px; font-size:48px; color:var(--muted); font-weight:500;">Former des managers qui savent décider avec l’IA.</div>
+    <div class="abs rule" id="t0d" style="left:120px; top:700px; width:1680px;"></div>
+    <div class="abs" id="t0e" style="left:120px; top:730px; font-size:28px; color:var(--muted);">Atelier pratique, sans code · animé par Otman Kettani</div>
+  </div>
+
+  <!-- 01 context -->
+  <div class="slide" id="s1">
+    <div class="label" id="s1l">01 — Contexte</div>
+    <div class="abs h" id="s1h" style="left:120px; top:210px; width:800px; font-size:76px;">Les agents IA entrent dans toutes les fonctions de l’entreprise.</div>
+    <div class="abs body" id="s1b" style="left:120px; top:640px; width:760px;">Ils ne se contentent plus de répondre : ils agissent, directement dans les processus.</div>
+    <div id="rows1"></div>
+  </div>
+
+  <!-- 02 stakes -->
+  <div class="slide" id="s2">
+    <div class="label" id="s2l">02 — Enjeu</div>
+    <div class="abs h" id="s2h" style="left:120px; top:210px; width:1680px; font-size:68px;">Une compétence demandée, encore rare.</div>
+    <div class="card" id="cA" style="left:120px;"><div class="top" style="background:var(--forest)"></div><div class="t" style="color:var(--forest)">La demande</div>
+      <div class="it" id="a0"><b style="color:var(--forest)">200 000</b> talents IA formés et certifiés visés d’ici 2030</div>
+      <div class="it" id="a1">Les agents IA : la compétence IA qui progresse le plus vite au recrutement</div>
+      <div class="src" id="asrc">Sources : feuille de route « Maroc IA 2030 » · Stanford AI Index 2026</div></div>
+    <div class="card" id="cB" style="left:990px;"><div class="top" style="background:var(--risk)"></div><div class="t" style="color:var(--risk)">L’écart</div>
+      <div class="it" id="b0">Savoir utiliser l’IA ne suffit plus</div><div class="it" id="b1">Un agent mal cadré coûte cher</div><div class="it" id="b2">Quelqu’un doit décider s’il est prêt</div></div>
+  </div>
+
+  <!-- 03 question (ink) -->
+  <div class="slide" id="s3" style="color:#fff;">
+    <div class="label" id="s3l" style="color:var(--mint);">03 — Le rôle du manager</div>
+    <div class="abs" id="s3a" style="left:120px; top:250px; width:1500px; font-size:44px; color:rgba(255,255,255,.62); font-weight:500; line-height:1.3;">Vos diplômés ne coderont pas forcément les agents.</div>
+    <div class="abs h" id="s3b" style="left:120px; top:400px; width:1680px; font-size:94px;">Mais ils <u id="u0">décideront</u> où les utiliser, ils les <u id="u1">piloteront</u>, et ils en porteront la <u id="u2">responsabilité</u>.</div>
+  </div>
+
+  <!-- 04 solution -->
+  <div class="slide" id="s4">
+    <div class="label" id="s4l">04 — La solution</div>
+    <div class="abs h" id="s4h" style="left:120px; top:210px; font-size:68px;">Un atelier pratique, sans code.</div>
+    <div class="abs" id="s4s" style="left:120px; top:305px; width:1680px; font-size:32px; color:var(--forest); font-weight:600;">Les étudiants construisent un agent, le testent, puis défendent devant un comité la décision de le lancer.</div>
+    <div id="mods"></div>
+  </div>
+
+  <!-- 05 deliverables -->
+  <div class="slide" id="s5">
+    <div class="label" id="s5l">05 — Livrables</div>
+    <div class="abs h" id="s5h" style="left:120px; top:210px; width:1600px; font-size:68px;">Trois livrables par équipe.</div>
+    <div class="dl" id="d0" style="left:120px;"><div class="top"></div><div class="n">01 · JOUR 1</div><div class="t">Un prototype fonctionnel</div><div class="d">Un agent qui traite les demandes, agit via des outils et passe la main à un humain.</div></div>
+    <div class="dl" id="d1" style="left:690px;"><div class="top"></div><div class="n">02 · JOUR 2</div><div class="t">Une batterie de tests</div><div class="d">Des cas de test, et un seuil de réussite fixé avant de lancer les tests.</div></div>
+    <div class="dl" id="d2" style="left:1260px;"><div class="top"></div><div class="n">03 · JOUR 2</div><div class="t">Une note de décision</div><div class="d">Lancer ou non, chiffres à l’appui.</div></div>
+    <div class="abs" id="s5f" style="left:120px; top:790px; width:1680px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--rule); padding-top:30px;">
+      <div style="font-size:40px; font-weight:700; letter-spacing:-0.02em;">Un projet concret à présenter en entretien.</div>
+      <div class="mono" style="font-size:20px; color:var(--forest);">+ attestation pour chaque étudiant</div></div>
+  </div>
+
+  <!-- 06 format -->
+  <div class="slide" id="s6">
+    <div class="label" id="s6l">06 — Format</div>
+    <div class="abs h" id="s6h" style="left:120px; top:210px; font-size:68px;">Un format qui s’adapte à votre programme.</div>
+    <div id="facts"></div>
+  </div>
+
+  <!-- 07 trainer -->
+  <div class="slide" id="s7">
+    <div class="label" id="s7l">07 — L’intervenant</div>
+    <div class="abs" id="ph"><img src="headshot.png"></div>
+    <div class="abs" id="s7n" style="left:600px; top:250px;"><div class="h" style="font-size:84px;">Otman Kettani</div>
+      <div style="font-size:34px; color:var(--forest); font-weight:600; margin-top:10px;">Global Product &amp; Operations Lead, Uber Eats</div></div>
+    <div class="abs" id="s7s" style="left:600px; top:470px;"><div class="stat" id="st0"><div class="n">51</div><div class="u">pays</div></div><div class="stat" id="st1"><div class="n">11</div><div class="u">langues</div></div><div class="stat" id="st2"><div class="n">10 ans</div><div class="u">stratégie, produit &amp; automatisation</div></div></div>
+    <div class="abs body" id="s7b" style="left:600px; top:660px; width:1150px; color:#2a332e;">A contribué à concevoir et déployer à l’échelle mondiale l’automatisation du service client, avec des agents LLM en production.</div>
+    <div class="abs mono" id="s7e" style="left:600px; top:800px; font-size:20px; color:var(--muted);">Ingénieur · École Centrale Paris · UPM Madrid</div>
+    <div class="abs" id="s7d" style="left:600px; top:850px; font-size:20px; color:#9a9a90;">Intervention à titre personnel, indépendante d’Uber.</div>
+  </div>
+
+  <!-- 08 next step (ink) -->
+  <div class="slide" id="s8" style="color:#fff;">
+    <div class="label" id="s8l" style="color:var(--mint);">08 — Prochaine étape</div>
+    <div class="abs h" id="s8h" style="left:120px; top:240px; width:1600px; font-size:92px;">Un échange de 20 minutes avec votre équipe pédagogique, pour fixer le format et une date.</div>
+    <div class="abs rule" id="s8r" style="left:120px; top:640px; width:1680px; background:rgba(255,255,255,.2);"></div>
+    <div class="abs" id="s8c" style="left:120px; top:690px; display:flex; gap:120px;">
+      <div><div class="mono" style="font-size:20px; color:var(--mint);">Contact</div><div style="font-size:44px; font-weight:700; margin-top:14px;">Otman Kettani</div></div>
+      <div><div class="mono" style="font-size:20px; color:var(--mint);">LinkedIn</div><div style="font-size:36px; margin-top:20px;">linkedin.com/in/otmaneekettani</div></div>
+      <div><div class="mono" style="font-size:20px; color:var(--mint);">E-mail</div><div style="font-size:36px; margin-top:20px;">otmankettani5@gmail.com</div></div>
+    </div>
+    <div class="abs" id="s8t" style="left:120px; top:860px; font-size:24px; color:rgba(255,255,255,.55);">Tarif sur devis · offre groupée possible avec la conférence de 90 minutes</div>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const cl = x => Math.max(0, Math.min(1, x));
+const eo = x => 1 - Math.pow(1 - cl(x), 3);
+const eio = x => { x = cl(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3) / 2; };
+const p = (t, a, d) => cl((t - a) / d);
+function show(el, on) { el.style.display = on ? '' : 'none'; }
+function fin(el, t, a, d = .55, dy = 16) { const i = eo(p(t, a, d)); el.style.opacity = i; el.style.transform = `translateY(${(1 - i) * dy}px)`; }
+function slideAlpha(el, t, a, b) { el.style.opacity = cl(p(t, a, .35)) * (1 - eio(p(t, b - .35, .35))); }
+
+const SEC = [['Contexte', 4.0, 14.2], ['Enjeu', 14.2, 31.3], ['Le rôle', 31.3, 40.3], ['Solution', 40.3, 60.0], ['Livrables', 60.0, 70.1], ['Format', 70.1, 80.2], ['Intervenant', 80.2, 88.3], ['Prochaine étape', 88.3, 97.0]];
+$('ftr').innerHTML = SEC.map((s, i) => `<span id="fs${i}">0${i + 1} ${s[0]}<i id="fi${i}"></i></span>`).join('');
+
+const ctx = [['Service client', 'traiter une demande, rembourser, escalader', 7.91], ['Finance', 'rapprocher, relancer, contrôler', 8.92], ['Achats', 'comparer des offres, préparer une commande', 9.73], ['Marketing', 'segmenter, personnaliser, analyser', 10.27]];
+$('rows1').innerHTML = ctx.map((r, i) => `<div class="trow" id="r${i}" style="top:${300 + i * 150}px"><div class="m" id="rm${i}"></div><div class="v">${r[0]}</div><div class="d">${r[1]}</div></div>`).join('');
+
+const mods = [['Cadrer le problème', 'Chiffrer l’enjeu, comparer à une solution sans IA.', 50.7], ['Comprendre un agent', 'Un premier prompt, un premier outil connecté.', 53.04],
+  ['Construire l’agent', 'Règles métier, outils, passage de relais à un humain.', 53.9], ['Tester et attaquer', 'Chaque équipe teste l’agent d’une autre sur des cas inconnus.', 54.99],
+  ['Poser les garde-fous', 'Manipulations, données personnelles, AI Act, loi 09-08.', 56.74], ['Défendre la décision', 'Plan de déploiement, puis présentation devant un comité.', 57.91]];
+$('mods').innerHTML = mods.map((m, i) => `<div class="mod" id="m${i}" style="left:${120 + (i % 3) * 570}px; top:${420 + Math.floor(i / 3) * 258}px"><div class="top" id="mt${i}"></div><div class="n">ÉTAPE 0${i + 1}</div><div class="t">${m[0]}</div><div class="d">${m[1]}</div></div>`).join('');
+
+const facts = [['Durée', '2 jours (12 h)<small>ou 1 jour, variante école de commerce</small>', 72.5], ['Groupe', '20 à 40 étudiants<small>en équipes de 4 à 5</small>', 75.4], ['Prérequis', 'Aucun<small>interface web no-code fournie</small>', 76.9], ['Fourni', 'Accès, cas d’étude, cahier<small>et grille de notation</small>', 78.4],
+  ['Public', 'Bac+2 à Bac+5<small>commerce et management</small>', 75.4], ['Côté école', 'Salle et Wi-Fi<small>1 PC avec navigateur par équipe</small>', 78.4], ['Encadrement', '1 formateur<small>+ 1 coach dès 5 équipes</small>', 76.9], ['Langue', 'Français ou anglais<small>exemples possibles en darija</small>', 78.4]];
+$('facts').innerHTML = facts.map((f, i) => `<div class="fact" id="fa${i}" style="left:${i < 4 ? 120 : 990}px; top:${380 + (i % 4) * 140}px"><div class="m" id="fm${i}"></div><div class="k">${f[0]}</div><div class="v">${f[1]}</div></div>`).join('');
+
+window.render = function (t) {
+  const ink = t < 40.3 ? eio(p(t, 31.0, .45)) * (1 - eio(p(t, 39.95, .45))) : eio(p(t, 87.95, .45));
+  $('ink').style.opacity = ink;
+  $('hdr').style.color = ink > .5 ? 'rgba(255,255,255,.55)' : 'var(--muted)'; $('hdr').style.opacity = cl(p(t, .3, .6));
+  $('ftr').style.opacity = cl(p(t, 3.6, .6)); $('prog').style.opacity = cl(p(t, 3.6, .6));
+  $('prog').style.background = ink > .5 ? 'rgba(255,255,255,.18)' : 'var(--rule)';
+  SEC.forEach((s, i) => {
+    const on = t >= s[1] && t < s[2];
+    $('fs' + i).style.color = on ? (ink > .5 ? '#fff' : 'var(--ink)') : (ink > .5 ? 'rgba(255,255,255,.35)' : '#9a9a90');
+    $('fi' + i).style.transform = `scaleX(${t >= s[2] ? 1 : on ? eio(p(t, s[1], s[2] - s[1])) : 0})`;
+    $('fi' + i).style.background = ink > .5 ? 'var(--mint)' : 'var(--forest)';
+  });
+
+  const t0 = t < 4.0; show($('t0'), t0);
+  if (t0) { slideAlpha($('t0'), t, -1, 4.0); fin($('t0a'), t, .3); fin($('t0b'), t, .5, .7, 24); fin($('t0c'), t, 1.0); $('t0d').style.transform = `scaleX(${eio(p(t, 1.3, .9))})`; fin($('t0e'), t, 1.7); }
+
+  const s1 = t >= 4.0 && t < 14.2; show($('s1'), s1);
+  if (s1) {
+    slideAlpha($('s1'), t, 4.0, 14.2);
+    fin($('s1l'), t, 4.1); fin($('s1h'), t, 4.4, .7, 20); fin($('s1b'), t, 11.0);
+    ctx.forEach((r, i) => { fin($('r' + i), t, r[2] - .15, .5, 12); const next = i < 3 ? ctx[i + 1][2] : 99;
+      $('rm' + i).style.transform = `scaleY(${eo(p(t, r[2], .35)) * (1 - eio(p(t, next, .3)))})`; });
+  }
+
+  const s2 = t >= 14.2 && t < 31.3; show($('s2'), s2);
+  if (s2) {
+    slideAlpha($('s2'), t, 14.2, 31.3);
+    fin($('s2l'), t, 14.3); fin($('s2h'), t, 14.6, .7, 20);
+    fin($('cA'), t, 14.9); fin($('a0'), t, 15.2, .5, 10); fin($('a1'), t, 19.4, .5, 10); fin($('asrc'), t, 20.5, .5, 0);
+    fin($('cB'), t, 24.3); [24.5, 26.9, 29.0].forEach((a, i) => fin($('b' + i), t, a, .5, 10));
+    $('cA').style.opacity = Math.min(+$('cA').style.opacity, 1 - .45 * eio(p(t, 24.3, .5)));
+  }
+
+  const s3 = t >= 31.3 && t < 40.3; show($('s3'), s3);
+  if (s3) {
+    slideAlpha($('s3'), t, 31.4, 40.3);
+    fin($('s3l'), t, 31.6); fin($('s3a'), t, 31.7, .7); fin($('s3b'), t, 34.3, .8, 20);
+    [34.6, 36.7, 38.9].forEach((a, i) => { const u = $('u' + i); u.style.textDecoration = 'none';
+      u.style.backgroundImage = 'linear-gradient(var(--mint), var(--mint))'; u.style.backgroundRepeat = 'no-repeat';
+      u.style.backgroundPosition = '0 96%'; u.style.backgroundSize = `${eio(p(t, a, .45)) * 100}% 6px`; });
+  }
+
+  const s4 = t >= 40.3 && t < 60.0; show($('s4'), s4);
+  if (s4) {
+    slideAlpha($('s4'), t, 40.3, 60.0);
+    fin($('s4l'), t, 40.5); fin($('s4h'), t, 40.8, .7, 20); fin($('s4s'), t, 44.4);
+    mods.forEach((m, i) => { fin($('m' + i), t, m[2] - .15, .5, 12); const next = i < 5 ? mods[i + 1][2] : 99;
+      $('mt' + i).style.transform = `scaleX(${eio(p(t, m[2], .4))})`; $('mt' + i).style.opacity = 1 - .7 * eio(p(t, next, .3)); });
+  }
+
+  const s5 = t >= 60.0 && t < 70.1; show($('s5'), s5);
+  if (s5) {
+    slideAlpha($('s5'), t, 60.0, 70.1);
+    fin($('s5l'), t, 60.1); fin($('s5h'), t, 60.4, .7, 20);
+    [62.6, 64.0, 65.3].forEach((a, i) => fin($('d' + i), t, a, .55, 12)); fin($('s5f'), t, 67.1, .6, 10);
+  }
+
+  const s6 = t >= 70.1 && t < 80.2; show($('s6'), s6);
+  if (s6) {
+    slideAlpha($('s6'), t, 70.1, 80.2);
+    fin($('s6l'), t, 70.2); fin($('s6h'), t, 70.5, .7, 20);
+    facts.forEach((f, i) => { fin($('fa' + i), t, f[2] - .2 + (i >= 4 ? .15 : 0), .5, 10); $('fm' + i).style.transform = `scaleY(${i < 4 ? eo(p(t, f[2], .35)) * (1 - eio(p(t, i < 3 ? facts[i + 1][2] : 99, .3))) : 0})`; });
+  }
+
+  const s7 = t >= 80.2 && t < 88.3; show($('s7'), s7);
+  if (s7) {
+    slideAlpha($('s7'), t, 80.2, 88.3);
+    fin($('s7l'), t, 80.3); fin($('ph'), t, 80.5, .8, 0); fin($('s7n'), t, 80.7, .7, 20);
+    fin($('st0'), t, 85.7); fin($('st1'), t, 86.8); fin($('st2'), t, 87.1);
+    fin($('s7b'), t, 83.2); fin($('s7e'), t, 84.0); fin($('s7d'), t, 84.2);
+  }
+
+  const s8 = t >= 88.3; show($('s8'), s8);
+  if (s8) {
+    fin($('s8l'), t, 88.5); fin($('s8h'), t, 88.7, .8, 20);
+    $('s8r').style.transform = `scaleX(${eio(p(t, 92.0, .8))})`; fin($('s8c'), t, 92.2, .7); fin($('s8t'), t, 93.0, .6, 8);
+  }
+};
+window.render(0);
+</script>
+</body>
+</html>
