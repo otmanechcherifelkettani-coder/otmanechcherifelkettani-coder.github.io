@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="vert.css">
+<style>
+.fly { position: absolute; font-family: "JBM", monospace; font-weight: 500; font-size: 30px; padding: 12px 20px; border-radius: 12px; white-space: nowrap;
+  background: rgba(111,211,159,.08); color: rgba(111,211,159,.55); border: 1px solid rgba(111,211,159,.18); }
+.row { position: absolute; left: 90px; width: 900px; }
+.row .v { font-family: "Inter Display", "Inter", sans-serif; font-weight: 700; font-size: 104px; letter-spacing: -0.04em; line-height: 1; }
+.row .v span { color: var(--mint); }
+.row .k { display: inline-block; margin-top: 18px; font-family: "JBM", monospace; font-size: 28px; font-weight: 500; padding: 9px 18px; border-radius: 10px;
+  background: rgba(111,211,159,.12); color: var(--mint); border: 1px solid rgba(111,211,159,.3); }
+.pdot { position: absolute; width: 44px; height: 44px; border-radius: 50%; background: var(--mint); }
+/* receipt */
+#rcpt { left: 90px; top: 900px; width: 900px; background: var(--cream); color: var(--ink); border-radius: 36px; padding: 44px 48px; box-shadow: 0 50px 140px rgba(0,0,0,.5); }
+#rcpt .lab { font-family: "JBM", monospace; font-weight: 600; font-size: 26px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+#rcpt .ln { display: flex; justify-content: space-between; font-size: 40px; font-weight: 500; margin-top: 26px; }
+#rcpt .ln b { font-weight: 700; }
+#rcpt .amt { font-family: "Inter Display", "Inter", sans-serif; font-size: 112px; font-weight: 800; letter-spacing: -0.05em; color: var(--coral); margin-top: 20px; position: relative; display: inline-block; }
+#rcpt .tool { position: static; display: inline-block; margin-top: 26px; }
+#x10b { right: 40px; bottom: 60px; background: var(--coral); color: #fff; font-weight: 800; font-size: 84px; padding: 6px 30px; border-radius: 20px; letter-spacing: -0.03em; box-shadow: 0 16px 40px rgba(255,122,89,.45); }
+/* sell */
+#photo { left: 90px; top: 400px; width: 300px; height: 300px; border-radius: 50%; overflow: hidden; border: 6px solid var(--mint); box-shadow: 0 0 80px rgba(111,211,159,.35); }
+#photo img { width: 100%; height: 100%; display: block; }
+.stat { position: absolute; top: 800px; width: 280px; height: 250px; border-radius: 26px; padding: 26px 28px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16); }
+.stat .n { font-family: "Inter Display", "Inter", sans-serif; font-weight: 800; font-size: 120px; letter-spacing: -0.05em; line-height: 1; color: var(--mint); }
+.stat .u { font-size: 32px; font-weight: 600; margin-top: 14px; color: #fff; }
+/* end card */
+.bg-mint { background: radial-gradient(900px 700px at 85% 8%, rgba(255,255,255,.35), transparent 60%), var(--mint); }
+.lead-ink { background: var(--forest); }
+.ichip { display: inline-block; font-family: "JBM", monospace; font-weight: 600; font-size: 30px; padding: 12px 22px; border-radius: 12px; margin: 0 12px 14px 0; background: var(--ink); color: var(--mint); }
+#ctaB { left: 90px; top: 1250px; width: 900px; height: 170px; border-radius: 85px; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center;
+  font-family: "Inter Display", "Inter", sans-serif; font-weight: 700; font-size: 64px; letter-spacing: -0.03em; box-shadow: 0 30px 70px rgba(16,33,27,.35); }
+#ctaB span { color: var(--mint); margin-left: 18px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="layer bg-ink" id="bg0"><div class="dots"></div></div>
+  <div class="layer" id="flyL"></div>
+
+  <div class="chap on-ink" id="chap1"><div style="display:flex;justify-content:space-between"><span class="lbl">01 · Pourquoi maintenant</span><span class="lbl" style="opacity:.6">1/3</span></div><div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i></div></div>
+
+  <!-- S1 hook (0 – 2.0) -->
+  <div class="layer" id="s1">
+    <div class="abs mono" id="aud" style="left:90px; top:560px; font-size:28px; color:rgba(255,255,255,.7);">Pour les équipes back-office de CFG Bank</div>
+    <div class="abs h kw" id="h1" style="left:90px; top:620px; width:900px; font-size:140px;">Les agents IA arrivent au <span class="hl" style="color:var(--mint)">back-office.</span></div>
+  </div>
+
+  <!-- S2 what they do (2.0 – 4.95) -->
+  <div class="layer" id="s2">
+    <div class="abs mono" id="l2" style="left:90px; top:330px; font-size:28px; color:rgba(255,255,255,.7);">Ils prennent déjà en charge</div>
+    <div id="rows"></div>
+  </div>
+
+  <!-- S3 stakes (4.95 – 8.2) -->
+  <div class="layer" id="s3">
+    <div class="abs h kw" id="h3a" style="left:90px; top:330px; width:900px; font-size:96px;">Mais en banque, une erreur d’agent…</div>
+    <div class="abs h kw" id="h3b" style="left:90px; top:560px; width:900px; font-size:96px;">c’est un virement <span class="hl" style="color:var(--coral)">exécuté deux fois.</span></div>
+    <div class="abs" id="rcpt">
+      <div class="lab">Exemple fictif · virement</div>
+      <div class="ln"><span>Ordre de virement</span><b>25 000 MAD</b></div>
+      <div class="tool bad" id="rtool">⚙ executer(virement) · relance après timeout</div>
+      <div><span class="amt" id="ramt">50&nbsp;000 MAD</span></div>
+      <div class="abs" id="x10b">×2</div>
+    </div>
+  </div>
+
+  <!-- S4 gap (8.2 – 12.75) -->
+  <div class="layer" id="s4">
+    <div class="abs h kw" id="h4a" style="left:90px; top:330px; width:900px; font-size:96px;">Tout le monde utilisera ces agents.</div>
+    <div id="crowd"></div>
+    <div class="abs h kw" id="h4b" style="left:90px; top:1180px; width:900px; font-size:92px;">Peu sauront <span class="hl" style="color:var(--mint)">les comprendre, et les piloter.</span></div>
+  </div>
+
+  <!-- S5 learn (12.75 – 17.7), cream -->
+  <div class="layer lead" id="lead1"></div>
+  <div class="layer bg-cream" id="bgC"><div class="dots"></div></div>
+  <div class="layer dark" id="s5">
+    <div class="chap on-cream" id="chap2"><div style="display:flex;justify-content:space-between"><span class="lbl">02 · Ce que vous apprenez</span><span class="lbl" style="opacity:.6">2/3</span></div><div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i></div></div>
+    <div class="abs mono" id="l5" style="left:90px; top:330px; font-size:28px; color:var(--forest);">Shipping AI That Works · édition back-office</div>
+    <div class="abs h kw" id="h5" style="left:90px; top:390px; width:900px; font-size:104px;">Un agent utile, <span class="hl" style="color:var(--forest)">et sous contrôle.</span></div>
+    <div class="abs" id="rail"></div>
+    <div id="steps"></div>
+  </div>
+
+  <!-- S6 career (17.7 – 21.0), ink -->
+  <div class="layer lead" id="lead2"></div>
+  <div class="layer bg-ink" id="bgI"><div class="dots"></div></div>
+  <div class="layer" id="s6">
+    <div class="chap on-ink" id="chap3"><div style="display:flex;justify-content:space-between"><span class="lbl">03 · Votre rôle</span><span class="lbl" style="opacity:.6">3/3</span></div><div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i></div></div>
+    <div class="abs mono" id="l6" style="left:90px; top:330px; font-size:28px; color:rgba(255,255,255,.7);">Avec un agent bien conçu</div>
+    <div class="abs h kw" id="h6" style="left:90px; top:390px; width:900px; font-size:112px;">L’agent prépare. <span class="hl" style="color:var(--mint)">Vous gardez la main.</span></div>
+    <div class="abs mono" id="l6b" style="left:90px; top:960px; font-size:26px; color:rgba(255,255,255,.6);">Vous repartez capables de</div>
+    <div class="role" id="rl0" style="top:1020px;"><span class="n">01</span><span class="t" style="font-size:46px">Repérer les bons cas d’usage</span></div>
+    <div class="role" id="rl1" style="top:1180px;"><span class="n">02</span><span class="t" style="font-size:46px">Cadrer et évaluer un agent</span></div>
+    <div class="role" id="rl2" style="top:1340px;"><span class="n">03</span><span class="t" style="font-size:46px">Devenir le référent IA de l’équipe</span></div>
+  </div>
+
+  <!-- S7 the trainer (21.0 – 27.6) -->
+  <div class="layer" id="s7">
+    <div class="abs mono" id="t0" style="left:90px; top:300px; font-size:30px; color:var(--mint);">Votre formateur</div>
+    <div class="abs" id="photo"><img src="headshot.png"></div>
+    <div class="abs" id="tn" style="left:430px; top:470px; width:560px;">
+      <div class="h" style="font-size:84px;">Otman Kettani</div>
+      <div style="font-size:34px; font-weight:600; color:var(--mint); margin-top:14px; line-height:1.25;">Global Product &amp; Operations Lead · Uber Eats</div>
+    </div>
+    <div class="stat" id="st_a" style="left:90px;"><div class="n" id="n51">51</div><div class="u">pays</div></div>
+    <div class="stat" id="st_b" style="left:400px;"><div class="n" id="n11">11</div><div class="u">langues</div></div>
+    <div class="stat" id="st_c" style="left:710px;"><div class="n" id="n10">10</div><div class="u">ans d’expérience</div></div>
+    <div class="abs" id="tl" style="left:90px; top:1110px; width:900px; font-size:42px; font-weight:500; line-height:1.3; color:rgba(255,255,255,.9);">A contribué à concevoir et déployer <b style="color:#fff">à l’échelle mondiale</b> l’automatisation du service client par agents LLM.</div>
+    <div class="abs mono" id="te" style="left:90px; top:1340px; font-size:26px; color:rgba(255,255,255,.65); letter-spacing:.12em;">Ingénieur · École Centrale Paris · UPM Madrid</div>
+    <div class="abs" id="td" style="left:90px; top:1560px; font-size:22px; color:rgba(255,255,255,.4);">Intervention à titre personnel, indépendante d’Uber.</div>
+  </div>
+
+  <!-- S8 end card (27.6 – 32.0), mint -->
+  <div class="layer lead-ink" id="lead3"></div>
+  <div class="layer bg-mint" id="bgM"><div class="dots" style="background-image: radial-gradient(rgba(16,33,27,.08) 2px, transparent 2.5px);"></div></div>
+  <div class="layer dark" id="s8">
+    <div class="abs mono" id="e0" style="left:90px; top:330px; font-size:30px; color:var(--forest);">Pour les équipes back-office · CFG Bank</div>
+    <div class="abs h kw" id="e1" style="left:90px; top:390px; width:900px; font-size:156px;">Shipping AI That Works</div>
+    <div class="abs" id="e2" style="left:90px; top:780px; width:920px;"><span class="ichip">Édition back-office</span><span class="ichip">Conférence · 90 min</span><span class="ichip">Atelier pratique</span><span class="ichip">FR · EN · darija</span></div>
+    <div class="abs" id="e3" style="left:90px; top:990px; display:flex; align-items:center; gap:28px;">
+      <div style="width:140px; height:140px; border-radius:50%; overflow:hidden; border:4px solid var(--ink);"><img src="headshot.png" style="width:100%;height:100%;display:block"></div>
+      <div style="font-size:44px; font-weight:700; letter-spacing:-0.02em;">avec Otman Kettani<div style="font-size:30px; font-weight:500; color:#24423a; margin-top:6px;">agents LLM · 51 pays · 11 langues</div></div>
+    </div>
+    <div class="abs" id="ctaB">Organiser une session <span>→</span></div>
+    <div class="abs mono" id="e5" style="left:90px; right:90px; top:1460px; text-align:center; font-size:26px; color:var(--forest);">linkedin.com/in/otmaneekettani</div>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const cl = x => Math.max(0, Math.min(1, x));
+const eo = x => 1 - Math.pow(1 - cl(x), 3);
+const eo5 = x => 1 - Math.pow(1 - cl(x), 5);
+const eio = x => { x = cl(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3) / 2; };
+const eback = x => { x = cl(x); const c1 = 1.6, c3 = c1 + 1; return 1 + c3*Math.pow(x-1,3) + c1*Math.pow(x-1,2); };
+const p = (t, a, d) => cl((t - a) / d);
+function S(el, o, tf) { el.style.opacity = o; el.style.transform = tf || 'none'; }
+function rise(el, t, a, dy = 40, din = .35) { const i = eo(p(t, a, din)); S(el, i, `translateY(${(1 - i) * dy}px)`); }
+function pop(el, t, a, din = .3) { const i = eback(p(t, a, din)), f = cl(p(t, a, din * .6)); S(el, f, `translateY(${(1 - i) * 30}px) scale(${.86 + .14 * i})`); }
+function show(el, on) { el.style.display = on ? '' : 'none'; }
+function exitUp(el, t, a, d = .2) { const o = eio(p(t, a, d)); el.style.opacity = 1 - o; el.style.transform = `translateY(${-o * 120}px)`; }
+function wipe2(lead, bg, t, a, d = .3) {
+  const w1 = eio(p(t, a, d)), w2 = eio(p(t, a + .07, d));
+  show(lead, t >= a && w2 < 1); show(bg, t >= a + .07);
+  lead.style.clipPath = `inset(${(1 - w1) * 100}% 0 0 0)`; bg.style.clipPath = `inset(${(1 - w2) * 100}% 0 0 0)`;
+}
+function split(el) {
+  [...el.childNodes].forEach(n => {
+    if (n.nodeType === 3) {
+      const frag = document.createDocumentFragment();
+      n.textContent.split(/(\s+)/).forEach(tok => {
+        if (!tok) return;
+        if (/^\s+$/.test(tok)) frag.appendChild(document.createTextNode(' '));
+        else { const s = document.createElement('span'); s.className = 'w'; s.textContent = tok; frag.appendChild(s); }
+      });
+      n.replaceWith(frag);
+    } else if (n.nodeType === 1) split(n);
+  });
+}
+document.querySelectorAll('.kw').forEach(split);
+function kin(el, t, a, st = .045, din = .4) {
+  const ws = el.querySelectorAll('.w'); el.style.opacity = 1;
+  const settle = a + ws.length * st + .12; let j = 0;
+  ws.forEach((w, i) => {
+    const k = eo5(p(t, a + i * st, din));
+    w.style.opacity = cl(p(t, a + i * st, din * .5));
+    w.style.transform = `translateY(${(1 - k) * 70}px) rotate(${(1 - k) * 4}deg)`;
+    if (w.closest('.hl')) {
+      const c = getComputedStyle(w.closest('.hl')).color.replace('rgb(', 'rgba(').replace(')', ', .22)');
+      const hw = eio(p(t, settle + j * .07, .25)); j++;
+      w.style.backgroundImage = `linear-gradient(${c}, ${c})`; w.style.backgroundSize = `${hw * 100}% .3em`;
+    }
+  });
+}
+function chap(el, t, a, n) {
+  const i = eo(p(t, a, .35)); S(el, i, `translateY(${(1 - i) * -24}px)`);
+  el.querySelectorAll('.bars b').forEach((b, k) => b.style.transform = `scaleX(${k < n - 1 ? 1 : k === n - 1 ? eio(p(t, a, .6)) : 0})`);
+}
+function push(el, t, a, b) { el.style.transform = `scale(${1 + .025 * cl((t - a) / (b - a))})`; el.style.transformOrigin = '50% 40%'; }
+
+const calls = ['verifier(kyc)', 'rapprocher(releves)', 'executer(virement)', 'classer(reclamation)', 'controler(lcb_ft)', 'extraire(rib)', 'relancer(dossier)', 'lettrer(ecritures)', 'saisir(ordre)', 'archiver(justificatif)', 'detecter(anomalie)', 'resumer(contrat)'];
+$('flyL').innerHTML = calls.map((c, i) => `<div class="fly" id="f${i}">⚙ ${c}</div>`).join('');
+// verbs, cued to the spoken words
+const rows = [['vérifient', 'des KYC', 'verifier(kyc, piece_identite)', 2.15], ['rapprochent', 'des relevés', 'rapprocher(releve, ecritures)', 2.95], ['traitent', 'des virements', 'executer(virement)', 3.63], ['trient', 'des réclamations', 'classer(reclamation)', 4.35]];
+$('rows').innerHTML = rows.map((r, i) => `<div class="row" id="rw${i}" style="top:${370 + i * 300}px"><div class="v" style="font-size:84px">Ils <span>${r[0]}</span> ${r[1]}.</div><div class="k">⚙ ${r[2]}</div></div>`).join('');
+const builders = [14, 33, 47];
+$('crowd').innerHTML = Array.from({ length: 60 }, (_, i) => `<div class="pdot" id="pd${i}" style="left:${100 + (i % 10) * 88}px; top:${640 + Math.floor(i / 10) * 84}px"></div>`).join('');
+const steps = [['Choisir', 'le bon cas : agent ou simple règle ?', 14.36], ['Concevoir', 'avec garde-fous : validation humaine, loi 09-08', 15.10], ['Tester', 'sur des cas réels, seuil fixé avant', 15.92], ['Déployer', 'en parallèle, pilote, puis généralisation', 16.59]];
+$('steps').innerHTML = steps.map((s, i) => `<div class="step" id="st${i}" style="top:${660 + i*180}px"><div class="c" id="sc${i}">0${i+1}</div><div><div class="t">${s[0]}</div><div class="q">${s[1]}</div></div></div>`).join('');
+$('rail').style.cssText = 'left:136px; top:730px; height:540px;';
+
+window.render = function (t) {
+  document.querySelectorAll('.dots').forEach(d => d.style.transform = `translate(${(t * 6) % 44}px, ${(t * 10) % 44}px)`);
+
+  // flying tool calls in the hook
+  const flyOn = t < 2.3; show($('flyL'), flyOn);
+  if (flyOn) {
+    const fo = 1 - eio(p(t, 1.9, .3));
+    calls.forEach((_, i) => {
+      const el = $('f' + i), sp = 90 + (i * 37) % 70, x = 40 + ((i * 263) % 760), y = 1900 - ((t * sp + i * 173) % 2100);
+      const edge = cl((y - 260) / 160) * cl((1560 - y) / 160);
+      el.style.opacity = cl(p(t, i * .1, .35)) * fo * edge;
+      el.style.transform = `translate(${x}px, ${y}px) rotate(${(i % 2 ? -1 : 1) * 3}deg)`;
+    });
+  }
+  // chapter 1 header (0 – 12.75)
+  show($('chap1'), t < 12.8); if (t < 12.8) chap($('chap1'), t, .1, 1);
+
+  // S1 hook
+  const s1 = t < 2.05; show($('s1'), s1);
+  if (s1) { push($('s1'), t, 0, 2); rise($('aud'), t, .05, 20); kin($('h1'), t, .1, .06); exitUp($('h1'), t, 1.85, .18); exitUp($('aud'), t, 1.85, .18); }
+
+  // S2 verbs
+  const s2 = t >= 1.95 && t < 5.0; show($('s2'), s2);
+  if (s2) {
+    exitUp($('s2'), t, 4.8, .18);
+    rise($('l2'), t, 2.0);
+    rows.forEach((r, i) => {
+      const el = $('rw' + i), a = r[3] - .08, k = eo5(p(t, a, .4));
+      const next = i < rows.length - 1 ? rows[i + 1][3] : 99;
+      el.style.opacity = cl(p(t, a, .15)) * (1 - .55 * eio(p(t, next - .08, .25)));
+      el.style.transform = `translateX(${(1 - k) * 140}px)`;
+    });
+  }
+
+  // S3 stakes
+  const s3 = t >= 4.9 && t < 8.25; show($('s3'), s3);
+  if (s3) {
+    push($('s3'), t, 4.95, 8.2); exitUp($('s3'), t, 8.02, .18);
+    kin($('h3a'), t, 5.0, .05);
+    show($('h3b'), t >= 6.35); if (t >= 6.35) kin($('h3b'), t, 6.38, .05);
+    { const i = eo5(p(t, 5.3, .45)); S($('rcpt'), cl(p(t, 5.3, .2)), `translateY(${(1 - i) * 160 + (t > 7.3 && t < 7.6 ? Math.sin((t - 7.3) * 90) * 14 * (1 - (t - 7.3) / .3) : 0)}px)`); }
+    pop($('rtool'), t, 6.42, .25);
+    { const i = eback(p(t, 6.9, .35)); S($('ramt'), cl(p(t, 6.9, .12)), `scale(${.6 + .4 * i})`); $('ramt').style.transformOrigin = 'left center'; }
+    { const i = eback(p(t, 7.3, .32)); S($('x10b'), cl(p(t, 7.3, .1)), `rotate(${-8 + (1 - i) * -24}deg) scale(${.3 + .7 * i})`); }
+    $('rcpt').style.boxShadow = t >= 7.3 ? `0 0 0 ${8 * eo(p(t, 7.3, .2))}px var(--coral), 0 50px 140px rgba(0,0,0,.5)` : '';
+  }
+
+  // S4 gap
+  const s4 = t >= 8.15 && t < 12.8; show($('s4'), s4);
+  if (s4) {
+    push($('s4'), t, 8.2, 12.75);
+    kin($('h4a'), t, 8.3, .05); $('h4a').style.opacity = 1 - .55 * eio(p(t, 9.95, .3));
+    for (let i = 0; i < 60; i++) {
+      const el = $('pd' + i), a = 8.6 + ((i * 7) % 60) / 60 * .7, k = eback(p(t, a, .3)), b = builders.includes(i);
+      const fade = b ? 1 : 1 - .85 * eio(p(t, 9.95 + (i % 10) * .015, .35));
+      const grow = b ? 1 + .45 * eback(p(t, 10.1, .4)) : 1;
+      el.style.opacity = cl(p(t, a, .15)) * fade;
+      el.style.transform = `scale(${(.3 + .7 * k) * grow})`;
+      el.style.boxShadow = b && t >= 10.1 ? `0 0 ${40 * eo(p(t, 10.1, .4))}px rgba(111,211,159,.8)` : 'none';
+    }
+    show($('h4b'), t >= 10.0); if (t >= 10.0) kin($('h4b'), t, 10.02, .05);
+  }
+
+  // S5 learn
+  wipe2($('lead1'), $('bgC'), t, 12.45); if (t >= 17.8) show($('bgC'), false);
+  const s5 = t >= 12.7 && t < 17.75; show($('s5'), s5);
+  if (s5) {
+    push($('s5'), t, 12.75, 17.7);
+    chap($('chap2'), t, 12.75, 2);
+    rise($('l5'), t, 12.8); kin($('h5'), t, 12.85, .06);
+    $('rail').style.transform = `scaleY(${eio(p(t, 14.3, 2.4))})`;
+    steps.forEach((s, k) => {
+      const a = s[2] - .05, i = eo5(p(t, a, .35));
+      S($('st' + k), cl(p(t, a, .15)), `translateX(${(1 - i) * 80}px)`);
+      const done = t >= a + .3; $('sc' + k).classList.toggle('done', done); $('sc' + k).textContent = done ? '✓' : '0' + (k + 1);
+    });
+  }
+
+  // S6 career
+  wipe2($('lead2'), $('bgI'), t, 17.4);
+  const s6 = t >= 17.65 && t < 21.05; show($('s6'), s6);
+  if (s6) {
+    push($('s6'), t, 17.7, 21); exitUp($('s6'), t, 20.82, .18);
+    chap($('chap3'), t, 17.7, 3);
+    rise($('l6'), t, 17.75); kin($('h6'), t, 17.8, .05);
+    rise($('l6b'), t, 18.9, 20);
+    [0, 1, 2].forEach(k => { const a = 19.1 + k * .25, i = eo5(p(t, a, .35)); S($('rl' + k), cl(p(t, a, .15)), `translateX(${(1 - i) * 120}px)`); });
+  }
+
+  // S7 the trainer (sell)
+  const s7 = t >= 20.95 && t < 27.65; show($('s7'), s7);
+  if (s7) {
+    push($('s7'), t, 21, 27.6);
+    rise($('t0'), t, 21.05);
+    { const k = eback(p(t, 21.15, .45)); S($('photo'), cl(p(t, 21.15, .2)), `scale(${.7 + .3 * k})`); }
+    rise($('tn'), t, 22.35, 40);
+    const ca = (el, a, n) => { const k = eback(p(t, a, .35)); S(el, cl(p(t, a, .12)), `translateY(${(1 - k) * 50}px)`); };
+    ca($('st_a'), 25.0); ca($('st_b'), 26.5); ca($('st_c'), 26.85);
+    $('n51').textContent = Math.round(51 * eo(p(t, 25.0, .6)));
+    $('n11').textContent = Math.round(11 * eo(p(t, 26.5, .5)));
+    $('n10').textContent = Math.round(10 * eo(p(t, 26.85, .5)));
+    rise($('tl'), t, 23.6, 30);
+    rise($('te'), t, 24.2, 20);
+    rise($('td'), t, 24.4, 10);
+  }
+
+  // S8 end card
+  wipe2($('lead3'), $('bgM'), t, 27.3);
+  const s8 = t >= 27.55; show($('s8'), s8);
+  if (s8) {
+    rise($('e0'), t, 27.65); kin($('e1'), t, 27.7, .07);
+    $('e2').querySelectorAll('.ichip').forEach((c, k) => pop(c, t, 28.4 + k * .125, .28));
+    rise($('e3'), t, 28.9, 30);
+    { const k = eback(p(t, 29.4, .4)), pulse = t > 30.2 ? 1 + .025 * Math.sin((t - 30.2) * 6) : 1; S($('ctaB'), cl(p(t, 29.4, .15)), `scale(${(.8 + .2 * k) * pulse})`); }
+    rise($('e5'), t, 30.0, 16);
+  }
+};
+// re-anchor the timeline to the voice (old composition time -> new output time), piecewise linear
+const ANCH = [[0,0],[2.0,3.35],[2.15,3.5],[2.95,5.01],[3.63,6.34],[4.35,7.42],[4.95,8.6],[6.38,10.97],[6.9,11.87],[7.3,12.5],[8.2,13.2],[9.95,15.46],[12.45,17.5],[12.75,17.8],
+  [14.36,19.27],[15.10,20.63],[15.92,22.40],[16.59,23.01],[17.4,23.5],[17.7,23.8],[19.1,25.0],[19.6,26.36],[20.82,28.62],[21.0,29.0],[22.35,30.33],[23.6,31.48],[25.0,33.05],[26.5,34.25],[26.85,34.55],
+  [27.3,35.0],[27.6,35.3],[29.4,38.76],[32.0,41.3]];
+function oldOf(to) {
+  for (let i = 1; i < ANCH.length; i++) { const [o0, n0] = ANCH[i-1], [o1, n1] = ANCH[i]; if (to <= n1) return o0 + (o1 - o0) * (to - n0) / (n1 - n0); }
+  const [o, n] = ANCH[ANCH.length - 1]; return o + (to - n);
+}
+const _render = window.render; window.render = to => _render(oldOf(to));
+window.render(0);
+</script>
+</body>
+</html>

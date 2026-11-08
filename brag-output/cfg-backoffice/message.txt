@@ -1,0 +1,13 @@
+Bonjour,
+
+Les agents IA arrivent dans les back-offices bancaires : vérification KYC, rapprochements, virements, réclamations.
+Bien conçus, ils font gagner un temps précieux. Mal conçus, ils exécutent un virement deux fois.
+
+Je propose « Shipping AI That Works, édition back-office » : une conférence de 90 minutes ou un atelier pratique pour vos équipes. Comment choisir les bons cas d’usage, concevoir un agent avec des garde-fous (validation humaine, données personnelles et loi 09-08), le tester sur des cas réels et le déployer par étapes. L’agent prépare, vos équipes gardent la main.
+
+Je pilote des agents LLM en production dans 51 pays et 11 langues, et j’ai contribué à automatiser le service client à l’échelle mondiale.
+
+Seriez-vous ouvert à un échange de 20 minutes pour voir si une session aurait du sens pour vos équipes ?
+
+Otman Kettani
+linkedin.com/in/otmaneekettani
