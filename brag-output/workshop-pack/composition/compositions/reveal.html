@@ -1,0 +1,41 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: var(--font-display); color: var(--color-ink); }
+    #rv-stage { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    #rv-glow { position: absolute; left: 460px; top: 140px; width: 1000px; height: 800px; border-radius: 50%;
+      background: radial-gradient(closest-side, rgba(111, 211, 159, 0.55), rgba(111, 211, 159, 0) 100%); }
+    #rv-label { font-family: var(--font-mono); font-size: 30px; letter-spacing: 4px; color: var(--color-accent); position: relative; }
+    #rv-title { font-size: 156px; font-weight: 900; letter-spacing: -6px; line-height: 1; margin-top: 30px; position: relative; }
+    #rv-title b { color: var(--color-accent); font-weight: 900; }
+    #rv-sub { font-size: 44px; color: var(--muted); margin-top: 34px; letter-spacing: -0.8px; position: relative; }
+  </style>
+  <div id="root" data-composition-id="reveal" data-width="1920" data-height="1080">
+    <div id="rv-stage" class="clip" data-start="0" data-duration="3" data-layout-allow-overlap>
+      <div id="rv-glow" data-layout-ignore></div>
+      <div id="rv-label">STUDENT WORKSHOP · 2 DAYS · 12 HOURS</div>
+      <h1 id="rv-title">Shipping AI That <b>Works</b></h1>
+      <div id="rv-sub">LLM agents from problem to production.</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      // music RMS (10 Hz, normalised) for 11.5–15.0 s, extracted with media-use extract-audio-data.py
+      const RMS = [0.35, 0.336, 0.372, 0.413, 0.394, 0.427, 0.493, 0.498, 0.504, 0.446, 0.384, 0.46, 0.5, 0.451, 0.408, 0.441, 0.431, 0.384, 0.408, 0.435, 0.402, 0.409, 0.476, 0.462, 0.428, 0.44, 0.49, 0.472, 0.47, 0.415, 0.346, 0.377, 0.374, 0.373, 0.388];
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#rv-glow", { opacity: 0, scale: 0.85 }, { opacity: 0.6, scale: 1, duration: 0.6, ease: "power2.out" }, 0);
+      // audio-reactive: the glow breathes with the bed (subtle)
+      RMS.forEach((r, i) => {
+        if (i * 0.1 < 0.6 || i * 0.1 > 2.6) return;
+        tl.to("#rv-glow", { opacity: 0.45 + 0.45 * r, scale: 1 + 0.06 * r, duration: 0.1, ease: "none" }, i * 0.1);
+      });
+      tl.fromTo("#rv-label", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0.1);
+      // beat-locked: 12.02 (local 0.52)
+      tl.fromTo("#rv-title", { opacity: 0, scale: 1.08, filter: "blur(12px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 0.52);
+      tl.fromTo("#rv-sub", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 1.02);
+      // exit: slide up
+      tl.to("#rv-label, #rv-title, #rv-sub", { opacity: 0, y: -40, duration: 0.25, ease: "power3.in", stagger: 0.03 }, 2.7);
+      tl.to("#rv-glow", { opacity: 0, duration: 0.25 }, 2.72);
+      window.__timelines["reveal"] = tl;
+    })();
+  </script>
+</template>

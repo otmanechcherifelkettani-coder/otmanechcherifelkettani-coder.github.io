@@ -1,0 +1,1 @@
+Anyone can demo an AI refund agent. "Shipping AI That Works" is two days of learning whether it should ship: build a bounded agent, test what it actually does with the money, and defend a go/no-go with evidence. Let evidence, not the demo, decide.

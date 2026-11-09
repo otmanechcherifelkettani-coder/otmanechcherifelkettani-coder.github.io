@@ -1,0 +1,29 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: var(--font-display); color: var(--color-ink); }
+    #thesis-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    #thesis-line { font-size: 108px; font-weight: 700; letter-spacing: -3.4px; line-height: 1.08; text-align: center; width: 1500px; }
+    .th-w { display: inline-block; color: #c9c4b8; }
+    .th-hot { color: var(--color-accent); }
+  </style>
+  <div id="root" data-composition-id="thesis" data-width="1920" data-height="1080">
+    <div id="thesis-wrap" class="clip" data-start="0" data-duration="3.5">
+      <h1 id="thesis-line">
+        <span class="th-w">A</span> <span class="th-w">successful</span> <span class="th-w">demo</span> <span class="th-w">can</span> <span class="th-w">still</span> <span class="th-w">be</span><br>
+        <span class="th-w">an</span> <span class="th-w th-u">unsafe</span> <span class="th-w th-u">product.</span>
+      </h1>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // the line blurs in whole, then each word goes grey → ink (80 ms apart)
+      tl.fromTo("#thesis-line", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.05);
+      tl.fromTo(".th-w:not(.th-u)", { color: "#c9c4b8" }, { color: "#10211b", duration: 0.12, stagger: 0.08, ease: "none" }, 0.15);
+      tl.fromTo(".th-u", { color: "#c9c4b8" }, { color: "#0f6b46", duration: 0.14, stagger: 0.1, ease: "none" }, 0.75);
+      // exit: blur-out
+      tl.to("#thesis-line", { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, 3.28);
+      window.__timelines["thesis"] = tl;
+    })();
+  </script>
+</template>

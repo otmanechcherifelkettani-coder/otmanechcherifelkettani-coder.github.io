@@ -1,0 +1,31 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: var(--font-display); color: var(--color-ink); }
+    #ou-stage { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    #ou-line { font-size: 96px; font-weight: 700; letter-spacing: -3px; line-height: 1.1; width: 1560px; }
+    #ou-line .ou-hot { color: var(--color-accent); }
+    .ou-w { display: inline-block; }
+    #ou-meta { font-family: var(--font-mono); font-size: 30px; letter-spacing: 3px; color: var(--muted); margin-top: 56px; }
+    #ou-sig { position: absolute; left: 160px; right: 160px; bottom: 90px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--sand); padding-top: 26px; }
+    #ou-sig b { font-size: 32px; font-weight: 900; letter-spacing: -0.8px; }
+    #ou-sig i { font-style: normal; font-family: var(--font-mono); font-size: 28px; color: var(--color-accent); }
+  </style>
+  <div id="root" data-composition-id="outro" data-width="1920" data-height="1080">
+    <div id="ou-stage" class="clip" data-start="0" data-duration="3">
+      <h2 id="ou-line"><span class="ou-w">Let</span> <span class="ou-w ou-hot">evidence</span><span class="ou-w">—not</span> <span class="ou-w">the</span> <span class="ou-w">demo—</span><br><span class="ou-w">decide</span> <span class="ou-w">whether</span> <span class="ou-w">you</span> <span class="ou-w">ship.</span></h2>
+      <div id="ou-meta">12 HOURS · 2 DAYS · NO CODING REQUIRED</div>
+      <div id="ou-sig"><b>Shipping AI That Works</b><i>Launching AI Agents in Companies</i></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // per word: blur → 0, 70 ms apart
+      tl.fromTo(".ou-w", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.13, stagger: 0.07, ease: "power2.out" }, 0.03);
+      // beat-grid: 22.52 (local 0.52); signature on 22.77
+      tl.fromTo("#ou-meta", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, ease: "expo.out" }, 0.52);
+      tl.fromTo("#ou-sig", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.77);
+      window.__timelines["outro"] = tl;
+    })();
+  </script>
+</template>

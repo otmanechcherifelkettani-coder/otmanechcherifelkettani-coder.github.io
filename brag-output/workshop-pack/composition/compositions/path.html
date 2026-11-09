@@ -1,0 +1,63 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: var(--font-display); color: var(--color-ink); }
+    #pa-stage { position: absolute; inset: 0; }
+    #pa-label { position: absolute; left: 160px; top: 150px; font-family: var(--font-mono); font-size: 28px; letter-spacing: 3px; color: var(--color-accent); }
+    #pa-head { position: absolute; left: 160px; top: 196px; font-size: 92px; font-weight: 700; letter-spacing: -3px; }
+    #pa-head span { color: var(--color-accent); }
+    #pa-row { position: absolute; left: 160px; top: 440px; width: 1600px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
+    #pa-line { position: absolute; left: 160px; top: 520px; width: 1600px; height: 4px; background: var(--sand); }
+    #pa-fill { position: absolute; left: 0; top: 0; height: 4px; width: 1600px; background: var(--color-accent); transform-origin: left center; }
+    .pa-node { position: relative; background: #fff; border-radius: 22px; padding: 26px 26px 28px; box-shadow: 0 16px 36px rgba(16,33,27,0.08); border: 3px solid transparent; }
+    .pa-node em { font-style: normal; font-family: var(--font-mono); font-size: 18px; color: var(--muted); }
+    .pa-node b { display: block; font-size: 40px; letter-spacing: -0.8px; margin-top: 10px; }
+    .pa-node small { display: block; font-size: 28px; line-height: 1.2; color: var(--muted); margin-top: 8px; }
+    #pa-n5 { border-color: var(--color-accent); }
+    #pa-ledger { position: absolute; left: 160px; top: 740px; width: 1600px; display: flex; align-items: center; gap: 40px;
+      background: var(--color-ink); color: #f5f2eb; border-radius: 22px; padding: 30px 40px; font-family: var(--font-mono); font-size: 30px; }
+    #pa-ledger .ok { margin-left: auto; background: var(--color-mint); color: var(--color-ink); padding: 8px 20px; border-radius: 999px; font-weight: 500; }
+    #pa-ledger .dim { color: #9fb1a8; }
+  </style>
+  <div id="root" data-composition-id="path" data-width="1920" data-height="1080">
+    <div id="pa-stage" class="clip" data-start="0" data-duration="4.5" data-layout-allow-overlap>
+      <div id="pa-label">THE MONEY PATH</div>
+      <h2 id="pa-head">A model proposes; <span>software acts.</span></h2>
+      <div id="pa-line"><div id="pa-fill"></div></div>
+      <div id="pa-row">
+        <div class="pa-node" id="pa-n1"><em data-layout-ignore>01</em><b>Identity</b><small>injected by the server</small></div>
+        <div class="pa-node" id="pa-n2"><em data-layout-ignore>02</em><b>Read order</b><small>scoped, read-only</small></div>
+        <div class="pa-node" id="pa-n3"><em data-layout-ignore>03</em><b>Eligibility</b><small>policy v1.0 decides</small></div>
+        <div class="pa-node" id="pa-n4"><em data-layout-ignore>04</em><b>Confirm</b><small>customer approves</small></div>
+        <div class="pa-node" id="pa-n5"><em data-layout-ignore>05</em><b>Ledger</b><small>source of truth</small></div>
+      </div>
+      <div id="pa-ledger"><span class="dim">LEDGER</span><span>SG-1001 · drink</span><span>MAD 20.00</span><span class="dim">1 entry</span><span class="ok">SUCCEEDED</span></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      // music RMS (10 Hz) from 15.0 s; used for the ledger card's glow
+      const RMS = [0.542, 0.469, 0.418, 0.427, 0.48, 0.428, 0.373, 0.384, 0.391, 0.422, 0.561, 0.644, 0.538, 0.547, 0.577, 0.61, 0.661, 0.576, 0.551, 0.522, 0.605, 0.6, 0.466, 0.526, 0.616, 0.661, 0.612, 0.551, 0.553, 0.539, 0.592, 0.605, 0.542, 0.564, 0.584, 0.608, 0.661, 0.584, 0.555, 0.473];
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#pa-label", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.0);
+      tl.fromTo("#pa-head", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.08);
+      tl.fromTo("#pa-line", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.3);
+      tl.fromTo("#pa-fill", { scaleX: 0 }, { scaleX: 1, duration: 2.1, ease: "none" }, 0.52);
+      // beat-grid: nodes at 15.02, 15.52, 16.02 (strong), 16.52, 17.02 (strong)
+      [1, 2, 3, 4, 5].forEach((n, i) => {
+        tl.fromTo("#pa-n" + n, { opacity: 0, y: 30, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "expo.out" }, 0.52 + i * 0.5);
+      });
+      // beat-locked: ledger row at 17.52 (local 3.02)
+      tl.fromTo("#pa-ledger", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, ease: "expo.out" }, 3.02);
+      tl.fromTo("#pa-ledger .ok", { scale: 0.7 }, { scale: 1, duration: 0.4, ease: "back.out(1.8)" }, 3.12);
+      // audio-reactive: the ledger card's mint glow follows the bed
+      RMS.forEach((r, i) => {
+        const t = 0.5 + i * 0.1;
+        if (t < 3.45 || t > 4.2) return;
+        tl.to("#pa-ledger", { boxShadow: "0 0 " + Math.round(20 + 40 * r) + "px rgba(111,211,159," + (0.25 + 0.35 * r).toFixed(2) + ")", duration: 0.1, ease: "none" }, t);
+      });
+      // exit
+      tl.to("#pa-stage > *", { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, 4.28);
+      window.__timelines["path"] = tl;
+    })();
+  </script>
+</template>

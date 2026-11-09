@@ -1,0 +1,97 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: var(--font-display); color: var(--color-ink); }
+    #demo-stage { position: absolute; inset: 0; }
+    #demo-chat {
+      position: absolute; left: 560px; top: 270px; width: 800px; height: 530px;
+      background: #fff; border-radius: 32px; box-shadow: 0 40px 90px rgba(16, 33, 27, 0.14);
+      overflow: hidden;
+    }
+    #demo-head { display: flex; align-items: center; gap: 18px; padding: 30px 36px; border-bottom: 2px solid var(--sand); }
+    #demo-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--color-mint); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 26px; color: var(--color-ink); }
+    #demo-name { font-weight: 700; font-size: 26px; letter-spacing: -0.4px; }
+    #demo-sub { font-family: var(--font-mono); font-size: 22px; color: var(--muted); margin-top: 4px; }
+    #demo-body { position: relative; padding: 36px; display: flex; flex-direction: column; gap: 22px; }
+    .demo-bubble { max-width: 620px; padding: 24px 30px; border-radius: 28px; font-size: 36px; line-height: 1.35; letter-spacing: -0.2px; }
+    #demo-user { align-self: flex-end; background: var(--color-accent); color: #fff; border-bottom-right-radius: 8px; min-height: 80px; }
+    #demo-typing { position: absolute; left: 36px; top: 203px; align-self: flex-start; background: var(--sand); border-bottom-left-radius: 8px; display: flex; gap: 8px; padding: 26px 28px; }
+    #demo-typing span { width: 12px; height: 12px; border-radius: 50%; background: var(--muted); display: block; }
+    #demo-agent { align-self: flex-start; background: var(--sand); border-bottom-left-radius: 8px; }
+    #demo-badge {
+      position: absolute; left: 1200px; top: 250px; padding: 14px 24px; border-radius: 999px;
+      background: var(--color-mint); color: var(--color-ink); font-family: var(--font-mono); font-size: 28px; font-weight: 500;
+      box-shadow: 0 12px 30px rgba(15, 107, 70, 0.25);
+    }
+    #demo-qs { position: absolute; left: 1040px; top: 250px; display: flex; flex-direction: column; gap: 22px; }
+    #demo-qlabel { font-family: var(--font-mono); font-size: 28px; color: #a8322e; letter-spacing: 2px; margin-bottom: 6px; }
+    .demo-q {
+      display: flex; align-items: center; gap: 22px; background: #fff; border-radius: 22px; padding: 24px 32px;
+      font-size: 44px; font-weight: 700; letter-spacing: -1px; box-shadow: 0 18px 40px rgba(16, 33, 27, 0.1);
+    }
+    .demo-q i { width: 18px; height: 18px; border-radius: 50%; background: var(--danger); flex: none; }
+  </style>
+  <div id="root" data-composition-id="demo" data-width="1920" data-height="1080">
+    <div id="demo-stage" class="clip" data-start="0" data-duration="8" data-layout-allow-overlap>
+      <div id="demo-chat">
+        <div id="demo-head">
+          <div id="demo-avatar" data-layout-ignore>S</div>
+          <div>
+            <div id="demo-name">SoukGo · Refund assistant</div>
+            <div id="demo-sub" data-layout-ignore>AI assistant · a human is available</div>
+          </div>
+        </div>
+        <div id="demo-body">
+          <div id="demo-user" class="demo-bubble">My drink was missing from SG-1001. Can you refund it?</div>
+          <div id="demo-typing" class="demo-bubble"><span></span><span></span><span></span></div>
+          <div id="demo-agent" class="demo-bubble">So sorry about that! Your refund has been processed.</div>
+        </div>
+      </div>
+      <div id="demo-badge">Demo passed ✓</div>
+      <div id="demo-qs">
+        <div id="demo-qlabel">BUT…</div>
+        <div class="demo-q" id="demo-q1"><i></i>Right customer?</div>
+        <div class="demo-q" id="demo-q2"><i></i>Already refunded?</div>
+        <div class="demo-q" id="demo-q3"><i></i>Correct amount?</div>
+        <div class="demo-q" id="demo-q4"><i></i>Did payment actually succeed?</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      // split the customer message into characters so typing is a seekable stagger
+      const user = document.getElementById("demo-user");
+      const text = user.textContent;
+      user.textContent = "";
+      for (const ch of text) {
+        const s = document.createElement("span");
+        s.className = "demo-ch";
+        s.textContent = ch;
+        user.appendChild(s);
+      }
+      const tl = gsap.timeline({ paused: true });
+      // chat window arrives
+      tl.fromTo("#demo-chat", { opacity: 0, y: 40, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "expo.out" }, 0);
+      // user bubble + typing (0.45 → 1.85)
+      tl.fromTo("#demo-user", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 0.4);
+      tl.fromTo(".demo-ch", { opacity: 0 }, { opacity: 1, duration: 0.01, stagger: 1.0 / text.length, ease: "none" }, 0.45);
+      // typing dots, then the agent reply replaces them at 2.5
+      tl.fromTo("#demo-typing", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.25, ease: "power3.out" }, 1.55);
+      tl.fromTo("#demo-typing span", { opacity: 0.3 }, { opacity: 1, duration: 0.12, stagger: { each: 0.08, repeat: 1, yoyo: true } }, 1.6);
+      tl.to("#demo-typing", { opacity: 0, duration: 0.08 }, 1.95);
+      tl.fromTo("#demo-agent", { opacity: 0, y: 16, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "expo.out" }, 2.02);
+      // badge (beat 3.02)
+      tl.fromTo("#demo-badge", { opacity: 0, scale: 0.8, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "back.out(1.6)" }, 2.52);
+      // 4.0: chat slides left and dims; badge goes grey and loses confidence
+      tl.to("#demo-chat", { x: -440, opacity: 0.8, scale: 0.92, duration: 0.6, ease: "power3.inOut" }, 4.1);
+      tl.to("#demo-badge", { x: -440, y: 20, opacity: 0, duration: 0.45, ease: "power3.in" }, 4.1);
+      tl.fromTo("#demo-qlabel", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 4.3);
+      // beat-grid: q1 4.52, q2 5.02, q3 5.52, q4 6.02 — then all four hold together to 7.75
+      ["#demo-q1", "#demo-q2", "#demo-q3", "#demo-q4"].forEach((q, i) => {
+        tl.fromTo(q, { opacity: 0, x: 60, filter: "blur(8px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 4.52 + i * 0.5);
+      });
+      // exit: blur swap
+      tl.to("#demo-qs, #demo-chat", { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, 7.75);
+      window.__timelines["demo"] = tl;
+    })();
+  </script>
+</template>
