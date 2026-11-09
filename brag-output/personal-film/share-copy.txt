@@ -1,0 +1,7 @@
+Every company wants to use AI. Far fewer get it into production.
+
+I've led AI-powered customer support transformation at Uber, deploying LLM-based agents at global scale. Independently, I help businesses find where AI creates real value, shape the strategy, design and prototype the agents, and get them ready for production, and I train teams to do it themselves.
+
+I don't just talk about AI. I help businesses make it work. If you're exploring AI agents or automation, let's talk.
+
+(Independent practice; not affiliated with or endorsed by Uber.)

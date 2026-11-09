@@ -1,0 +1,360 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>AI Strategy Film</title>
+<style>
+@font-face { font-family: "IDisp"; src: local("Inter Display Bold"), local("InterDisplay-Bold"); font-weight: 700; }
+@font-face { font-family: "IDisp"; src: local("Inter Display SemiBold"), local("InterDisplay-SemiBold"); font-weight: 600; }
+@font-face { font-family: "IDisp"; src: local("Inter Display Medium"), local("InterDisplay-Medium"); font-weight: 500; }
+@font-face { font-family: "IDisp"; src: local("Inter Display Black"), local("InterDisplay-Black"); font-weight: 800; }
+:root { --bg:#0a0a0a; --fg:#f2f0eb; --dim:#7a7872; --dim2:#45443f; --line:rgba(242,240,235,.14); --acc:#ff4a1c; --card:#141413; }
+* { box-sizing:border-box; margin:0; padding:0; }
+html,body { width:1920px; height:1080px; overflow:hidden; background:var(--bg); }
+#stage { position:relative; width:1920px; height:1080px; overflow:hidden; background:var(--bg); color:var(--fg);
+  font-family:"Inter",sans-serif; -webkit-font-smoothing:antialiased; }
+canvas { position:absolute; inset:0; }
+.a { position:absolute; will-change:transform,opacity; }
+.mono { font-family:"JetBrains Mono",monospace; font-weight:500; letter-spacing:.14em; text-transform:uppercase; }
+.code { font-family:"JetBrains Mono",monospace; font-weight:500; letter-spacing:0; }
+.hl { position:absolute; font-family:"IDisp","Inter",sans-serif; font-weight:700; letter-spacing:-.035em; line-height:1.02; white-space:nowrap; }
+.hl .w { display:inline-block; overflow:hidden; vertical-align:top; padding-bottom:.08em; margin-bottom:-.08em; }
+.hl .w > span { display:inline-block; will-change:transform; }
+.acc { color:var(--acc); }
+.dimc { color:var(--dim); }
+/* chrome */
+.chrome { font-size:15px; color:var(--dim); }
+/* chaos cards */
+.frag { position:absolute; background:rgba(20,20,19,.92); border:1px solid var(--line); padding:14px 18px 16px; min-width:300px; }
+.frag .k { font-size:14px; color:var(--dim); }
+.frag .v { font-family:"JetBrains Mono",monospace; font-size:24px; margin-top:6px; color:var(--fg); white-space:nowrap; }
+.frag.err { border-color:rgba(255,74,28,.7); }
+.frag.err .v { color:var(--acc); }
+/* demo card */
+#demo { left:1100px; top:300px; width:600px; height:330px; background:var(--card); border:1px solid var(--line); }
+#demo .bar { height:52px; border-bottom:1px solid var(--line); display:flex; align-items:center; padding:0 22px; gap:10px; }
+#demo .bar i { width:10px; height:10px; border-radius:50%; background:var(--dim2); display:block; }
+.bub { position:absolute; padding:16px 22px; font-size:27px; font-weight:500; white-space:nowrap; }
+.bu { right:26px; background:var(--fg); color:var(--bg); }
+.ba { left:26px; background:#232321; color:var(--fg); }
+/* pipeline */
+.pl-i { font-size:16px; color:var(--dim); }
+.pl-w { font-family:"IDisp",sans-serif; font-weight:700; font-size:42px; letter-spacing:-.02em; }
+.pl-s { font-size:22px; line-height:1.3; color:var(--dim); width:310px; font-weight:500; }
+/* method */
+.box { position:absolute; border:1px solid rgba(242,240,235,.35); background:var(--card); padding:18px 20px; }
+.box .t { font-family:"IDisp",sans-serif; font-weight:700; font-size:30px; letter-spacing:-.02em; }
+.box .s { font-size:14px; color:var(--dim); margin-bottom:10px; }
+.pill { position:absolute; height:56px; border:1px solid rgba(242,240,235,.3); display:flex; align-items:center; padding:0 20px; font-size:24px; background:var(--card); white-space:nowrap; }
+.pill .tag { margin-left:auto; font-size:13px; color:var(--dim); }
+.blk { color:var(--dim2); border-color:var(--dim2); background:transparent; }
+.strike { position:absolute; left:-6px; right:-6px; top:50%; height:2px; background:var(--acc); transform-origin:left; }
+.row { position:absolute; height:56px; width:450px; border-bottom:1px solid var(--line); display:flex; align-items:center; font-size:21px; white-space:nowrap; }
+.row .id { width:64px; font-size:15px; color:var(--dim); }
+.row .r { margin-left:auto; font-size:13px; display:flex; align-items:center; gap:10px; }
+.tick { width:22px; height:22px; border-radius:50%; background:var(--fg); color:var(--bg); display:inline-flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; }
+.stop { position:absolute; height:96px; width:300px; border:1px solid rgba(242,240,235,.3); padding:14px 18px; }
+.stop .n { font-family:"IDisp",sans-serif; font-weight:700; font-size:44px; line-height:1; margin-top:6px; }
+.stop .l { font-size:13px; color:var(--dim); }
+.step { position:absolute; background:#1b1b1a; border-top:2px solid rgba(242,240,235,.6); }
+.step .l { position:absolute; left:0; top:-30px; font-size:13px; white-space:nowrap; color:var(--fg); }
+/* principle */
+.pr { font-size:78px; }
+</style></head>
+<body><div id="stage">
+<canvas id="cv" width="1920" height="1080"></canvas>
+<div id="dom"></div>
+</div>
+<script>
+// ---------- helpers ----------
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+const eo=x=>x>=1?1:1-Math.pow(2,-10*x);             // expo out
+const ei=x=>x*x*x;                                 // cubic in
+const eio=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;  // cubic in-out
+const lerp=(a,b,p)=>a+(b-a)*p;
+const BEAT=.625;
+function rnd(seed){ let s=seed>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+const dom=document.getElementById('dom');
+const els=[];   // {el, in, out, fx, dy, dx}
+function add(html, x, y, opt={}){
+  const d=document.createElement('div'); d.className='a '+(opt.cls||''); d.innerHTML=html;
+  d.style.left=x+'px'; d.style.top=y+'px';
+  if(opt.w) d.style.width=opt.w+'px'; if(opt.h) d.style.height=opt.h+'px';
+  if(opt.style) d.style.cssText+=';'+opt.style;
+  (opt.parent||dom).appendChild(d);
+  if(opt.in!==undefined) els.push({el:d, in:opt.in, out:opt.out??1e9, fx:opt.fx||'rise', dy:opt.dy??24, dx:opt.dx??0, dur:opt.dur||.5, odur:opt.odur||.3});
+  return d;
+}
+// headline with per-word mask reveal
+const hls=[];
+function hl(text, x, y, size, tin, tout, opt={}){
+  const d=document.createElement('div'); d.className='hl '+(opt.cls||''); d.style.left=x+'px'; d.style.top=y+'px'; d.style.fontSize=size+'px';
+  if(opt.align==='center'){ d.style.left='0'; d.style.width='1920px'; d.style.textAlign='center'; }
+  if(opt.weight) d.style.fontWeight=opt.weight;
+  const words=text.split(' '); const inner=[];
+  words.forEach((w,i)=>{ const acc=w.startsWith('*'); const t=acc?w.slice(1):w;
+    const s=document.createElement('span'); s.className='w'; const k=document.createElement('span'); k.textContent=t; if(acc) k.className='acc';
+    s.appendChild(k); d.appendChild(s); if(i<words.length-1) d.appendChild(document.createTextNode(' ')); inner.push(k); });
+  (opt.parent||dom).appendChild(d);
+  const h={el:d, words:inner, tin, tout, st:opt.stagger??.07, ost:opt.ostagger??.03, outfx:opt.outfx||'up'};
+  hls.push(h); return h;
+}
+function applyEl(o,t){
+  const pi=eo(seg(t,o.in,o.in+o.dur)); const po=ei(seg(t,o.out,o.out+o.odur));
+  let op=pi*(1-po), tr='';
+  if(o.fx==='rise') tr=`translate(${o.dx*(1-pi)}px,${o.dy*(1-pi)-o.dy*.5*po}px)`;
+  else if(o.fx==='fade') tr='';
+  else if(o.fx==='scalex'){ tr=`scaleX(${pi})`; o.el.style.transformOrigin='left center'; op=1-po; if(pi<=0) op=0; }
+  else if(o.fx==='scaley'){ tr=`scaleY(${pi})`; o.el.style.transformOrigin='center bottom'; op=1-po; if(pi<=0) op=0; }
+  else if(o.fx==='pop') tr=`scale(${.92+.08*pi})`;
+  o.el.style.opacity=op; o.el.style.transform=tr;
+  o.el.style.visibility=op<=0.001?'hidden':'visible';
+}
+function applyHl(h,t){
+  let any=false;
+  h.words.forEach((k,i)=>{
+    const pi=eo(seg(t,h.tin+i*h.st,h.tin+i*h.st+.6));
+    const po=ei(seg(t,h.tout+i*h.ost,h.tout+i*h.ost+.32));
+    const y=(1-pi)*110 - po*110;
+    k.style.transform=`translateY(${y}%)`;
+    if(pi>0&&po<1) any=true;
+  });
+  h.el.style.visibility=any?'visible':'hidden';
+}
+
+// ================= PERSONAL SALES FILM =================
+const ML=160;
+const NAME='[YOUR NAME]';
+const EXTRA_CSS=`
+.svc { position:absolute; width:660px; height:72px; border-bottom:1px solid var(--line); display:flex; align-items:center; white-space:nowrap; }
+.svc .t { font-family:IDisp,sans-serif; font-weight:600; font-size:30px; letter-spacing:-.015em; padding-left:40px; }
+.svc .n { margin-left:auto; font-size:13px; color:var(--dim); }
+.st { position:absolute; height:6px; background:var(--acc); transform-origin:left; }
+.ven { font-size:15px; color:var(--fg); }
+`;
+{ const s=document.createElement('style'); s.textContent=EXTRA_CSS; document.head.appendChild(s); }
+
+// ---------- CHROME ----------
+const chromeTL=add(`<span class="mono">${NAME}</span>`,ML,56,{cls:'chrome'});
+const chromeTR=add('<span class="mono" id="sec"></span>',1260,56,{cls:'chrome',w:500,style:'text-align:right'});
+const chromeBL=add('<span class="mono">AI Strategy &amp; Implementation</span>',ML,1006,{cls:'chrome'});
+const chromeBR=add('<span class="mono" id="tc"></span>',1460,1006,{cls:'chrome',w:300,style:'text-align:right'});
+const prog=add('',ML,1046,{w:1600,h:1,style:'background:var(--fg);transform-origin:left;opacity:.5'});
+const SECS=[[0,'01 / Opportunity'],[9.375,'02 / Experience'],[25,'03 / Challenge'],[35.625,'04 / Approach'],[47.5,'05 / Difference']];
+
+// ---------- 01 OPPORTUNITY (0 - 9.375) ----------
+hl('Every company wants to use AI.', ML, 452, 120, .45, 2.3);
+['Automate operations.','Deploy agents.','Reduce costs.','Unlock new *opportunities.'].forEach((w,i)=>
+  hl(w, ML, 250+i*130, 116, 2.5+i*BEAT, 5.5+i*.04, {weight:800, stagger:.04}));
+hl('But turning AI potential into real business impact', ML, 400, 84, 5.7, 9.05, {stagger:.05});
+hl('is a different challenge.', ML, 500, 84, 6.0, 9.12, {stagger:.05, cls:'dimc'});
+
+// ---------- 02 EXPERIENCE (9.375 - 25) ----------
+// C1: intersection
+add('<span class="mono">Background</span>', ML, 252, {cls:'pl-i', in:9.4, out:13.95, fx:'rise', dy:10});
+['I’ve spent the last several years','working at the intersection of','product, technology and operations.'].forEach((l,i)=>
+  hl(l, ML, 296+i*86, 64, 9.45+i*.12, 13.95+i*.03, {stagger:.04}));
+const VEN=[[1560,430,'Product'],[1465,600,'Technology'],[1655,600,'Operations']];
+const venLbl=[[1500,262,'Product'],[1250,782,'Technology'],[1700,782,'Operations']];
+venLbl.forEach((v,i)=>add(`<span class="mono ven">${v[2]}</span>`, v[0], v[1], {in:9.9+i*.3, out:13.9, fx:'rise', dy:8}));
+// C2: Uber, global scale
+add('<span class="mono">Currently · Uber · AI-powered customer support</span>', ML, 252, {cls:'pl-i', in:14.4, out:19.85, fx:'rise', dy:10});
+['At Uber, I’ve led the','development of AI-powered','customer support systems,','deploying LLM-based agents','at *global *scale.'].forEach((l,i)=>
+  hl(l, ML, 292+i*80, 62, 14.45+i*.11, 19.85+i*.03, {stagger:.04}));
+const GLOBE={cx:1420, cy:560, r:340};
+add('<span class="mono">LLM-based agents · global-scale operations</span>', 1110, 930, {cls:'pl-i', in:15.3, out:19.8, fx:'fade', style:'font-size:13px'});
+// C3: experimentation -> production
+add('<span class="mono">Experience</span>', ML, 252, {cls:'pl-i', in:20.0, out:24.6, fx:'rise', dy:10});
+['I’ve seen firsthand what it takes','to move AI from experimentation','into *production.'].forEach((l,i)=>
+  hl(l, ML, 296+i*86, 64, 20.05+i*.12, 24.6+i*.03, {stagger:.04}));
+const TRK=[['Experiment',160],['Prototype',560],['Pilot',960],['Production',1360]];
+const GATES=[['Evaluation',360],['Guardrails',760],['Monitoring',1160]];
+const TY=720;
+TRK.forEach((s,i)=>add(`<span class="mono" style="font-size:15px;color:${i===3?'var(--acc)':'var(--fg)'}">${s[0]}</span>`, s[1], TY+28, {in:20.5+i*.35, out:24.6, fx:'rise', dy:8}));
+GATES.forEach((g,i)=>add(`<span class="mono" style="font-size:12px;color:var(--dim)">${g[0]}</span>`, g[1]-40, TY-52, {in:20.7+i*.35, out:24.6, fx:'fade'}));
+
+// ---------- 03 CHALLENGE (25 - 35.625) ----------
+hl('The challenge isn’t simply choosing a model.', ML, 452, 84, 25.05, 27.35, {stagger:.05});
+['It’s identifying the right opportunities,','designing reliable workflows, integrating systems,','managing risks and measuring results.'].forEach((l,i)=>
+  hl(l, ML, 392+i*86, 64, 27.5+i*.25, 32.5, {stagger:.035, ostagger:0}));
+const FR=[
+ ['use_case','ROI: unknown',1, 160,150], ['model','which one?',0, 700,120], ['crm.sync()','TIMEOUT',1, 1240,150],
+ ['workflow','undocumented',1, 1500,250], ['guardrails','none',1, 420,230], ['eval','"looks good"',0, 980,240],
+ ['erp.write()','permission denied',1, 160,720], ['owner','unassigned',1, 640,760], ['data','PII in prompt',1, 1080,700],
+ ['agent → tool','retry loop',1, 1440,770], ['cost / run','unmeasured',0, 300,860], ['pilot','stuck in demo',1, 860,880],
+ ['handoff','no human path',1, 1300,880], ['success_metric','undefined',1, 1560,120], ['policy','v?',0, 120,600], ['launch','postponed',1, 1620,620],
+];
+const frags=FR.map((f,i)=>{ const t0=28.0+i*.25;
+  const d=add(`<div class="k mono">${f[0]}</div><div class="v">${f[1]}</div>`, f[3], f[4], {cls:'frag'+(f[2]?' err':''), in:t0, out:32.5, fx:'pop', dur:.18, odur:.01});
+  return {d,t0,i}; });
+hl('That’s where most AI initiatives struggle.', 0, 470, 100, 32.8, 35.35, {align:'center', stagger:.06});
+
+// ---------- 04 APPROACH (35.625 - 47.5) ----------
+hl('I help businesses navigate that journey.', ML, 150, 84, 35.7, 37.7, {stagger:.05});
+['From AI opportunity assessments','and transformation strategy','to agent architecture, rapid','prototyping and implementation.'].forEach((l,i)=>
+  hl(l, ML, 300+i*76, 54, 37.85+i*.12, 42.3+i*.03, {stagger:.035}));
+const SVC=['AI opportunity assessments','AI transformation strategy','Agent architecture & design','Prototyping & implementation','Workshops & team enablement','Evaluation, governance, readiness'];
+const SVX=1100, SVY=k=>262+k*86;
+add('<span class="mono">Services</span>', SVX, 214, {cls:'pl-i', in:37.9, out:42.3, fx:'rise', dy:8});
+SVC.forEach((s,k)=>add(`<span class="t">${s.replace('&','&amp;')}</span><span class="n mono">0${k+1}</span>`, SVX, SVY(k)-36, {cls:'svc', in:38.0+k*.12, out:42.3+k*.02, dx:-14, dy:0}));
+['I also help teams develop','the practical knowledge to build,','evaluate and deploy','AI agents *themselves.'].forEach((l,i)=>
+  hl(l, ML, 300+i*76, 54, 42.5+i*.12, 47.2+i*.03, {stagger:.035}));
+// agent architecture
+{ const a=42.6, o=47.2;
+  add('<span class="mono">Agent architecture</span>', 1120, 196, {cls:'pl-i', in:a, out:o, fx:'rise', dy:8});
+  add('<div class="s mono">Input</div><div class="t">Request</div>', 1120, 236, {cls:'box', w:200, in:a+.05, out:o});
+  add('<div class="s mono">Orchestrator · LLM</div><div class="t">Plan · route · act</div>', 1120, 420, {cls:'box', w:300, style:'border-color:var(--fg)', in:a+.25, out:o});
+  add('<span class="mono">Policy &amp; permissions</span>', 1544, 196, {cls:'pl-i', in:a+.5, out:o, fx:'fade', style:'color:var(--acc);font-size:12px'});
+  ['crm.lookup','kb.search','ticket.update','refund.propose'].forEach((n,i)=>add(`<span class="code" style="font-size:20px">${n}</span>`, 1544, 236+i*76, {cls:'pill', w:236, in:a+.45+i*.08, out:o, dx:-12, dy:0}));
+  add('<div class="s mono">Quality</div><div class="t">Evals · traces</div>', 1120, 640, {cls:'box', w:300, in:a+.8, out:o});
+  add('<div class="s mono">Escalation</div><div class="t">Human handoff</div>', 1480, 640, {cls:'box', w:300, style:'border-color:var(--acc)', in:a+.9, out:o});
+  add('<span class="mono" style="font-size:13px">Shadow → pilot → staged rollout → production</span>', 1120, 800, {in:a+1.1, out:o, fx:'rise', dy:8, style:'color:var(--fg)'});
+}
+
+// ---------- 05 DIFFERENCE (47.5 - 55) ----------
+const D1=[hl('No unnecessary complexity.', ML, 300, 72, 47.5, 51.0, {stagger:.04}),
+          hl('No AI hype.', ML, 400, 72, 48.125, 51.03, {stagger:.04}),
+          hl('No impressive demos that never reach production.', ML, 500, 72, 48.75, 51.06, {stagger:.04})];
+const STRIKE_T=[49.375,49.6875,50.0];
+const strikes=D1.map(()=>add('', 0, 0, {cls:'st'}));
+['Just practical expertise,','structured execution and','measurable business *outcomes.'].forEach((l,i)=>
+  hl(l, ML, 290+i*120, 108, 51.25+i*.14, 54.7+i*.03, {stagger:.05, weight:800}));
+
+// ---------- 06 NAME REVEAL (55 - 60) ----------
+const E0=55.0;
+add('<span class="mono">AI Strategy &amp; Implementation</span>', ML, 288, {cls:'pl-i', in:E0+.35, dy:10, style:'font-size:18px;color:var(--fg)'});
+const nameWrap=add(`<div id="nm" style="font-family:IDisp;font-weight:800;font-size:200px;letter-spacing:-.04em;line-height:1;white-space:nowrap">${NAME}</div>`, ML-8, 330, {});
+const sweep=add('', ML, 0, {h:12, style:'background:var(--acc)'});
+add('<div style="font-family:IDisp;font-weight:700;font-size:58px;letter-spacing:-.03em;white-space:nowrap">AI that works. <span class="dimc">Not just AI that impresses.</span></div>', ML, 610, {in:E0+.9, dy:18, dur:.7});
+add('<div style="font-family:IDisp;font-weight:600;font-size:40px;letter-spacing:-.02em">Let’s build something that <span class="acc">works.</span> &nbsp;→</div>', ML, 730, {in:E0+1.7, dy:16, dur:.7});
+add('<span class="mono" style="font-size:14px;color:var(--dim)">Independent practice. Not affiliated with or endorsed by Uber.</span>', ML, 956, {in:E0+2.0, fx:'fade', dur:.6});
+const endDots=[0,1,2,3,4].map(k=>add('', 1560+k*44, 300, {w:14, h:14, style:'border-radius:50%;background:'+(k===4?'var(--acc)':'var(--fg)'), in:E0+.5+k*.08, fx:'pop'}));
+
+// ---------- CANVAS ----------
+const cv=document.getElementById('cv'), cx=cv.getContext('2d');
+const NN=108; const R=rnd(42); const nodes=[];
+for(let i=0;i<NN;i++){ const early=i<26;
+  nodes.push({x:140+R()*1640, y:120+R()*840, a: early? 2.9+i*(4.6/26) : 7.6+(i-26)*(6.2/(NN-26)), ph:R()*6.28, f1:.8+R()*2.2, f2:.7+R()*2.4, r:2+R()*2.5}); }
+const edges=[];
+nodes.forEach((n,i)=>{ const c=nodes.slice(0,i).map((m,j)=>[j,Math.hypot(m.x-n.x,m.y-n.y)]).sort((p,q)=>p[1]-q[1]).slice(0,i<26?1:2);
+  c.forEach(([j])=>edges.push({i,j,t:n.a+.1,brk: R()<.18 ? 10.5+R()*3.6 : 1e9, sp:.3+R()*.7, ph:R()})); });
+for(let k=0;k<46;k++){ const i=26+Math.floor(R()*(NN-26)), j=Math.floor(R()*NN); if(i!==j) edges.push({i,j,t:9+R()*5,brk:R()<.35?11+R()*3:1e9,sp:.3+R()*.6,ph:R(),long:1}); }
+// network clock: opportunity uses u=t (calm), challenge maps 25..32.5 -> u 6..14.375
+const netU=t=> t<25 ? t : 6+(t-25)*(14.375-6)/7.5;
+const chaosOn=t=> t>=25;
+function chaosAmp(u,t){ return chaosOn(t) ? 22*eio(seg(u,8.6,14.3)) : 0; }
+function npos(i,u,t){ const n=nodes[i]; const A=chaosAmp(u,t);
+  const z=1+(chaosOn(t)?.07*eio(seg(u,7.5,14.3)):0); const x=960+(n.x-960)*z, y=540+(n.y-540)*z;
+  return [x+A*Math.sin(u*n.f1*3+n.ph), y+A*Math.cos(u*n.f2*3+n.ph)]; }
+const LAT=nodes.map((n,i)=>({x:160+(i%18)*90, y:315+Math.floor(i/18)*90}));
+const bulletIdx=[0,1,2,3,4,5].map(k=>(k)*18+12);   // one per row, column 12 (x=1240)
+const order=nodes.map((n,i)=>i).sort((p,q)=>nodes[p].x-nodes[q].x); const rank=[]; order.forEach((i,k)=>rank[i]=k);
+// globe points
+const GP=[]; for(let la=-70;la<=80;la+=9){ const step=Math.max(6, 8/Math.cos(la*Math.PI/180)); for(let lo=0;lo<360;lo+=step) GP.push([la*Math.PI/180, lo*Math.PI/180]); }
+const GR=rnd(7); const ARCS=[]; for(let k=0;k<14;k++) ARCS.push([GP[Math.floor(GR()*GP.length)],GP[Math.floor(GR()*GP.length)],GR()]);
+function gproj(la,lo,rot){ const x=Math.cos(la)*Math.sin(lo+rot), y=Math.sin(la), z=Math.cos(la)*Math.cos(lo+rot);
+  const tilt=.32; const y2=y*Math.cos(tilt)-z*Math.sin(tilt), z2=y*Math.sin(tilt)+z*Math.cos(tilt);
+  return [GLOBE.cx+GLOBE.r*x, GLOBE.cy-GLOBE.r*y2, z2]; }
+
+function bez(cx,x1,y1,x2,y2,p,col,w=1.5){ cx.strokeStyle=col; cx.lineWidth=w; cx.beginPath(); cx.moveTo(x1,y1);
+  const mx=lerp(x1,x2,.5); const N=24; for(let k=1;k<=N*p;k++){ const q=k/N;
+    const bx=Math.pow(1-q,3)*x1+3*(1-q)*(1-q)*q*mx+3*(1-q)*q*q*mx+q*q*q*x2, by=Math.pow(1-q,3)*y1+3*(1-q)*(1-q)*q*y1+3*(1-q)*q*q*y2+q*q*q*y2; cx.lineTo(bx,by); }
+  cx.stroke(); cx.lineWidth=1; }
+
+function drawCanvas(t){
+  cx.clearRect(0,0,1920,1080);
+  let ga=.075*eo(seg(t,0,1.4)); if(t>=32.5&&t<35.625) ga=0;
+  if(t>=35.625) ga=.075+.06*Math.sin(Math.PI*seg(t,35.8,37.8));
+  if(ga>0){ cx.strokeStyle=`rgba(242,240,235,${ga})`;
+    for(let c=0;c<=12;c++){ const x=Math.round(160+c*1600/12)+.5; const p=eo(seg(t,c*.06,c*.06+1.2)); cx.beginPath(); cx.moveTo(x,0); cx.lineTo(x,1080*p); cx.stroke(); } }
+  // network: calm in opportunity, chaos in challenge
+  const netA = t<9.375 ? 1-seg(t,8.6,9.3) : (t>=25 && t<32.5 ? seg(t,25,25.5) : 0);
+  if(netA>0 && t>=2.8){ const u=netU(t); const calm=t<9.375; const base = calm ? (t<5.6 ? .16 : .26) : .42;
+    for(const e of edges){ if(calm && e.long) continue; const p=eo(seg(u,e.t,e.t+.5)); if(p<=0) continue;
+      const [x1,y1]=npos(e.i,u,t), [x2,y2]=npos(e.j,u,t); const broken=!calm && u>e.brk; const fl=broken&&(Math.floor(t*14+e.ph*9)%3===0);
+      cx.strokeStyle = broken?`rgba(255,74,28,${(fl?.9:.55)*netA})`:`rgba(242,240,235,${base*(e.long?.6:1)*netA})`; cx.lineWidth=broken?1.5:1;
+      if(broken){ cx.beginPath(); cx.moveTo(x1,y1); cx.lineTo(lerp(x1,x2,.42),lerp(y1,y2,.42)); cx.moveTo(lerp(x1,x2,.58),lerp(y1,y2,.58)); cx.lineTo(x2,y2); cx.stroke(); }
+      else { cx.beginPath(); cx.moveTo(x1,y1); cx.lineTo(lerp(x1,x2,p),lerp(y1,y2,p)); cx.stroke(); }
+      if(!calm && !broken && p>=1){ const q=((t*e.sp+e.ph)%1); cx.fillStyle=`rgba(242,240,235,${.85*netA})`; cx.fillRect(lerp(x1,x2,q)-1.5,lerp(y1,y2,q)-1.5,3,3); } }
+    for(let i=0;i<NN;i++){ const n=nodes[i]; if(calm && i>=26) continue; const p=eo(seg(u,n.a,n.a+.3)); if(p<=0) continue;
+      const [x,y]=npos(i,u,t); cx.fillStyle=`rgba(242,240,235,${(calm?.55:.85)*p*netA})`; cx.beginPath(); cx.arc(x,y,n.r*p,0,6.283); cx.fill(); }
+    if(!calm){ // legibility band behind the three challenge lines
+      const b=seg(t,27.3,27.8); const g=cx.createLinearGradient(0,330,0,700); g.addColorStop(0,'rgba(10,10,10,0)'); g.addColorStop(.15,`rgba(10,10,10,${.82*b})`); g.addColorStop(.85,`rgba(10,10,10,${.82*b})`); g.addColorStop(1,'rgba(10,10,10,0)');
+      cx.fillStyle=g; cx.fillRect(0,330,1920,370); }
+  }
+  // C1 venn
+  if(t>=9.6 && t<14.3){ const out=1-seg(t,13.9,14.25);
+    VEN.forEach((v,i)=>{ const p=eio(seg(t,9.7+i*.3,10.6+i*.3)); cx.strokeStyle=`rgba(242,240,235,${.75*out})`; cx.lineWidth=1.5;
+      cx.beginPath(); cx.arc(v[0],v[1],175,-Math.PI/2,-Math.PI/2+6.283*p); cx.stroke(); });
+    const c=eo(seg(t,11.0,11.4)); cx.fillStyle=`rgba(255,74,28,${out})`; cx.beginPath(); cx.arc(1560,545,10*c,0,6.283); cx.fill(); cx.lineWidth=1; }
+  // C2 globe
+  if(t>=14.375 && t<20.3){ const ap=eo(seg(t,14.4,15.3)), out=1-seg(t,19.8,20.25); const rot=t*.22;
+    for(const [la,lo] of GP){ const [x,y,z]=gproj(la,lo,rot); if(z<0) continue; cx.fillStyle=`rgba(242,240,235,${(.15+.6*z)*ap*out})`; cx.fillRect(x-1.2,y-1.2,2.4,2.4); }
+    cx.strokeStyle=`rgba(242,240,235,${.2*ap*out})`; cx.beginPath(); cx.arc(GLOBE.cx,GLOBE.cy,GLOBE.r,0,6.283); cx.stroke();
+    ARCS.forEach(([A,Bp,ph],k)=>{ const s=15.0+k*.18; const p=eo(seg(t,s,s+.7)); if(p<=0) return;
+      const [x1,y1,z1]=gproj(A[0],A[1],rot), [x2,y2,z2]=gproj(Bp[0],Bp[1],rot); if(z1<.05||z2<.05) return;
+      const mx=(x1+x2)/2, my=(y1+y2)/2, d=Math.hypot(x2-x1,y2-y1); const ox=(mx-GLOBE.cx), oy=(my-GLOBE.cy); const L=Math.hypot(ox,oy)||1; const h=.35*d;
+      const qx=mx+ox/L*h, qy=my+oy/L*h;
+      cx.strokeStyle=`rgba(255,74,28,${.75*out*Math.min(z1,z2)*1.4})`; cx.lineWidth=1.3; cx.beginPath(); cx.moveTo(x1,y1);
+      for(let j=1;j<=20*p;j++){ const q=j/20; cx.lineTo((1-q)*(1-q)*x1+2*(1-q)*q*qx+q*q*x2,(1-q)*(1-q)*y1+2*(1-q)*q*qy+q*q*y2); } cx.stroke();
+      const q=((t*.6+ph)%1); cx.fillStyle=`rgba(242,240,235,${out})`; cx.fillRect((1-q)*(1-q)*x1+2*(1-q)*q*qx+q*q*x2-2,(1-q)*(1-q)*y1+2*(1-q)*q*qy+q*q*y2-2,4,4);
+      cx.fillStyle=`rgba(255,74,28,${out})`; cx.beginPath(); cx.arc(x1,y1,3.5,0,6.283); cx.arc(x2,y2,3.5,0,6.283); cx.fill(); });
+    cx.lineWidth=1; }
+  // C3 track
+  if(t>=20.4 && t<24.95){ const out=1-seg(t,24.6,24.95); const p=eio(seg(t,20.5,22.0));
+    cx.strokeStyle=`rgba(242,240,235,${.6*out})`; cx.lineWidth=1.5; cx.beginPath(); cx.moveTo(160,TY); cx.lineTo(160+1600*p,TY); cx.stroke(); cx.lineWidth=1;
+    TRK.forEach((s,i)=>{ const q=seg(t,20.5+i*.35,20.7+i*.35); cx.fillStyle= i===3?`rgba(255,74,28,${q*out})`:`rgba(242,240,235,${q*out})`; cx.beginPath(); cx.arc(s[1],TY,7*eo(q),0,6.283); cx.fill(); });
+    GATES.forEach((g,i)=>{ const q=eo(seg(t,20.7+i*.35,21.0+i*.35)); cx.fillStyle=`rgba(242,240,235,${.8*out})`; cx.fillRect(g[1]-1,TY-26*q,2,52*q); });
+    const pk=eio(seg(t,22.2,24.1)); if(pk>0){ const x=160+1200*pk; cx.fillStyle=`rgba(255,74,28,${out})`; cx.fillRect(x-6,TY-6,12,12); } }
+  // 04 snap to lattice -> service bullets
+  if(t>=35.625 && t<42.6){
+    const fadeAll=seg(t,37.2,37.6); const rowLine=eo(seg(t,36.6,37.1))*(1-fadeAll);
+    if(rowLine>0){ cx.strokeStyle=`rgba(242,240,235,${.12*rowLine})`; for(let r=0;r<6;r++){ const y=315+r*90+.5; cx.beginPath(); cx.moveTo(160,y); cx.lineTo(160+1530*rowLine,y); cx.stroke(); } }
+    for(let i=0;i<NN;i++){ const isB=bulletIdx.includes(i); if(!isB && fadeAll>=1) continue;
+      const [sx,sy]=npos(i,netU(32.48),32.48); const st=35.75+rank[i]*.0065; const p=eio(seg(t,st,st+.75));
+      let x=lerp(sx,LAT[i].x,p), y=lerp(sy,LAT[i].y,p); let al=.8*seg(t,35.625,35.9); if(!isB) al*=1-fadeAll; let r=3;
+      if(isB){ const k=bulletIdx.indexOf(i); const m=eio(seg(t,37.4+k*.06,37.95+k*.06)); x=lerp(x,SVX+12,m); y=lerp(y,SVY(k),m); r=3+2*m;
+        al*=1-seg(t,42.3,42.55); if(k===4 && m>=1) cx.fillStyle=`rgba(255,74,28,${al})`; else cx.fillStyle=`rgba(242,240,235,${al})`; }
+      else cx.fillStyle=`rgba(242,240,235,${al})`;
+      cx.beginPath(); cx.arc(x,y,r,0,6.283); cx.fill(); } }
+  // agent architecture connectors
+  if(t>=42.6 && t<47.5){ const a=42.6, out=1-seg(t,47.2,47.5); const col=`rgba(242,240,235,${.7*out})`;
+    const L=[[1220,300,1220,420,a+.2,'v'],[1420,468,1544,264,a+.55],[1420,468,1544,340,a+.6],[1420,468,1544,416,a+.65],[1420,468,1544,492,a+.7],[1270,516,1270,640,a+.8,'v'],[1420,500,1480,690,a+.9]];
+    L.forEach(l=>{ const p=eo(seg(t,l[4],l[4]+.4)); if(p<=0) return; if(l[5]==='v'){ cx.strokeStyle=col; cx.lineWidth=1.5; cx.beginPath(); cx.moveTo(l[0],l[1]); cx.lineTo(l[2],lerp(l[1],l[3],p)); cx.stroke(); cx.lineWidth=1; } else bez(cx,l[0],l[1],l[2],l[3],p,col); });
+    // policy boundary
+    const bp=eo(seg(t,a+.45,a+.9)); if(bp>0){ cx.setLineDash([8,7]); cx.strokeStyle=`rgba(255,74,28,${.85*out})`; cx.strokeRect(1528,222,268*bp+4,312); cx.setLineDash([]); }
+    // packets
+    if(t>a+1.2){ [0,1,2,3].forEach(i=>{ const q=(t*.8+i*.25)%1; const x1=1420,y1=468,x2=1544,y2=264+i*76, mx=lerp(x1,x2,.5);
+      const bx=Math.pow(1-q,3)*x1+3*(1-q)*(1-q)*q*mx+3*(1-q)*q*q*mx+q*q*q*x2, by=Math.pow(1-q,3)*y1+3*(1-q)*(1-q)*q*y1+3*(1-q)*q*q*y2+q*q*q*y2;
+      cx.fillStyle=`rgba(255,74,28,${out})`; cx.fillRect(bx-2,by-2,4,4); }); }
+  }
+}
+
+// ---------- RENDER ----------
+window.render=function(t){
+  drawCanvas(t);
+  const cOn=(t>=.6 && t<32.5) || (t>=35.7 && t<54.8);
+  const ca= cOn ? Math.min(1, seg(t,.6,1.2)+(t>=35.7?1:0)) * (t>=35.7? seg(t,35.7,36.2):1) * (1-seg(t,54.5,54.85)) : 0;
+  [chromeTL,chromeTR,chromeBL,chromeBR].forEach(e=>{e.style.opacity=ca; e.style.visibility=ca>0?'visible':'hidden';});
+  prog.style.opacity=.45*ca; prog.style.transform=`scaleX(${clamp(t/60)})`;
+  let s=''; for(const [a,l] of SECS) if(t>=a) s=l; document.getElementById('sec').textContent=s;
+  document.getElementById('tc').textContent=`00:${String(Math.floor(t)).padStart(2,'0')} / 01:00`;
+  for(const o of els) applyEl(o,t);
+  for(const h of hls) applyHl(h,t);
+  for(const f of frags){ if(t<f.t0||t>=32.5) continue; const A=22*eio(seg(t,27,32.4))*.6; const g=(Math.floor(t*12+f.i*3)%11===0)?A*1.6:0;
+    const pi=eo(seg(t,f.t0,f.t0+.18)); f.d.style.transform=`translate(${A*Math.sin(t*(3+f.i*.37)+f.i)+g}px,${A*Math.cos(t*(2.6+f.i*.29)+f.i)}px) scale(${.92+.08*pi})`; }
+  // strikes through the "No ..." lines (from the 2nd word to the end)
+  D1.forEach((h,i)=>{ const st=strikes[i]; const p=eo(seg(t,STRIKE_T[i],STRIKE_T[i]+.35)), o=seg(t,51.0,51.3);
+    if(p>0 && o<1){ const a=h.words[1].parentNode.getBoundingClientRect(), b=h.words[h.words.length-1].parentNode.getBoundingClientRect();
+      st.style.visibility='visible'; st.style.left=(a.left-6)+'px'; st.style.width=(b.right-a.left+12)+'px'; st.style.top=(a.top+a.height*.5)+'px'; st.style.transform=`scaleX(${p})`; st.style.opacity=1-o; }
+    else st.style.visibility='hidden';
+    const d=seg(t,STRIKE_T[i]+.2,STRIKE_T[i]+.6); h.el.style.color= d>0?`rgba(242,240,235,${1-.55*d})`:''; });
+  // name reveal: an accent bar sweeps across and leaves the name behind, then settles as an underline
+  { const nm=document.getElementById('nm'); const W=nm.getBoundingClientRect().width; const p=eio(seg(t,E0,E0+.7));
+    nm.style.clipPath=`inset(-20% ${100-100*p}% -20% 0)`; nameWrap.style.visibility=t>=E0?'visible':'hidden';
+    const settle=eio(seg(t,E0+.7,E0+1.1));
+    const barTop=lerp(330, 560, settle), barH=lerp(200,10,settle);
+    const x0=ML-8, bx=x0+W*p; const bw= p<1 ? 26 : lerp(26, W, settle);
+    sweep.style.visibility=t>=E0?'visible':'hidden'; sweep.style.top=barTop+'px'; sweep.style.height=barH+'px';
+    sweep.style.left=(p<1? bx-13 : lerp(bx-13, x0, settle))+'px'; sweep.style.width=bw+'px'; sweep.style.opacity=1; }
+};
+window.render(0);
+</script></body></html>
