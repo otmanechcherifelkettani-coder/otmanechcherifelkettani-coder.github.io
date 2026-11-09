@@ -1,0 +1,196 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Shipping AI That Works · University v2</title>
+<style>
+@font-face{font-family:D;src:local("Inter Display Light"),local("InterDisplay-Light");font-weight:300}
+@font-face{font-family:D;src:local("Inter Display"),local("InterDisplay-Regular");font-weight:400}
+@font-face{font-family:D;src:local("Inter Display Medium"),local("InterDisplay-Medium");font-weight:500}
+@font-face{font-family:M;src:local("JetBrains Mono Medium"),local("JetBrainsMono-Medium");font-weight:500}
+:root{--ink:#0B1530;--blue:#2563FF;--mute:#6B7896}
+*{box-sizing:border-box;margin:0;padding:0}
+body{overflow:hidden;font-family:Inter,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#st{position:relative;overflow:hidden}
+.L{position:absolute;inset:0}
+.a{position:absolute}
+.bg-light{background:radial-gradient(1200px 700px at 70% 30%,#E6EFFF 0%,rgba(230,239,255,0) 60%),radial-gradient(900px 600px at 15% 85%,#E3ECFF 0%,rgba(227,236,255,0) 60%),linear-gradient(180deg,#F8FAFF,#EDF2FF)}
+.bg-deep{background:radial-gradient(900px 700px at 72% 18%,#3D7BFF 0%,rgba(61,123,255,0) 55%),radial-gradient(1200px 800px at 25% 115%,#1F49D8 0%,rgba(31,73,216,0) 60%),linear-gradient(180deg,#06103A,#0B1F6E)}
+.blob{position:absolute;border-radius:50%;filter:blur(100px)}
+.h{font-family:D;font-weight:300;letter-spacing:-.045em;line-height:1.0}
+.cap{font-family:D;font-weight:300;letter-spacing:-.03em;text-transform:uppercase;line-height:.98}
+.grad{background:linear-gradient(90deg,#2563FF,#6B9BFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gradw{background:linear-gradient(90deg,#FFFFFF,#9DBBFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mono{font-family:M;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.glass{background:rgba(255,255,255,.74);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.95);border-radius:26px;box-shadow:0 40px 120px rgba(37,99,255,.18),0 2px 0 rgba(255,255,255,.8) inset}
+.glass-d{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:20px;color:#DCE6FF}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 14px;font-family:M;font-weight:500;font-size:13px;white-space:nowrap}
+.msg{padding:13px 17px;border-radius:20px;font-size:19px;line-height:1.38}
+.u{background:var(--ink);color:#fff;border-bottom-right-radius:6px;align-self:flex-end}
+.ag{background:#fff;border:1px solid #E3EAF8;border-bottom-left-radius:6px}
+.row{display:flex;align-items:center;gap:12px;height:56px;border-bottom:1px solid #EEF2FA;font-size:17px}
+.n{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:M;font-size:12px;color:#fff;background:var(--blue);flex:none}
+.c{font-family:M;font-size:14.5px} .r{font-family:M;font-size:12px;color:var(--mute);margin-top:2px}
+.ok{background:#E8F7EF;color:#13865f} .warn{background:#FFF1E6;color:#D2601A} .gray{background:#F1F4FA;color:#8A95B0}
+.orb{border-radius:50%;background:radial-gradient(circle at 35% 30%,#A9C8FF,#2563FF 55%,#1239B8);box-shadow:0 18px 50px rgba(37,99,255,.45),inset 0 -8px 20px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center}
+.tog{width:44px;height:26px;border-radius:999px;background:#D7DFEF;position:relative;flex:none}
+.tog i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.15)}
+</style></head><body><div id="st"><div id="bg1" class="L bg-light"></div><div id="bg2" class="L bg-deep" style="opacity:0"></div><div id="blobs" class="L"></div><div id="ov" class="L"></div></div>
+<script>
+const V=location.hash==='#v'; const W=V?1080:1920,H=V?1920:1080; const P=(h,v)=>V?v:h;
+const st=document.getElementById('st'); st.style.width=W+'px'; st.style.height=H+'px'; document.body.style.width=W+'px'; document.body.style.height=H+'px';
+const ov=document.getElementById('ov');
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), seg=(t,a,b)=>clamp((t-a)/(b-a)), lerp=(a,b,p)=>a+(b-a)*p;
+const eo=x=>x>=1?1:1-Math.pow(2,-10*x), ei=x=>x*x*x, eio=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const bo=x=>{ if(x<=0) return 0; if(x>=1) return 1; const c1=1.4,c3=c1+1; return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2); };
+const els=[], hls=[];
+function add(html,x,y,o={}){ const d=document.createElement('div'); d.className='a '+(o.cls||''); d.innerHTML=html; d.style.left=x+'px'; d.style.top=y+'px';
+  if(o.w) d.style.width=o.w+'px'; if(o.h) d.style.height=o.h+'px'; if(o.style) d.style.cssText+=';'+o.style; (o.parent||ov).appendChild(d);
+  if(o.in!==undefined) els.push({el:d,in:o.in,out:o.out??1e9,fx:o.fx||'focus',dur:o.dur||.6,odur:o.odur||.35,dy:o.dy??24,base:o.base||'',rot:o.rot||0}); return d; }
+function applyEl(o,t){ const pi=seg(t,o.in,o.in+o.dur), po=seg(t,o.out,o.out+o.odur); let op,tr='',f='';
+  if(o.fx==='focus'){ const e=eo(pi); op=clamp(pi*2.5)*(1-ei(po)); f=`blur(${(1-e)*18+ei(po)*16}px)`; tr=`translateY(${(1-e)*o.dy}px) scale(${1+.04*(1-e)+.03*ei(po)})`; }
+  else if(o.fx==='pop'){ const s=bo(pi); op=clamp(pi*4)*(1-ei(po)); tr=`scale(${.85+.15*s}) rotate(${o.rot*(1-s)}deg)`; f=po>0?`blur(${ei(po)*14}px)`:''; }
+  else if(o.fx==='fade'){ op=eo(pi)*(1-ei(po)); }
+  else if(o.fx==='slide'){ const e=eo(pi); op=clamp(pi*3)*(1-ei(po)); tr=`translateX(${(1-e)*80}px)`; f=`blur(${(1-e)*8+ei(po)*14}px)`; }
+  o.el.style.opacity=op; o.el.style.transform=o.base+' '+tr; o.el.style.filter=f; o.el.style.visibility=op<=.002?'hidden':'visible'; }
+function hl(html,x,y,size,w,tin,tout,o={}){ // word-by-word focus reveal; words wrapped by space; <g>..</g> marks gradient words
+  const d=document.createElement('div'); d.className='a '+(o.cls||'h'); d.style.cssText=`left:${x}px;top:${y}px;font-size:${size}px;width:${w}px;${o.style||''}`;
+  const parts=html.split(' '); const ws=[]; let grad=false;
+  parts.forEach((p,i)=>{ if(p.startsWith('<g>')){grad=true;p=p.slice(3);} let end=false; if(p.endsWith('</g>')){end=true;p=p.slice(0,-4);}
+    const s=document.createElement('span'); s.style.display='inline-block'; s.textContent=p; if(grad) s.className=o.gc||'grad'; if(p==='<br>'){ d.appendChild(document.createElement('br')); } else { d.appendChild(s); ws.push(s); if(i<parts.length-1) d.appendChild(document.createTextNode(' ')); }
+    if(end) grad=false; });
+  ov.appendChild(d); const h={el:d,ws,tin,tout,st:o.st??.06}; hls.push(h); return h; }
+function applyHl(h,t){ let any=false; h.ws.forEach((s,i)=>{ const pi=eo(seg(t,h.tin+i*h.st,h.tin+i*h.st+.55)), po=ei(seg(t,h.tout,h.tout+.3));
+  s.style.opacity=clamp(pi*2)*(1-po); s.style.filter=`blur(${(1-pi)*14+po*14}px)`; s.style.transform=`translateY(${(1-pi)*.25}em)`; if(pi>0&&po<1) any=true; }); h.el.style.visibility=any?'visible':'hidden'; }
+const star=(s,c='#fff')=>`<svg width="${s}" height="${s}" viewBox="-50 -50 100 100"><g fill="${c}"><rect x="-27" y="-27" width="54" height="54"/><rect x="-27" y="-27" width="54" height="54" transform="rotate(45)"/></g></svg>`;
+const orb=(s)=>`<div class="orb" style="width:${s}px;height:${s}px">${star(s*.42,'rgba(255,255,255,.96)')}</div>`;
+const cursorSVG=`<svg width="34" height="34" viewBox="0 0 24 24" style="filter:drop-shadow(0 6px 10px rgba(0,0,0,.25))"><path d="M4 2l16 9-7 2-3 7z" fill="#0B1530" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+const ML=P(120,70), CW=P(1680,940);
+// blobs (drift)
+const blobs=[[P(1150,500),P(-150,1000),900,700,'#BCD2FF'],[P(-200,-300),P(600,300),900,700,'#D6E3FF'],[P(800,100),P(400,1500),700,500,'#C8DAFF']].map(b=>{ const d=document.createElement('div'); d.className='blob'; d.style.cssText=`left:${b[0]}px;top:${b[1]}px;width:${b[2]}px;height:${b[3]}px;background:${b[4]};opacity:.8`; document.getElementById('blobs').appendChild(d); return d; });
+const grain=`<svg class="L" style="opacity:.10;mix-blend-mode:multiply;pointer-events:none" width="${W}" height="${H}"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>`;
+
+// ========== S1 OPPORTUNITY 0-12 ==========
+hl('THE WORLD IS <g>CHANGING.</g>', ML, P(380,700), P(170,140), CW, .3, 2.75, {cls:'cap', st:.1});
+const IND=[['E-commerce','Where is my order #4821?','Out for delivery. Arriving today, 14:30.','track_order'],['Healthcare','Can I move my appointment to Thursday?','Thursday 10:00 is available. Shall I book it?','check_schedule'],['Banking','I was charged twice for the same purchase.','I’ve opened a dispute for you: case 2291.','open_dispute']];
+IND.forEach((d,i)=>{ const a=3.0+i*2.0, b=a+1.85;
+  add(`<div class="cap" style="font-size:${P(260,190)}px;color:rgba(37,99,255,.10);white-space:nowrap">${d[0]}</div>`, P(60,40), P(120,280), {in:a, out:b, fx:'slide', dur:.5});
+  add(`<span class="mono" style="font-size:16px;color:var(--blue)">0${i+1} · ${d[0]}</span>`, ML, P(330,560), {in:a+.05, out:b});
+  add(`<div class="h" style="font-size:${P(64,64)}px">An agent that ${['tracks orders','books appointments','opens disputes'][i]}.</div>`, ML, P(370,600), {w:P(700,940), in:a+.1, out:b});
+  const card=add(`<div style="display:flex;align-items:center;gap:12px;padding:0 0 14px;border-bottom:1px solid #EEF2FA">${orb(36)}<div><div style="font-family:D;font-weight:500;font-size:19px">${d[0]} agent</div><div class="mono" style="font-size:10px">working · ${d[3]}()</div></div><span class="pill ok" style="margin-left:auto">● live</span></div>
+     <div style="display:flex;flex-direction:column;gap:12px;padding-top:16px"><div class="msg u" style="max-width:420px">${d[1]}</div><div class="msg ag" style="max-width:440px">${d[2]}</div></div>`,
+     P(1000,90), P(300,920), {cls:'glass', w:P(640,900), in:a+.15, out:b, fx:'focus', base:`perspective(1600px) rotateY(${P(-14,0)}deg) rotateX(${P(6,8)}deg)`, style:'padding:22px'});
+});
+hl('THE NEXT GENERATION NEEDS TO <g>BUILD</g> AI.', ML, P(330,640), P(150,124), CW, 9.3, 11.75, {cls:'cap', st:.07});
+
+// ========== S2 UNIVERSITY 12-20 ==========
+{ // abstract lecture hall: perspective rows of seats + board
+  let rows=''; for(let r=0;r<6;r++){ for(let s=0;s<14;s++){ rows+=`<div style="position:absolute;left:${s*92+(r%2)*46}px;top:${r*70}px;width:70px;height:42px;border-radius:14px;background:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.95);box-shadow:0 10px 30px rgba(37,99,255,.10)"></div>`; } }
+  add(`<div style="position:relative;width:1340px;height:420px">${rows}</div>`, P(300,-130), P(560,1250), {in:12.1, out:19.6, fx:'focus', base:'perspective(1100px) rotateX(58deg)', style:'transform-origin:50% 0'});
+  add(`<div class="glass" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center"><span class="mono" style="font-size:15px">Lecture · Week 6 · AI agents</span></div>`, P(760,240), P(250,960), {w:P(420,600), h:P(200,230), in:12.3, out:16.6});
+  hl('THEORY', ML, P(250,300), P(150,150), CW, 12.6, 19.6, {cls:'cap', st:0});
+  // slides (theory)
+  ['What is an LLM?','How agents use tools','Why evaluation matters'].forEach((s,i)=>add(`<div style="font-family:D;font-size:24px">${s}</div><div style="height:8px;width:70%;background:#E3EAF8;border-radius:4px;margin-top:16px"></div><div style="height:8px;width:52%;background:#E3EAF8;border-radius:4px;margin-top:10px"></div>`,
+     P(1180+i*40,560+i*40), P(560+i*60,540+i*70), {cls:'glass', w:P(500,520), h:150, in:13.2+i*.35, out:16.6, base:`rotate(${(i-1)*3}deg)`, style:'padding:26px'}));
+  hl('→ <g>PRACTICE</g>', P(ML+680,ML), P(250,450), P(150,150), CW, 16.75, 19.6, {cls:'cap', st:.1});
+  // interactive builder (practice)
+  add(`<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">${orb(34)}<b style="font-family:D;font-weight:500;font-size:20px">Agent builder</b><span class="pill gray" style="margin-left:auto">sandbox</span></div>
+     <div class="mono" style="font-size:11px;margin-bottom:8px">Instructions</div><div style="font-size:18px;line-height:1.45;background:#F6F8FD;border-radius:14px;padding:14px">Help only with the authenticated customer’s refund request. Use the eligibility tool. Hand exceptions to a human.</div>
+     <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap"><span class="pill" style="background:#EEF4FF;color:var(--blue)">get_order</span><span class="pill" style="background:#EEF4FF;color:var(--blue)">check_refund_eligibility</span><span class="pill" style="background:#EEF4FF;color:var(--blue)">escalate_case</span><span class="pill" style="margin-left:auto;background:var(--blue);color:#fff;font-family:Inter;font-weight:600;font-size:15px;padding:9px 18px">Run ▸</span></div>`,
+     P(1060,90), P(500,880), {cls:'glass', w:P(720,900), in:17.1, out:19.6, style:'padding:24px', base:`perspective(1600px) rotateY(${P(-10,0)}deg)`});
+}
+
+// ========== S3 INTRODUCING 20-31.5 (deep) ==========
+add(`<span class="mono" style="font-size:17px;color:#9DB8FF">Introducing</span>`, ML, P(330,560), {in:20.25, out:22.9});
+hl('Shipping AI <g>that works.</g>', ML, P(370,600), P(170,150), CW, 20.5, 22.9, {gc:'gradw', style:'color:#fff', st:.09});
+add(`<div style="transform:scale(1)">${orb(P(200,180))}</div>`, P(1560,780), P(700,1160), {in:20.8, out:22.9, fx:'pop'});
+// two-day timeline
+add(`<span class="mono" style="font-size:15px;color:#9DB8FF">Shipping AI That Works · two days · 12 hours · teams of 4–5</span>`, ML, P(170,150), {in:23.0, out:31.2});
+const DAY=[['Day 1','Understand & build',['Problem framing','How agents work','Build lab']],['Day 2','Evaluate & deploy',['Evaluation','Guardrails & risk','Rollout','Final pitch']]];
+add(`<div style="height:2px;background:linear-gradient(90deg,rgba(157,184,255,.2),#9DB8FF,rgba(157,184,255,.2))"></div>`, ML, P(320,320), {w:CW, in:23.1, out:31.2, fx:'fade', dur:.9});
+DAY.forEach((d,i)=>{ const x=P(ML+i*840,ML), y=P(260,260+i*560);
+  add(`<div style="width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 0 0 8px rgba(255,255,255,.15)"></div>`, x, P(310,310)+ (V?i*0:0), {in:23.3+i*.6, out:31.2, fx:'pop'});
+  add(`<div class="mono" style="font-size:14px;color:#9DB8FF">${d[0]}</div><div class="h" style="font-size:${P(58,62)}px;color:#fff;margin-top:8px">${d[1]}</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">${d[2].map(c=>`<span class="pill glass-d" style="font-size:14px">${c}</span>`).join('')}</div>`,
+    x, P(370,370+i*230), {w:P(780,940), in:23.4+i*.6, out:31.2});
+});
+add(`<div class="mono" style="font-size:14px;color:#9DB8FF">Led by an industry practitioner</div><div class="h" style="font-size:${P(84,88)}px;color:#fff;margin-top:12px">Otman Kettani</div><div style="font-family:D;font-weight:300;font-size:${P(30,34)}px;color:#C9D8FF;margin-top:14px;line-height:1.3">Built and deployed LLM-powered customer support agents at Uber.</div>`,
+  ML, P(680,920), {w:P(1100,940), in:26.6, out:31.2});
+add(`<div style="display:flex;gap:10px">${['Product','Operations','AI agents in production'].map(c=>`<span class="pill glass-d">${c}</span>`).join('')}</div>`, ML, P(940,1260), {in:27.4, out:31.2});
+add(`<span class="mono" style="font-size:11px;color:rgba(220,230,255,.6)">Independent workshop · not affiliated with or endorsed by Uber</span>`, ML, P(1010,1600), {in:27.8, out:31.2, fx:'fade'});
+
+// ========== S4 EXPERIENCE 31.5-44 ==========
+const STEPS=['Identify','Design','Build','Test','Evaluate','Deploy']; const ST=[31.75,34.6,36.1,37.4,38.9,40.4], SE=[34.45,35.95,37.25,38.75,40.25,43.75];
+const rib=STEPS.map((s,i)=>add(`<span class="pill" style="font-size:${P(14,15)}px;padding:9px 16px">${String(i+1).padStart(2,'0')} ${s}</span>`, P(ML+i*170,ML+(i%3)*300), P(90,96+Math.floor(i/3)*54), {in:31.6+i*.06, out:43.85, fx:'fade'}));
+add(`<span class="mono" style="font-size:14px">Working in teams</span>`, P(1500,ML), P(100,220), {in:31.7, out:43.85, fx:'fade'});
+const big=(t,i)=>add(`<div class="h" style="font-size:${P(76,80)}px">${t}</div>`, ML, P(220,300), {w:P(700,940), in:ST[i]+.05, out:SE[i]});
+const R=(x,y)=>[P(x[0],x[1]),P(y[0],y[1])];
+// a IDENTIFY
+big('Identify a <span class="grad">business challenge.</span>',0);
+[['E-commerce','Refund requests','track_order'],['Banking','Card disputes','open_dispute'],['Healthcare','Appointment changes','check_schedule']].forEach((c,i)=>add(`<div class="mono" style="font-size:12px;color:var(--blue)">${c[0]}</div><div style="font-family:D;font-size:28px;margin-top:8px">${c[1]}</div><div style="display:flex;gap:8px;margin-top:14px"><span class="pill gray">volume?</span><span class="pill gray">baseline?</span></div>`,
+  P(ML+i*370,ML+(i%2)*470), P(520,700+Math.floor(i/2)*230), {cls:'glass', w:P(340,450), h:190, in:32.0+i*.25, out:33.25, style:'padding:22px'}));
+add(`<div style="display:flex;align-items:center;gap:12px">${orb(40)}<div><div class="mono" style="font-size:12px;color:var(--blue)">Workshop case</div><div style="font-family:D;font-size:34px">SoukGo · missing-item refunds</div></div></div><div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap"><span class="pill" style="background:#EEF4FF;color:var(--blue)">fictional delivery app</span><span class="pill ok">bounded scope</span><span class="pill gray">vs. rules engine · human assist</span></div>`,
+  P(1180,ML), P(400,900), {cls:'glass', w:P(640,940), in:33.3, out:SE[0], style:'padding:26px', base:`perspective(1600px) rotateY(${P(-10,0)}deg)`});
+// b DESIGN workflow
+big('Design the <span class="grad">workflow.</span>',1);
+{ const nodes=[['Request','“il manque ma boisson”'],['Agent','understands & proposes'],['Policy engine','decides eligibility'],['Ledger','executes once'],['Human','handles exceptions']];
+  nodes.forEach((n,i)=>{ const x=P(ML+i*350,ML+ (i%2)*470), y=P(560,560+Math.floor(i/2)*250);
+    add(`<div style="display:flex;align-items:center;gap:10px">${i===1?orb(30):`<span class="n" style="${i===4?'background:#D2601A':''}">${i+1}</span>`}<b style="font-family:D;font-weight:500;font-size:22px">${n[0]}</b></div><div class="r" style="margin-top:8px;font-size:13px">${n[1]}</div>`,
+      x, y, {cls:'glass', w:P(300,450), h:120, in:34.7+i*.12, out:SE[1], style:'padding:20px'});
+    if(i<4 && !V) add(`<div style="width:50px;height:2px;background:var(--blue)"></div>`, x+300, y+60, {in:34.8+i*.12, out:SE[1], fx:'fade'}); }); }
+// c BUILD: instructions + tools
+big('Build it. Connect <span class="grad">tools & instructions.</span>',2);
+add(`<div class="mono" style="font-size:11px">System instructions</div><div style="font-size:18px;line-height:1.5;margin-top:10px;background:#F6F8FD;border-radius:14px;padding:16px">You are SoukGo’s refund assistant. Never invent amounts. Use the eligibility tool. Say a refund succeeded only when the ledger confirms it.<span class="caret" style="display:inline-block;width:2px;height:22px;background:var(--blue);vertical-align:-4px"></span></div>
+   <div class="mono" style="font-size:11px;margin-top:18px">Tools</div>
+   ${['get_order','check_refund_eligibility','submit_refund','escalate_case'].map((tl,i)=>`<div class="row"><span class="c">${tl}</span><span class="tog" style="margin-left:auto" data-on="${36.5+i*.12}"><i></i></span></div>`).join('')}
+   <div class="row" style="color:#B3BBCD"><span class="c">shell · sql · browser</span><span class="pill gray" style="margin-left:auto">not connected</span></div>`,
+  P(1000,70), P(220,620), {cls:'glass', w:P(780,940), in:36.15, out:SE[2], style:'padding:26px', base:`perspective(1600px) rotateY(${P(-8,0)}deg)`});
+// d TEST: console + scenarios
+big('Test <span class="grad">real scenarios.</span>',3);
+add(`<div style="display:flex;gap:18px;height:100%"><div style="flex:1;display:flex;flex-direction:column;gap:12px"><div class="msg u">Bonjour, il manque ma boisson dans ma commande SG-1001.</div><div class="msg ag">Votre boisson (20 MAD) est éligible au remboursement. Je confirme ?</div></div>
+  <div style="flex:1"><div class="mono" style="font-size:11px">Scenarios</div>${[['D01','Missing drink','✓ refund ×1','ok'],['D03','Other customer’s order','✓ blocked','ok'],['D06','Cash payment','✓ to human','ok'],['D09','“ignore policy…”','✓ no authority','ok'],['D10','Suspected illness','✓ priority human','ok']].map((s,i)=>`<div class="row" data-k="${37.6+i*.18}"><span class="r" style="width:40px">${s[0]}</span><span style="font-size:15px">${s[1]}</span><span class="pill ${s[3]}" style="margin-left:auto;font-size:11px">${s[2]}</span></div>`).join('')}</div></div>`,
+  P(860,60), P(420,700), {cls:'glass', w:P(960,960), h:P(470,520), in:37.5, out:SE[3], style:'padding:24px'});
+// e EVALUATE
+big('Evaluate <span class="grad">performance & risk.</span>',4);
+{ let g=''; for(let k=0;k<24;k++) g+=`<i data-k="${k}" style="display:block;width:44px;height:44px;border-radius:10px;background:#E8EEF9"></i>`;
+  add(`<div class="mono" style="font-size:11px">Eval set v0.1 · decisions & ledger actions</div><div class="eg" style="display:grid;grid-template-columns:repeat(8,44px);gap:8px;margin-top:14px">${g}</div>
+    <div style="display:flex;gap:10px;margin-top:20px">${['Unauthorized payouts','Duplicate payouts','False success claims'].map(s=>`<div style="flex:1;border:1px solid #E3EAF8;border-radius:14px;padding:12px"><div class="mono" style="font-size:9.5px">${s}</div><div style="font-family:D;font-size:34px">0</div></div>`).join('')}</div>`,
+    P(1000,70), P(260,640), {cls:'glass', w:P(720,940), in:39.0, out:SE[4], style:'padding:26px'});
+  add(`<div style="display:flex;gap:10px;flex-wrap:wrap">${['Prompt injection','Privacy','Double payout','Dialect coverage'].map(r=>`<span class="pill warn">${r}</span>`).join('')}</div>`, P(1000,70), P(720,1260), {in:39.4, out:SE[4]}); }
+// f DEPLOY
+big('Deploy <span class="grad">responsibly.</span>',5);
+['Offline','Shadow','Human-approved','1%','5%','25%','Approved scope'].forEach((s,i)=>{ const x=P(860+i*140,70+i*136), hgt=60+i*55;
+  add(`<div style="position:absolute;left:0;right:0;bottom:0;height:${hgt}px;border-radius:14px 14px 4px 4px;background:${i<3?'rgba(37,99,255,.22)':'linear-gradient(180deg,#5B8CFF,#2563FF)'}"></div><div class="mono" style="position:absolute;bottom:${hgt+10}px;left:0;font-size:11px;white-space:nowrap;color:var(--ink)">${s}</div>`,
+    x, P(400,700), {w:120, h:420, in:40.5+i*.15, out:SE[5]}); });
+add(`<div style="display:flex;gap:10px"><span class="pill warn">stop rules</span><span class="pill gray">rollback owner</span><span class="pill gray">monitoring</span></div>`, P(860,70), P(860,1180), {in:41.6, out:SE[5]});
+
+// ========== S5 OUTCOMES 44-52.5 ==========
+add(`<span class="mono" style="font-size:15px">They leave with</span>`, ML, P(150,150), {in:44.25, out:48.4});
+const OUT=[['Working AI agent prototype','Bounded sandbox agent',1],['Evaluation report','Decisions & ledger actions',0],['Risk assessment','Threat model · data map',0],['Executive presentation','GO · NO-GO · MORE EVIDENCE',0]];
+OUT.forEach((o,i)=>{ const x=P(ML+i*420,ML+(i%2)*470), y=P(330+Math.abs(i-1.5)*20,280+Math.floor(i/2)*420);
+  add(`${o[2]?orb(56):`<div style="width:56px;height:56px;border-radius:16px;background:#EEF4FF;display:flex;align-items:center;justify-content:center;color:var(--blue);font-family:M;font-size:22px">${['','▦','◆','▶'][i]}</div>`}<div><div class="mono" style="font-size:11px">0${i+1}</div><div style="font-family:D;font-size:${P(32,38)}px;letter-spacing:-.03em;line-height:1.06;margin-top:6px">${o[0]}</div><div style="font-size:15px;color:var(--mute);margin-top:8px">${o[1]}</div></div>`,
+    x, y, {cls:'glass', w:P(380,450), h:P(320,360), in:44.4+i*.55, out:48.4, style:'padding:28px;display:flex;flex-direction:column;justify-content:space-between', base:`perspective(1200px) rotateY(${P((i-1.5)*-5,0)}deg)`}); });
+['STUDENT EMPLOYABILITY','CURRICULUM INNOVATION','UNIVERSITY POSITIONING'].forEach((b,i)=>hl(b.replace(' ',' <g>')+'</g>', ML, P(270+i*190,420+i*300), P(120,96), CW, 48.6+i*.55, 52.2, {cls:'cap', st:.08}));
+
+// ========== S6 CTA 52.5- ==========
+hl('Don’t just teach students <g>about AI.</g>', ML, P(380,700), P(110,104), CW, 52.75, 54.6, {st:.06});
+hl('Give them the opportunity <g>to build it.</g>', ML, P(380,700), P(110,104), CW, 54.75, 56.45, {st:.06});
+add(`<span class="mono" style="font-size:15px;color:var(--blue)">A two-day, hands-on AI workshop for universities & business schools</span>`, ML, P(220,240), {in:56.6, w:P(1400,940)});
+hl('Shipping AI <g>that works.</g>', ML, P(270,330), P(168,140), CW, 56.7, 1e9, {st:.08});
+add(`<div class="cap" style="font-size:${P(40,44)}px;color:var(--ink);letter-spacing:.0em;font-weight:400">From learning AI <span class="grad">to building AI.</span></div>`, ML, P(470,680), {w:CW, in:57.3});
+const cta=add(`<div style="display:inline-flex;align-items:center;gap:14px;padding:24px 36px;border-radius:999px;background:linear-gradient(90deg,#2563FF,#4F86FF);color:#fff;font-family:D;font-weight:500;font-size:${P(30,28)}px;box-shadow:0 20px 50px rgba(37,99,255,.4);white-space:nowrap">Bring the workshop to your university →</div>`, ML, P(600,820), {in:57.7, fx:'pop'});
+const cur=add(cursorSVG, 0, 0, {in:57.9, fx:'fade'});
+add(`<span class="mono" style="font-size:15px;color:var(--ink)">Led by Otman Kettani</span>`, ML, P(760,1000), {in:58.1});
+add(orb(P(220,200)), P(1540,760), P(640,1300), {in:56.9, fx:'pop'});
+add(`<span class="mono" style="font-size:11px">Independent workshop · not affiliated with or endorsed by Uber</span>`, ML, P(1000,1600), {in:58.3, fx:'fade'});
+st.insertAdjacentHTML('beforeend',grain); if(V) ov.style.transform='translateY(170px)';
+
+window.render=function(t){
+  const deep=seg(t,19.75,20.25)-seg(t,31.25,31.75); document.getElementById('bg2').style.opacity=deep;
+  blobs.forEach((b,i)=>{ b.style.transform=`translate(${Math.sin(t*.25+i*2)*80}px,${Math.cos(t*.2+i)*60}px)`; b.style.opacity=.8*(1-deep*.9); });
+  for(const o of els) applyEl(o,t); for(const h of hls) applyHl(h,t);
+  rib.forEach((r,i)=>{ const on=t>=ST[i]&&t<SE[i]+.15, done=t>=SE[i]+.15; const p=r.firstChild; p.style.background=on?'#2563FF':(done?'#DCE7FF':'rgba(255,255,255,.7)'); p.style.color=on?'#fff':(done?'#2563FF':'#6B7896'); });
+  document.querySelectorAll('.tog').forEach(tg=>{ const on=t>=+tg.dataset.on; tg.style.background=on?'#2563FF':'#D7DFEF'; tg.firstChild.style.transform=`translateX(${on?18:0}px)`; });
+  document.querySelectorAll('[data-k]').forEach(e=>{ if(e.tagName==='I'){ const k=+e.dataset.k; e.style.background= t>=39.3+k*.045 ? ([6,15].includes(k)&&t<40.0?'#FF9B5C':'#2563FF') : '#E8EEF9'; } else { const on=t>=+e.dataset.k; e.style.opacity=on?1:.15; } });
+  document.querySelectorAll('.caret').forEach(c=>c.style.opacity=Math.floor(t*2.5)%2?0:1);
+  // cursor glides to CTA, clicks at 58.75
+  { const r=cta.getBoundingClientRect(), o=ov.getBoundingClientRect(); const tx=r.left-o.left+r.width*.82, ty=r.top-o.top+r.height*.62; const p=eio(seg(t,57.9,58.6));
+    cur.style.left=lerp(tx+260,tx,p)+'px'; cur.style.top=lerp(ty+180,ty,p)+'px'; const pr=seg(t,58.75,58.85)-seg(t,58.85,59.05); cta.style.transform += ` scale(${1-.05*pr})`; }
+};
+window.render(0); window.done=true;
+</script></body></html>
