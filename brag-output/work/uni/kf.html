@@ -1,0 +1,191 @@
+<meta charset="utf-8">
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<style>
+@font-face{font-family:Brico;src:url(node_modules/@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-800-normal.woff2);font-weight:800}
+@font-face{font-family:Brico;src:url(node_modules/@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-700-normal.woff2);font-weight:700}
+@font-face{font-family:JBM;src:local("JetBrains Mono Medium"),local("JetBrainsMono-Medium");font-weight:500}
+@font-face{font-family:JBM;src:local("JetBrains Mono SemiBold"),local("JetBrainsMono-SemiBold");font-weight:600}
+:root{--blue:#1F5BFF;--orange:#FF6A2B;--yellow:#FFC83D;--mint:#52DCAE;--paper:#FBF4E8;--navy:#11204A;--sky:#D9E4FF}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--navy);font-family:Inter,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+.br{font-family:Brico;font-weight:800;letter-spacing:-.03em;line-height:.98}
+.mono{font-family:JBM;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.a{position:absolute}
+</style>
+<title>Keyframes</title>
+<style>
+.ui{position:absolute;background:#fff;border-radius:26px;box-shadow:0 30px 80px rgba(17,32,74,.16),0 2px 0 rgba(17,32,74,.06);overflow:hidden;color:var(--navy)}
+.ui .top{height:64px;display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1.5px solid #efe7d6}
+.ui .dot{width:28px;height:28px;border-radius:9px;background:var(--orange);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;font-family:Brico}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 14px;font-family:JBM;font-weight:600;font-size:13px;letter-spacing:.04em}
+.msg{position:absolute;max-width:430px;padding:14px 18px;border-radius:20px;font-size:19px;line-height:1.35}
+.step{position:absolute;left:0;right:0;height:78px;display:flex;align-items:center;gap:14px;padding:0 20px;border-bottom:1.5px solid #f2ecdf}
+.step .n{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:JBM;font-weight:600;font-size:14px;color:#fff;flex:none}
+.step .c{font-family:JBM;font-weight:600;font-size:15px}
+.step .r{font-family:JBM;font-size:13px;color:#6a7390;margin-top:3px}
+.step .s{margin-left:auto}
+.lab{position:absolute;font-family:JBM;font-weight:600;font-size:14px;letter-spacing:.08em;text-transform:uppercase;padding:8px 14px;border-radius:12px;background:#fff;box-shadow:0 8px 24px rgba(17,32,74,.12);white-space:nowrap}
+.mk{background:var(--yellow);padding:0 .1em;border-radius:.12em}
+.cta{display:inline-flex;align-items:center;gap:16px;border-radius:999px;padding:24px 40px;background:var(--orange);color:#fff;font-family:Brico;font-weight:800;font-size:36px;letter-spacing:-.01em;box-shadow:0 10px 0 #c4461a}
+</style>
+<body><canvas id="c" class="a" style="left:0;top:0"></canvas><div id="ov" class="a" style="left:0;top:0;right:0;bottom:0"></div>
+<script type="module">
+import * as THREE from 'three';
+import { C, CSS, makeAgent, poseAgent, makeWorld, P, wordBlock, toolTile, ICON, cup, box, star } from './kit.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+await document.fonts.load('800 40px Brico'); await document.fonts.load('600 40px JBM'); await document.fonts.ready;
+const q=new URLSearchParams(location.search); const K=+q.get('k'); const V=q.has('v');
+const W=V?1080:1920, H=V?1920:1080; document.body.style.width=W+'px'; document.body.style.height=H+'px';
+const cv=document.getElementById('c'); const r=new THREE.WebGLRenderer({canvas:cv,antialias:true,preserveDrawingBuffer:true}); r.setPixelRatio(1); r.setSize(W,H);
+const BG={1:C.paper,2:C.paper,3:C.blue,4:C.yellow,5:C.paper,6:C.mint,7:C.paper,8:C.blue}[K];
+const {scene,cam}=makeWorld(r,W,H,{bg:BG});
+const ov=document.getElementById('ov'); const H_=(html)=>{ ov.insertAdjacentHTML('beforeend',html); };
+const add=(o,x,y,z,s=1,rx=0,ry=0,rz=0)=>{ o.position.set(x,y,z); o.scale.setScalar(s); o.rotation.set(rx,ry,rz); scene.add(o); return o; };
+const look=(px,py,pz,tx,ty,tz,fov=30)=>{ cam.fov=fov; cam.aspect=W/H; cam.updateProjectionMatrix(); cam.position.set(px,py,pz); cam.lookAt(tx,ty,tz); };
+const mono=(t,x,y,o='')=>H_(`<div class="a mono" style="left:${x}px;top:${y}px;font-size:15px;color:#6a7390;${o}">${t}</div>`);
+const head=(t,x,y,size,w,o='')=>H_(`<div class="a br" style="left:${x}px;top:${y}px;font-size:${size}px;width:${w}px;${o}">${t}</div>`);
+const najma=add(makeAgent(),0,0,0);
+const tile=(l,c,ic)=>toolTile(l,c,ICON[ic]);
+const zellige=(op=.07,color='#11204A')=>H_(`<svg class="a" style="left:0;top:0" width="${W}" height="${H}"><defs><pattern id="z" width="120" height="120" patternUnits="userSpaceOnUse"><g transform="translate(60 60)" fill="none" stroke="${color}" stroke-width="2"><rect x="-26" y="-26" width="52" height="52"/><rect x="-26" y="-26" width="52" height="52" transform="rotate(45)"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#z)" opacity="${op}"/></svg>`);
+const frameTag=(n,label,dark)=>mono(`KF ${n} · ${label}`, V?60:80, V?60:56, dark?'color:rgba(255,255,255,.7)':'');
+
+if(K===1){ // HOOK
+  frameTag(1,'00:00–00:08 · Hook');
+  if(!V){ look(2.0,1.4,13.5,2.0,.55,0);
+    poseAgent(najma,{bob:0,look:[-.5,.2],wave:.0,reach:.6},.4); najma.position.set(3.0,.25,0); najma.scale.setScalar(1.55); najma.rotation.y=-.25;
+    add(P.ball(C.yellow,.45),5.6,2.4,-1); add(P.ring(C.mint,.5,.17),2.2,3.0,-.6,1,1.2,.4); add(P.cone(C.orange),6.2,-.45,.6,1,0,0,.3);
+    add(P.pill(C.blue,.22,.7),.9,-.55,1.2,1,0,0,1.4); add(P.star(C.yellow,.42,.14),4.2,3.3,-.5,1,.3,.2); add(P.cube(C.sky,.8,.18),7.1,1.4,-2,1,.4,.6);
+    add(tile('get_order',CSS.blue,'search'),5.2,.7,1.6,.75,-.1,-.35,.06); add(tile('escalate_case',CSS.orange,'person'),6.4,-.2,-2.2,.7,0,-.3,-.06);
+    add(P.ball(C.orange,.18),2.0,-.7,2.0); add(P.ball(C.mint,.14),6.6,2.9,0); add(P.ring(C.yellow,.25,.09),7.2,-.3,-1,1,.6,0,.5);
+    mono('Shipping AI That Works',80,170);
+    head('Artificial intelligence is changing the <span class="mk">world of work.</span>',80,210,104,760);
+    H_(`<div class="a" style="left:80px;top:780px;font-size:24px;color:#3a4566;width:620px;line-height:1.4">VO: “Artificial intelligence is changing the world of work. But tomorrow's professionals will need more than the ability to use AI…”</div>`);
+  } else { look(0,1.6,15,0,.9,0,34);
+    poseAgent(najma,{bob:0,look:[0,.3],reach:.6},.4); najma.position.set(0,.1,0); najma.scale.setScalar(1.7);
+    add(P.ball(C.yellow,.45),2.4,3.6,-1); add(P.ring(C.mint,.5,.17),-2.3,2.9,-.6,1,1.2,.4); add(P.cone(C.orange),2.5,-.4,.8,1,0,0,.3);
+    add(P.pill(C.blue,.22,.7),-2.4,-.5,1,1,0,0,1.4); add(tile('get_order',CSS.blue,'search'),-1.9,1.2,1.4,.62,-.1,.3,.05);
+    mono('Shipping AI That Works',60,150);
+    head('Artificial intelligence is changing the <span class="mk">world of work.</span>',60,200,98,960);
+  }
+}
+if(K===2){ // OPPORTUNITY
+  frameTag(2,'00:08–00:18 · Opportunity'); zellige(.06);
+  look(1.2,3.2,14,1.6,.9,0,30);
+  const steps=[['LLMs',C.sky,CSS.navy],['Tools',C.yellow,CSS.navy],['Workflows',C.mint,CSS.navy],['Evals',C.orange,'#fff']];
+  steps.forEach((s,i)=>{ const b=wordBlock(s[0],s[1],s[2],2.1,.7,.9); add(b,-1.3+i*1.55,-.55+i*.72,0,1,0,-.18); });
+  poseAgent(najma,{bob:0,happy:true,wave:1,look:[-.3,.2]},.6); najma.position.set(5.4,2.1,.2); najma.scale.setScalar(1.05); najma.rotation.y=-.35;
+  add(tile('get_order',CSS.blue,'search'),7.5,1.0,-.6,.6,0,-.5,0); add(tile('check_refund_eligibility'.slice(0,15)+'…',CSS.mint,'shield'),7.6,.1,-.2,.6,0,-.5,0);
+  add(P.star(C.orange,.3,.1),3.6,3.4,-1.2,1,.2,.4); add(P.ball(C.yellow,.25),3.2,4.0,-1.5);
+  mono('Concepts become tangible',80,170);
+  head('From ideas you study<br>to <span style="color:var(--blue)">tools you use.</span>',80,210,92,900);
+  H_(`<div class="a" style="left:80px;top:560px;font-size:24px;color:#3a4566;width:560px;line-height:1.4">VO: “As Morocco accelerates its ambitions in artificial intelligence, universities have an opportunity to prepare a new generation of talent…”</div>`);
+  H_(`<div class="a pill" style="left:80px;bottom:80px;background:#fff;box-shadow:0 6px 20px rgba(17,32,74,.1)">Made for Moroccan universities & business schools</div>`);
+}
+if(K===3){ // INSTRUCTOR
+  frameTag(3,'00:18–00:29 · Instructor',true);
+  look(5.0,6.5,15,5.4,0,-2,30);
+  scene.remove(najma);
+  const N=22*14; const g=new RoundedBoxGeometry(.42,.38,.36,3,.12); const m=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.45});
+  const inst=new THREE.InstancedMesh(g,m,N); inst.castShadow=true; const d=new THREE.Object3D(); const col=new THREE.Color(); let k=0;
+  for(let j=0;j<14;j++) for(let i=0;i<22;i++){ const x=3.4+i*.62, z=-7+j*.62; const wv=Math.sin(i*.5+j*.35); d.position.set(x,-.65+.12*wv,z); d.rotation.y=.2*wv; d.updateMatrix(); inst.setMatrixAt(k,d.matrix);
+    const h=((i*7+j*13)%17); col.set(h<2?C.orange:(h<6?C.yellow:(h<9?C.mint:0xdfe7ff))); inst.setColorAt(k,col); k++; }
+  scene.add(inst);
+  const hero=makeAgent(); poseAgent(hero,{bob:0,happy:true,look:[-.5,.2]},.6); add(hero,7.6,.35,3.2,1.2,0,-.3);
+  mono('Your instructor',80,200,'color:var(--yellow)');
+  head('Otman<br>Kettani',80,236,150,800,'color:#fff');
+  H_(`<div class="a" style="left:80px;top:560px;width:700px;font-family:Brico;font-weight:700;font-size:34px;color:#fff;line-height:1.2">Product & operations · AI-powered customer support at Uber</div>`);
+  H_(`<div class="a pill" style="left:80px;top:680px;background:var(--yellow);color:var(--navy)">LLM-based agents · millions of customer interactions</div>`);
+  H_(`<div class="a" style="left:80px;top:760px;font-size:22px;color:rgba(255,255,255,.85);width:640px;line-height:1.4">VO: “…leading the development of LLM-based agents that support millions of customer interactions. Now, I want to bring that real-world experience into the classroom.”</div>`);
+}
+if(K===4){ // TITLE
+  frameTag(4,'00:29–00:31 · Title');
+  look(0,1.2,14,0,.6,0,30);
+  poseAgent(najma,{bob:0,happy:true,lift:.6,squash:-.05,wave:1},.2); najma.position.set(3.2,-.75,3.6); najma.scale.setScalar(.75); najma.rotation.y=-.3;
+  add(P.ring(C.blue,.6,.2),-5.3,2.6,-1,1,.9,.3); add(P.ball(C.orange,.5),-5.6,-.2,.5); add(P.star(C.white,.5,.15),5.9,3.0,-1,1,.2,-.3); add(P.cone(C.mint,.45,.9),-3.2,3.2,-1.5,1,0,0,-.6); add(P.cube(C.blue,.7,.16),2.0,-.45,2.5,1,.3,.5);
+  add(P.pill(C.orange,.2,.6),6.4,-.4,-.5,1,0,0,1.2);
+  mono('Introducing',0,250,'width:1920px;text-align:center;color:var(--navy)');
+  head('SHIPPING AI<br>THAT WORKS',0,300,210,1920,'text-align:center;letter-spacing:-.045em');
+}
+if(K===5){ // SOUKGO FLOW
+  frameTag(5,'00:31–00:40 · The workshop: SoukGo');
+  look(4.4,1.8,13,4.4,.6,0,30);
+  poseAgent(najma,{bob:0,reach:1,look:[-1,-.1]},.9); najma.position.set(7.0,.3,0); najma.scale.setScalar(1.3); najma.rotation.y=-.5;
+  add(cup(),5.5,.7,1.6,1.1,.2,0,-.25); add(box(),8.0,-.5,-.6,1,0,-.4);
+  add(tile('get_order',CSS.blue,'search'),8.6,2.4,-1.2,.62,0,-.45,0); add(tile('check_refund_…',CSS.mint,'shield'),8.9,1.5,-1.0,.62,0,-.45,0); add(tile('submit_refund',CSS.yellow,'card'),9.0,.6,-.8,.62,0,-.45,0);
+  ui(80,150,1010,780);
+  H_(`<div class="a pill" style="left:1130px;top:120px;background:var(--navy);color:#fff">Case · SoukGo, a fictional delivery app</div>`);
+}
+if(K===6){ // EXCEPTION + ESCALATION
+  frameTag(6,'00:37–00:43 · Guardrails & escalation');
+  look(3.4,1.6,13,3.4,.6,0,30);
+  const gate=new THREE.Group(); [-1,1].forEach(s=>{ const p=P.slab(C.navy,.35,2.6,.35,.08); p.position.set(s*1.1,.4,0); gate.add(p); }); const beam=P.slab(C.orange,2.9,.42,.42,.1); beam.position.y=1.85; gate.add(beam); add(gate,3.4,0,-.5,1,0,-.35);
+  poseAgent(najma,{bob:0,look:[1,.2],tilt:.08,reach:.4},.9); najma.position.set(1.0,.0,1.0); najma.scale.setScalar(1.15); najma.rotation.y=.25;
+  add(P.slab(C.white,.7,.45,.06,.05),.1,-.15,1.9,1,0,.3,.2);
+  add(P.star(C.yellow,.3,.1),6.5,2.6,-1,1,.3,.4); add(P.ball(C.blue,.3),-1.6,1.2,-1);
+  H_(`<div class="a ui" style="left:1180px;top:300px;width:640px;height:400px">
+    <div class="top"><span class="dot" style="background:var(--blue)">H</span><b style="font-family:Brico;font-size:22px">Human support queue</b><span class="pill" style="margin-left:auto;background:#FFF1E9;color:var(--orange)">NEEDS_HUMAN</span></div>
+    <div style="padding:24px">
+      <div class="mono" style="font-size:12px;color:#6a7390">escalate_case · reason code</div>
+      <div style="font-family:Brico;font-weight:700;font-size:30px;margin:6px 0 16px">Item not verified as missing</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><span class="pill" style="background:#EEF3FF;color:var(--blue)">order SG-1001</span><span class="pill" style="background:#EEF3FF;color:var(--blue)">item I-1 · sandwich</span><span class="pill" style="background:#E6FAF3;color:#13865f">no money moved</span></div>
+      <div style="margin-top:22px;font-size:19px;color:#3a4566;line-height:1.4">The agent stops, explains, and hands the case to a person with the context attached.</div>
+    </div></div>`);
+  mono('Guardrails & human oversight',80,170,'color:var(--navy)');
+  head('When the rules say no,<br>it hands over.',80,210,84,1100);
+}
+if(K===7){ // DELIVERABLES
+  frameTag(7,'00:43–00:53 · What they leave with');
+  look(0,3.0,15.5,0,.9,0,30);
+  const items=[[C.yellow,'Opportunity brief'],[C.blue,'Working prototype'],[C.mint,'Evaluation report'],[C.orange,'Risk assessment'],[C.navy,'Deployment recommendation']];
+  const ped=[0,.4,.8,.4,0];
+  items.forEach((it,i)=>{ const x=-5.2+i*2.6; const p=P.slab(it[0]===C.navy?C.sky:0xffffff,1.9,.5+ped[i],1.6,.12); add(p,x,-.65+(.5+ped[i])/2,0);
+    const top=-.65+.5+ped[i];
+    if(i===0){ for(let s=0;s<4;s++) add(P.slab(s%2?0xfff3c9:C.yellow,1.0,.06,1.3,.02),x,top+.05+s*.07,0,1,0,s*.08); }
+    if(i===1){ const m=makeAgent(); poseAgent(m,{bob:0,happy:true,wave:1},.3); add(m,x,top+.62,0,.62); }
+    if(i===2){ const b=P.slab(C.mint,1.0,1.3,.08,.05); add(b,x,top+.65,0,1,-.1); for(let a=0;a<3;a++) for(let c=0;c<3;c++) add(P.slab(a===2&&c===2?C.orange:C.white,.22,.22,.04,.03),x-.28+c*.28,top+.82-a*.28,.07,1,-.1); }
+    if(i===3){ const sh=new THREE.Shape(); sh.moveTo(0,.65); sh.lineTo(.5,.45); sh.lineTo(.5,0); sh.quadraticCurveTo(.45,-.45,0,-.65); sh.quadraticCurveTo(-.45,-.45,-.5,0); sh.lineTo(-.5,.45); sh.closePath();
+      const m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:.18,bevelEnabled:true,bevelSize:.05,bevelThickness:.05,bevelSegments:4}),new THREE.MeshStandardMaterial({color:C.orange,roughness:.4})); m.castShadow=true; add(m,x,top+.75,-.1,1,0,-.2); }
+    if(i===4){ const b=P.slab(C.navy,1.5,1.0,.08,.06); add(b,x,top+.9,0,1,-.05,-.2); const leg=P.slab(C.navy,.08,.5,.08,.03); add(leg,x,top+.25,-.05); }
+  });
+  head('They leave having built something.',0,150,92,1920,'text-align:center');
+  const L=[[300,'Opportunity brief'],[640,'Working prototype'],[960,'Evaluation report'],[1280,'Risk assessment'],[1610,'Deployment<br>recommendation']];
+  L.forEach(([x,t],i)=>H_(`<div class="lab" style="left:${x-110}px;top:${905}px;width:220px;text-align:center;white-space:normal;line-height:1.2">${t}</div>`));
+  H_(`<div class="a ui" style="left:1460px;top:965px;width:300px;padding:10px 18px;font-family:JBM;font-weight:600;font-size:15px;display:flex;gap:8px;justify-content:center"><span style="color:#13865f">GO</span>·<span style="color:var(--orange)">NO-GO</span>·<span style="color:var(--blue)">MORE EVIDENCE</span></div>`);
+}
+if(K===8){ // FINAL
+  frameTag(8,'00:53–01:00 · Final frame',true);
+  if(!V){ look(4.5,1.2,13,4.5,.5,0,30);
+    poseAgent(najma,{bob:0,happy:true,wave:1,look:[-.6,.2]},.3); najma.position.set(7.4,.2,0); najma.scale.setScalar(1.5); najma.rotation.y=-.35;
+    add(P.ball(C.yellow,.4),9.4,2.8,-1); add(P.ring(C.mint,.42,.15),5.8,3.3,-1,1,1,.3); add(P.cone(C.orange,.35,.7),9.8,-.5,.5,1,0,0,.4); add(P.star(C.white,.3,.1),6.0,-.4,1.5,1,.3,.3);
+    mono('A two-day, hands-on AI workshop for universities and business schools',80,170,'color:var(--yellow)');
+    head('SHIPPING AI<br>THAT WORKS',80,210,176,1100,'color:#fff;letter-spacing:-.045em');
+    H_(`<div class="a" style="left:80px;top:610px;font-family:Brico;font-weight:700;font-size:40px;color:#fff">The next generation should know how to build it.</div>`);
+    H_(`<div class="a cta" style="left:80px;top:720px">BRING PRACTICAL AI TO YOUR UNIVERSITY <span>→</span></div>`);
+    H_(`<div class="a mono" style="left:80px;top:880px;font-size:17px;color:#fff">Led by Otman Kettani</div>`);
+    H_(`<div class="a mono" style="left:80px;top:990px;font-size:12px;color:rgba(255,255,255,.6)">Independent workshop · not affiliated with or endorsed by Uber</div>`);
+  } else { look(0,1.6,14,0,.4,0,34);
+    poseAgent(najma,{bob:0,happy:true,wave:1},.3); najma.position.set(.6,-.1,0); najma.scale.setScalar(1.5);
+    add(P.ball(C.yellow,.4),2.3,2.4,-1); add(P.ring(C.mint,.42,.15),-2.1,1.8,-1,1,1,.3); add(P.cone(C.orange,.35,.7),-2.0,-.5,.5,1,0,0,.4);
+    mono('A two-day, hands-on AI workshop<br>for universities and business schools',60,150,'color:var(--yellow);line-height:1.6');
+    head('SHIPPING AI<br>THAT WORKS',60,230,150,960,'color:#fff;letter-spacing:-.045em');
+    H_(`<div class="a cta" style="left:60px;top:1500px;font-size:31px;padding:22px 30px">BRING PRACTICAL AI TO YOUR UNIVERSITY →</div>`);
+    H_(`<div class="a mono" style="left:60px;top:1640px;font-size:17px;color:#fff">Led by Otman Kettani</div>`);
+    H_(`<div class="a mono" style="left:60px;top:1820px;font-size:12px;color:rgba(255,255,255,.6)">Independent workshop · not affiliated with or endorsed by Uber</div>`);
+  }
+}
+function ui(x,y,w,h){ H_(`<div class="ui" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">
+  <div class="top"><span class="dot">S</span><b style="font-family:Brico;font-size:22px">SoukGo Support</b><span class="mono" style="font-size:12px;color:#6a7390">Agent sandbox</span><span class="pill" style="margin-left:auto;background:#EEF3FF;color:var(--blue)">v0.1 · policy v1.0</span></div>
+  <div style="position:absolute;left:0;top:64px;width:47%;bottom:0;background:#FFFCF6;border-right:1.5px solid #efe7d6">
+    <div class="msg" style="right:18px;top:24px;background:var(--navy);color:#fff;border-bottom-right-radius:6px">Bonjour, il manque ma boisson dans ma commande SG-1001.</div>
+    <div class="msg" style="left:18px;top:150px;background:#EEF3FF;border-bottom-left-radius:6px">Désolé ! Votre boisson (20 MAD) est éligible au remboursement. Je confirme ?</div>
+    <div style="position:absolute;left:18px;top:270px;display:flex;gap:10px"><span class="pill" style="background:var(--orange);color:#fff;font-size:15px;padding:10px 18px">Confirmer</span><span class="pill" style="background:#fff;border:1.5px solid #d9d0bd;font-size:15px;padding:10px 18px">Parler à un humain</span></div>
+    <div class="mono" style="position:absolute;left:18px;bottom:20px;font-size:11px;color:#6a7390">Customer · French · authenticated</div>
+  </div>
+  <div style="position:absolute;left:47%;top:64px;right:0;bottom:0">
+    <div class="mono" style="padding:16px 20px 6px;font-size:12px;color:#6a7390">Agent trace</div>
+    ${[['1','var(--navy)','request.received','intent: missing_item','✓'],['2','var(--blue)','get_order("SG-1001")','delivered · card · 2 items','✓'],['3','#13865f','check_refund_eligibility','ELIGIBLE · MAD 20 · proposal p-7','✓'],['4','var(--orange)','submit_refund(p-7)','waiting for customer confirmation','…'],['5','#8a93ad','escalate_case','only if NEEDS_HUMAN','—']]
+      .map((s,i)=>`<div class="step" style="top:${40+i*80}px"><span class="n" style="background:${s[1]}">${s[0]}</span><div><div class="c">${s[2]}</div><div class="r">${s[3]}</div></div><span class="s pill" style="background:${s[4]==='✓'?'#E6FAF3':(s[4]==='…'?'#FFF1E9':'#F2F0EA')};color:${s[4]==='✓'?'#13865f':(s[4]==='…'?'var(--orange)':'#8a93ad')}">${s[4]}</span></div>`).join('')}
+    <div style="position:absolute;left:20px;right:20px;bottom:18px;display:flex;gap:8px;flex-wrap:wrap"><span class="pill" style="background:#F2F0EA">identity: server-side</span><span class="pill" style="background:#F2F0EA">amount: policy engine</span><span class="pill" style="background:#F2F0EA">money: ledger</span></div>
+  </div></div>`); }
+r.render(scene,cam); window.done=true;
+</script></body>

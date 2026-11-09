@@ -1,0 +1,37 @@
+<title>Najma: character and system</title>
+<body style="width:1920px;height:1080px;position:relative">
+<canvas id="c" style="position:absolute;left:0;top:0;width:1920px;height:1080px"></canvas>
+<div class="a mono" style="left:80px;top:60px;font-size:15px;color:#6a7390">Shipping AI That Works · Character & system · v1</div>
+<div class="a br" style="left:80px;top:96px;font-size:84px">Meet Najma.</div>
+<div class="a" style="left:80px;top:196px;width:760px;font-size:22px;line-height:1.4;color:#3a4566">The workshop's AI agent and the film's protagonist. A soft, toy-like body; a face screen that can show what it is thinking; and an orange eight-point star, a quiet nod to Moroccan zellige, that spins whenever it is working. <b>Najma</b> means "star".</div>
+<div id="labels"></div>
+<div class="a mono" style="left:80px;top:840px;font-size:14px;color:#6a7390">Colour</div>
+<div class="a" style="left:80px;top:870px;display:flex;gap:14px" id="sw"></div>
+<div class="a mono" style="left:1040px;top:840px;font-size:14px;color:#6a7390">Type</div>
+<div class="a br" style="left:1040px;top:868px;font-size:64px">Bricolage Grotesque</div>
+<div class="a" style="left:1040px;top:944px;font-size:22px;color:#3a4566">Headlines: expressive, editorial, warm</div>
+<div class="a mono" style="left:1500px;top:950px;font-size:18px;letter-spacing:.06em;color:var(--blue)">JetBrains Mono · UI</div>
+<script type="module">
+import * as THREE from 'three';
+import { C, CSS, makeAgent, poseAgent, makeWorld } from './kit.js';
+await document.fonts.ready;
+const W=1920,H=1080; const r=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true,preserveDrawingBuffer:true}); r.setSize(W,H,false);
+const {scene,cam,ground}=makeWorld(r,W,H,{});
+const a=makeAgent(); scene.add(a);
+const cells=[ // x,y,w,h, turn, pose, label
+ [80,330,300,330, 0,{}, 'Front'],[400,330,300,330, -.75,{look:[.4,0]}, '3/4'],[720,330,300,330,-1.57,{}, 'Side'],
+ [1100,330,190,210, .2,{happy:true,wave:1}, 'Happy · wave'],[1300,330,190,210, .2,{look:[1,.6],tilt:.12}, 'Thinking'],[1500,330,190,210, .2,{blink:1}, 'Blink'],[1700,330,190,210,.2,{squash:.18,look:[0,-.8]}, 'Focus'],
+ [1100,560,190,210, -.3,{reach:1,look:[-1,0]}, 'Reach · use tool'],[1300,560,190,210, .3,{lift:.25,happy:true}, 'Jump'],[1500,560,190,210, 0,{tilt:-.25,look:[-1,-.4]}, 'Curious'],[1700,560,190,210,0,{look:[0,.9]}, 'Alert'],
+];
+r.setScissorTest(true); r.setClearColor(C.paper,1);
+r.setViewport(0,0,W,H); r.setScissor(0,0,W,H); r.clear();
+cells.forEach(([x,y,w,h,turn,pose,label],i)=>{
+  poseAgent(a,{bob:0,...pose},0.3); a.rotation.y=turn; a.position.set(0,0,0);
+  cam.aspect=w/h; cam.fov= i<3?24:26; cam.updateProjectionMatrix(); cam.position.set(0,1.0,8.2); cam.lookAt(0,.15,0);
+  const yy=H-y-h; r.setViewport(x,yy,w,h); r.setScissor(x,yy,w,h); r.render(scene,cam);
+  const d=document.createElement('div'); d.className='a mono'; d.style.cssText=`left:${x}px;top:${y+h+6}px;width:${w}px;text-align:center;font-size:12px;color:#6a7390`; d.textContent=label; document.getElementById('labels').appendChild(d);
+});
+[['blue','Electric blue'],['orange','Vivid orange'],['yellow','Warm yellow'],['mint','Mint'],['paper','Off-white'],['navy','Deep navy']].forEach(([k,n])=>{
+  const s=document.createElement('div'); s.style.cssText=`width:138px`; s.innerHTML=`<div style="height:90px;border-radius:18px;background:${CSS[k]};border:${k==='paper'?'2px solid #e6dcc8':'0'}"></div><div class="mono" style="font-size:11px;margin-top:8px">${n}</div><div class="mono" style="font-size:11px;color:#6a7390">${CSS[k]}</div>`; document.getElementById('sw').appendChild(s); });
+window.done=true;
+</script></body>
