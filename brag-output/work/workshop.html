@@ -1,0 +1,299 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Launching AI Agents</title>
+<style>
+@font-face { font-family:"IDisp"; src: local("Inter Display ExtraBold"), local("InterDisplay-ExtraBold"); font-weight:800; }
+@font-face { font-family:"IDisp"; src: local("Inter Display Bold"), local("InterDisplay-Bold"); font-weight:700; }
+@font-face { font-family:"IDisp"; src: local("Inter Display SemiBold"), local("InterDisplay-SemiBold"); font-weight:600; }
+:root { --paper:#F5F1E8; --cob:#2346FF; --org:#FF5B1F; --yel:#FFC531; --navy:#0E1A3D; --sky:#DCE3FF; --line:rgba(14,26,61,.14); }
+* { box-sizing:border-box; margin:0; padding:0; }
+html,body { overflow:hidden; background:var(--paper); }
+#stage { position:relative; overflow:hidden; color:var(--navy); font-family:"Inter",sans-serif; -webkit-font-smoothing:antialiased; }
+canvas { position:absolute; inset:0; }
+.a { position:absolute; will-change:transform,opacity; }
+.mono { font-family:"JetBrains Mono",monospace; font-weight:600; letter-spacing:.12em; text-transform:uppercase; }
+.code { font-family:"JetBrains Mono",monospace; font-weight:500; }
+.hl { position:absolute; font-family:"IDisp",sans-serif; font-weight:800; letter-spacing:-.035em; line-height:1.04; }
+.hl .w { display:inline-block; overflow:hidden; vertical-align:top; padding:0 .02em .1em; margin:0 -.02em -.1em; }
+.hl .w > span { display:inline-block; will-change:transform; }
+.mk { background:var(--yel); color:var(--navy); padding:0 .12em; border-radius:.12em; }
+.c-cob { color:var(--cob); } .c-org { color:var(--org); } .c-yel { color:var(--yel); } .c-white { color:#fff; }
+.ag { position:absolute; border-radius:28%; }
+.ag .e { position:absolute; top:34%; width:17%; height:26%; background:#fff; border-radius:50%; overflow:hidden; }
+.ag .e.l { left:25%; } .ag .e.r { right:25%; }
+.ag .e i { position:absolute; left:28%; top:34%; width:46%; height:46%; background:var(--navy); border-radius:50%; display:block; }
+.bub { position:absolute; padding:12px 20px; border-radius:22px; font-family:IDisp; font-weight:700; font-size:28px; white-space:nowrap; background:#fff; box-shadow:0 8px 0 rgba(14,26,61,.08); }
+.chip { position:absolute; height:58px; border-radius:16px; display:flex; align-items:center; gap:12px; padding:0 18px; background:#fff; border:2px solid var(--navy); font-size:22px; white-space:nowrap; }
+.chip svg, .ic svg { width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.card { position:absolute; border-radius:28px; overflow:hidden; }
+.tile { position:absolute; width:400px; height:460px; border-radius:26px; background:#fff; border:2px solid var(--navy); overflow:hidden; }
+.tile .hd { height:64px; display:flex; align-items:center; padding:0 22px; gap:12px; font-size:15px; }
+.tile .face { position:absolute; inset:0; }
+.tile .bd { position:absolute; left:0; right:0; top:64px; bottom:0; }
+.pill { display:inline-block; border-radius:999px; padding:10px 22px; }
+.row { position:absolute; left:22px; right:22px; height:44px; display:flex; align-items:center; border-bottom:1.5px solid var(--line); font-size:18px; white-space:nowrap; }
+.row .id { width:48px; font-size:13px; color:#6b7390; }
+.row .s { margin-left:auto; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:15px; font-weight:800; }
+.dl { position:absolute; border-radius:24px; padding:26px; display:flex; flex-direction:column; justify-content:space-between; }
+.dl .k { font-size:14px; } .dl .t { font-family:IDisp; font-weight:800; font-size:36px; letter-spacing:-.025em; line-height:1.05; }
+.dl .ic svg { width:54px; height:54px; stroke-width:1.8; }
+</style></head>
+<body><div id="stage"><canvas id="cv"></canvas><div id="dom"></div></div>
+<script>
+const V = location.hash==='#v';
+const W = V?1080:1920, H = V?1920:1080;
+const P = (h,v)=>V?v:h;
+const stage=document.getElementById('stage'); stage.style.width=W+'px'; stage.style.height=H+'px';
+document.body.style.width=W+'px'; document.body.style.height=H+'px';
+const cv=document.getElementById('cv'); cv.width=W; cv.height=H; const cx=cv.getContext('2d');
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)); const seg=(t,a,b)=>clamp((t-a)/(b-a));
+const eo=x=>x>=1?1:1-Math.pow(2,-10*x); const ei=x=>x*x*x; const eio=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const bo=x=>{ if(x<=0) return 0; if(x>=1) return 1; const c1=1.9,c3=c1+1; return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2); };
+const lerp=(a,b,p)=>a+(b-a)*p; const BEAT=.5;
+function rnd(seed){ let s=seed>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+const COL={paper:'#F5F1E8',cob:'#2346FF',org:'#FF5B1F',yel:'#FFC531',navy:'#0E1A3D',sky:'#DCE3FF'};
+const dom=document.getElementById('dom'); const els=[]; const hls=[];
+function add(html,x,y,o={}){ const d=document.createElement('div'); d.className='a '+(o.cls||''); d.innerHTML=html; d.style.left=x+'px'; d.style.top=y+'px';
+  if(o.w) d.style.width=o.w+'px'; if(o.h) d.style.height=o.h+'px'; if(o.style) d.style.cssText+=';'+o.style; (o.parent||dom).appendChild(d);
+  if(o.in!==undefined) els.push({el:d,in:o.in,out:o.out??1e9,fx:o.fx||'rise',dy:o.dy??30,dx:o.dx??0,dur:o.dur||.5,odur:o.odur||.25,rot:o.rot||0}); return d; }
+function applyEl(o,t){ const pi=seg(t,o.in,o.in+o.dur), po=ei(seg(t,o.out,o.out+o.odur)); let op, tr;
+  if(o.fx==='pop'){ const s=bo(pi); op=clamp(pi*4)*(1-po); tr=`scale(${s*(1-.3*po)}) rotate(${o.rot*(1-s)}deg)`; }
+  else if(o.fx==='fade'){ op=eo(pi)*(1-po); tr=''; }
+  else if(o.fx==='sx'){ op=1-po; tr=`scaleX(${eo(pi)})`; o.el.style.transformOrigin='left center'; if(pi<=0) op=0; }
+  else { const e=eo(pi); op=e*(1-po); tr=`translate(${o.dx*(1-e)}px,${o.dy*(1-e)-o.dy*.6*po}px)`; }
+  o.el.style.opacity=op; o.el.style.transform=tr; o.el.style.visibility=op<=.001?'hidden':'visible'; }
+// wrapping headline with per-word mask; *word = accent class given in opt.acc ; _word = marker
+function hl(text,x,y,size,w,tin,tout,o={}){ const d=document.createElement('div'); d.className='hl '+(o.cls||''); d.style.left=x+'px'; d.style.top=y+'px'; d.style.fontSize=size+'px'; d.style.width=w+'px';
+  if(o.align) d.style.textAlign=o.align; if(o.lh) d.style.lineHeight=o.lh; if(o.color) d.style.color=o.color; if(o.weight) d.style.fontWeight=o.weight;
+  const words=text.split(' '), inner=[]; words.forEach((wd,i)=>{ let c=''; if(wd[0]==='*'){c=o.acc||'c-cob'; wd=wd.slice(1);} else if(wd[0]==='_'){c='mk'; wd=wd.slice(1);}
+    const s=document.createElement('span'); s.className='w'; const k=document.createElement('span'); k.textContent=wd; if(c) k.className=c; s.appendChild(k); d.appendChild(s); if(i<words.length-1) d.appendChild(document.createTextNode(' ')); inner.push(k); });
+  dom.appendChild(d); const h={el:d,words:inner,tin,tout,st:o.st??.045,ost:o.ost??.015}; hls.push(h); return h; }
+function applyHl(h,t){ let any=false; h.words.forEach((k,i)=>{ const pi=eo(seg(t,h.tin+i*h.st,h.tin+i*h.st+.5)), po=ei(seg(t,h.tout+i*h.ost,h.tout+i*h.ost+.25));
+  k.style.transform=`translateY(${(1-pi)*110-po*110}%)`; if(pi>0&&po<1) any=true; }); h.el.style.visibility=any?'visible':'hidden'; }
+// icons
+const IC={
+ doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+ grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M15 17.5l2 2 3.5-4"/>',
+ shield:'<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/>',
+ slides:'<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 12l3-3 2 2 4-4"/>',
+ search:'<circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/>',
+ card:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>',
+ person:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>',
+ db:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3 3 7 3s7-1.3 7-3"/>',
+ bolt:'<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+ cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+ bot:'<rect x="4" y="6" width="16" height="13" rx="4"/><circle cx="9.5" cy="12.5" r="1.3"/><circle cx="14.5" cy="12.5" r="1.3"/>',
+ send:'<path d="M4 12l16-8-6 16-3-6z"/>',
+};
+const svg=k=>`<svg viewBox="0 0 24 24">${IC[k]}</svg>`;
+// agent characters
+const agents=[];
+function agent(x,y,s,color,tin,tout,o={}){ const d=document.createElement('div'); d.className='ag'; d.style.cssText=`left:${x-s/2}px;top:${y-s/2}px;width:${s}px;height:${s}px;background:${color}`;
+  d.innerHTML='<div class="e l"><i></i></div><div class="e r"><i></i></div>'; (o.parent||dom).appendChild(d);
+  const a={el:d,tin,tout,ph:o.ph??Math.random()*6,look:o.look||(()=>[0,0]),bob:o.bob??1,pupils:[...d.querySelectorAll('.e i')],eyes:[...d.querySelectorAll('.e')],rot:o.rot??-12}; agents.push(a); return a; }
+function applyAgent(a,t){ const pi=seg(t,a.tin,a.tin+.45), po=ei(seg(t,a.tout,a.tout+.25)); const s=bo(pi)*(1-po);
+  const by=a.bob*Math.sin(t*2*Math.PI*1+a.ph)*6; a.el.style.transform=`translateY(${by}px) scale(${s}) rotate(${a.rot*(1-bo(pi))+Math.sin(t*3+a.ph)*3}deg)`;
+  a.el.style.visibility=s<=.001?'hidden':'visible'; const blink=((t*.8+a.ph)%3.1)<.12; a.eyes.forEach(e=>e.style.transform=`scaleY(${blink?.12:1})`);
+  const [lx,ly]=a.look(t); a.pupils.forEach(p=>p.style.transform=`translate(${lx*45}%,${ly*45}%)`); }
+
+const ML=P(140,80), CW=P(1640,920);
+
+// ======================= S1 HOOK 0-8 =======================
+hl('AI agents are everywhere.', ML, P(420,780), P(150,118), CW, .15, 1.75, {align:'center'});
+hl('Everyone is talking about *them.', ML, P(420,780), P(150,118), CW, 1.85, 3.85, {align:'center', acc:'c-org'});
+const R1=rnd(5);
+const HPOS = V ? [[170,260],[540,190],[900,300],[150,560],[930,560],[260,1350],[640,1300],[920,1460],[180,1650],[540,1720],[880,1700],[400,470]]
+               : [[240,190],[640,140],[1100,170],[1560,200],[1760,420],[200,760],[560,880],[980,860],[1420,880],[1760,760],[860,300],[1300,320]];
+const HCOL=[COL.cob,COL.org,COL.yel,COL.navy,COL.cob,COL.yel,COL.org,COL.cob,COL.navy,COL.yel,COL.org,COL.cob];
+const hookAg=HPOS.map((p,i)=>agent(p[0],p[1],P(96,92)-(i%3)*12,HCOL[i],i*.25,3.7+R1()*.2,{look:t=>[Math.sin(t*1.3+i),Math.cos(t*1.1+i)*.5]}));
+const TOOLS=['search','db','card','doc','cal','bolt'];
+const toolIc=HPOS.slice(0,8).map((p,i)=>{ const ox=P(110,95)*(i%2?1:-1), oy=P(60,70)*((i>>1)%2?1:-1);
+  return {d:add(`<div class="ic" style="width:56px;height:56px;border-radius:16px;background:#fff;border:2px solid var(--navy);display:flex;align-items:center;justify-content:center">${svg(TOOLS[i%6])}</div>`, p[0]+ox-28, p[1]+oy-28, {in:.5+i*.25, out:3.7, fx:'pop', rot:20}), ax:p[0], ay:p[1], tx:p[0]+ox, ty:p[1]+oy, t0:.5+i*.25}; });
+['Agents!','Copilots','Autonomous','AI!','Multi-agent'].forEach((b,i)=>{ const p=HPOS[[1,3,7,9,5][i]];
+  add(b, p[0]+P(40,30), p[1]-P(110,100), {cls:'bub', in:2.0+i*.25, out:3.7, fx:'pop', rot:i%2?8:-8, style:`background:${[COL.yel,'#fff',COL.sky,'#fff',COL.yel][i]}`}); });
+hl('But could your team actually _build _one?', ML, P(300,560), P(132,108), P(1250,920), 4.0, 7.3, {lh:1.08});
+const qAg=agent(P(1560,540), P(700,1420), P(250,260), COL.cob, 4.6, 7.4, {look:t=>[-.9,-.35], rot:-20});
+add('?', P(1660,640), P(520,1210), {cls:'bub', in:5.25, out:7.3, fx:'pop', rot:15, style:'font-size:64px;padding:6px 30px;background:var(--yel)'});
+
+// ======================= S2 OPPORTUNITY 8-18 =======================
+hl('Imagine your team going beyond *ChatGPT *prompts.', ML, P(220,200), P(96,88), P(900,920), 8.0, 10.85, {acc:'c-cob'});
+const PB=add(`<div style="width:${P(700,920)}px;height:150px;background:#fff;border:2px solid var(--navy);border-radius:28px;display:flex;align-items:center;padding:0 32px;gap:20px">
+  <span id="ptxt" style="font-size:30px;font-weight:500;flex:1;white-space:nowrap;overflow:hidden"></span>
+  <span style="width:64px;height:64px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center" class="ic">${svg('send')}</span></div>`,
+  P(1080,80), P(380,800), {in:8.2, out:10.7, fx:'rise', dy:40});
+add('<span class="mono" style="font-size:15px;color:#6b7390">Prompt · reply · repeat</span>', P(1080,80), P(560,980), {in:8.5, out:10.7, fx:'fade'});
+hl('Understanding how agents *think, use *tools, solve *problems and interact with real business *systems.', ML, P(200,170), P(62,62), P(760,920), 11.0, 17.3, {acc:'c-cob'});
+// workflow box
+const BO=V?{x:60,y:700}:{x:920,y:210};
+const B=(x,y)=>[BO.x+x,BO.y+y];
+add('<span class="mono" style="font-size:14px;color:#6b7390">Case · SoukGo, a fictional delivery app</span>', ...B(0,-34), {in:11.1, out:17.3, fx:'fade'});
+add('My drink is missing from my order.', ...B(0,0), {cls:'bub', in:11.25, out:17.3, fx:'pop', rot:-6, style:'background:var(--navy);color:#fff;font-size:26px'});
+const wfAg=agent(...B(95,250), 140, COL.cob, 11.75, 17.4, {look:t=>t<12.6?[-.3,-.9]:(t<14.4?[1,0]:[.3,.9]), rot:-15});
+const think=[0,1,2].map(i=>add('', ...B(190+i*26,170), {w:16,h:16,style:'border-radius:50%;background:var(--navy)'}));
+const WT=[['search','get_order','#fff'],['shield','check_refund_eligibility','#fff'],['person','escalate_case','#fff']];
+const wtc=WT.map((w,i)=>add(`${svg(w[0])}<span class="code">${w[1]}</span>`, ...B(380,150+i*82), {cls:'chip', in:12.625+i*.125, out:17.3, fx:'pop', rot:4}));
+const SYS=[['db','Orders'],['shield','Policy engine'],['card','Ledger']];
+const sysc=SYS.map((s,i)=>add(`<div style="display:flex;align-items:center;gap:12px;font-family:IDisp;font-weight:700;font-size:26px">${svg(s[0])}${s[1]}</div>`, ...B(i*320,450), {cls:'chip', w:290, h:76, in:14.5+i*.25, out:17.3, fx:'rise', dy:20, style:'border-radius:20px'}));
+add(`<div style="display:flex;align-items:center;gap:14px"><span style="width:40px;height:40px;border-radius:50%;background:var(--cob);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800">✓</span><span style="font-family:IDisp;font-weight:700;font-size:28px">Refund of MAD 20 proposed. Customer confirms.</span></div>`,
+  ...B(0,590), {in:15.75, out:17.3, fx:'pop', rot:-3});
+
+// ======================= S3 INTRODUCING 18-30 =======================
+add('<span class="mono" style="font-size:22px;color:var(--yel)">Introducing</span>', ML, P(250,600), {in:18.0, out:21.3, dy:16});
+const TL=['LAUNCHING','AI AGENTS','IN COMPANIES'];
+TL.forEach((l,i)=>hl(l, ML, P(300+i*150,650+i*130), P(156,122), CW, 18.25+i*.5, 21.3, {color:i===1?COL.yel:'#fff', st:.03}));
+const shapes=[
+  add(`<div style="width:${P(180,170)}px;height:${P(180,170)}px;border-radius:50%;background:var(--yel)"></div>`, P(1500,720), P(230,250), {in:18.3, out:21.3, fx:'pop', rot:90}),
+  add(`<svg width="${P(200,180)}" height="${P(180,160)}" viewBox="0 0 100 90"><path d="M50 0L100 90H0z" fill="#FF5B1F"/></svg>`, P(1640,180), P(560,1180), {in:18.8, out:21.3, fx:'pop', rot:-120}),
+  add(`<div style="width:${P(150,150)}px;height:${P(150,150)}px;border-radius:26px;background:var(--cob)"></div>`, P(1350,820), P(220,1450), {in:19.3, out:21.3, fx:'pop', rot:60}),
+];
+const tAg=agent(P(1700,880), P(820,1600), 150, COL.cob, 19.6, 21.3, {look:t=>[-1,-.4]});
+hl('A hands-on, two-day workshop designed to take your team from understanding AI agents to building and evaluating one *themselves.', ML, P(200,170), P(54,58), P(800,920), 22.0, 29.85, {acc:'c-org', st:.03});
+add('<span class="mono" style="font-size:15px;color:#6b7390">Launching AI Agents in Companies</span>', ML, P(160,128), {in:22.0, out:29.85, fx:'fade'});
+const DAYS=[[COL.cob,'Day 1','Understand & build',['Problem framing','How agents work','Build lab']],[COL.org,'Day 2','Evaluate & deploy',['Evaluation','Guardrails & risk','Rollout & monitoring','Final pitch']]];
+DAYS.forEach((d,i)=>{ const x=P(1000+i*440,80+i*480), y=P(180,720), w=P(420,440), h=P(560,600);
+  const c=add(`<div style="padding:34px;color:#fff;height:100%;display:flex;flex-direction:column">
+    <span class="mono" style="font-size:18px;opacity:.85">${d[1]}</span>
+    <span style="font-family:IDisp;font-weight:800;font-size:${P(50,48)}px;letter-spacing:-.03em;line-height:1.02;margin-top:14px">${d[2]}</span>
+    <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px" class="dchips">${d[3].map(c=>`<span class="pill" style="background:rgba(255,255,255,.18);font-size:22px;font-weight:600;padding:10px 18px">${c}</span>`).join('')}</div></div>`,
+    x, y, {cls:'card', w, h, in:24.0+i*.5, out:29.85, fx:'pop', rot:i?6:-6, style:`background:${d[0]}`});
+});
+['12 hours','Teams of 4–5','No coding required'].forEach((f,i)=>add(`<span class="pill mono" style="font-size:15px;background:var(--yel);color:var(--navy)">${f}</span>`, P(1000+i*215,80+i*290), P(800,1380), {in:26.0+i*.25, out:29.85, fx:'pop', rot:-8}));
+
+// ======================= S4 WHAT THEY DO 30-42 =======================
+hl('Your team will explore real business *opportunities, design an *agent, build a working *prototype and put it to the *test.', ML, P(130,150), P(54,56), CW, 30.0, 35.6, {acc:'c-cob', st:.03});
+hl('They’ll learn how to *evaluate performance, establish *guardrails, manage *risks and understand what it takes to *deploy AI responsibly.', ML, P(130,150), P(54,56), CW, 35.75, 41.35, {acc:'c-org', st:.03});
+const TP = V ? [[90,640],[590,640],[90,1150],[590,1150]] : [[140,400],[560,400],[980,400],[1400,400]];
+const TA=[['Explore',COL.yel,'#0E1A3D'],['Design',COL.cob,'#fff'],['Build',COL.org,'#fff'],['Test',COL.navy,'#fff']];
+const TB=[['Evaluate',COL.yel,'#0E1A3D'],['Guardrails',COL.cob,'#fff'],['Risks',COL.org,'#fff'],['Deploy',COL.navy,'#fff']];
+const tiles=[];
+TP.forEach((p,i)=>{ const T=add('', p[0], p[1], {cls:'tile', in:30.5+i*1.25, out:41.35, fx:'pop', rot:i%2?5:-5});
+  const fa=document.createElement('div'); fa.className='face'; const fb=document.createElement('div'); fb.className='face';
+  fa.innerHTML=`<div class="hd mono" style="background:${TA[i][1]};color:${TA[i][2]}"><b>0${i+1}</b>${TA[i][0]}</div><div class="bd"></div>`;
+  fb.innerHTML=`<div class="hd mono" style="background:${TB[i][1]};color:${TB[i][2]}"><b>0${i+5}</b>${TB[i][0]}</div><div class="bd"></div>`;
+  T.appendChild(fa); T.appendChild(fb); tiles.push({T,fa,fb,ba:fa.querySelector('.bd'),bb:fb.querySelector('.bd'),flip:35.75+i*.25}); });
+const inT=(tile,face,html,x,y,o={})=>add(html,x,y,{...o,parent:tiles[tile][face]});
+// A1 explore
+inT(0,'ba','<span class="mono" style="font-size:12px;color:#6b7390">SoukGo · fictional case</span>',22,18,{});
+inT(0,'ba','<span style="font-family:IDisp;font-weight:800;font-size:30px;line-height:1.05;letter-spacing:-.02em">Where could an agent create value?</span>',22,44,{w:350});
+['Process fix','Rules engine','Human assist','Bounded agent'].forEach((o,k)=>inT(0,'ba',`<span>${o}</span>`,22,160+k*56,{cls:'chip',w:356,h:46,in:30.9+k*.15,fx:'pop',style:`font-size:19px;font-weight:600;${k===3?'background:var(--cob);color:#fff;border-color:var(--cob)':''}`}));
+// A2 design
+const dAg=agent(0,0,96,COL.cob,31.9,1e9,{parent:tiles[1].ba,look:t=>[1,0]}); dAg.el.style.left='26px'; dAg.el.style.top='130px';
+['get_order','check_eligibility','submit_refund'].forEach((n,k)=>inT(1,'ba',`<span class="code" style="font-size:16px">${n}</span>`,170,40+k*70,{cls:'chip',h:46,in:32.0+k*.15,fx:'pop',style:'padding:0 12px'}));
+inT(1,'ba',`${svg('person')}<span style="font-size:18px;font-weight:700">Human handoff</span>`,170,270,{cls:'chip',h:50,in:32.5,fx:'pop',style:'background:var(--org);color:#fff;border-color:var(--org)'});
+inT(1,'ba','<span class="mono" style="font-size:12px;color:#6b7390">Narrow tools · clear limits</span>',22,350,{in:32.6,fx:'fade'});
+// A3 build
+inT(2,'ba','My drink is missing.',150,30,{cls:'bub',in:33.1,fx:'pop',style:'font-size:20px;background:var(--navy);color:#fff;padding:10px 16px'});
+inT(2,'ba','Found it: MAD 20 refund.<br>Confirm?',22,100,{cls:'bub',in:33.5,fx:'pop',style:'font-size:20px;background:var(--sky);white-space:normal;width:260px;padding:12px 16px'});
+inT(2,'ba','Confirm',22,210,{cls:'pill',in:33.9,fx:'pop',style:'background:var(--org);color:#fff;font-weight:800;font-size:20px'});
+inT(2,'ba','<span class="mono" style="font-size:13px">✓ Ledger: succeeded · 1 entry</span>',22,290,{in:34.3,fx:'rise',dy:10,style:'color:var(--cob)'});
+inT(2,'ba','<span class="mono" style="font-size:12px;color:#6b7390">Working sandbox prototype</span>',22,350,{in:34.3,fx:'fade'});
+// A4 test
+const TC=[['D01','Missing drink'],['D02','Ambiguous item'],['D03','Other customer’s order'],['D06','Cash payment'],['D09','Injected instruction'],['D12','Darija request']];
+TC.forEach((c,k)=>inT(3,'ba',`<span class="id code">${c[0]}</span><span>${c[1]}</span><span class="s" style="background:${k===4?'var(--org)':'var(--cob)'}">${k===4?'!':'✓'}</span>`,0,14+k*50,{cls:'row',in:34.4+k*.12,fx:'rise',dy:10}));
+// B1 evaluate
+{ let h=''; for(let k=0;k<24;k++) h+=`<i data-k="${k}" style="display:block;width:48px;height:48px;border-radius:10px;background:#eee8da"></i>`;
+  inT(0,'bb',`<div class="egrid" style="display:grid;grid-template-columns:repeat(6,48px);gap:8px">${h}</div>`,22,26,{});
+  inT(0,'bb','<span class="mono" style="font-size:13px">Score actions, not just answers</span>',22,260,{});
+  inT(0,'bb','<div style="display:flex;gap:10px">'+['Unauthorized payouts','Duplicates','False success'].map(s=>`<div style="flex:1;border:2px solid var(--navy);border-radius:12px;padding:8px 10px"><div class="mono" style="font-size:9px;letter-spacing:.06em">${s}</div><div style="font-family:IDisp;font-weight:800;font-size:30px">0</div></div>`).join('')+'</div>',22,296,{w:356}); }
+// B2 guardrails
+const gAg=agent(0,0,80,COL.cob,0,1e9,{parent:tiles[1].bb,look:t=>[1,0]}); gAg.el.style.left='22px'; gAg.el.style.top='70px';
+inT(1,'bb',`<div style="width:86px;height:100px;color:var(--cob)" class="ic">${svg('shield').replace('<svg','<svg style="width:86px;height:100px;stroke-width:1.6"')}</div>`,150,56,{});
+inT(1,'bb',`${svg('card')}<span style="font-size:18px;font-weight:700">Ledger</span>`,262,80,{cls:'chip',h:50,style:'padding:0 12px'});
+inT(1,'bb','<span class="code" style="font-size:15px">"ignore policy…"</span>',20,10,{cls:'pill',style:'background:var(--org);color:#fff;padding:6px 12px'}).id='inj';
+inT(1,'bb',`${svg('person')}<span style="font-size:18px;font-weight:700">Human escalation</span>`,150,230,{cls:'chip',h:52,style:'background:var(--org);color:#fff;border-color:var(--org)'});
+inT(1,'bb','<span class="mono" style="font-size:12px;color:#6b7390">Model proposes · systems decide</span>',22,340,{});
+// B3 risks
+{ const heat=['#FFE7A3','#FFC531','#FF9A6B','#FFC531','#FF9A6B','#FF5B1F','#FF9A6B','#FF5B1F','#E2401A']; let h='';
+  heat.forEach((c,k)=>h+=`<i data-k="${k}" style="display:block;width:96px;height:66px;border-radius:12px;background:${c}"></i>`);
+  inT(2,'bb',`<div class="rgrid" style="display:grid;grid-template-columns:repeat(3,96px);gap:8px">${h}</div>`,60,24,{});
+  inT(2,'bb','<span class="mono" style="font-size:11px;color:#6b7390;writing-mode:vertical-rl;transform:rotate(180deg)">Likelihood</span>',22,60,{});
+  ['Injection','Privacy','Double payout'].forEach((r,k)=>inT(2,'bb',r,22+k*118,262,{cls:'pill',style:'font-size:15px;font-weight:700;background:var(--navy);color:#fff;padding:7px 12px'}));
+  inT(2,'bb','<span class="mono" style="font-size:12px;color:#6b7390">Threat model · data map</span>',22,340,{}); }
+// B4 deploy
+['Offline','Shadow','Pilot','1%','5%','25%'].forEach((s,k)=>inT(3,'bb',`<div style="position:absolute;bottom:0;left:0;right:0;height:100%;background:${k<3?'#2a3a6e':'var(--cob)'};border-radius:8px 8px 0 0"></div><span class="mono" style="position:absolute;top:-24px;left:0;font-size:11px;white-space:nowrap;color:#fff">${s}</span>`,22+k*60,300-k*36-40,{w:52,h:40+k*36,cls:'bar'+k}));
+inT(3,'bb','<span class="mono" style="font-size:12px;color:var(--yel)">Stop rules · rollback</span>',22,340,{});
+tiles[3].T.style.background='var(--navy)'; tiles[3].T.style.color='#fff';
+
+// ======================= S5 INSTRUCTOR 42-46 =======================
+add('<span class="mono" style="font-size:22px;color:var(--yel)">Learn from a practitioner</span>', ML, P(330,640), {in:42.05, out:45.35, dy:14});
+hl('Otman Kettani', ML, P(370,690), P(150,128), CW, 42.1, 45.35, {color:'#fff', st:.06});
+hl('Has led the deployment of LLM-powered customer support agents at global scale.', ML, P(570,880), P(44,46), P(1100,920), 42.3, 45.4, {color:'rgba(255,255,255,.9)', st:.02, cls:'w600'});
+
+// ======================= S6 TAKEAWAYS 46-54 =======================
+[['Two days.','var(--navy)'],['Real exercises.','var(--cob)'],['A working prototype.','var(--org)']].forEach((p,i)=>hl(p[0], ML, P(230+i*170,560+i*150), P(150,92), CW, 46.0+i*.5, 49.85, {color:p[1], st:.03}));
+hl('Your team leaves with', ML, P(150,170), P(72,80), CW, 50.0, 53.35, {st:.04});
+const DL=[['doc','Opportunity brief',COL.yel,'#0E1A3D'],['bot','Agent prototype',COL.cob,'#fff'],['grid','Evaluation report',COL.org,'#fff'],['shield','Risk assessment',COL.navy,'#fff'],['slides','Executive recommendation','#fff','#0E1A3D']];
+DL.forEach((d,i)=>{ const x=P(140+i*334,80), y=P(330,330+i*250), w=P(310,920), h=P(400,220);
+  add(`<span class="ic">${svg(d[0])}</span><div><div class="mono k" style="opacity:.75">0${i+1}</div><div class="t" style="${V?'font-size:48px':''}">${d[1]}</div></div>`, x, y, {cls:'dl', w, h, in:50.5+i*.5, out:53.35, fx:'pop', rot:i%2?7:-7, style:`background:${d[2]};color:${d[3]};${d[2]==='#fff'?'border:2px solid var(--navy);':''}${V?'flex-direction:row;align-items:center;gap:30px;justify-content:flex-start':''}`}); });
+
+// ======================= S7 FINAL 54-61 =======================
+add('<span class="pill mono" style="background:var(--yel);color:var(--navy);font-size:20px">A two-day hands-on workshop</span>', ML, P(170,420), {in:54.6, fx:'pop', rot:-6});
+['LAUNCHING','AI AGENTS','IN COMPANIES'].forEach((l,i)=>hl(l, ML, P(250+i*135,500+i*118), P(140,112), CW, 54.0+i*.18, 1e9, {color:i===1?COL.yel:'#fff', st:.025}));
+hl('Learn it. Build it. Test it.', ML, P(680,880), P(60,64), CW, 55.5, 1e9, {color:'#fff', st:.12});
+const cta=add(`<span style="display:inline-flex;align-items:center;gap:18px;background:var(--org);color:#fff;border-radius:999px;padding:${P('24px 40px','26px 36px')};font-family:IDisp;font-weight:800;font-size:${P(38,36)}px;letter-spacing:-.01em;box-shadow:0 10px 0 #b8380c">BRING THE WORKSHOP TO YOUR TEAM <span style="font-size:1.1em">→</span></span>`, ML, P(800,1010), {in:56.4, fx:'pop', rot:-4});
+add('<span class="mono" style="font-size:18px;color:rgba(255,255,255,.85)">Led by Otman Kettani</span>', ML, P(960,1170), {in:57.0, dy:12});
+const fAg=agent(P(1620,640), P(860,1560), P(240,230), COL.yel, 55.0, 1e9, {look:t=>[-.8,.2], rot:-30});
+const fAg2=agent(P(1780,430), P(640,1700), P(110,110), COL.org, 55.3, 1e9, {look:t=>[-1,.3]});
+
+// ======================= CANVAS / BACKGROUND =======================
+const WIPES=[[0,COL.paper],[17.65,COL.navy],[21.65,COL.paper],[41.65,COL.cob],[45.65,COL.paper],[53.65,COL.cob]];
+function drawBg(t){ let prev=COL.paper, cur=COL.paper, p=1;
+  for(let i=0;i<WIPES.length;i++){ if(t>=WIPES[i][0]){ prev=i?WIPES[i-1][1]:COL.paper; cur=WIPES[i][1]; p=eio(seg(t,WIPES[i][0],WIPES[i][0]+.35)); } }
+  cx.fillStyle=prev; cx.fillRect(0,0,W,H); if(p>0){ cx.fillStyle=cur; cx.beginPath(); const d=W*.35, x=-d+(W+2*d)*p;
+    cx.moveTo(-10,-10); cx.lineTo(x+d,-10); cx.lineTo(x-d,H+10); cx.lineTo(-10,H+10); cx.fill(); } }
+function line(x1,y1,x2,y2,p,col,w=3,dash){ if(p<=0) return; cx.strokeStyle=col; cx.lineWidth=w; cx.lineCap='round'; if(dash) cx.setLineDash(dash); cx.beginPath(); cx.moveTo(x1,y1); cx.lineTo(lerp(x1,x2,p),lerp(y1,y2,p)); cx.stroke(); cx.setLineDash([]); }
+function curve(x1,y1,x2,y2,p,col,w=3){ if(p<=0) return; cx.strokeStyle=col; cx.lineWidth=w; cx.beginPath(); cx.moveTo(x1,y1); const mx=(x1+x2)/2; const N=30;
+  for(let k=1;k<=N*p;k++){ const q=k/N; const bx=Math.pow(1-q,3)*x1+3*(1-q)*(1-q)*q*mx+3*(1-q)*q*q*mx+q*q*q*x2, by=Math.pow(1-q,3)*y1+3*(1-q)*(1-q)*q*y1+3*(1-q)*q*q*y2+q*q*q*y2; cx.lineTo(bx,by);} cx.stroke(); }
+function bezPt(x1,y1,x2,y2,q){ const mx=(x1+x2)/2; return [Math.pow(1-q,3)*x1+3*(1-q)*(1-q)*q*mx+3*(1-q)*q*q*mx+q*q*q*x2, Math.pow(1-q,3)*y1+3*(1-q)*(1-q)*q*y1+3*(1-q)*q*q*y2+q*q*q*y2]; }
+const GR=(()=>{ const r=rnd(3), a=[]; const cols=P(32,18), rows=P(18,32); for(let j=0;j<rows;j++) for(let i=0;i<cols;i++) a.push([i,j,r()]); return {a,cols,rows}; })();
+function drawCanvas(t){
+  drawBg(t);
+  // hook connections agent <-> tool
+  if(t<3.95){ const o=1-seg(t,3.6,3.85); toolIc.forEach(ti=>{ const p=eo(seg(t,ti.t0+.1,ti.t0+.5)); line(ti.ax,ti.ay,ti.tx,ti.ty,p,`rgba(14,26,61,${.35*o})`,2.5,[6,8]); });
+    for(let i=0;i<HPOS.length-1;i+=2){ const a=HPOS[i], b=HPOS[i+1]; const p=eo(seg(t,.6+i*.2,1.2+i*.2)); line(a[0],a[1],b[0],b[1],p,`rgba(35,70,255,${.25*o})`,2.5); } }
+  // workflow lines
+  if(t>=11.5 && t<17.6){ const o=1-seg(t,17.2,17.5); const nv=`rgba(14,26,61,${.5*o})`;
+    const [ax,ay]=B(165,250);
+    WT.forEach((w,i)=>{ const [tx,ty]=B(380,179+i*82); curve(ax,ay,tx,ty,eo(seg(t,12.7+i*.12,13.1+i*.12)),nv,2.5); });
+    const sel = t<13.6?0:1; if(t>13.0){ const [tx,ty]=B(380,179+sel*82); curve(ax,ay,tx,ty,1,`rgba(35,70,255,${o})`,5); const q=(t*1.4)%1; const [px,py]=bezPt(ax,ay,tx,ty,q); cx.fillStyle=`rgba(255,91,31,${o})`; cx.beginPath(); cx.arc(px,py,7,0,6.28); cx.fill(); }
+    [0,1,2].forEach(i=>{ const [sx,sy]=B(145+i*320,450); const [tx,ty]=B(560,179+Math.min(i,1)*82+30); line(tx,ty,sx,sy,eo(seg(t,14.5+i*.2,14.9+i*.2)),`rgba(35,70,255,${.6*o})`,2.5,[4,8]); });
+  }
+  // agent field (instructor)
+  if(t>=41.7 && t<45.8){ const o=1-seg(t,45.3,45.6); const cw=W/GR.cols, ch=H/GR.rows, s=Math.min(cw,ch)*.46;
+    for(const [i,j,r] of GR.a){ const x=(i+.5)*cw, y=(j+.5)*ch; const wave=seg(t,41.9+(i/GR.cols)*1.6+r*.4,42.2+(i/GR.cols)*1.6+r*.4); const lit=wave>0 && r<.55;
+      const inTxt = V ? (y>560 && y<1120) : (x<1500 && y>290 && y<660); const k=inTxt?.25:1;
+      cx.fillStyle= lit ? `rgba(255,197,49,${(.35+.4*(r<.12))*o*k})` : `rgba(255,255,255,${.1*o*k})`; const ss=s*(.6+.4*eo(wave));
+      cx.beginPath(); cx.roundRect(x-ss/2,y-ss/2,ss,ss,ss*.28); cx.fill();
+      if(lit&&!inTxt){ cx.fillStyle=`rgba(35,70,255,${o})`; cx.fillRect(x-ss*.22,y-ss*.1,ss*.12,ss*.18); cx.fillRect(x+ss*.1,y-ss*.1,ss*.12,ss*.18); } } }
+  // final: floating shapes
+  if(t>=54){ const p=bo(seg(t,54.2,54.9)); cx.fillStyle=COL.org; cx.beginPath(); cx.arc(P(1500,960),P(200,180)+Math.sin(t*2)*6,P(70,60)*p,0,6.28); cx.fill();
+    cx.strokeStyle=COL.yel; cx.lineWidth=10; cx.beginPath(); cx.arc(P(1820,180),P(900,1840),P(140,150)*p,0,6.28); cx.stroke(); }
+}
+
+// ======================= RENDER =======================
+window.render=function(t){
+  drawCanvas(t);
+  for(const o of els) applyEl(o,t); for(const h of hls) applyHl(h,t); for(const a of agents) applyAgent(a,t);
+  // prompt typing
+  { const s='Write a polite reply to this customer…'; const n=Math.floor(clamp((t-8.6)/1.3)*s.length); document.getElementById('ptxt').textContent=s.slice(0,n)+((Math.floor(t*3)%2&&t<10.4)?'|':'');
+    if(t>9.9){ const p=eio(seg(t,9.9,10.5)); PB.style.transform=`translateX(${-60*p}px) scale(${1-.12*p})`; PB.style.opacity=1-.6*p; } }
+  // thinking dots
+  think.forEach((d,i)=>{ const on=t>=12.0&&t<13.0; d.style.visibility=on?'visible':'hidden'; d.style.transform=`translateY(${-8*Math.max(0,Math.sin((t*6-i*.8)))}px)`; });
+  // tool selection highlight
+  wtc.forEach((c,i)=>{ const sel=(t>=13.0&&t<13.6&&i===0)||(t>=13.6&&i===1); c.style.background=sel?COL.cob:'#fff'; c.style.color=sel?'#fff':COL.navy; c.style.borderColor=sel?COL.cob:COL.navy; });
+  sysc.forEach((c,i)=>{ const lit=t>=14.75+i*.25; c.style.background=lit?COL.yel:'#fff'; });
+  // tile flips
+  tiles.forEach(tl=>{ const p=seg(t,tl.flip,tl.flip+.4); const ang=p*Math.PI; const sx=Math.abs(Math.cos(ang)); const showB=p>=.5;
+    tl.fa.style.opacity=showB?0:1; tl.fb.style.opacity=showB?1:0; tl.fa.style.display=showB?'none':'block'; tl.fb.style.display=showB?'block':'none'; tl.T.firstChild && (tl.T.style.transform += ` scaleX(${Math.max(sx,.001)})`); });
+  tiles[3].T.style.background = '#fff'; tiles[3].T.style.color=COL.navy; if(t>=tiles[3].flip+.2){ tiles[3].T.style.background=COL.navy; tiles[3].T.style.color='#fff'; }
+  // eval grid fill
+  document.querySelectorAll('.egrid i').forEach(e=>{ const k=+e.dataset.k; const on=t>=36.25+k*.0625; e.style.background= on ? ([5,17].includes(k)&&t<38.6? COL.org : COL.cob) : '#eee8da'; });
+  document.querySelectorAll('.rgrid i').forEach(e=>{ const k=+e.dataset.k; const p=bo(seg(t,36.7+k*.07,37.1+k*.07)); e.style.transform=`scale(${p})`; });
+  for(let k=0;k<6;k++){ const b=document.querySelector('.bar'+k); if(!b) continue; const p=eo(seg(t,37.0+k*.12,37.4+k*.12)); b.style.transform=`scaleY(${p})`; b.style.transformOrigin='bottom'; b.style.opacity=p>0?1:0; }
+  // injection bounce on guardrails
+  { const inj=document.getElementById('inj'); const p=seg(t,36.5,37.4), q=seg(t,37.4,37.9);
+    const x=20+lerp(0,110,eio(p))-lerp(0,90,eo(q)), y=10+lerp(0,70,eio(p))+lerp(0,90,eio(q)); inj.style.transform=`translate(${x-20}px,${y-10}px) rotate(${-25*eo(q)}deg)`; inj.style.opacity= t<36.5?0:(1-seg(t,38.6,39)); }
+  // CTA press
+  { const pr=seg(t,57.5,57.65)-seg(t,57.65,57.85); if(t>57.5 && t<57.9){ cta.style.transform=`translateY(${8*pr}px)`; } }
+};
+window.render(0);
+</script></body></html>
