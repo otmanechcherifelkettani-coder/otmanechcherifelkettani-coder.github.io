@@ -1,0 +1,255 @@
+<title>Shipping AI That Works · University</title>
+<style>
+.ui{position:absolute;background:#fff;border-radius:26px;box-shadow:0 30px 80px rgba(17,32,74,.16);overflow:hidden;color:var(--navy)}
+.ui .top{height:62px;display:flex;align-items:center;gap:12px;padding:0 22px;border-bottom:1.5px solid #efe7d6}
+.ui .dot{width:28px;height:28px;border-radius:9px;background:var(--orange);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;font-family:Brico}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 15px;font-family:JBM;font-weight:600;font-size:14px;letter-spacing:.03em;white-space:nowrap}
+.msg{position:absolute;max-width:84%;padding:13px 17px;border-radius:20px;font-size:19px;line-height:1.35}
+.step{position:absolute;left:16px;right:16px;height:70px;display:flex;align-items:center;gap:12px;border-bottom:1.5px solid #f2ecdf}
+.step .n{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:JBM;font-weight:600;font-size:13px;color:#fff;flex:none}
+.step .c{font-family:JBM;font-weight:600;font-size:15px;white-space:nowrap}
+.step .r{font-family:JBM;font-size:12.5px;color:#6a7390;margin-top:3px;white-space:nowrap}
+.step .s{margin-left:auto}
+.hl{position:absolute;font-family:Brico;font-weight:800;letter-spacing:-.03em;line-height:1.0}
+.hl .w{display:inline-block;overflow:hidden;vertical-align:top;padding:0 .03em .12em;margin:0 -.03em -.12em}
+.hl .w>span{display:inline-block}
+.mk{background:var(--yellow);padding:0 .08em;border-radius:.12em}
+.lab{position:absolute;font-family:JBM;font-weight:600;font-size:14px;letter-spacing:.08em;text-transform:uppercase;padding:9px 14px;border-radius:12px;background:#fff;box-shadow:0 8px 24px rgba(17,32,74,.12);text-align:center;line-height:1.25}
+.cta{display:inline-flex;align-items:center;gap:16px;border-radius:999px;padding:24px 40px;background:var(--orange);color:#fff;font-family:Brico;font-weight:800;font-size:36px;letter-spacing:-.01em;box-shadow:0 10px 0 #c4461a;white-space:nowrap}
+#wipe{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+</style>
+<body><canvas id="c" class="a" style="left:0;top:0"></canvas><div id="ov" class="a" style="left:0;top:0;right:0;bottom:0;overflow:hidden"></div><svg id="wipe"><polygon id="wp" points=""/></svg>
+<script type="module">
+import * as THREE from 'three';
+import { C, CSS, makeAgent, poseAgent, makeWorld, P, wordBlock, toolTile, ICON, cup, box } from './kit.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+await document.fonts.load('800 40px Brico'); await document.fonts.load('600 40px JBM'); await document.fonts.ready;
+const V=location.hash==='#v'; const W=V?1080:1920, H=V?1920:1080; const PV=(h,v)=>V?v:h;
+document.body.style.width=W+'px'; document.body.style.height=H+'px';
+const r=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true,preserveDrawingBuffer:true}); r.setPixelRatio(1); r.setSize(W,H);
+const {scene,cam}=makeWorld(r,W,H,{});
+const wipeSvg=document.getElementById('wipe'); wipeSvg.setAttribute('width',W); wipeSvg.setAttribute('height',H);
+// ---------- helpers ----------
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), seg=(t,a,b)=>clamp((t-a)/(b-a)), lerp=(a,b,p)=>a+(b-a)*p;
+const eo=x=>x>=1?1:1-Math.pow(2,-10*x), ei=x=>x*x*x, eio=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const bo=x=>{ if(x<=0) return 0; if(x>=1) return 1; const c1=1.8,c3=c1+1; return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2); };
+const el2=x=>{ if(x<=0) return 0; if(x>=1) return 1; return Math.pow(2,-9*x)*Math.sin((x*10-.75)*2.0944)+1; };
+const ov=document.getElementById('ov'); const els=[]; const hls=[];
+function add(html,x,y,o={}){ const d=document.createElement('div'); d.className='a '+(o.cls||''); d.innerHTML=html; d.style.left=x+'px'; d.style.top=y+'px';
+  if(o.w) d.style.width=o.w+'px'; if(o.h) d.style.height=o.h+'px'; if(o.style) d.style.cssText+=';'+o.style; (o.parent||ov).appendChild(d);
+  if(o.in!==undefined) els.push({el:d,in:o.in,out:o.out??1e9,fx:o.fx||'rise',dy:o.dy??26,dur:o.dur||.45,odur:o.odur||.2,rot:o.rot||0}); return d; }
+function applyEl(o,t){ const pi=seg(t,o.in,o.in+o.dur), po=ei(seg(t,o.out,o.out+o.odur)); let op,tr;
+  if(o.fx==='pop'){ const s=bo(pi); op=clamp(pi*4)*(1-po); tr=`scale(${s*(1-.2*po)}) rotate(${o.rot*(1-s)}deg)`; }
+  else if(o.fx==='fade'){ op=eo(pi)*(1-po); tr=''; }
+  else { const e=eo(pi); op=e*(1-po); tr=`translateY(${o.dy*(1-e)-o.dy*.5*po}px)`; }
+  o.el.style.opacity=op; o.el.style.transform=tr; o.el.style.visibility=op<=.001?'hidden':'visible'; }
+function hl(text,x,y,size,w,tin,tout,o={}){ const d=document.createElement('div'); d.className='hl'; d.style.cssText=`left:${x}px;top:${y}px;font-size:${size}px;width:${w}px;${o.style||''}`;
+  const words=text.split(' '), inner=[]; words.forEach((wd,i)=>{ let c=''; if(wd[0]==='*'){c='acc';wd=wd.slice(1);} else if(wd[0]==='_'){c='mk';wd=wd.slice(1);}
+    const s=document.createElement('span'); s.className='w'; const k=document.createElement('span'); k.textContent=wd; if(c==='mk') k.className='mk'; if(c==='acc') k.style.color=o.acc||CSS.blue;
+    s.appendChild(k); d.appendChild(s); if(i<words.length-1) d.appendChild(document.createTextNode(' ')); inner.push(k); });
+  ov.appendChild(d); const h={el:d,words:inner,tin,tout,st:o.st??.05}; hls.push(h); return h; }
+function applyHl(h,t){ let any=false; h.words.forEach((k,i)=>{ const pi=eo(seg(t,h.tin+i*h.st,h.tin+i*h.st+.5)), po=ei(seg(t,h.tout+i*.012,h.tout+i*.012+.22));
+  k.style.transform=`translateY(${(1-pi)*110-po*110}%)`; if(pi>0&&po<1) any=true; }); h.el.style.visibility=any?'visible':'hidden'; }
+const mono=(t,x,y,tin,tout,o='')=>add(`<span class="mono" style="font-size:${PV(15,17)}px;${o}">${t}</span>`,x,y,{in:tin,out:tout,dy:12});
+const ML=PV(90,64), TW=PV(820,950);
+
+// ---------- scenes & timeline ----------
+const SC=[ // start, bg, wipe colour
+ [0,C.paper,null],[8.0,C.paper,CSS.yellow],[19.5,C.blue,CSS.blue],[30.75,C.yellow,CSS.yellow],[33.5,C.paper,CSS.paper],[42.25,C.mint,CSS.mint],[46.0,C.paper,CSS.paper],[54.0,C.blue,CSS.blue]];
+const sceneAt=t=>{ let k=0; for(let i=0;i<SC.length;i++) if(t>=SC[i][0]) k=i; return k; };
+const groups=SC.map(()=>{ const g=new THREE.Group(); scene.add(g); return g; });
+const put=(k,o,x,y,z,s=1,rx=0,ry=0,rz=0)=>{ o.position.set(x,y,z); o.scale.setScalar(s); o.rotation.set(rx,ry,rz); o.userData.home={x,y,z,s,rx,ry,rz}; groups[k].add(o); return o; };
+const tile=(l,c,ic)=>toolTile(l,c,ICON[ic]);
+const hero=makeAgent(); scene.add(hero);
+const zel=add(`<svg width="${W}" height="${H}"><defs><pattern id="z" width="120" height="120" patternUnits="userSpaceOnUse"><g transform="translate(60 60)" fill="none" stroke="#11204A" stroke-width="2"><rect x="-26" y="-26" width="52" height="52"/><rect x="-26" y="-26" width="52" height="52" transform="rotate(45)"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#z)" opacity=".065"/></svg>`,0,0,{in:8.1,out:19.3,fx:'fade',dur:.8});
+
+// ===== S0 HOOK 0-8 =====
+const S0=[]; { const k=0;
+  const defs = V ? [[P.ball(C.yellow,.45),2.4,3.0,-1],[P.ring(C.mint,.5,.17),-2.4,2.4,-.6,1,1.2,.4],[P.cone(C.orange),2.6,-.45,.8,1,0,0,.3],[P.pill(C.blue,.22,.7),-2.5,-.5,1,1,0,0,1.4],[P.star(C.yellow,.42,.14),-2.2,.6,-1.4,1,.3,.2],[P.cube(C.sky,.7,.16),2.2,1.1,-1.6,1,.4,.6],[tile('get_order',CSS.blue,'search'),-1.9,1.1,1.4,.6,-.1,.3,.05],[P.ball(C.orange,.18),.9,-.75,2.2]]
+    : [[P.ball(C.yellow,.45),5.6,2.4,-1],[P.ring(C.mint,.5,.17),2.2,3.0,-.6,1,1.2,.4],[P.cone(C.orange),6.2,-.45,.6,1,0,0,.3],[P.pill(C.blue,.22,.7),.9,-.55,1.2,1,0,0,1.4],[P.star(C.yellow,.42,.14),4.2,3.3,-.5,1,.3,.2],[P.cube(C.sky,.8,.18),7.1,1.4,-2,1,.4,.6],[tile('get_order',CSS.blue,'search'),5.2,.7,1.6,.75,-.1,-.35,.06],[tile('escalate_case',CSS.orange,'person'),6.4,-.2,-2.2,.7,0,-.3,-.06],[P.ball(C.orange,.18),2.0,-.7,2.0],[P.ring(C.yellow,.25,.09),7.2,-.3,-1,1,.6,0,.5]];
+  defs.forEach((d,i)=>{ const o=put(k,d[0],d[1],d[2],d[3],d[4]??1,d[5]??0,d[6]??0,d[7]??0); S0.push({o,t0:.25+i*.25,ph:i*1.3}); });
+  hl('AI is changing the _world _of _work.', ML, PV(240,170), PV(100,100), PV(860,950), .5, 2.85);
+  hl('Tomorrow’s professionals won’t just use it.', ML, PV(240,170), PV(110,104), TW, 3.0, 5.35);
+  hl('They’ll need to *build with it.', ML, PV(240,170), PV(118,110), TW, 5.5, 7.75);
+  mono('Shipping AI That Works', ML, PV(190,120), .4, 7.75, 'color:#6a7390');
+}
+// ===== S1 OPPORTUNITY 8-19.5 =====
+const S1b=[]; { const k=1;
+  const steps=[['LLMs',C.sky,CSS.navy],['Tools',C.yellow,CSS.navy],['Workflows',C.mint,CSS.navy],['Evals',C.orange,'#fff']];
+  steps.forEach((s,i)=>{ const b=wordBlock(s[0],s[1],s[2],2.1,.7,.9); const x=PV(-1.3+i*1.55,-1.9+i*1.0), y=PV(-.55+i*.72,-.55+i*.72); S1b.push(put(k,b,x,y,PV(0,-i*.2),PV(1,.82),0,-.18)); });
+  S1b.tiles=[put(k,tile('get_order',CSS.blue,'search'),PV(7.5,1.2),PV(1.0,4.3),PV(-.6,-1.2),PV(.6,.5),0,-.5,0), put(k,tile('check_refund_…',CSS.mint,'shield'),PV(7.6,1.4),PV(.1,3.6),PV(-.2,-1),PV(.6,.5),0,-.5,0)];
+  put(k,P.star(C.orange,.3,.1),PV(3.6,2.4),PV(3.4,-.6),-1.2,1,.2,.4); put(k,P.ball(C.yellow,.25),PV(3.2,2.6),PV(4.0,.2),-1.5);
+  mono('Concepts become tangible', ML, PV(150,120), 8.3, 19.25, 'color:#6a7390');
+  hl('From ideas you study', ML, PV(190,170), PV(92,96), PV(1200,950), 8.3, 19.25);
+  hl('to *tools *you *use.', ML, PV(290,370), PV(92,96), PV(1200,950), 13.5, 19.25);
+  add(`<span class="pill" style="background:#fff;box-shadow:0 6px 20px rgba(17,32,74,.1);font-size:${PV(14,16)}px">Made for Moroccan universities & business schools</span>`, ML, PV(960,1780), {in:10.0, out:19.2, fx:'pop', rot:-4});
+}
+// ===== S2 INSTRUCTOR 19.5-30.75 =====
+const NX=22, NZ=14, N=NX*NZ; const S2={}; { const k=2;
+  const g=new RoundedBoxGeometry(.42,.38,.36,3,.12); const m=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.45});
+  const inst=new THREE.InstancedMesh(g,m,N); inst.castShadow=true; const col=new THREE.Color(); let i=0; const A=[],B=[];
+  for(let j=0;j<NZ;j++) for(let q=0;q<NX;q++){ const h=((q*7+j*13)%17); col.set(h<2?C.orange:(h<6?C.yellow:(h<9?C.mint:0xdfe7ff))); inst.setColorAt(i,col);
+    A.push([PV(3.4,-6.5)+q*.62, PV(-7,-12)+j*.62]); // field
+    const row=Math.floor(i/14), seat=i%14; B.push([PV(4.2,-3.6)+seat*.62+(row%2)*.31, PV(-2,-7)-row*.72]); i++; }
+  groups[k].add(inst); S2.inst=inst; S2.A=A; S2.B=B;
+  const board=new THREE.Group(); const bs=P.slab(C.navy,PV(6.5,5.2),2.4,.2,.1); board.add(bs);
+  const cv=document.createElement('canvas'); cv.width=1300; cv.height=480; const x=cv.getContext('2d'); x.fillStyle='#FFC83D'; x.font='800 120px Brico'; x.fillText('SoukGo',70,190); x.fillStyle='#fff'; x.font='600 54px JBM'; x.fillText('Day 1 · Build lab',74,320);
+  const tx=new THREE.CanvasTexture(cv); tx.colorSpace=THREE.SRGBColorSpace; const pl=new THREE.Mesh(new THREE.PlaneGeometry(PV(6.2,5),PV(2.2,1.84)),new THREE.MeshBasicMaterial({map:tx,transparent:true})); pl.position.z=.11; board.add(pl);
+  S2.board=put(k,board,PV(10.5,-1.4),.8,PV(-16,-22),1); board.userData.y0=.8;
+  mono('Your instructor', ML, PV(250,150), 19.75, 30.6, 'color:var(--yellow)');
+  hl('Otman Kettani', ML, PV(290,190), PV(150,128), PV(780,950), 19.85, 30.6, {style:'color:#fff'});
+  add(`<div style="font-family:Brico;font-weight:700;font-size:${PV(34,38)}px;color:#fff;line-height:1.2;width:${PV(700,940)}px">Product & operations · AI-powered customer support at Uber</div>`, ML, PV(600,500), {in:20.5, out:30.6});
+  add(`<span class="pill" style="background:var(--yellow);color:var(--navy);font-size:${PV(15,17)}px">LLM-based agents · millions of customer interactions</span>`, ML, PV(720,620), {in:21.5, out:30.6, fx:'pop', rot:-4});
+  add(`<span class="pill" style="background:#fff;color:var(--blue);font-size:${PV(15,17)}px">From real-world production → to the classroom</span>`, ML, PV(790,690), {in:26.75, out:30.6, fx:'pop', rot:4});
+}
+// ===== S3 TITLE 30.75-33.5 =====
+const S3=[]; { const k=3;
+  const defs=[[P.ring(C.blue,.6,.2),-5.3,2.6,-1,1,.9,.3],[P.ball(C.orange,.5),-5.6,-.2,.5],[P.star(C.white,.5,.15),5.9,3.0,-1,1,.2,-.3],[P.cone(C.mint,.45,.9),-3.2,3.2,-1.5,1,0,0,-.6],[P.cube(C.blue,.7,.16),2.0,-.45,2.5,1,.3,.5],[P.pill(C.orange,.2,.6),6.4,-.4,-.5,1,0,0,1.2],[P.ball(C.mint,.3),4.6,4.0,-2]];
+  defs.forEach((d,i)=>{ const [o,x,y,z,s,rx,ry,rz]=d; S3.push(put(k,o,V?x*.45:x,V?y*1.3-0.5:y,z,s??1,rx??0,ry??0,rz??0)); });
+  add(`<div class="mono" style="font-size:${PV(17,19)}px;text-align:center;color:var(--navy)">Introducing</div>`, 0, PV(330,560), {w:W, in:30.9, out:33.3, dy:12});
+  hl('SHIPPING AI', 0, PV(380,610), PV(210,150), W, 31.0, 33.3, {style:'text-align:center;letter-spacing:-.045em', st:.04});
+  hl('THAT WORKS', 0, PV(590,770), PV(210,150), W, 31.5, 33.3, {style:'text-align:center;letter-spacing:-.045em', st:.04});
+}
+// ===== S4 WORKSHOP / SOUKGO 33.5-42.25 =====
+const S4={}; { const k=4;
+  S4.cup=put(k,cup(),PV(5.5,-1.9),PV(.7,2.2),PV(1.6,1.0),1.1,.2,0,-.25); S4.box=put(k,box(),PV(8.0,2.0),PV(-.5,1.4),PV(-.6,-.4),1,0,-.4);
+  S4.tiles=[put(k,tile('get_order',CSS.blue,'search'),PV(8.6,-1.4),PV(2.4,3.6),PV(-1.2,-1.4),.62,0,PV(-.45,0),0), put(k,tile('check_refund_…',CSS.mint,'shield'),PV(8.9,.4),PV(1.5,4.5),PV(-1.0,-1.6),.62,0,PV(-.45,0),0), put(k,tile('submit_refund',CSS.yellow,'card'),PV(9.0,2.0),PV(.6,3.6),PV(-.8,-1.4),.62,0,PV(-.45,0),0)];
+  // console
+  const cx=PV(70,40), cy=PV(170,930), cw=PV(1010,1000), ch=PV(780,820);
+  const ui=add(`<div class="top"><span class="dot">S</span><b style="font-family:Brico;font-size:22px">SoukGo Support</b><span class="mono" style="font-size:11px;color:#6a7390">Agent sandbox · team 3</span><span class="pill" style="margin-left:auto;background:#EEF3FF;color:var(--blue);font-size:12px">v0.1 · policy v1.0</span></div>
+    <div id="chat" style="position:absolute;left:0;top:62px;width:46%;bottom:0;background:#FFFCF6;border-right:1.5px solid #efe7d6"><div class="mono" style="position:absolute;left:16px;bottom:16px;font-size:10px;color:#6a7390">Customer · French · fictional data</div></div>
+    <div id="trace" style="position:absolute;left:46%;top:62px;right:0;bottom:0"><div class="mono" style="position:absolute;left:16px;top:14px;font-size:11px;color:#6a7390">Agent trace</div>
+    <div style="position:absolute;left:16px;right:16px;bottom:16px;display:flex;gap:6px;flex-wrap:wrap"><span class="pill" style="background:#F2F0EA;font-size:11px">identity: server-side</span><span class="pill" style="background:#F2F0EA;font-size:11px">amount: policy engine</span><span class="pill" style="background:#F2F0EA;font-size:11px">money: ledger</span></div></div>`,
+    cx, cy, {cls:'ui', w:cw, h:ch, in:33.6, out:42.0, fx:'pop', rot:-2});
+  const chat=ui.querySelector('#chat'), trace=ui.querySelector('#trace');
+  const ce=(par,html,tin)=>add(html,0,0,{parent:par,in:tin,fx:'pop',rot:0,style:'position:absolute;inset:0;pointer-events:none'});
+  ce(chat,'<div class="msg" style="right:14px;top:18px;background:var(--navy);color:#fff;border-bottom-right-radius:6px;position:absolute">Bonjour, il manque ma boisson dans ma commande SG-1001.</div>',34.2);
+  S4.typing=ce(chat,'<div style="position:absolute;left:14px;top:140px;display:flex;gap:7px;background:#EEF3FF;padding:16px 18px;border-radius:20px"><i style="width:10px;height:10px;border-radius:50%;background:#8a93ad;display:block"></i><i style="width:10px;height:10px;border-radius:50%;background:#8a93ad;display:block"></i><i style="width:10px;height:10px;border-radius:50%;background:#8a93ad;display:block"></i></div>',37.5);
+  ce(chat,'<div class="msg" style="left:14px;top:140px;background:#EEF3FF;border-bottom-left-radius:6px;position:absolute">Désolé ! Votre boisson (20 MAD) est éligible au remboursement. Je confirme ?</div>',40.0);
+  S4.btn=ce(chat,'<div style="position:absolute;left:14px;top:262px;display:flex;gap:8px"><span class="pill" id="cbtn" style="background:var(--orange);color:#fff;font-size:15px;padding:10px 18px">Confirmer</span><span class="pill" style="background:#fff;border:1.5px solid #d9d0bd;font-size:15px;padding:10px 18px">Parler à un humain</span></div>',40.3);
+  ce(chat,'<div class="msg" style="left:14px;top:330px;background:#E6FAF3;position:absolute">C’est fait : remboursement de 20 MAD confirmé.</div>',41.4);
+  const ST=[['1','var(--navy)','request.received','intent: missing_item · fr','✓',37.4],['2','var(--blue)','get_order("SG-1001")','delivered · card · 2 items','✓',38.4],['3','#13865f','check_refund_eligibility','ELIGIBLE · MAD 20 · p-7','✓',39.3],['4','var(--orange)','submit_refund(p-7)','customer confirmed → ledger','SUCCEEDED',41.0]];
+  ST.forEach((s,i)=>ce(trace,`<div class="step" style="top:${42+i*76}px;position:absolute"><span class="n" style="background:${s[1]}">${s[0]}</span><div><div class="c">${s[2]}</div><div class="r">${s[3]}</div></div><span class="s pill" style="font-size:11px;background:${s[4]==='✓'?'#E6FAF3':'#13865f'};color:${s[4]==='✓'?'#13865f':'#fff'}">${s[4]}</span></div>`,s[5]));
+  // ribbon
+  const RB=['Request','Order','Eligibility','Trusted tool','Escalate'];
+  S4.rib=RB.map((r,i)=>add(`<span class="pill" style="font-size:${PV(14,15)}px;background:#fff;box-shadow:0 4px 14px rgba(17,32,74,.08)"><b style="font-family:JBM">${i+1}</b> ${r}</span>`, PV(70+i*196,40+(i%3)*330), PV(84,820+(i<3?0:52)), {in:33.8+i*.1, out:45.8, fx:'pop', rot:-6}));
+  ['2 days','12 hours','Teams of 4–5','Hands-on'].forEach((c,i)=>add(`<span class="pill" style="background:var(--yellow);color:var(--navy);font-size:${PV(17,19)}px;padding:10px 18px">${c}</span>`, PV(1120+i*0,40+i*250), PV(170+i*62, 160), {in:34.0+i*.25, out:37.1, fx:'pop', rot:-8}));
+  add(`<span class="pill" style="background:var(--navy);color:#fff;font-size:${PV(13,15)}px">Case · SoukGo, a fictional delivery app</span>`, PV(1140,40), PV(980,1580), {in:34.3, out:42.0, fx:'pop'});
+}
+// ===== S5 ESCALATION 42.25-46 =====
+const S5={}; { const k=5;
+  const gate=new THREE.Group(); [-1,1].forEach(s=>{ const p=P.slab(C.navy,.35,2.6,.35,.08); p.position.set(s*1.1,.4,0); gate.add(p); }); const beam=P.slab(C.orange,2.9,.42,.42,.1); beam.position.y=1.85; gate.add(beam);
+  S5.gate=put(k,gate,PV(3.4,.6),0,PV(-.5,-.8),1,0,PV(-.35,-.2));
+  S5.ticket=put(k,P.slab(C.white,.7,.45,.06,.05),0,0,0);
+  put(k,P.star(C.yellow,.3,.1),PV(6.5,2.2),PV(2.6,4.2),-1,1,.3,.4);
+  mono('Guardrails & human oversight', ML, PV(150,120), 42.4, 45.8, 'color:var(--navy)');
+  hl('When the rules say no,', ML, PV(190,170), PV(84,88), PV(1100,950), 42.5, 45.8);
+  hl('it hands over.', ML, PV(280,262), PV(84,88), PV(1100,950), 42.9, 45.8);
+  add(`<div class="top"><span class="dot" style="background:var(--blue)">H</span><b style="font-family:Brico;font-size:22px">Human support queue</b><span class="pill" style="margin-left:auto;background:#FFF1E9;color:var(--orange);font-size:12px">NEEDS_HUMAN</span></div>
+    <div style="padding:20px"><div class="mono" style="font-size:11px;color:#6a7390">escalate_case · reason</div><div style="font-family:Brico;font-weight:700;font-size:28px;margin:6px 0 14px">Quality complaint: sandwich</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="pill" style="background:#EEF3FF;color:var(--blue);font-size:12px">order SG-1001</span><span class="pill" style="background:#EEF3FF;color:var(--blue);font-size:12px">case H-0142</span><span class="pill" style="background:#E6FAF3;color:#13865f;font-size:12px">no money moved</span></div></div>`,
+    PV(1190,60), PV(560,1380), {cls:'ui', w:PV(640,960), h:250, in:44.3, out:45.8, fx:'pop', rot:3});
+  add(`<div class="msg" style="position:relative;background:var(--navy);color:#fff;border-bottom-right-radius:6px">Et le sandwich ? Il était froid.</div>`, PV(1260,400), PV(400,1060), {in:42.6, out:45.8, fx:'pop', w:PV(420,500)});
+}
+// ===== S6 ACHIEVEMENT 46-54 =====
+const S6={items:[]}; { const k=6;
+  const items=[[C.yellow,'Opportunity brief'],[C.blue,'Working prototype'],[C.mint,'Evaluation report'],[C.orange,'Risk assessment'],[C.navy,'Deployment recommendation']];
+  const ped=[0,.4,.8,.4,0];
+  items.forEach((it,i)=>{ const g=new THREE.Group(); const VP=[[-2.05,0],[0,0],[2.05,0],[-1.05,-2.7],[1.05,-2.7]]; const x=V?VP[i][0]:-5.2+i*2.6; const z=V?VP[i][1]:0;
+    const hgt=.5+ped[i]; const p=P.slab(it[0]===C.navy?C.sky:0xffffff,1.9,hgt,1.6,.12); p.position.y=hgt/2; g.add(p); const top=hgt;
+    if(i===0){ for(let s=0;s<4;s++){ const q=P.slab(s%2?0xfff3c9:C.yellow,1.0,.06,1.3,.02); q.position.set(0,top+.05+s*.07,0); q.rotation.y=s*.08; g.add(q);} }
+    if(i===1){ const m=makeAgent(); m.position.set(0,top+.62,0); m.scale.setScalar(.62); g.add(m); S6.mini=m; }
+    if(i===2){ const b=P.slab(C.mint,1.0,1.3,.08,.05); b.position.set(0,top+.65,0); b.rotation.x=-.1; g.add(b); for(let a=0;a<3;a++) for(let c=0;c<3;c++){ const q=P.slab(a===2&&c===2?C.orange:C.white,.22,.22,.04,.03); q.position.set(-.28+c*.28,top+.82-a*.28,.07); q.rotation.x=-.1; g.add(q);} }
+    if(i===3){ const sh=new THREE.Shape(); sh.moveTo(0,.65); sh.lineTo(.5,.45); sh.lineTo(.5,0); sh.quadraticCurveTo(.45,-.45,0,-.65); sh.quadraticCurveTo(-.45,-.45,-.5,0); sh.lineTo(-.5,.45); sh.closePath();
+      const m=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:.18,bevelEnabled:true,bevelSize:.05,bevelThickness:.05,bevelSegments:4}),new THREE.MeshStandardMaterial({color:C.orange,roughness:.4})); m.castShadow=true; m.position.set(0,top+.75,-.1); m.rotation.y=-.2; g.add(m); }
+    if(i===4){ const b=P.slab(C.navy,1.5,1.0,.08,.06); b.position.set(0,top+.9,0); b.rotation.set(-.05,-.2,0); g.add(b); const leg=P.slab(C.navy,.08,.5,.08,.03); leg.position.set(0,top+.25,-.05); g.add(leg); }
+    put(k,g,x,-.9,z,V?.72:1); S6.items.push(g); });
+  S6.labs=items.map((it,i)=>add(it[1].replace('Deployment ','Deployment<br>'), 0, 0, {cls:'lab', w:PV(220,230), in:46.6+i*.5, out:53.8, fx:'pop', rot:-5}));
+  ['Evaluate','Manage risks','Deploy responsibly'].forEach((c,i)=>add(`<span class="pill" style="background:var(--navy);color:#fff;font-size:${PV(20,22)}px;padding:12px 22px">${c}</span>`, PV(ML+[0,210,470][i],ML), PV(170,150+i*72), {in:[46.6,48.3,49.3][i], out:51.0, fx:'pop', rot:-6}));
+  hl('They leave having built something.', V?ML:0, PV(150,150), PV(92,96), PV(1920,950), 51.25, 53.8, {style:V?'':'text-align:center'});
+}
+// ===== S7 FINAL 54- =====
+const S7=[]; { const k=7;
+  const defs=V?[[P.ball(C.yellow,.4),2.3,2.4,-1],[P.ring(C.mint,.42,.15),-2.1,1.8,-1,1,1,.3],[P.cone(C.orange,.35,.7),-2.0,-.5,.5,1,0,0,.4],[P.star(C.white,.3,.1),2.2,-.4,1.2,1,.3,.3]]
+              :[[P.ball(C.yellow,.4),9.4,2.8,-1],[P.ring(C.mint,.42,.15),5.8,3.3,-1,1,1,.3],[P.cone(C.orange,.35,.7),9.8,-.5,.5,1,0,0,.4],[P.star(C.white,.3,.1),6.0,-.4,1.5,1,.3,.3]];
+  defs.forEach((d,i)=>S7.push(put(k,d[0],d[1],d[2],d[3],d[4]??1,d[5]??0,d[6]??0,d[7]??0)));
+  mono(V?'A two-day, hands-on AI workshop<br>for universities and business schools':'A two-day, hands-on AI workshop for universities and business schools', ML, PV(170,150), 54.3, 1e9, 'color:var(--yellow);line-height:1.6');
+  hl('SHIPPING AI', ML, PV(210,240), PV(176,150), PV(1300,950), 54.45, 1e9, {style:'color:#fff;letter-spacing:-.045em', st:.04});
+  hl('THAT WORKS', ML, PV(386,390), PV(176,150), PV(1300,950), 54.75, 1e9, {style:'color:#fff;letter-spacing:-.045em', st:.04});
+  hl('The next generation should know how to build it.', ML, PV(610,1290), PV(40,46), PV(1200,950), 57.25, 1e9, {style:'color:#fff;font-weight:700;letter-spacing:-.02em', st:.03});
+  S7.cta=add(`<span class="cta" style="${V?'font-size:31px;padding:22px 30px':''}">BRING PRACTICAL AI TO YOUR UNIVERSITY <span>→</span></span>`, ML, PV(720,1430), {in:55.6, fx:'pop', rot:-4});
+  mono('Led by Otman Kettani', ML, PV(880,1590), 56.0, 1e9, 'color:#fff');
+  add(`<span class="mono" style="font-size:12px;color:rgba(255,255,255,.65)">Independent workshop · not affiliated with or endorsed by Uber</span>`, ML, PV(990,1830), {in:56.3, fx:'fade'});
+}
+
+// ---------- per-frame animation ----------
+const CAM=[ // camera per scene (h / v): [px,py,pz,tx,ty,tz,fov]
+ ()=>V?[0,1.6,15,0,.9,0,34]:[2.0,1.4,13.5,2.0,.55,0,30],
+ ()=>V?[0,4.0,16,0,1.9,0,34]:[1.2,3.2,14,1.6,.9,0,30],
+ ()=>V?[0,8.5,14,0,3.4,-6,38]:[5.0,6.5,15,5.4,0,-2,30],
+ ()=>V?[0,1.2,15,0,1.0,0,34]:[0,1.2,14,0,.6,0,30],
+ ()=>V?[0,3.0,16,0,.6,0,34]:[4.4,1.8,13,4.4,.6,0,30],
+ ()=>V?[0,1.8,14,0,1.0,0,34]:[3.4,1.6,13,3.4,.6,0,30],
+ ()=>V?[0,7,13.5,0,.9,-2.6,40]:[0,3.0,15.5,0,.9,0,30],
+ ()=>V?[0,1.6,14,0,.4,0,34]:[4.5,1.2,13,4.5,.5,0,30],
+];
+const dummy=new THREE.Object3D();
+function frame(t){
+  const k=sceneAt(t), t0=SC[k][0], lt=t-t0;
+  groups.forEach((g,i)=>g.visible=i===k);
+  scene.background.set(SC[k][1]);
+  const [px,py,pz,tx,ty,tz,fov]=CAM[k](); const drift=Math.min(lt,12)*.06;
+  cam.fov=fov; cam.aspect=W/H; cam.updateProjectionMatrix(); cam.position.set(px+drift*.3,py,pz-drift); cam.lookAt(tx,ty,tz);
+  hero.visible=true; let hp={bob:.06}, hpos=[0,0,0], hs=1, hry=0;
+  if(k===0){ S0.forEach(({o,t0,ph})=>{ const h=o.userData.home; const p=el2(seg(t,t0,t0+.9)); o.position.set(h.x+(1-p)*(h.x>2?6:-6)*.6, h.y+(1-p)*5+Math.sin(t*1.6+ph)*.08, h.z); o.scale.setScalar(h.s*Math.max(.001,p)); o.rotation.y=h.ry+t*.3*(ph%2?1:-1); });
+    const pop=bo(seg(t,1.0,1.5)); hs=PV(1.55,1.7)*Math.max(.001,pop); hpos=PV([3.0,.25,0],[0,.1,0]); hry=PV(-.25,0);
+    hp={bob:.06,look:t<5.5?[-.5+.5*Math.sin(t),.2]:[.6,.1],blink:((t%3.2)<.1)?1:0,happy:t>5.6,reach:t>5.6?1:.3,squash:.12*Math.sin(Math.PI*seg(t,1.0,1.4))}; }
+  if(k===1){ S1b.forEach((b,i)=>{ const h=b.userData.home; const p=el2(seg(t,8.5+i*.5,9.3+i*.5)); b.position.y=h.y+(1-p)*6; b.visible=p>0; });
+    const hops=[[10.9,0],[11.9,1],[12.9,2],[13.9,3]]; const blocks=S1b.map(b=>b.userData.home); let pos=[blocks[0].x-PV(1.6,1.3),-.25,PV(0,0)];
+    hops.forEach(([ht,i])=>{ if(t>=ht){ const p=seg(t,ht,ht+.45); const from= i===0? [blocks[0].x-PV(1.6,1.3),-.25,0] : [blocks[i-1].x,blocks[i-1].y+.95,blocks[i-1].z]; const to=[blocks[i].x,blocks[i].y+.95,blocks[i].z];
+      pos=[lerp(from[0],to[0],p),lerp(from[1],to[1],p)+Math.sin(Math.PI*p)*1.1,lerp(from[2],to[2],p)]; } });
+    if(t>=14.4){ const p=eio(seg(t,14.4,15.0)); const last=[blocks[3].x,blocks[3].y+.95,blocks[3].z]; const end=PV([5.4,2.1,.2],[1.6,3.0,-.8]); pos=[lerp(last[0],end[0],p),lerp(last[1],end[1],p)+Math.sin(Math.PI*p)*.8,lerp(last[2],end[2],p)]; }
+    hpos=pos; hs=PV(1.05,1.0)*bo(seg(t,10.4,10.8)); hry=-.35; hp={bob:.03,happy:t>16.75,wave:t>16.75?1:0,reach:t>15.0&&t<16.75?1:0,look:t>15?[1,.2]:[.4,.4],squash:.1*Math.sin(Math.PI*clamp(((t-10.9)%1)/.45))};
+    S1b.tiles.forEach((o,i)=>{ const h=o.userData.home; const p=el2(seg(t,14.6+i*.25,15.3+i*.25)); o.position.x=h.x+(1-p)*4; o.scale.setScalar(h.s*Math.max(.001,p)); o.position.y=h.y+(t>16.75?.08*Math.sin(t*6+i):0); }); }
+  if(k===2){ const m=S2.inst; const cls=eio(seg(t,26.6,27.8));
+    for(let i=0;i<N;i++){ const [ax,az]=S2.A[i], [bx,bz]=S2.B[i]; const q=i%NX, j=Math.floor(i/NX); const wv=Math.sin(q*.5+j*.35-t*2.4);
+      const lit=(1-cls)*Math.max(0,Math.sin(q*.35-t*3.0+j*.2))**8;
+      dummy.position.set(lerp(ax,bx,cls),-.65+.12*wv*(1-cls)+.25*lit, lerp(az,bz,cls)); dummy.rotation.set(0,.2*wv*(1-cls)+lerp(0,PV(0,0),cls),0); dummy.scale.setScalar(1+.15*lit); dummy.updateMatrix(); m.setMatrixAt(i,dummy.matrix); }
+    m.instanceMatrix.needsUpdate=true; const b=S2.board; b.position.y=b.userData.y0+(1-eo(seg(t,26.8,27.6)))*-6; b.visible=t>26.8;
+    hpos=t<26.6?PV([7.6,.35,3.2],[.8,1.3,1.2]):[lerp(PV(7.6,1.6),PV(9.6,1.8),eio(seg(t,26.6,27.6))),.35+Math.sin(Math.PI*seg(t,26.6,27.6))*1.2,lerp(3.2,PV(-12,-14),eio(seg(t,26.6,27.6)))];
+    hs=1.2*bo(seg(t,19.9,20.4)); hry=t<26.6?-.3:Math.PI*0+.2; hp={bob:.04,happy:true,look:[-.5,.2]}; }
+  if(k===3){ S3.forEach((o,i)=>{ const h=o.userData.home; const p=eo(seg(t,31.0,31.7)); const dir=new THREE.Vector3(h.x,h.y-1,h.z+1).normalize();
+      o.position.set(h.x*(.2+.8*p)+Math.sin(t*2+i)*.05,h.y*(.2+.8*p)+Math.cos(t*2+i)*.05,h.z); o.scale.setScalar(h.s*Math.max(.001,bo(seg(t,31.0,31.45)))); o.rotation.y=h.ry+t*.8; });
+    hpos=PV([0,-.95+Math.max(0,Math.sin(Math.PI*seg(t,31.5,32.1)))*1.4,3.6],[.0,-.6+Math.max(0,Math.sin(Math.PI*seg(t,31.5,32.1)))*1.2,2.5]); hs=PV(.55,.85)*bo(seg(t,30.9,31.3)); hry=-.3; hp={bob:.02,happy:true,wave:1,squash:t>32.1&&t<32.3?.15:0}; }
+  if(k===4){ hpos=PV([7.0,.3,0],[0,2.3,0]); hs=1.3*bo(seg(t,33.7,34.1)); hry=PV(-.5,0);
+    const reach=(t>38.4&&t<39.2)||(t>39.3&&t<40.0)||(t>41.0&&t<41.6); hp={bob:.05,reach:reach?1:0,look:t<38.4?[-1,-.1]:(t<39.3?[1,-.4]:[1,.4]),happy:t>41.6,starSpin:t>37.4&&t<41.6?t*6:0};
+    S4.tiles.forEach((o,i)=>{ const h=o.userData.home; const p=el2(seg(t,34.0+i*.2,34.8+i*.2)); o.scale.setScalar(h.s*Math.max(.001,p)); const act=(i===0&&t>38.4&&t<39.3)||(i===1&&t>39.3&&t<40.3)||(i===2&&t>41.0&&t<41.8); o.position.y=h.y+(act?.25:0)+.05*Math.sin(t*2+i); o.rotation.z=act?.06*Math.sin(t*20):0; });
+    const c=S4.cup, ch=c.userData.home; c.position.y=ch.y+(t>38.4&&t<39.3?.4*Math.sin(Math.PI*seg(t,38.4,39.2)):0)+.06*Math.sin(t*2.2); c.rotation.y=t*.5;
+    const bx=S4.box, bh=bx.userData.home; bx.rotation.z=(t>38.4&&t<38.9)?.08*Math.sin(t*40):0;
+    const cb=document.getElementById('cbtn'); if(cb){ const pr=seg(t,40.9,41.0)-seg(t,41.0,41.15); cb.style.transform=`scale(${1-.1*pr})`; }
+    S4.rib.forEach((r,i)=>{ const act=[37.4,38.4,39.3,41.0,99][i]; const on=t>=act; r.firstChild.style.background=on?(i===3?'#13865f':'var(--blue)'):'#fff'; r.firstChild.style.color=on?'#fff':'var(--navy)'; });
+    [...S4.typing.firstChild.children].forEach((d,i)=>d.style.transform=`translateY(${-5*Math.max(0,Math.sin(t*9-i*.9))}px)`); S4.typing.style.display=t<40.0?'':'none'; }
+  if(k===5){ const g=S5.gate.userData.home; S5.gate.position.y=(1-bo(seg(t,42.4,42.9)))*-4;
+    const walk=eio(seg(t,42.5,43.4)); const stopX=PV(1.0,-.6); hpos=[lerp(PV(-1.5,-2.5),stopX,walk)-(t>43.4&&t<43.7?.15*Math.sin(Math.PI*seg(t,43.4,43.7)):0),0,PV(1.0,.8)]; hs=1.15; hry=PV(.25,.2);
+    hp={bob:.03,look:t<43.5?[1,.2]:(t<44.3?[0,-.6]:[1,.2]),tilt:t>43.4&&t<43.8?-.12:.05,reach:t>44.0?1:0,happy:t>44.6};
+    const tk=S5.ticket; const tp=eio(seg(t,44.0,44.7)); tk.position.set(lerp(hpos[0]-.5,PV(5.5,1.4),tp),lerp(-.1,PV(1.6,2.6),tp)+Math.sin(Math.PI*tp)*.8,lerp(hpos[2]+.8,PV(.5,-.5),tp)); tk.rotation.set(0,.3+tp*2,.2); tk.visible=t>43.8; tk.scale.setScalar(t>44.7?Math.max(.001,1-seg(t,44.7,44.9)):1); }
+  if(k===6){ S6.items.forEach((g,i)=>{ const h=g.userData.home; const p=el2(seg(t,46.5+i*.5,47.3+i*.5)); g.position.y=h.y+(1-p)*-3.5; g.visible=p>0; g.rotation.y=Math.sin(t*.8+i)*.08; });
+    if(S6.mini){ poseAgent(S6.mini,{bob:.04,happy:true,wave:t>51.25?1:0,lift:t>51.25?.4*Math.max(0,Math.sin(Math.PI*((t-51.25)%.5)/.5)):0},t); }
+    const v3=new THREE.Vector3(); cam.updateMatrixWorld(); S6.items.forEach((g,i)=>{ v3.set(g.position.x,g.position.y+(V?-.05:-.35),g.position.z+.9).project(cam); const lx=(v3.x*.5+.5)*W, ly=(-v3.y*.5+.5)*H; S6.labs[i].style.left=(lx-PV(110,115))+'px'; S6.labs[i].style.top=(ly+PV(30,14))+'px'; });
+    hero.visible=false; }
+  if(k===7){ S7.forEach((o,i)=>{ const h=o.userData.home; const p=bo(seg(t,54.2+i*.15,54.7+i*.15)); o.scale.setScalar(h.s*Math.max(.001,p)); o.position.y=h.y+Math.sin(t*1.8+i)*.12; o.rotation.y=t*.6; });
+    hpos=PV([7.4,.2,0],[.6,-.1,0]); hs=1.5*bo(seg(t,54.4,54.9)); hry=PV(-.35,0); hp={bob:.06,happy:true,wave:1,look:[-.6,.2]};
+    }
+  hero.position.set(...hpos); hero.scale.setScalar(Math.max(.001,hs)); hero.rotation.y=hry; poseAgent(hero,hp,t);
+  for(const o of els) applyEl(o,t); for(const h of hls) applyHl(h,t);
+  if(k===7){ const pr=seg(t,58.75,58.85)-seg(t,58.85,59.05); S7.cta.style.transform += ` translateY(${8*pr}px)`; }
+  // wipes
+  const wp=document.getElementById('wp'); let shown=false;
+  for(let i=1;i<SC.length;i++){ const b=SC[i][0]; if(t>=b-.22 && t<b+.22){ const p=t<b? eio(seg(t,b-.22,b)) : 1+eio(seg(t,b,b+.22)); const d=W*.35;
+      const xL = p<=1 ? -d : -d+(W+2*d)*(p-1), xR = p<=1 ? -d+(W+2*d)*p : W+d;
+      wp.setAttribute('points',`${xL+d},0 ${xR+d},0 ${xR-d},${H} ${xL-d},${H}`); wp.setAttribute('fill',SC[i][2]); shown=true; } }
+  wp.style.display=shown?'':'none';
+  r.render(scene,cam);
+}
+window.render=frame; frame(0); window.done=true;
+</script></body>
