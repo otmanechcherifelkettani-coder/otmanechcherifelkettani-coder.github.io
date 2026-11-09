@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "JBM"; src: url("fonts/package/files/jetbrains-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+:root { --paper: #f7f5f0; --ink: #10211b; --forest: #0f6b46; --mint: #7fcfa6; --muted: #5d625c; --rule: #d9d4c7; --risk: #a33a22; --card: #ffffff; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--paper); }
+#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--paper); color: var(--ink);
+  font-family: "Inter", sans-serif; -webkit-font-smoothing: antialiased; }
+.abs { position: absolute; }
+.slide { position: absolute; inset: 0; }
+.mono { font-family: "JBM", monospace; font-weight: 500; text-transform: uppercase; letter-spacing: .14em; }
+.h { font-family: "Inter Display", "Inter", sans-serif; font-weight: 700; letter-spacing: -0.025em; line-height: 1.08; }
+.label { position: absolute; left: 120px; top: 150px; font-family: "JBM", monospace; font-size: 22px; letter-spacing: .14em; text-transform: uppercase; color: var(--forest); }
+.label b { font-weight: 500; color: var(--muted); }
+.body { font-size: 32px; line-height: 1.45; color: var(--muted); }
+.rule { height: 2px; background: var(--rule); transform-origin: left; }
+
+/* chrome */
+#ink { position: absolute; inset: 0; background: var(--ink); opacity: 0; }
+#hdr { position: absolute; left: 120px; right: 120px; top: 64px; display: flex; justify-content: space-between; font-size: 18px; color: var(--muted); }
+#ftr { position: absolute; left: 120px; right: 120px; top: 990px; display: flex; justify-content: space-between; font-size: 16px; color: #9a9a90; }
+#ftr span { position: relative; padding-top: 16px; }
+#ftr span i { position: absolute; left: 0; top: 0; height: 3px; background: var(--forest); width: 100%; transform-origin: left; transform: scaleX(0); }
+#ftr span.on { color: var(--ink); }
+#prog { position: absolute; left: 120px; right: 120px; top: 988px; height: 1px; background: var(--rule); }
+
+/* context table */
+.trow { position: absolute; left: 1020px; width: 780px; height: 132px; border-top: 1px solid var(--rule); padding-top: 26px; padding-left: 28px; }
+.trow .v { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; }
+.trow .d { font-size: 28px; color: var(--muted); margin-top: 6px; }
+.trow .m { position: absolute; left: 0; top: 26px; width: 4px; height: 82px; background: var(--forest); transform-origin: top; }
+
+/* stake cards */
+.card { position: absolute; top: 400px; width: 810px; height: 420px; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 44px 48px; }
+.card .t { font-family: "JBM", monospace; font-size: 22px; letter-spacing: .14em; text-transform: uppercase; }
+.card .it { font-size: 40px; line-height: 1.3; margin-top: 36px; padding-left: 34px; position: relative; }
+.card .it::before { content: ""; position: absolute; left: 0; top: 22px; width: 16px; height: 2px; background: currentColor; }
+.card .top { position: absolute; left: 0; right: 0; top: 0; height: 5px; border-radius: 6px 6px 0 0; }
+
+/* modules */
+.mod { position: absolute; width: 540px; height: 228px; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 30px 34px; }
+.mod .n { font-family: "JBM", monospace; font-size: 20px; color: var(--forest); letter-spacing: .1em; }
+.mod .t { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; margin-top: 14px; line-height: 1.15; }
+.mod .d { font-size: 24px; color: var(--muted); margin-top: 10px; line-height: 1.35; }
+.mod .top { position: absolute; left: -1px; right: -1px; top: -1px; height: 4px; background: var(--forest); transform-origin: left; border-radius: 6px 6px 0 0; }
+
+/* grid sheet */
+#sheet { left: 120px; top: 470px; width: 1680px; height: 400px; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; display: flex; }
+.col { flex: 1; border-right: 1px solid var(--rule); }
+.col:last-child { border-right: 0; }
+.col .hd { background: var(--ink); color: #fff; font-size: 34px; font-weight: 700; padding: 28px 30px; letter-spacing: -0.01em; }
+.col .q { font-size: 30px; line-height: 1.35; padding: 30px; color: var(--ink); }
+.col .ck { margin: 6px 30px; height: 46px; border: 1px solid var(--rule); border-radius: 4px; font-family: "JBM", monospace; font-size: 18px; color: var(--muted); display: flex; align-items: center; padding-left: 16px; letter-spacing: .08em; }
+
+/* trainer */
+#ph { left: 160px; top: 290px; width: 320px; height: 320px; border-radius: 50%; overflow: hidden; background: #e9e5dc; border: 1px solid var(--rule); }
+#ph img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.06); }
+.stat { display: inline-block; padding-right: 48px; margin-right: 48px; border-right: 1px solid var(--rule); }
+.stat:last-child { border-right: 0; }
+.stat .n { font-family: "Inter Display", "Inter", sans-serif; font-weight: 700; font-size: 84px; letter-spacing: -0.03em; color: var(--forest); line-height: 1; }
+.stat .u { font-size: 26px; color: var(--muted); margin-top: 8px; }
+
+/* formats */
+.fmt { position: absolute; top: 380px; width: 810px; height: 520px; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 44px 48px; }
+.fmt .k { font-family: "JBM", monospace; font-size: 22px; letter-spacing: .14em; text-transform: uppercase; color: var(--forest); }
+.fmt .t { font-size: 58px; font-weight: 700; letter-spacing: -0.025em; margin-top: 16px; }
+.fmt .it { font-size: 32px; line-height: 1.3; margin-top: 28px; padding-left: 34px; position: relative; color: #2a332e; }
+.fmt .it::before { content: ""; position: absolute; left: 0; top: 20px; width: 16px; height: 2px; background: var(--forest); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="ink"></div>
+  <div id="hdr" class="mono"><span id="hdrL">Shipping AI That Works · Édition back-office</span><span id="hdrR">Proposition · CFG Bank</span></div>
+  <div id="prog"></div>
+  <div id="ftr" class="mono"></div>
+
+  <!-- T0 title -->
+  <div class="slide" id="t0">
+    <div class="abs mono" id="t0a" style="left:120px; top:330px; font-size:24px; color:var(--forest);">Proposition de formation · Équipes back-office · CFG Bank</div>
+    <div class="abs h" id="t0b" style="left:120px; top:390px; font-size:150px;">Shipping AI That Works</div>
+    <div class="abs" id="t0c" style="left:120px; top:580px; font-size:48px; color:var(--muted); font-weight:500;">Des agents IA utiles, et sous contrôle.</div>
+    <div class="abs rule" id="t0d" style="left:120px; top:700px; width:1680px;"></div>
+    <div class="abs" id="t0e" style="left:120px; top:730px; font-size:28px; color:var(--muted);">Conférence &amp; atelier pratique · animés par Otman Kettani</div>
+  </div>
+
+  <!-- S1 context -->
+  <div class="slide" id="s1">
+    <div class="label" id="s1l">01 — Contexte</div>
+    <div class="abs h" id="s1h" style="left:120px; top:210px; width:800px; font-size:76px;">Les agents IA entrent dans les opérations bancaires.</div>
+    <div class="abs body" id="s1b" style="left:120px; top:560px; width:760px;">Ils ne se contentent plus de répondre : ils agissent, directement dans les processus.</div>
+    <div id="rows1"></div>
+  </div>
+
+  <!-- S2 stakes -->
+  <div class="slide" id="s2">
+    <div class="label" id="s2l">02 — Enjeu</div>
+    <div class="abs h" id="s2h" style="left:120px; top:210px; width:1680px; font-size:68px;">Un gain réel, à condition de maîtriser le risque.</div>
+    <div class="card" id="cA" style="left:120px; color:var(--ink);"><div class="top" style="background:var(--forest)"></div><div class="t" style="color:var(--forest)">Opportunité</div>
+      <div class="it" id="a0">Moins de tâches répétitives</div><div class="it" id="a1">Des délais plus courts</div><div class="it" id="a2">Des équipes concentrées sur les cas complexes</div></div>
+    <div class="card" id="cB" style="left:990px; color:var(--ink);"><div class="top" style="background:var(--risk)"></div><div class="t" style="color:var(--risk)">Risque, si l’agent est mal conçu</div>
+      <div class="it" id="b0">Un virement traité deux fois</div><div class="it" id="b1">Un dossier KYC validé à tort</div><div class="it" id="b2">Une donnée personnelle exposée</div></div>
+  </div>
+
+  <!-- S3 the real question (ink) -->
+  <div class="slide" id="s3" style="color:#fff;">
+    <div class="label" id="s3l" style="color:var(--mint);">03 — La vraie question</div>
+    <div class="abs" id="s3a" style="left:120px; top:250px; width:1500px; font-size:44px; color:rgba(255,255,255,.62); font-weight:500; line-height:1.3;">La question n’est pas de savoir s’il faut utiliser des agents.</div>
+    <div class="abs h" id="s3b" style="left:120px; top:400px; width:1640px; font-size:100px;">C’est de savoir les <u id="u0">concevoir</u>, les <u id="u1">évaluer</u>, et <u id="u2">décider</u> quand ils sont prêts.</div>
+  </div>
+
+  <!-- S4 solution + modules -->
+  <div class="slide" id="s4">
+    <div class="label" id="s4l">04 — La solution</div>
+    <div class="abs h" id="s4h" style="left:120px; top:210px; font-size:68px;">Shipping AI That Works · édition back-office</div>
+    <div class="abs" id="s4s" style="left:120px; top:310px; font-size:34px; color:var(--forest); font-weight:600;">Une méthode en six modules</div>
+    <div id="mods"></div>
+  </div>
+
+  <!-- S5 deliverable -->
+  <div class="slide" id="s5">
+    <div class="label" id="s5l">05 — Livrable</div>
+    <div class="abs h" id="s5h" style="left:120px; top:210px; width:1600px; font-size:64px;">Une grille d’une page pour décider si un agent est prêt pour la production.</div>
+    <div class="abs" id="sheet"></div>
+  </div>
+
+  <!-- S6 trainer -->
+  <div class="slide" id="s6">
+    <div class="label" id="ivl">06 — L’intervenant</div>
+    <div class="abs" id="ph"><img src="headshot.png"></div>
+    <div class="abs" id="ivn" style="left:600px; top:250px;"><div class="h" style="font-size:84px;">Otman Kettani</div>
+      <div style="font-size:34px; color:var(--forest); font-weight:600; margin-top:10px;">Global Product &amp; Operations Lead, Uber Eats</div></div>
+    <div class="abs" id="ivs" style="left:600px; top:470px; display:flex;">
+      <div class="stat" id="iv0"><div class="n">50+</div><div class="u">agents IA lancés</div></div>
+      <div class="stat" id="iv1"><div class="n">M€</div><div class="u" style="max-width:300px">plusieurs millions d’euros économisés</div></div>
+      <div class="stat" id="iv2"><div class="n">51</div><div class="u">pays</div></div>
+      <div class="stat" id="iv3"><div class="n">11</div><div class="u">langues</div></div></div>
+    <div class="abs body" id="ivb" style="left:600px; top:700px; width:1180px; color:#2a332e;">Service client, marketing et autres fonctions, pour des multinationales.</div>
+    <div class="abs mono" id="ive" style="left:600px; top:800px; font-size:20px; color:var(--muted);">Ingénieur · École Centrale Paris · UPM Madrid</div>
+    <div class="abs" id="ivd" style="left:600px; top:850px; font-size:20px; color:#9a9a90;">Intervention à titre personnel, indépendante d’Uber.</div>
+  </div>
+
+  <!-- S7 formats -->
+  <div class="slide" id="s7">
+    <div class="label" id="s7l">07 — Formats</div>
+    <div class="abs h" id="s7h" style="left:120px; top:210px; font-size:68px;">Deux formats, selon vos objectifs.</div>
+    <div class="fmt" id="fA" style="left:120px;"><div class="k">Conférence · 90 min</div><div class="t">Sensibiliser</div>
+      <div class="it">Quand un agent IA se justifie, et quand une règle suffit</div><div class="it">Démonstration en direct : un agent qui réussit, puis qui se trompe</div><div class="it">La grille de décision remise à chaque participant</div></div>
+    <div class="fmt" id="fB" style="left:990px;"><div class="k">Atelier pratique</div><div class="t">Construire et tester</div>
+      <div class="it">En équipes, sur un cas proche de vos opérations</div><div class="it">Tests sur des cas inconnus, seuil fixé à l’avance</div><div class="it">Une décision argumentée : lancer ou non</div></div>
+    <div class="abs" id="s7f" style="left:120px; top:925px; font-size:24px; color:var(--muted);">En français ou en anglais · exemples possibles en darija</div>
+  </div>
+
+  <!-- S8 next step (ink) -->
+  <div class="slide" id="s8" style="color:#fff;">
+    <div class="label" id="s8l" style="color:var(--mint);">08 — Prochaine étape</div>
+    <div class="abs h" id="s8h" style="left:120px; top:240px; width:1600px; font-size:96px;">Un échange de 20 minutes pour définir le format adapté à vos équipes.</div>
+    <div class="abs rule" id="s8r" style="left:120px; top:640px; width:1680px; background:rgba(255,255,255,.2);"></div>
+    <div class="abs" id="s8c" style="left:120px; top:690px; display:flex; gap:120px;">
+      <div><div class="mono" style="font-size:20px; color:var(--mint);">Contact</div><div style="font-size:44px; font-weight:700; margin-top:14px;">Otman Kettani</div></div>
+      <div><div class="mono" style="font-size:20px; color:var(--mint);">LinkedIn</div><div style="font-size:36px; margin-top:20px;">linkedin.com/in/otmaneekettani</div></div>
+      <div><div class="mono" style="font-size:20px; color:var(--mint);">E-mail</div><div style="font-size:36px; margin-top:20px;">otmankettani5@gmail.com</div></div>
+    </div>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const cl = x => Math.max(0, Math.min(1, x));
+const eo = x => 1 - Math.pow(1 - cl(x), 3);
+const eio = x => { x = cl(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3) / 2; };
+const p = (t, a, d) => cl((t - a) / d);
+function show(el, on) { el.style.display = on ? '' : 'none'; }
+// one restrained entrance for everything: fade + 16px rise
+function fin(el, t, a, d = .55, dy = 16) { const i = eo(p(t, a, d)); el.style.opacity = i; el.style.transform = `translateY(${(1 - i) * dy}px)`; }
+function slideAlpha(el, t, a, b) { el.style.opacity = cl(p(t, a, .35)) * (1 - eio(p(t, b - .35, .35))); }
+
+// sections: [label, start, end]
+const SEC = [['Contexte', 4.0, 13.4], ['Enjeu', 13.4, 32.6], ['La question', 32.6, 41.3], ['Solution', 41.3, 59.8], ['Livrable', 59.8, 66.4], ['Intervenant', 66.4, 75.0], ['Formats', 75.0, 84.4], ['Prochaine étape', 84.4, 93.0]];
+$('ftr').innerHTML = SEC.map((s, i) => `<span id="fs${i}">0${i + 1} ${s[0]}<i id="fi${i}"></i></span>`).join('');
+
+const ctx = [['Vérifier', 'les dossiers KYC et les pièces d’identité', 9.52], ['Rapprocher', 'les relevés et les écritures', 10.50], ['Saisir', 'les ordres et les virements', 11.34], ['Transmettre', 'les réclamations au bon service', 12.0]];
+$('rows1').innerHTML = ctx.map((r, i) => `<div class="trow" id="r${i}" style="top:${300 + i * 150}px"><div class="m" id="rm${i}"></div><div class="v">${r[0]}</div><div class="d">${r[1]}</div></div>`).join('');
+
+const mods = [['Identifier les bons cas d’usage', 'Agent IA ou simple règle : partir du besoin.', 47.8], ['Comprendre comment un agent décide', 'Une demande, un outil, une action.', 49.98],
+  ['Concevoir le système', 'Pas seulement le prompt : outils, données, contrôles.', 52.2], ['Évaluer sur des cas réels', 'Juger ses actions, pas seulement ses réponses.', 54.87],
+  ['Maîtriser les risques', 'Paiements, données personnelles (loi 09-08), validation humaine.', 56.57], ['Déployer par étapes', 'Test en parallèle, pilote, puis généralisation.', 57.81]];
+$('mods').innerHTML = mods.map((m, i) => `<div class="mod" id="m${i}" style="left:${120 + (i % 3) * 570}px; top:${420 + Math.floor(i / 3) * 258}px"><div class="top" id="mt${i}"></div><div class="n">MODULE 0${i + 1}</div><div class="t">${m[0]}</div><div class="d">${m[1]}</div></div>`).join('');
+
+const crit = [['Valeur', 'Résout-il un vrai problème ?'], ['Fiabilité', 'Donne-t-il le bon résultat à chaque fois ?'], ['Sécurité', 'Que se passe-t-il quand il se trompe ?'], ['Évaluation', 'Peut-on prouver qu’il fonctionne ?'], ['Opérations', 'Peut-on le surveiller et le maintenir ?']];
+$('sheet').innerHTML = crit.map((c, i) => `<div class="col" id="c${i}"><div class="hd">${c[0]}</div><div class="q">${c[1]}</div><div class="ck">☐ OUI&nbsp;&nbsp;&nbsp;☐ NON</div></div>`).join('');
+
+window.render = function (t) {
+  // chrome: header + footer tracker
+  const inkOn = (t >= 32.4 && t < 41.3) || t >= 84.2;
+  const ink = t < 41.3 ? eio(p(t, 32.3, .45)) * (1 - eio(p(t, 40.95, .45))) : eio(p(t, 84.05, .45));
+  $('ink').style.opacity = ink;
+  const chromeCol = ink > .5 ? 'rgba(255,255,255,.55)' : 'var(--muted)';
+  $('hdr').style.color = chromeCol; $('hdr').style.opacity = cl(p(t, .3, .6));
+  $('ftr').style.opacity = cl(p(t, 3.6, .6)); $('prog').style.opacity = cl(p(t, 3.6, .6));
+  $('prog').style.background = ink > .5 ? 'rgba(255,255,255,.18)' : 'var(--rule)';
+  SEC.forEach((s, i) => {
+    const on = t >= s[1] && t < s[2];
+    const sp = $('fs' + i); sp.classList.toggle('on', on);
+    sp.style.color = on ? (ink > .5 ? '#fff' : 'var(--ink)') : (ink > .5 ? 'rgba(255,255,255,.35)' : '#9a9a90');
+    $('fi' + i).style.transform = `scaleX(${t >= s[2] ? 1 : on ? eio(p(t, s[1], s[2] - s[1])) : 0})`;
+    $('fi' + i).style.background = ink > .5 ? 'var(--mint)' : 'var(--forest)';
+  });
+
+  // T0 title (0 – 4.0)
+  const t0 = t < 4.0; show($('t0'), t0);
+  if (t0) { slideAlpha($('t0'), t, -1, 4.0); fin($('t0a'), t, .3); fin($('t0b'), t, .5, .7, 24); fin($('t0c'), t, 1.0); $('t0d').style.transform = `scaleX(${eio(p(t, 1.3, .9))})`; fin($('t0e'), t, 1.7); }
+
+  // S1 context (4.0 – 13.4)
+  const s1 = t >= 4.0 && t < 13.4; show($('s1'), s1);
+  if (s1) {
+    slideAlpha($('s1'), t, 4.0, 13.4);
+    fin($('s1l'), t, 4.1); fin($('s1h'), t, 4.4, .7, 20); fin($('s1b'), t, 7.5);
+    ctx.forEach((r, i) => { fin($('r' + i), t, r[2] - .15, .5, 12); const next = i < 3 ? ctx[i + 1][2] : 99;
+      $('rm' + i).style.transform = `scaleY(${eo(p(t, r[2], .35)) * (1 - eio(p(t, next, .3)))})`; });
+  }
+
+  // S2 stakes (13.4 – 32.6)
+  const s2 = t >= 13.4 && t < 32.6; show($('s2'), s2);
+  if (s2) {
+    slideAlpha($('s2'), t, 13.4, 32.6);
+    fin($('s2l'), t, 13.5); fin($('s2h'), t, 13.8, .7, 20);
+    fin($('cA'), t, 15.1); [16.47, 18.10, 19.31].forEach((a, i) => fin($('a' + i), t, a - .1, .5, 10));
+    fin($('cB'), t, 22.2); [25.96, 27.62, 30.0].forEach((a, i) => fin($('b' + i), t, a - .1, .5, 10));
+    $('cA').style.opacity = Math.min(+$('cA').style.opacity, 1 - .45 * eio(p(t, 22.2, .5)));
+  }
+
+  // S3 question (32.6 – 41.3), ink
+  const s3 = t >= 32.6 && t < 41.3; show($('s3'), s3);
+  if (s3) {
+    slideAlpha($('s3'), t, 32.7, 41.3);
+    fin($('s3l'), t, 32.9); fin($('s3a'), t, 33.0, .7); fin($('s3b'), t, 36.2, .8, 20);
+    [36.36, 38.18, 39.07].forEach((a, i) => {
+      const u = $('u' + i); u.style.textDecoration = 'none';
+      u.style.backgroundImage = 'linear-gradient(var(--mint), var(--mint))'; u.style.backgroundRepeat = 'no-repeat';
+      u.style.backgroundPosition = '0 96%'; u.style.backgroundSize = `${eio(p(t, a + .15, .45)) * 100}% 6px`;
+    });
+  }
+
+  // S4 solution + modules (41.3 – 59.8)
+  const s4 = t >= 41.3 && t < 59.8; show($('s4'), s4);
+  if (s4) {
+    slideAlpha($('s4'), t, 41.3, 59.8);
+    fin($('s4l'), t, 41.5); fin($('s4h'), t, 41.9, .7, 20); fin($('s4s'), t, 45.4);
+    mods.forEach((m, i) => { fin($('m' + i), t, m[2] - .15, .5, 12); const next = i < 5 ? mods[i + 1][2] : 99;
+      $('mt' + i).style.transform = `scaleX(${eio(p(t, m[2], .4))})`; $('mt' + i).style.opacity = 1 - .7 * eio(p(t, next, .3)); });
+  }
+
+  // S5 deliverable (59.8 – 66.4)
+  const s5 = t >= 59.8 && t < 66.4; show($('s5'), s5);
+  if (s5) {
+    slideAlpha($('s5'), t, 59.8, 66.4);
+    fin($('s5l'), t, 59.9); fin($('s5h'), t, 60.2, .7, 20); fin($('sheet'), t, 61.6, .6);
+    crit.forEach((_, i) => fin($('c' + i), t, 62.0 + i * .4, .5, 10));
+  }
+
+  const s6 = t >= 66.4 && t < 75.0; show($('s6'), s6);
+  if (s6) {
+    slideAlpha($('s6'), t, 66.4, 75.0);
+    const r = TO - 66.4;   // cues on the output timeline, from the voice
+    fin($('ivl'), r, .1); fin($('ph'), r, .3, .8, 0); fin($('ivn'), r, .5, .7, 20);
+    fin($('iv0'), r, 2.9); fin($('ivb'), r, 5.1); fin($('iv1'), r, 8.9); fin($('iv2'), r, 9.8); fin($('iv3'), r, 10.2);
+    fin($('ive'), r, 10.6); fin($('ivd'), r, 10.8);
+  }
+
+  // S7 formats (75.0 – 84.4)
+  const s7 = t >= 75.0 && t < 84.4; show($('s7'), s7);
+  if (s7) {
+    slideAlpha($('s7'), t, 75.0, 84.0);
+    fin($('s7l'), t, 75.1); fin($('s7h'), t, 75.4, .7, 20);
+    fin($('fA'), t, 77.0); $('fA').querySelectorAll('.it').forEach((e, i) => fin(e, t, 77.4 + i * .5, .5, 8));
+    fin($('fB'), t, 80.7); $('fB').querySelectorAll('.it').forEach((e, i) => fin(e, t, 81.1 + i * .5, .5, 8));
+    fin($('s7f'), t, 82.8);
+  }
+
+  // S8 next step (84.4 – 93.0), ink
+  const s8 = t >= 84.4; show($('s8'), s8);
+  if (s8) {
+    fin($('s8l'), t, 84.6); fin($('s8h'), t, 84.8, .8, 20);
+    $('s8r').style.transform = `scaleX(${eio(p(t, 87.4, .8))})`; fin($('s8c'), t, 87.6, .7);
+  }
+};
+// voice-over pacing: the trainer section runs 12.1s on the output timeline instead of 8.6s
+const IVB = 66.4, IVOL = 8.6, IVNL = 12.1, IVD = IVNL - IVOL; let TO = 0;
+const _render0 = window.render;
+window.render = to => { TO = to; _render0(to < IVB ? to : to < IVB + IVNL ? IVB + (to - IVB) * IVOL / IVNL : to - IVD); };
+window.render(0);
+</script>
+</body>
+</html>
