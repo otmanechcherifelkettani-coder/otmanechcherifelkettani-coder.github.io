@@ -1,0 +1,117 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Shipping AI That Works · v2 style</title>
+<style>
+@font-face{font-family:D;src:local("Inter Display Light"),local("InterDisplay-Light");font-weight:300}
+@font-face{font-family:D;src:local("Inter Display"),local("InterDisplay-Regular");font-weight:400}
+@font-face{font-family:D;src:local("Inter Display Medium"),local("InterDisplay-Medium");font-weight:500}
+@font-face{font-family:M;src:local("JetBrains Mono Medium"),local("JetBrainsMono-Medium");font-weight:500}
+:root{--ink:#0B1530;--blue:#2563FF;--blue2:#5B8CFF;--sky:#DCE8FF;--mute:#6B7896;--warm:#FFB86B}
+*{box-sizing:border-box;margin:0;padding:0}
+body{overflow:hidden;font-family:Inter,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#st{position:relative;overflow:hidden}
+.a{position:absolute}
+.bg-light{background:radial-gradient(1200px 700px at 70% 30%,#E9F1FF 0%,rgba(233,241,255,0) 60%),radial-gradient(900px 600px at 15% 85%,#E6EEFF 0%,rgba(230,238,255,0) 60%),linear-gradient(180deg,#F8FAFF,#EEF3FF)}
+.bg-deep{background:radial-gradient(900px 700px at 70% 20%,#3D7BFF 0%,rgba(61,123,255,0) 55%),radial-gradient(1200px 800px at 30% 110%,#1F49D8 0%,rgba(31,73,216,0) 60%),linear-gradient(180deg,#06103A,#0B1F6E)}
+.grain{position:absolute;inset:0;opacity:.11;mix-blend-mode:multiply;pointer-events:none}
+.blob{position:absolute;border-radius:50%;filter:blur(90px)}
+.h{font-family:D;font-weight:300;letter-spacing:-.045em;line-height:1.0}
+.h b{font-weight:400}
+.grad{background:linear-gradient(90deg,#2563FF,#6B9BFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mono{font-family:M;font-weight:500;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.glass{background:rgba(255,255,255,.72);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.9);border-radius:28px;box-shadow:0 40px 120px rgba(37,99,255,.18),0 2px 0 rgba(255,255,255,.8) inset}
+.glass-d{background:rgba(255,255,255,.08);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.18);border-radius:22px}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 14px;font-family:M;font-weight:500;font-size:13px;white-space:nowrap}
+.step{display:flex;align-items:center;gap:14px;height:66px;border-bottom:1px solid #EEF2FA}
+.step .n{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:M;font-size:12px;color:#fff;background:var(--blue);flex:none}
+.c{font-family:M;font-size:15px;color:var(--ink)} .r{font-family:M;font-size:12.5px;color:var(--mute);margin-top:3px}
+.msg{padding:14px 18px;border-radius:20px;font-size:19px;line-height:1.38;max-width:420px}
+.cursor{width:34px;height:34px}
+.orb{border-radius:50%;background:radial-gradient(circle at 35% 30%,#9CC0FF,#2563FF 55%,#1239B8);box-shadow:0 20px 60px rgba(37,99,255,.45),inset 0 -8px 20px rgba(0,0,0,.18)}
+</style></head><body><div id="st"></div>
+<script>
+const q=new URLSearchParams(location.search); const F=+q.get('f'); const V=q.has('v');
+const W=V?1080:1920,H=V?1920:1080; const st=document.getElementById('st'); st.style.width=W+'px'; st.style.height=H+'px';
+const P=(h,v)=>V?v:h; const add=h=>st.insertAdjacentHTML('beforeend',h);
+const grain=`<svg class="grain" width="${W}" height="${H}"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>`;
+const star=(s,c='#fff')=>`<svg width="${s}" height="${s}" viewBox="-50 -50 100 100"><g fill="${c}"><rect x="-27" y="-27" width="54" height="54"/><rect x="-27" y="-27" width="54" height="54" transform="rotate(45)"/></g></svg>`;
+const agentMark=(s)=>`<div class="orb" style="width:${s}px;height:${s}px;display:flex;align-items:center;justify-content:center">${star(s*.42,'rgba(255,255,255,.95)')}</div>`;
+const cursor=(x,y)=>`<svg class="a cursor" style="left:${x}px;top:${y}px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.25))" viewBox="0 0 24 24"><path d="M4 2l16 9-7 2-3 7z" fill="#0B1530" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+const tag=(t)=>add(`<div class="a mono" style="left:${P(80,60)}px;top:${P(56,60)}px;font-size:12px;opacity:.7">${t}</div>`);
+const consoleUI=(w,h,blur=0)=>`<div class="glass" style="width:${w}px;height:${h}px;overflow:hidden;${blur?`filter:blur(${blur}px)`:''}">
+  <div style="height:66px;display:flex;align-items:center;gap:14px;padding:0 24px;border-bottom:1px solid #EEF2FA">${agentMark(34)}<div><div style="font-family:D;font-weight:500;font-size:20px">SoukGo Support</div><div class="mono" style="font-size:10px">Agent sandbox · Team 3</div></div><span class="pill" style="margin-left:auto;background:#EEF4FF;color:var(--blue)">policy v1.0</span></div>
+  <div style="display:flex;height:calc(100% - 66px)">
+   <div style="width:46%;padding:22px;display:flex;flex-direction:column;gap:14px;background:rgba(248,250,255,.6);border-right:1px solid #EEF2FA">
+    <div class="msg" style="align-self:flex-end;background:var(--ink);color:#fff;border-bottom-right-radius:6px">Bonjour, il manque ma boisson dans ma commande SG-1001.</div>
+    <div class="msg" style="background:#fff;border:1px solid #E6ECF8;border-bottom-left-radius:6px">Désolé ! Votre boisson (20 MAD) est éligible au remboursement. Je confirme ?</div>
+    <div style="display:flex;gap:10px"><span class="pill" style="background:var(--blue);color:#fff;font-size:15px;padding:10px 18px;font-family:Inter;font-weight:600">Confirmer</span><span class="pill" style="background:#fff;border:1px solid #DCE3F2;color:var(--ink);font-size:15px;padding:10px 18px;font-family:Inter;font-weight:600">Parler à un humain</span></div></div>
+   <div style="flex:1;padding:10px 22px">
+    <div class="mono" style="font-size:11px;padding:8px 0">Agent trace</div>
+    ${[['get_order("SG-1001")','delivered · card · 2 items','✓'],['check_refund_eligibility','ELIGIBLE · MAD 20 · p-7','✓'],['submit_refund(p-7)','waiting for confirmation','…'],['escalate_case','only if NEEDS_HUMAN','—']].map((s,i)=>`<div class="step"><span class="n" style="${i>1?'background:#C9D5F0':''}">${i+1}</span><div><div class="c">${s[0]}</div><div class="r">${s[1]}</div></div><span class="pill" style="margin-left:auto;background:${s[2]==='✓'?'#E8F7EF':'#F1F4FA'};color:${s[2]==='✓'?'#13865f':'#8A95B0'}">${s[2]}</span></div>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap"><span class="pill" style="background:#F1F4FA;color:var(--ink)">identity · server</span><span class="pill" style="background:#F1F4FA;color:var(--ink)">money · ledger</span></div>
+   </div></div></div>`;
+
+if(F===1){ // HOOK
+  st.className='bg-light'; tag('01 · Hook · 00:00');
+  add(`<div class="blob" style="left:${P(1100,500)}px;top:${P(-200,900)}px;width:900px;height:700px;background:#BFD4FF;opacity:.7"></div>`);
+  // out-of-focus UI cards in depth
+  add(`<div class="a" style="left:${P(1180,520)}px;top:${P(170,1060)}px;transform:perspective(1400px) rotateY(-24deg) rotateX(8deg);filter:blur(5px);opacity:.85">${consoleUI(620,420)}</div>`);
+  add(`<div class="a glass" style="left:${P(1500,90)}px;top:${P(640,1450)}px;width:300px;height:150px;filter:blur(9px);transform:perspective(1000px) rotateY(-18deg)"></div>`);
+  add(`<div class="a glass" style="left:${P(980,700)}px;top:${P(80,820)}px;width:220px;height:110px;filter:blur(12px)"></div>`);
+  add(`<div class="a h" style="left:${P(120,70)}px;top:${P(300,330)}px;font-size:${P(132,118)}px;width:${P(1000,950)}px">AI is changing<br>the <span class="grad">world of work.</span></div>`);
+  add(`<div class="a mono" style="left:${P(124,74)}px;top:${P(250,280)}px">Shipping AI That Works</div>`);
+}
+if(F===2){ // PROMPT
+  st.className='bg-light'; tag('02 · They\'ll need to build with it · 00:05');
+  add(`<div class="blob" style="left:300px;top:200px;width:1300px;height:700px;background:#C9DBFF;opacity:.8"></div>`);
+  add(`<div class="a h" style="left:0;width:${W}px;text-align:center;top:${P(250,520)}px;font-size:${P(88,82)}px">Tomorrow’s professionals<br><span style="color:var(--mute)">won’t just use AI.</span></div>`);
+  const pw=P(1000,940); add(`<div class="a glass" style="left:${(W-pw)/2}px;top:${P(560,900)}px;width:${pw}px;padding:28px 30px 20px">
+    <div style="font-size:30px;line-height:1.4">Build an agent that handles SoukGo refund requests, <span style="color:#9AA7C4">checks the policy and hands exceptions to a hu</span><span style="display:inline-block;width:2px;height:34px;background:var(--blue);vertical-align:-6px"></span></div>
+    <div style="display:flex;align-items:center;gap:14px;margin-top:24px"><span style="width:44px;height:44px;border-radius:50%;border:1px solid #DCE3F2;display:flex;align-items:center;justify-content:center;font-size:24px;color:#8A95B0">+</span><span class="pill" style="background:#F1F4FA;color:var(--ink)">Agent · Sandbox</span><span class="pill" style="background:#F1F4FA;color:var(--ink)">5 tools</span>
+    <span style="margin-left:auto;width:52px;height:52px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(37,99,255,.45)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span></div></div>`);
+  add(cursor((W+pw)/2-60, P(735,1070)));
+}
+if(F===3){ // INSTRUCTOR
+  st.className='bg-deep'; tag('03 · Instructor · 00:20');
+  // orbit of channels around an agent mark
+  const cx=P(1380,540), cy=P(560,1330), R=P(300,300);
+  let lines=''; const N=['Chat','Email','Voice','Orders','Payments','Policy','Ledger','Human queue'];
+  N.forEach((n,i)=>{ const a=i/N.length*Math.PI*2-Math.PI/2; const x=cx+Math.cos(a)*R, y=cy+Math.sin(a)*R*.82; lines+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(160,190,255,.35)" stroke-width="1.4"/>`;
+    add(`<div class="a glass-d" style="left:${x-70}px;top:${y-22}px;width:140px;height:44px;display:flex;align-items:center;justify-content:center;color:#DCE6FF;font-family:M;font-size:13px">${n}</div>`); });
+  add(`<svg class="a" style="left:0;top:0" width="${W}" height="${H}">${lines}<circle cx="${cx}" cy="${cy}" r="${R*1.25}" fill="none" stroke="rgba(160,190,255,.12)"/><circle cx="${cx}" cy="${cy}" r="${R*.6}" fill="none" stroke="rgba(160,190,255,.18)"/></svg>`);
+  add(`<div class="a" style="left:${cx-60}px;top:${cy-60}px">${agentMark(120)}</div>`);
+  st.querySelectorAll('.glass-d').forEach(e=>st.appendChild(e));
+  add(`<div class="a mono" style="left:${P(120,70)}px;top:${P(250,170)}px;color:#9DB8FF">Your instructor</div>`);
+  add(`<div class="a h" style="left:${P(116,66)}px;top:${P(290,210)}px;font-size:${P(120,118)}px;color:#fff">Otman<br>Kettani</div>`);
+  add(`<div class="a" style="left:${P(120,70)}px;top:${P(560,470)}px;font-family:D;font-weight:300;font-size:${P(34,36)}px;color:#C9D8FF;width:${P(660,900)}px;line-height:1.3">Led the development of LLM-based customer support agents at Uber, <span style="color:#fff">supporting millions of customer interactions.</span></div>`);
+}
+if(F===4){ // CONSOLE
+  st.className='bg-light'; tag('04 · The workshop: SoukGo · 00:37');
+  add(`<div class="blob" style="left:400px;top:100px;width:1200px;height:800px;background:#C4D7FF;opacity:.85"></div>`);
+  add(`<div class="a" style="left:${P(330,60)}px;top:${P(150,520)}px;transform:perspective(1800px) rotateX(${P(14,10)}deg) rotateY(${P(-10,0)}deg) rotateZ(${P(2,0)}deg);transform-origin:center">${consoleUI(P(1240,960),P(740,820))}</div>`);
+  add(`<div class="a glass" style="left:${P(1380,600)}px;top:${P(120,380)}px;padding:16px 20px;display:flex;align-items:center;gap:12px;transform:rotate(-2deg)"><span class="pill" style="background:#E8F7EF;color:#13865f">✓ ELIGIBLE</span><span style="font-family:D;font-size:20px">MAD 20 · policy v1.0</span></div>`);
+  add(cursor(P(470,180),P(645,1060)));
+  add(`<div class="a h" style="left:${P(120,60)}px;top:${P(930,180)}px;font-size:${P(44,64)}px">Design. Build. <span class="grad">Test.</span></div>`);
+  add(`<div class="a mono" style="left:${P(1380,60)}px;top:${P(960,140)}px">Case · SoukGo, a fictional delivery app</div>`);
+}
+if(F===5){ // DELIVERABLES
+  st.className='bg-light'; tag('05 · What they leave with · 00:47');
+  add(`<div class="blob" style="left:300px;top:300px;width:1300px;height:600px;background:#C9DBFF;opacity:.8"></div>`);
+  add(`<div class="a h" style="left:0;width:${W}px;text-align:center;top:${P(150,200)}px;font-size:${P(84,80)}px">They leave having<br><span class="grad">built something.</span></div>`);
+  const D=[['Opportunity brief','Problem, baseline, value','doc'],['Working prototype','Bounded sandbox agent','orb'],['Evaluation report','Decisions & ledger actions','grid'],['Risk assessment','Threat model · data map','shield'],['Recommendation','GO · NO-GO · MORE EVIDENCE','deck']];
+  D.forEach((d,i)=>{ const x=P(150+i*330,90+(i%2)*470), y=P(520+Math.abs(i-2)*28,560+Math.floor(i/2)*390), rot=P((i-2)*-6,(i%2?4:-4));
+    const icon=d[2]==='orb'?agentMark(56):`<div style="width:56px;height:56px;border-radius:16px;background:#EEF4FF;display:flex;align-items:center;justify-content:center;color:var(--blue);font-family:M;font-size:22px">${{doc:'≡',grid:'▦',shield:'◆',deck:'▶'}[d[2]]}</div>`;
+    add(`<div class="a glass" style="left:${x}px;top:${y}px;width:${P(290,430)}px;height:${P(330,330)}px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;transform:perspective(1200px) rotateY(${rot}deg)">${icon}<div><div class="mono" style="font-size:11px">0${i+1}</div><div style="font-family:D;font-weight:400;font-size:${P(32,40)}px;letter-spacing:-.03em;line-height:1.05;margin-top:6px">${d[0]}</div><div style="font-size:15px;color:var(--mute);margin-top:8px">${d[1]}</div></div></div>`); });
+}
+if(F===6){ // FINAL
+  st.className='bg-light'; tag('06 · Final frame · 00:55');
+  add(`<div class="blob" style="left:${P(900,200)}px;top:${P(100,900)}px;width:1000px;height:800px;background:#B8CEFF;opacity:.9"></div>`);
+  add(`<div class="a" style="left:${P(1450,760)}px;top:${P(380,1240)}px;transform:scale(1.0)">${agentMark(P(220,200))}</div>`);
+  add(`<div class="a mono" style="left:${P(120,70)}px;top:${P(250,250)}px;color:var(--blue)">A two-day, hands-on AI workshop · for universities & business schools</div>`.replace('· for',V?'<br>for':'· for'));
+  add(`<div class="a h" style="left:${P(114,64)}px;top:${P(300,330)}px;font-size:${P(150,132)}px">Shipping AI<br><span class="grad">that works.</span></div>`);
+  add(`<div class="a" style="left:${P(120,70)}px;top:${P(640,680)}px;font-family:D;font-weight:300;font-size:${P(36,40)}px;color:var(--mute);width:${P(900,900)}px">The next generation should know how to build it.</div>`);
+  add(`<div class="a" style="left:${P(120,70)}px;top:${P(740,800)}px;display:inline-flex;align-items:center;gap:14px;padding:22px 34px;border-radius:999px;background:linear-gradient(90deg,#2563FF,#4F86FF);color:#fff;font-family:D;font-weight:500;font-size:${P(28,28)}px;box-shadow:0 20px 50px rgba(37,99,255,.4)">Bring practical AI to your university →</div>`);
+  add(cursor(P(660,560),P(800,860)));
+  add(`<div class="a mono" style="left:${P(120,70)}px;top:${P(900,1700)}px;color:var(--ink)">Led by Otman Kettani</div>`);
+  add(`<div class="a mono" style="left:${P(120,70)}px;top:${P(1000,1830)}px;font-size:11px">Independent workshop · not affiliated with or endorsed by Uber</div>`);
+}
+st.insertAdjacentHTML('beforeend',grain); window.done=true;
+</script></body></html>
