@@ -1,0 +1,5 @@
+AI is not the hard part. Shipping it is.
+
+Building an agent is easy. Building one that works means bounded tools, trusted systems for identity and money, evals that score actions rather than answers, and a staged rollout with stop rules. That is what Cadence Academy teaches in Shipping AI That Works, a two-day practical workshop for university and corporate cohorts.
+
+Let the model handle language. Let trusted systems enforce authority and money. Let evidence, not the demo, decide whether you ship.
