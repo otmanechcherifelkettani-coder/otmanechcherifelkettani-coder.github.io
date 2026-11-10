@@ -1,0 +1,100 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: Inter, sans-serif; color: #f5f7ff; }
+    .s5-head { position: absolute; left: 0; right: 0; top: 92px; text-align: center; font-weight: 900; font-size: 86px; letter-spacing: -0.035em; }
+    .s5-head .acc { background: linear-gradient(90deg, #a5a5ff, #22d3ee); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .s5-row { position: absolute; left: 150px; top: 250px; width: 1620px; height: 640px; display: flex; gap: 60px; }
+    .s5-a { width: 500px; }
+    .s5-doc { height: 560px; border-radius: 26px; background: linear-gradient(180deg, rgba(26, 29, 50, 0.98), rgba(15, 17, 31, 0.98)); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 40px 110px rgba(0, 0, 0, 0.55); padding: 30px 32px; position: relative; overflow: hidden; }
+    .s5-cap { margin-top: 24px; text-align: center; font-weight: 800; font-size: 32px; letter-spacing: -0.01em; }
+    .s5-k { font-family: "JetBrains Mono", monospace; font-size: 17px; color: #9aa3bd; letter-spacing: 0.08em; }
+    .s5-t { font-weight: 800; font-size: 30px; margin-top: 8px; }
+    .s5-live { display: inline-block; margin-top: 12px; font-family: "JetBrains Mono", monospace; font-size: 17px; color: #4ade80; padding: 6px 12px; border-radius: 999px; background: rgba(74, 222, 128, 0.12); }
+    .s5-b { font-size: 21px; line-height: 1.35; padding: 14px 18px; border-radius: 16px; margin-top: 16px; max-width: 380px; }
+    .s5-b.u { margin-left: auto; background: #5b5bf0; }
+    .s5-b.a { background: #23273f; }
+    .s5-tr { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+    .s5-tr span { font-family: "JetBrains Mono", monospace; font-size: 15px; color: #a5f3fc; padding: 5px 10px; border-radius: 8px; background: rgba(34, 211, 238, 0.12); }
+    .s5-score { font-weight: 900; font-size: 110px; letter-spacing: -0.04em; margin-top: 18px; line-height: 1; background: linear-gradient(90deg, #a5a5ff, #4ade80); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .s5-sl { font-family: "JetBrains Mono", monospace; font-size: 17px; color: #9aa3bd; margin-top: 6px; }
+    .s5-chart { display: flex; align-items: flex-end; gap: 14px; height: 130px; margin-top: 26px; }
+    .s5-chart b { flex: 1; border-radius: 8px 8px 3px 3px; background: linear-gradient(180deg, #7c7cff, #3b3b9e); transform-origin: 50% 100%; }
+    .s5-skel { height: 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.08); margin-top: 16px; }
+    .s5-stamp { margin-top: 26px; display: inline-block; white-space: nowrap; font-weight: 900; font-size: 34px; letter-spacing: 0.02em; color: #4ade80; padding: 12px 24px; border: 4px solid #4ade80; border-radius: 16px; transform: rotate(-4deg); }
+    .s5-li { display: flex; align-items: center; gap: 14px; font-size: 22px; font-weight: 600; height: 62px; border-top: 1px solid rgba(255, 255, 255, 0.07); }
+    .s5-li b { width: 30px; height: 30px; border-radius: 50%; background: rgba(74, 222, 128, 0.18); color: #4ade80; display: flex; align-items: center; justify-content: center; font-size: 17px; flex: none; }
+    .s5-ben { position: absolute; left: 150px; top: 720px; width: 1620px; display: flex; gap: 60px; }
+    .s5-bn { width: 500px; text-align: center; font-weight: 900; font-size: 50px; line-height: 1.05; letter-spacing: -0.02em; }
+    .s5-bn i { display: block; width: 64px; height: 6px; border-radius: 3px; margin: 0 auto 24px; background: linear-gradient(90deg, #7c7cff, #22d3ee); }
+  </style>
+  <div id="root" data-composition-id="s5" data-width="1920" data-height="1080">
+    <div class="s5-head" id="s5-head">NOT JUST THEORY. <span class="acc">REAL OUTPUTS.</span></div>
+    <div class="s5-row" id="s5-row" data-layout-allow-overflow>
+      <div class="s5-a" id="s5-a0">
+        <div class="s5-doc">
+          <div class="s5-k">PROTOTYPE · v2</div>
+          <div class="s5-t">Booking assistant</div>
+          <div class="s5-live">● Running in sandbox</div>
+          <div class="s5-b u">Can I move my Lisbon trip to Friday?</div>
+          <div class="s5-b a">Done. Friday 14:20, no change fee.</div>
+          <div class="s5-tr"><span>get_booking</span><span>check_fare_rules</span><span>rebook_trip</span></div>
+        </div>
+        <div class="s5-cap">Working agent prototype</div>
+      </div>
+      <div class="s5-a" id="s5-a1">
+        <div class="s5-doc">
+          <div class="s5-k">REPORT</div>
+          <div class="s5-t">Evaluation results</div>
+          <div class="s5-score">94%</div>
+          <div class="s5-sl">task success · 40 scenarios</div>
+          <div class="s5-chart" id="s5-chart"><b style="height:62%"></b><b style="height:78%"></b><b style="height:71%"></b><b style="height:88%"></b><b style="height:94%"></b></div>
+          <div class="s5-skel" style="width:92%"></div>
+          <div class="s5-skel" style="width:76%"></div>
+        </div>
+        <div class="s5-cap">Evaluation report</div>
+      </div>
+      <div class="s5-a" id="s5-a2">
+        <div class="s5-doc">
+          <div class="s5-k">MEMO</div>
+          <div class="s5-t">Deployment decision</div>
+          <div class="s5-stamp" id="s5-stamp">GO, WITH CONTROLS</div>
+          <div style="margin-top:28px">
+            <div class="s5-li"><b>✓</b>Human approval on refunds</div>
+            <div class="s5-li"><b>✓</b>Pilot on 10% of requests</div>
+            <div class="s5-li"><b>✓</b>Weekly evaluation review</div>
+          </div>
+        </div>
+        <div class="s5-cap">Go / no-go deployment memo</div>
+      </div>
+    </div>
+    <div class="s5-ben" id="s5-ben">
+      <div class="s5-bn" id="s5-bn0"><i></i>STUDENT EMPLOYABILITY.</div>
+      <div class="s5-bn" id="s5-bn1"><i></i>CURRICULUM INNOVATION.</div>
+      <div class="s5-bn" id="s5-bn2"><i></i>UNIVERSITY POSITIONING.</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    gsap.set("#s5-head", { opacity: 0, filter: "blur(12px)" });
+    tl.to("#s5-head", { opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 0.2);
+    const A = [2.0, 3.55, 5.0];
+    A.forEach((t, i) => {
+      gsap.set(`#s5-a${i}`, { opacity: 0, y: 120, rotate: [-4, 2, 5][i], scale: 0.92, filter: "blur(10px)" });
+      tl.to(`#s5-a${i}`, { opacity: 1, y: 0, rotate: 0, scale: 1, filter: "blur(0px)", duration: 0.7, ease: "expo.out" }, t);
+    });
+    gsap.set("#s5-chart b", { scaleY: 0 });
+    tl.to("#s5-chart b", { scaleY: 1, duration: 0.5, ease: "power3.out", stagger: 0.07 }, 3.85);
+    gsap.set("#s5-stamp", { opacity: 0, scale: 1.6 });
+    tl.to("#s5-stamp", { opacity: 1, scale: 1, duration: 0.3, ease: "power4.in" }, 5.45);
+    // outputs step back, benefits arrive
+    tl.to("#s5-head", { opacity: 0, filter: "blur(10px)", duration: 0.25, ease: "power2.in" }, 6.1);
+    gsap.set("#s5-row", { y: 0, scale: 1, transformOrigin: "50% 0%" });
+    tl.to("#s5-row", { y: -180, scale: 0.68, duration: 0.7, ease: "expo.inOut" }, 6.1);
+    [6.45, 6.95, 7.45].forEach((t, i) => {
+      gsap.set(`#s5-bn${i}`, { opacity: 0, y: 30, filter: "blur(8px)" });
+      tl.to(`#s5-bn${i}`, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, t);
+    });
+    tl.to(["#s5-row", "#s5-ben"], { opacity: 0, filter: "blur(12px)", duration: 0.25, ease: "power2.in" }, 9.72);
+    window.__timelines["s5"] = tl;
+  </script>
+</template>

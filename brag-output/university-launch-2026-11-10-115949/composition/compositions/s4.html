@@ -1,0 +1,291 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: Inter, sans-serif; color: #f5f7ff; }
+    .s4-win { position: absolute; left: 110px; top: 90px; width: 1700px; height: 900px; border-radius: 30px; background: linear-gradient(180deg, rgba(20, 23, 40, 0.97), rgba(11, 13, 24, 0.97)); border: 1px solid rgba(255, 255, 255, 0.09); box-shadow: 0 50px 140px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06); overflow: hidden; }
+    .s4-bar { height: 70px; display: flex; align-items: center; padding: 0 30px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); gap: 18px; }
+    .s4-dots i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: #2a2e45; margin-right: 8px; }
+    .s4-bt { font-weight: 700; font-size: 22px; color: #dfe3f2; }
+    .s4-case { margin-left: auto; font-family: "JetBrains Mono", monospace; font-size: 18px; color: #9aa3bd; padding: 7px 16px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); }
+    .s4-steps { height: 120px; display: flex; align-items: center; justify-content: center; gap: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
+    .s4-st { display: flex; align-items: center; gap: 14px; height: 70px; padding: 0 26px 0 14px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.02); }
+    .s4-st .n { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-size: 18px; font-weight: 700; background: #23273f; color: #c3c8dc; }
+    .s4-st .l { font-weight: 900; font-size: 34px; letter-spacing: 0.01em; color: #8e95ad; }
+    .s4-sep { width: 34px; height: 2px; background: rgba(255, 255, 255, 0.12); }
+    .s4-body { position: absolute; left: 60px; top: 220px; width: 1580px; height: 640px; }
+    .s4-p { position: absolute; inset: 0; }
+    .s4-h { font-family: "JetBrains Mono", monospace; font-size: 22px; color: #9aa3bd; letter-spacing: 0.06em; margin-bottom: 26px; }
+    .s4-card { border-radius: 22px; background: #161a2e; border: 1px solid rgba(255, 255, 255, 0.09); }
+    /* identify */
+    .s4-opps { display: flex; gap: 36px; }
+    .s4-opp { width: 368px; height: 250px; padding: 28px; position: relative; }
+    .s4-chip { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 18px; font-weight: 700; padding: 6px 14px; border-radius: 999px; }
+    .s4-opp .t { font-weight: 800; font-size: 34px; margin-top: 22px; line-height: 1.12; }
+    .s4-opp .m { font-family: "JetBrains Mono", monospace; font-size: 18px; color: #9aa3bd; margin-top: 16px; }
+    .s4-ring { position: absolute; inset: -3px; border-radius: 24px; border: 3px solid #22d3ee; box-shadow: 0 0 40px rgba(34, 211, 238, 0.35); }
+    .s4-brief { margin-top: 36px; height: 230px; padding: 32px 38px; display: flex; gap: 50px; align-items: center; border-color: rgba(34, 211, 238, 0.35); }
+    .s4-brief .k { font-family: "JetBrains Mono", monospace; font-size: 18px; color: #22d3ee; letter-spacing: 0.08em; margin-bottom: 12px; }
+    .s4-brief .v { font-size: 30px; font-weight: 600; line-height: 1.3; }
+    .s4-brief .big { font-weight: 900; font-size: 64px; letter-spacing: -0.03em; }
+    /* design */
+    .s4-flow { position: relative; height: 520px; }
+    .s4-node { position: absolute; width: 260px; height: 120px; border-radius: 20px; display: flex; flex-direction: column; justify-content: center; padding: 0 24px; background: #1a1e35; border: 1px solid rgba(255, 255, 255, 0.12); }
+    .s4-node .k { font-family: "JetBrains Mono", monospace; font-size: 16px; color: #9aa3bd; letter-spacing: 0.06em; }
+    .s4-node .v { font-weight: 700; font-size: 28px; margin-top: 6px; line-height: 1.1; }
+    .s4-svg { position: absolute; left: 0; top: 0; width: 1580px; height: 560px; }
+    /* build */
+    .s4-cols { display: flex; gap: 32px; }
+    .s4-col { padding: 28px 30px; height: 520px; }
+    .s4-code { font-family: "JetBrains Mono", monospace; font-size: 22px; line-height: 1.55; color: #dfe3f2; }
+    .s4-code div { white-space: nowrap; }
+    .s4-code .c { color: #8e95ad; }
+    .s4-tool { display: flex; align-items: center; justify-content: space-between; height: 84px; border-top: 1px solid rgba(255, 255, 255, 0.07); font-family: "JetBrains Mono", monospace; font-size: 24px; }
+    .s4-tg { width: 66px; height: 36px; border-radius: 999px; background: #2a2e45; position: relative; }
+    .s4-tg b { position: absolute; left: 4px; top: 4px; width: 28px; height: 28px; border-radius: 50%; background: #c3c8dc; }
+    .s4-msg { font-size: 25px; line-height: 1.35; padding: 18px 22px; border-radius: 18px; max-width: 470px; margin-bottom: 16px; }
+    .s4-msg.u { margin-left: auto; background: #5b5bf0; border-radius: 18px 18px 4px 18px; }
+    .s4-msg.a { background: #23273f; border-radius: 18px 18px 18px 4px; }
+    .s4-ok { font-family: "JetBrains Mono", monospace; font-size: 18px; color: #4ade80; margin-top: 10px; }
+    .s4-send { position: absolute; right: 30px; bottom: 28px; left: 30px; height: 64px; border-radius: 16px; background: #0f1222; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; padding: 0 10px 0 22px; font-size: 22px; color: #8e95ad; }
+    .s4-send span { margin-left: auto; width: 46px; height: 46px; border-radius: 12px; background: #5b5bf0; display: flex; align-items: center; justify-content: center; }
+    /* test */
+    .s4-run { display: flex; align-items: center; gap: 28px; margin-bottom: 22px; }
+    .s4-prog { flex: 1; height: 12px; border-radius: 6px; background: #23273f; overflow: hidden; }
+    .s4-prog b { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #7c7cff, #22d3ee); transform-origin: 0 50%; }
+    .s4-cnt { font-family: "JetBrains Mono", monospace; font-size: 24px; font-weight: 700; width: 400px; text-align: right; }
+    .s4-row { display: flex; align-items: center; height: 74px; padding: 0 28px; border-radius: 16px; margin-bottom: 8px; background: #161a2e; border: 1px solid rgba(255, 255, 255, 0.07); font-size: 27px; font-weight: 600; position: relative; }
+    .s4-row .id { font-family: "JetBrains Mono", monospace; font-size: 18px; color: #8e95ad; width: 90px; }
+    .s4-row .r { margin-left: auto; font-family: "JetBrains Mono", monospace; font-size: 20px; font-weight: 700; padding: 6px 16px; border-radius: 999px; }
+    .s4-pass { color: #4ade80; background: rgba(74, 222, 128, 0.12); }
+    .s4-fail { color: #f87171; background: rgba(248, 113, 113, 0.14); }
+    .s4-note { font-family: "JetBrains Mono", monospace; font-size: 19px; color: #fca5a5; margin-left: 26px; }
+    .s4-flag { position: absolute; inset: -2px; border-radius: 17px; border: 2px solid #f87171; box-shadow: 0 0 30px rgba(248, 113, 113, 0.3); }
+    /* evaluate */
+    .s4-ev { display: flex; gap: 34px; }
+    .s4-met { width: 820px; padding: 30px 36px; height: 560px; }
+    .s4-mr { margin-bottom: 30px; }
+    .s4-mr .top { display: flex; align-items: baseline; justify-content: space-between; font-size: 28px; font-weight: 700; margin-bottom: 14px; }
+    .s4-mr .val { font-family: "JetBrains Mono", monospace; font-size: 30px; }
+    .s4-bars { position: relative; height: 18px; border-radius: 9px; background: #23273f; }
+    .s4-bars b { position: absolute; left: 0; top: 0; height: 100%; border-radius: 9px; transform-origin: 0 50%; }
+    .s4-fix { display: inline-block; margin-top: 4px; font-family: "JetBrains Mono", monospace; font-size: 19px; color: #fbbf24; padding: 8px 16px; border-radius: 12px; background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3); }
+    .s4-risk { flex: 1; padding: 30px 34px; height: 560px; border-color: rgba(74, 222, 128, 0.3); }
+    .s4-rt { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .s4-rt .t { font-weight: 800; font-size: 32px; }
+    .s4-hitl { font-family: "JetBrains Mono", monospace; font-size: 18px; font-weight: 700; color: #07080f; background: #4ade80; padding: 8px 14px; border-radius: 999px; }
+    .s4-ctl { display: flex; align-items: center; gap: 20px; height: 104px; border-top: 1px solid rgba(255, 255, 255, 0.07); font-size: 26px; font-weight: 600; line-height: 1.2; }
+    .s4-ctl .s4-tg { flex: none; }
+    .s4-cur { position: absolute; left: 0; top: 0; width: 34px; height: 34px; z-index: 5; }
+  </style>
+  <div id="root" data-composition-id="s4" data-width="1920" data-height="1080">
+    <div class="s4-win" id="s4-win" data-layout-allow-overflow data-layout-allow-overlap>
+      <div class="s4-bar"><div class="s4-dots"><i></i><i></i><i></i></div><div class="s4-bt">Team workspace</div><div class="s4-case">Case: Veloria Travel (fictional)</div></div>
+      <div class="s4-steps" id="s4-steps">
+        <div class="s4-st" id="s4-st0"><div class="n">01</div><div class="l">IDENTIFY.</div></div><div class="s4-sep"></div>
+        <div class="s4-st" id="s4-st1"><div class="n">02</div><div class="l">DESIGN.</div></div><div class="s4-sep"></div>
+        <div class="s4-st" id="s4-st2"><div class="n">03</div><div class="l">BUILD.</div></div><div class="s4-sep"></div>
+        <div class="s4-st" id="s4-st3"><div class="n">04</div><div class="l">TEST.</div></div><div class="s4-sep"></div>
+        <div class="s4-st" id="s4-st4"><div class="n">05</div><div class="l">EVALUATE.</div></div>
+      </div>
+      <div class="s4-body">
+        <!-- IDENTIFY -->
+        <div class="s4-p" id="s4-p0">
+          <div class="s4-h">Where could an agent create value?</div>
+          <div class="s4-opps">
+            <div class="s4-card s4-opp" id="s4-o0"><span class="s4-chip" style="color:#2dd4bf;background:rgba(45,212,191,.14)">Healthcare</span><div class="t">Appointment rescheduling</div><div class="m">high volume · rule-based</div></div>
+            <div class="s4-card s4-opp" id="s4-o1"><span class="s4-chip" style="color:#a5a5ff;background:rgba(124,124,255,.16)">Banking</span><div class="t">Card dispute triage</div><div class="m">regulated · needs oversight</div></div>
+            <div class="s4-card s4-opp" id="s4-o2"><span class="s4-chip" style="color:#f472b6;background:rgba(244,114,182,.14)">E-commerce</span><div class="t">Returns and refunds</div><div class="m">high volume · policy-driven</div></div>
+            <div class="s4-card s4-opp" id="s4-o3"><span class="s4-chip" style="color:#22d3ee;background:rgba(34,211,238,.14)">Travel</span><div class="t">Booking changes</div><div class="m">high volume · clear rules</div><div class="s4-ring" id="s4-ring"></div></div>
+          </div>
+          <div class="s4-card s4-brief" id="s4-brief">
+            <div><div class="k">PROBLEM</div><div class="big">2 days</div><div class="v" style="font-size:24px;color:#9aa3bd">average wait for a booking change</div></div>
+            <div style="flex:1"><div class="k">AGENT OPPORTUNITY</div><div class="v">Resolve routine booking changes end to end, within fare rules, and hand everything else to a person.</div></div>
+          </div>
+        </div>
+        <!-- DESIGN -->
+        <div class="s4-p" id="s4-p1">
+          <div class="s4-h">Agent workflow · v1</div>
+          <div class="s4-flow">
+            <svg class="s4-svg" viewBox="0 0 1580 560">
+              <g stroke="rgba(165,165,255,0.6)" stroke-width="3" fill="none">
+                <path id="s4-e0" d="M260 120 L330 120" />
+                <path id="s4-e1" d="M590 120 L660 120" />
+                <path id="s4-e2" d="M920 120 L990 120" />
+                <path id="s4-e3" d="M1250 120 L1320 120" />
+                <path id="s4-e4" d="M1120 180 L1120 330" stroke="rgba(251,191,36,0.7)" />
+              </g>
+            </svg>
+            <div class="s4-node" id="s4-n0" style="left:0;top:60px"><div class="k">TRIGGER</div><div class="v">Customer request</div></div>
+            <div class="s4-node" id="s4-n1" style="left:330px;top:60px"><div class="k">TOOL</div><div class="v">Look up booking</div></div>
+            <div class="s4-node" id="s4-n2" style="left:660px;top:60px"><div class="k">TOOL</div><div class="v">Check fare rules</div></div>
+            <div class="s4-node" id="s4-n3" style="left:990px;top:60px;border-color:rgba(251,191,36,.5)"><div class="k" style="color:#fbbf24">DECISION</div><div class="v">Within policy?</div></div>
+            <div class="s4-node" id="s4-n4" style="left:1320px;top:60px;border-color:rgba(74,222,128,.5)"><div class="k" style="color:#4ade80">YES</div><div class="v">Rebook and confirm</div></div>
+            <div class="s4-node" id="s4-n5" style="left:990px;top:330px;width:330px;border-color:rgba(251,191,36,.5)"><div class="k" style="color:#fbbf24">NO</div><div class="v">Hand off to a human agent</div></div>
+          </div>
+        </div>
+        <!-- BUILD -->
+        <div class="s4-p" id="s4-p2">
+          <div class="s4-cols">
+            <div class="s4-card s4-col" style="width:600px">
+              <div class="s4-h">INSTRUCTIONS</div>
+              <div class="s4-code">
+                <div class="s4-ln" id="s4-l0"><span class="c">#</span> Role</div>
+                <div class="s4-ln" id="s4-l1">You are Veloria's booking assistant.</div>
+                <div class="s4-ln" id="s4-l2"><span class="c">#</span> Rules</div>
+                <div class="s4-ln" id="s4-l3">Change bookings only within fare rules.</div>
+                <div class="s4-ln" id="s4-l4">Never refund over €200 without approval.</div>
+                <div class="s4-ln" id="s4-l5">If unsure, hand off to a human.</div>
+              </div>
+            </div>
+            <div class="s4-card s4-col" style="width:420px">
+              <div class="s4-h">TOOLS</div>
+              <div class="s4-tool">get_booking<div class="s4-tg" id="s4-t0"><b></b></div></div>
+              <div class="s4-tool">check_fare_rules<div class="s4-tg" id="s4-t1"><b></b></div></div>
+              <div class="s4-tool">rebook_trip<div class="s4-tg" id="s4-t2"><b></b></div></div>
+              <div class="s4-tool">handoff_to_human<div class="s4-tg" id="s4-t3"><b></b></div></div>
+            </div>
+            <div class="s4-card s4-col" style="width:496px;position:relative">
+              <div class="s4-h">PROTOTYPE · SANDBOX</div>
+              <div class="s4-msg u" id="s4-mu">Can I move my Lisbon trip to Friday?</div>
+              <div class="s4-msg a" id="s4-ma">Done. You're on Friday's 14:20 departure, with no change fee.<div class="s4-ok">✓ check_fare_rules · ✓ rebook_trip</div></div>
+              <div class="s4-send" id="s4-send">Message the agent…<span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span></div>
+            </div>
+          </div>
+        </div>
+        <!-- TEST -->
+        <div class="s4-p" id="s4-p3">
+          <div class="s4-run"><div class="s4-h" style="margin:0">TEST SUITE</div><div class="s4-prog"><b id="s4-pb"></b></div><div class="s4-cnt" id="s4-cnt">0 run · 0 passed</div></div>
+          <div class="s4-row" id="s4-r0"><span class="id">T-01</span>Date change within fare rules<span class="r s4-pass">PASS</span></div>
+          <div class="s4-row" id="s4-r1"><span class="id">T-07</span>Name correction on a ticket<span class="r s4-pass">PASS</span></div>
+          <div class="s4-row" id="s4-r2"><span class="id">T-12</span>Change plus seat upgrade request<span class="r s4-pass">PASS</span></div>
+          <div class="s4-row" id="s4-r3"><span class="id">T-18</span>Refund request over €200<span class="s4-note">refunded without approval</span><span class="r s4-fail">FAIL</span><div class="s4-flag" id="s4-flag"></div></div>
+          <div class="s4-row" id="s4-r4"><span class="id">T-23</span>Customer pastes a card number<span class="r s4-pass">PASS</span></div>
+          <div class="s4-row" id="s4-r5"><span class="id">T-31</span>Prompt injection hidden in a message<span class="r s4-pass">PASS</span></div>
+        </div>
+        <!-- EVALUATE -->
+        <div class="s4-p" id="s4-p4">
+          <div class="s4-ev">
+            <div class="s4-card s4-met">
+              <div class="s4-h">EVALUATION · v1 → v2</div>
+              <div class="s4-mr"><div class="top">Task success<span class="val"><span id="s4-v0" style="color:#9aa3bd">78%</span> → <span style="color:#4ade80">94%</span></span></div><div class="s4-bars"><b id="s4-b0a" style="width:78%;background:#4b5170"></b><b id="s4-b0" style="width:94%;background:linear-gradient(90deg,#7c7cff,#4ade80)"></b></div></div>
+              <div class="s4-mr"><div class="top">Correct hand-offs<span class="val" style="color:#4ade80">96%</span></div><div class="s4-bars"><b id="s4-b1" style="width:96%;background:linear-gradient(90deg,#7c7cff,#22d3ee)"></b></div></div>
+              <div class="s4-mr"><div class="top">Policy violations<span class="val"><span style="color:#f87171">1</span> → <span style="color:#4ade80">0</span></span></div><div class="s4-bars"><b id="s4-b2" style="width:4%;background:#4ade80"></b></div></div>
+              <div class="s4-fix" id="s4-fix">Fix · refunds over €200 now need approval</div>
+            </div>
+            <div class="s4-card s4-risk">
+              <div class="s4-rt"><div class="t">Risk controls</div><div class="s4-hitl" id="s4-hitl">HUMAN OVERSIGHT ON</div></div>
+              <div class="s4-ctl"><div class="s4-tg" id="s4-c0"><b></b></div>Human approval for refunds over €200</div>
+              <div class="s4-ctl"><div class="s4-tg" id="s4-c1"><b></b></div>Card numbers redacted from logs</div>
+              <div class="s4-ctl"><div class="s4-tg" id="s4-c2"><b></b></div>Hand off when confidence is low</div>
+              <div class="s4-ctl"><div class="s4-tg" id="s4-c3"><b></b></div>Every action logged for review</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <svg class="s4-cur" id="s4-cur" viewBox="0 0 24 24"><path d="M4 2l16 9-7 2-3 7z" fill="#fff" stroke="#07080f" stroke-width="1.5" stroke-linejoin="round" /></svg>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    gsap.set("#s4-win", { opacity: 0, y: 60, scale: 0.96 });
+    tl.to("#s4-win", { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "expo.out" }, 0);
+    // stepper
+    const STEP = [0.3, 3.6, 5.9, 8.9, 11.4];
+    STEP.forEach((t, i) => {
+      const s = `#s4-st${i}`;
+      tl.to(`${s}`, { backgroundColor: "rgba(124,124,255,0.18)", borderColor: "rgba(165,165,255,0.7)", duration: 0.3 }, t);
+      tl.to(`${s} .l`, { color: "#ffffff", duration: 0.3 }, t);
+      tl.to(`${s} .n`, { backgroundColor: "#5b5bf0", color: "#ffffff", duration: 0.3 }, t);
+      if (i < 4) {
+        tl.to(`${s}`, { backgroundColor: "rgba(255,255,255,0.02)", borderColor: "rgba(74,222,128,0.45)", duration: 0.3 }, STEP[i + 1]);
+        tl.to(`${s} .l`, { color: "#c3c8dc", duration: 0.3 }, STEP[i + 1]);
+        tl.to(`${s} .n`, { backgroundColor: "#4ade80", color: "#07080f", duration: 0.3 }, STEP[i + 1]);
+      }
+    });
+    // panels swap on one stage
+    const PEND = [3.55, 5.85, 8.85, 11.35, 99];
+    STEP.forEach((t, i) => {
+      const p = `#s4-p${i}`;
+      gsap.set(p, { opacity: 0, x: 40, filter: "blur(10px)" });
+      tl.to(p, { opacity: 1, x: 0, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, i === 0 ? 0.35 : t);
+      if (i < 4) tl.to(p, { opacity: 0, x: -40, filter: "blur(10px)", duration: 0.22, ease: "power2.in" }, PEND[i] - 0.2);
+    });
+    // IDENTIFY
+    ["#s4-o0", "#s4-o1", "#s4-o2", "#s4-o3"].forEach((o, i) => {
+      gsap.set(o, { opacity: 0, y: 24 });
+      tl.to(o, { opacity: 1, y: 0, duration: 0.45, ease: "expo.out" }, 0.5 + i * 0.1);
+    });
+    gsap.set("#s4-cur", { x: 1250, y: 820, opacity: 0 });
+    tl.to("#s4-cur", { opacity: 1, duration: 0.2 }, 1.1);
+    tl.to("#s4-cur", { x: 1480, y: 480, duration: 0.75, ease: "power3.inOut" }, 1.15);
+    tl.to("#s4-cur", { scale: 0.82, duration: 0.08, yoyo: true, repeat: 1 }, 1.93);
+    gsap.set("#s4-ring", { opacity: 0, scale: 1.04 });
+    tl.to("#s4-ring", { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" }, 1.97);
+    tl.to("#s4-o3", { y: -8, duration: 0.3, ease: "power2.out" }, 1.97);
+    tl.to(["#s4-o0", "#s4-o1", "#s4-o2"], { opacity: 0.35, duration: 0.3 }, 2.05);
+    tl.to("#s4-cur", { opacity: 0, duration: 0.25 }, 2.4);
+    gsap.set("#s4-brief", { opacity: 0, y: 30 });
+    tl.to("#s4-brief", { opacity: 1, y: 0, duration: 0.5, ease: "expo.out" }, 2.2);
+    // DESIGN: nodes then edges
+    const NT = [3.75, 4.05, 4.35, 4.65, 4.95, 5.2];
+    NT.forEach((t, i) => {
+      gsap.set(`#s4-n${i}`, { opacity: 0, scale: 0.9 });
+      tl.to(`#s4-n${i}`, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(1.6)" }, t);
+    });
+    ["#s4-e0", "#s4-e1", "#s4-e2", "#s4-e3", "#s4-e4"].forEach((e, i) => {
+      gsap.set(e, { strokeDasharray: 200, strokeDashoffset: 200 });
+      tl.to(e, { strokeDashoffset: 0, duration: 0.3, ease: "power2.out" }, [3.95, 4.25, 4.55, 4.85, 5.1][i]);
+    });
+    // BUILD: instructions type in (clip reveal), tools toggle on, prototype answers
+    gsap.utils.toArray("#s4-p2 .s4-ln").forEach((l, i) => {
+      gsap.set(l, { clipPath: "inset(0 100% 0 0)" });
+      tl.to(l, { clipPath: "inset(0 0% 0 0)", duration: 0.28, ease: "steps(14)" }, 6.05 + i * 0.25);
+    });
+    [6.25, 6.6, 6.95, 7.3].forEach((t, i) => {
+      tl.to(`#s4-t${i}`, { backgroundColor: "#4ade80", duration: 0.18 }, t);
+      tl.to(`#s4-t${i} b`, { x: 30, backgroundColor: "#ffffff", duration: 0.22, ease: "power3.out" }, t);
+    });
+    gsap.set("#s4-mu", { opacity: 0, y: 16 });
+    gsap.set("#s4-ma", { opacity: 0, y: 16 });
+    tl.to("#s4-mu", { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 7.6);
+    tl.to("#s4-send span", { scale: 0.85, duration: 0.08, yoyo: true, repeat: 1 }, 7.5);
+    tl.to("#s4-ma", { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 8.4);
+    // TEST
+    gsap.set("#s4-pb", { scaleX: 0 });
+    tl.to("#s4-pb", { scaleX: 1, duration: 1.9, ease: "power1.inOut" }, 9.0);
+    const cnt = { v: 0 };
+    tl.fromTo(cnt, { v: 0 }, { v: 40, duration: 1.9, ease: "power1.inOut", onUpdate: () => {
+      const n = Math.round(cnt.v); const p = Math.max(0, n - (n >= 18 ? 1 : 0));
+      document.getElementById("s4-cnt").textContent = `${n} run · ${p} passed`;
+    } }, 9.0);
+    gsap.utils.toArray("#s4-p3 .s4-row").forEach((r, i) => {
+      gsap.set(r, { opacity: 0, x: -20 });
+      tl.to(r, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, 9.1 + i * 0.25);
+    });
+    gsap.set("#s4-flag", { opacity: 0 });
+    tl.to("#s4-flag", { opacity: 1, duration: 0.25 }, 10.95);
+    tl.to("#s4-r3", { x: -6, duration: 0.06, yoyo: true, repeat: 3, ease: "sine.inOut" }, 10.95);
+    // EVALUATE
+    gsap.set(["#s4-b0a"], { scaleX: 0 });
+    gsap.set(["#s4-b0", "#s4-b1", "#s4-b2"], { scaleX: 0 });
+    tl.to("#s4-b0a", { scaleX: 1, duration: 0.6, ease: "power3.out" }, 11.7);
+    tl.to("#s4-b1", { scaleX: 1, duration: 0.7, ease: "power3.out" }, 12.0);
+    tl.to("#s4-b2", { scaleX: 1, duration: 0.5, ease: "power3.out" }, 12.2);
+    gsap.set("#s4-fix", { opacity: 0, y: 10 });
+    tl.to("#s4-fix", { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 12.4);
+    tl.to("#s4-b0", { scaleX: 1, duration: 0.8, ease: "power3.out" }, 12.9);
+    tl.to("#s4-v0", { color: "#6b7290", duration: 0.3 }, 12.9);
+    gsap.utils.toArray("#s4-p4 .s4-ctl").forEach((c, i) => {
+      gsap.set(c, { opacity: 0, x: 20 });
+      tl.to(c, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, 11.8 + i * 0.15);
+    });
+    [13.55, 13.8, 14.05, 14.35].forEach((t, i) => {
+      tl.to(`#s4-c${i}`, { backgroundColor: "#4ade80", duration: 0.18 }, t);
+      tl.to(`#s4-c${i} b`, { x: 30, backgroundColor: "#ffffff", duration: 0.22, ease: "power3.out" }, t);
+    });
+    gsap.set("#s4-hitl", { opacity: 0, scale: 0.8 });
+    tl.to("#s4-hitl", { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 14.45);
+    // exit
+    tl.to("#s4-win", { opacity: 0, y: -40, filter: "blur(14px)", duration: 0.3, ease: "power2.in" }, 15.68);
+    window.__timelines["s4"] = tl;
+  </script>
+</template>

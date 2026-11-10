@@ -1,0 +1,7 @@
+composition/.hyperframes/
+composition/assets/vo/raw*.wav
+build/scaffold/
+build/package/
+build/*.tgz
+build/render.log
+build/frames/

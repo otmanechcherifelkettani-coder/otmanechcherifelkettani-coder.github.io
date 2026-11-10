@@ -1,0 +1,1 @@
+Shipping AI That Works, University Edition: a proposed two-day, hands-on workshop where students design, build, test and evaluate a working AI agent on a fictional business case. They leave with a prototype, an evaluation report and a go / no-go deployment memo. Want to bring it to your university?
