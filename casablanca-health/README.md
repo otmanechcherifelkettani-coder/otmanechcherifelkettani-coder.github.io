@@ -22,6 +22,12 @@ P_cz  = f(d_cz) / ( f(d_cz) + Σ_j A_j · f(d_jz) + f(3 km) )                   
 Score = Σ_z D_z · P_cz                                                             in residents captured
 ```
 
+The two demand channels are kept apart: cR (residents) and cP (prescribers), combined as α·cR + (1−α)·cP.
+The page can rank by either channel alone or by "Both" (the weaker of the two percentile ranks), and by
+straight-line distance or by drive time (`drivetime.py`, on the Overture road network). Residents are also weighted
+by age (under 15 ×0.4, 15–59 ×1, 60+ ×2.5, regional mean 1). "Strength of existing labs" (A up to 2) stands in for
+incumbents' collection points and home sampling, which no source lists.
+
 - residents_z: HCP RGPH 2024 commune population spread over a 400 m grid (building footprint + place density);
   g_z: the commune's annual growth 2014–2024; years: projection horizon (default 3).
 - affluence_z: income proxy of the commune (100 = regional average, γ = 1 by default). HCP publishes no income by
@@ -52,8 +58,11 @@ python3 fetch_communes.py pop2024.xlsx region.json communes.json
 python3 hcp_2014.py pop_legal_2014.pdf communes.json
 python3 fetch_buildings.py communes.json places.json popcells.json   # residents on a 400 m grid
 # HCP fiches communales RGPH 2024 (one PDF per province, hcp.ma/reg-casablanca) -> affluence index
-python3 hcp_fiches.py fiches/ communes.json
+python3 hcp_fiches.py fiches/ communes.json                          # also age structure
+python3 fetch_roads.py roads.npz communes.json                       # road graph from Overture segments
 REGION=region.json COMMUNES=communes.json POPCELLS=popcells.json python3 build.py places.json divisions.json context.json osm_health.json
+python3 drivetime.py roads.npz data.json drive.json                  # drive-time site scores (~2 min)
+REGION=region.json COMMUNES=communes.json POPCELLS=popcells.json DRIVE=drive.json python3 build.py places.json divisions.json context.json osm_health.json
 node analysis.js data.json "Nouaceur"                    # text ranking, optionally for one province
 ```
 

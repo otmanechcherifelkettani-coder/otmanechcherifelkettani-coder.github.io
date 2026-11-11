@@ -95,53 +95,77 @@
 
   // ---------------------------------------------------------------------------------------------------------
   // Site model (the "Best sites" tab): expected demand a NEW lab would capture at each candidate location.
-  //   demand at point z      D_z = α · residents_z · (1 + g_z)^years · (affluence_z / 100)^γ  +  (1 − α) · k · prescriber weight_z
-  //     affluence_z: the commune's income proxy (HCP fiches communales 2024; 100 = regional average)
-  //   pull of a site at d    f(d) = max(d, 300 m)^−β
-  //   share captured from z  P_cz = f(d_cz) / ( f(d_cz) + Σ_j A_j f(d_jz) + f(D0) )            (Huff model)
-  //     A_j = 1 for a medical lab, 0.5 for a public hospital and 0.3 for a private clinic (in-house labs)
-  //     f(D0) = the "outside option": as attractive as a lab D0 = 3 km away (going to the city, hospital,
-  //     home sample collection, or not testing). Without it a site with no competitor "captures" everyone.
-  //   site score             S_c = Σ_z D_z · P_cz       over z within maxDist of c
-  // k rescales prescriber weights so both demand channels have the same regional total.
-  // Result is in "resident-equivalents captured"; × tests per resident per year × average ticket = revenue estimate.
+  //   resident demand at z   R_z = residents_z · (1 + g_z)^years · (affluence_z / 100)^γ · age_z
+  //     affluence_z: commune income proxy (HCP fiches communales 2024; 100 = regional average)
+  //     age_z: commune test-use index from its age structure (under 15 ×0.4, 15–59 ×1, 60+ ×2.5; regional mean 1)
+  //   prescriber demand at z P_z = k · prescriber weight_z      (k: both channels have the same regional total)
+  //   pull at distance d     f(d) = max(d, 300 m)^−β            (or drive minutes, see data.drive)
+  //   share won from z       P_cz = f(d_cz) / ( f(d_cz) + Σ_j A_j f(d_jz) + f(D0) )            (Huff model)
+  //     A_j = incumbent strength (1 by default; raise it to stand in for collection points and home sampling)
+  //           for medical labs, 0.5 for public hospitals and 0.3 for private clinics (in-house labs)
+  //     f(D0) = "outside option": as attractive as a lab 3 km away (going further, hospital, not testing)
+  //   channels               cR_c = Σ_z R_z P_cz ,  cP_c = Σ_z P_z P_cz          over z within maxDist of c
+  //   combined score         S_c = α · cR_c + (1 − α) · cP_c
+  //   rank: 'combined' (S), 'residents' (cR), 'prescribers' (cP), or 'robust' (worse of the two percentile ranks)
   function siteModel(data, opts) {
-    const o = Object.assign({ alpha: 0.6, beta: 2, years: 3, gamma: 1, maxDist: 6000, hex: 500, includePatho: false, topN: 15,
-      outside: 3000, inHouse: { HU: 0.5, HP: 0.3 } }, opts);
+    const o = Object.assign({ alpha: 0.6, beta: 2, years: 3, gamma: 1, age: true, incumbent: 1, rank: 'combined',
+      maxDist: 6000, hex: 500, includePatho: false, topN: 15, outside: 3000, inHouse: { HU: 0.5, HP: 0.3 },
+      drive: false }, opts);
     const pts = points(data), wt = weightsFor(o);
     const labs = pts.filter(p => isCompetitor(p, o));
-    const rivals = labs.map(p => Object.assign({ A: 1 }, p))
-      .concat(pts.filter(p => o.inHouse[p.s]).map(p => Object.assign({ A: o.inHouse[p.s] }, p)));
-    const affOf = ci => ((data.communes || [])[ci] || {}).aff || 100;
+    const com = data.communes || [];
+    const affOf = ci => (com[ci] || {}).aff || 100, ageOf = ci => (com[ci] || {}).ageIdx || 1;
     const res = (data.popcells || []).map(c => {
       const [x, y] = toXY(c[0], c[1]), aff = affOf(c[4]);
-      return { x, y, v: c[2] * Math.pow(1 + (c[3] || 0) / 100, o.years) * Math.pow(aff / 100, o.gamma), pop: c[2], g: c[3], aff, ci: c[4] };
+      const v = c[2] * Math.pow(1 + (c[3] || 0) / 100, o.years) * Math.pow(aff / 100, o.gamma) * (o.age ? ageOf(c[4]) : 1);
+      return { x, y, v, pop: c[2], g: c[3], aff, ci: c[4] };
     });
     const pre = pts.filter(p => p.c !== 'L' && (wt[p.s] || 0) > 0).map(p => ({ x: p.x, y: p.y, v: wt[p.s] }));
     const totR = res.reduce((a, r) => a + r.v, 0) || 1, totP = pre.reduce((a, r) => a + r.v, 0) || 1;
     const k = totR / totP;
-    const demand = res.map(r => ({ x: r.x, y: r.y, v: o.alpha * r.v, kind: 'R' }))
-      .concat(pre.map(p => ({ x: p.x, y: p.y, v: (1 - o.alpha) * k * p.v, kind: 'P' })));
-    const f = d => Math.pow(Math.max(d, 300) / 1000, -o.beta);
-    const li = bucketIndex(labs, 2000), vi = bucketIndex(rivals, 2000), F0 = f(o.outside);
-    for (const z of demand) { z.S = F0; for (const [j, d] of vi.near(z.x, z.y, o.maxDist)) z.S += j.A * f(d); }
-    const di = bucketIndex(demand, 1000), ri = bucketIndex(res, 1000), pi = bucketIndex(pre, 1000);
-    // candidates: hexagon centres with residents or prescribers within 1.5 km
-    let xmin = Infinity, xmax = -Infinity, ymin = Infinity, ymax = -Infinity;
-    for (const z of demand) { xmin = Math.min(xmin, z.x); xmax = Math.max(xmax, z.x); ymin = Math.min(ymin, z.y); ymax = Math.max(ymax, z.y); }
-    const s = o.hex, hw = Math.sqrt(3) * s, cands = [];
-    for (let r = Math.floor(ymin / (1.5 * s)) - 1; r <= Math.ceil(ymax / (1.5 * s)) + 1; r++) {
-      const y = r * 1.5 * s, off = (r & 1) ? hw / 2 : 0;
-      for (let x = Math.floor(xmin / hw) * hw - hw + off; x <= xmax + hw; x += hw) {
-        const local = di.near(x, y, 1500);
-        if (local.reduce((a, [z]) => a + z.v, 0) < 200) continue; // too little demand nearby to be worth scoring
-        let score = 0, fromR = 0;
-        for (const [z, d] of di.near(x, y, o.maxDist)) { const fc = f(d); const c = z.v * fc / (fc + z.S); score += c; if (z.kind === 'R') fromR += c; }
-        const corners = [];
+    const li = bucketIndex(labs, 2000), ri = bucketIndex(res, 1000), pi = bucketIndex(pre, 1000);
+    let cands = [];
+    if (o.drive && data.drive) {
+      // drive-time results computed offline (drivetime.py) for β, years and γ at their defaults
+      const s = data.drive.hex, ag = o.age ? 2 : 3;
+      cands = data.drive.cands.map(r => {
+        const [x, y] = toXY(r[0], r[1]), corners = [];
         for (let q = 0; q < 6; q++) { const a = Math.PI / 180 * (60 * q - 30); corners.push(toLL(x + s * Math.cos(a), y + s * Math.sin(a))); }
-        const [lat, lon] = toLL(x, y);
-        cands.push({ x, y, lat, lon, score, fromR, corners });
+        return { x, y, lat: r[0], lon: r[1], cR: r[ag], cP: r[4] * k / data.drive.k, minutes: r[5], labs10: r[6], corners };
+      });
+    } else {
+      const rivals = labs.map(p => Object.assign({ A: o.incumbent }, p))
+        .concat(pts.filter(p => o.inHouse[p.s]).map(p => Object.assign({ A: o.inHouse[p.s] }, p)));
+      const demand = res.map(r => ({ x: r.x, y: r.y, v: r.v, kind: 'R' }))
+        .concat(pre.map(p => ({ x: p.x, y: p.y, v: k * p.v, kind: 'P' })));
+      const f = d => Math.pow(Math.max(d, 300) / 1000, -o.beta);
+      const vi = bucketIndex(rivals, 2000), F0 = f(o.outside);
+      for (const z of demand) { z.S = F0; for (const [j, d] of vi.near(z.x, z.y, o.maxDist)) z.S += j.A * f(d); }
+      const di = bucketIndex(demand, 1000);
+      let xmin = Infinity, xmax = -Infinity, ymin = Infinity, ymax = -Infinity;
+      for (const z of demand) { xmin = Math.min(xmin, z.x); xmax = Math.max(xmax, z.x); ymin = Math.min(ymin, z.y); ymax = Math.max(ymax, z.y); }
+      const s = o.hex, hw = Math.sqrt(3) * s;
+      for (let r = Math.floor(ymin / (1.5 * s)) - 1; r <= Math.ceil(ymax / (1.5 * s)) + 1; r++) {
+        const y = r * 1.5 * s, off = (r & 1) ? hw / 2 : 0;
+        for (let x = Math.floor(xmin / hw) * hw - hw + off; x <= xmax + hw; x += hw) {
+          const local = di.near(x, y, 1500);
+          if (local.reduce((a, [z]) => a + z.v, 0) < 300) continue; // too little demand nearby to be worth scoring
+          let cR = 0, cP = 0;
+          for (const [z, d] of di.near(x, y, o.maxDist)) { const fc = f(d); const c = z.v * fc / (fc + z.S); if (z.kind === 'R') cR += c; else cP += c; }
+          const corners = [];
+          for (let q = 0; q < 6; q++) { const a = Math.PI / 180 * (60 * q - 30); corners.push(toLL(x + s * Math.cos(a), y + s * Math.sin(a))); }
+          const [lat, lon] = toLL(x, y);
+          cands.push({ x, y, lat, lon, cR, cP, corners });
+        }
       }
+    }
+    for (const c of cands) { c.combined = o.alpha * c.cR + (1 - o.alpha) * c.cP; c.fromR = o.alpha * c.cR; }
+    // percentile ranks of each channel (1 = best) for the robust ranking
+    const pct = key => { const srt = cands.slice().sort((a, b) => a[key] - b[key]); srt.forEach((c, i) => { c['p' + key] = (i + 1) / srt.length; }); };
+    pct('cR'); pct('cP');
+    for (const c of cands) {
+      c.robust = Math.min(c.pcR, c.pcP);
+      c.score = o.rank === 'residents' ? c.cR : o.rank === 'prescribers' ? c.cP : o.rank === 'robust' ? c.robust : c.combined;
     }
     // context for each candidate (only computed for the shortlist and on demand)
     const describe = c => {
@@ -224,7 +248,7 @@
     console.log(`SITE MODEL (alpha .6, beta 2, 3 years, gamma 1): ${sm.cands.length} candidates, ${sm.labs} competing labs`);
     sm.top.forEach((c, i) => {
       const z = zoneName(data, c.lat, c.lon);
-      console.log(`${i + 1}. ${z.hood} (${z.district}) ${c.lat.toFixed(4)},${c.lon.toFixed(4)} captures ${Math.round(c.score)} res-eq (${Math.round(100 * c.fromR / c.score)}% residents) | pop 2km ${Math.round(c.pop2km)} affluence ${c.aff2km ? Math.round(c.aff2km) : '?'} growth ${c.growth == null ? '?' : c.growth.toFixed(1)}%/yr | labs 1km ${c.labs1} 2km ${c.labs2} nearest ${Math.round(c.nearest)}m | prescribers 1km ${c.presc1km}`);
+      console.log(`${i + 1}. ${z.hood} (${z.district}) ${c.lat.toFixed(4)},${c.lon.toFixed(4)} combined ${Math.round(c.combined)} (residents ${Math.round(c.cR)}, prescribers ${Math.round(c.cP)}, robust ${c.robust.toFixed(2)}) | pop 2km ${Math.round(c.pop2km)} affluence ${c.aff2km ? Math.round(c.aff2km) : '?'} growth ${c.growth == null ? '?' : c.growth.toFixed(1)}%/yr | labs 1km ${c.labs1} 2km ${c.labs2} nearest ${Math.round(c.nearest)}m | prescribers 1km ${c.presc1km}`);
     });
     console.log('ZONES (prescriber gap):');
     const res = analyse(data, { hex: 400, radius: 1000, wH: 3, wT: 0, minDemand: 10, province: process.argv[3] || '' });

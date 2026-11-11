@@ -25,6 +25,9 @@ QUERIES = {
     "lab_ar": "مختبر التحليلات الطبية",
     "clinic": "clinique",
 }
+# override, e.g. QUERIES='{"collect": "centre de prélèvement"}'
+if os.environ.get("QUERIES"):
+    QUERIES = json.loads(os.environ["QUERIES"])
 FIELDS = "places.id,places.displayName,places.location,places.primaryType,places.types,places.businessStatus"
 nreq, places = 0, {}
 

@@ -22,6 +22,8 @@ NUM = r"(\d+(?:[.,]\d+)?)"
 PATTERNS = {
     "pop": r"population l[ée]gale de (?:la commune|l.arrondissement|la municipalit[ée]) de .*? est de (\d+)",
     "illiteracy": r"10 ans et plus, " + NUM + r"\s*% sont\s+analphab",
+    "age_u15": r"Selon l.[âa]ge, " + NUM + r"\s*% ont moins de 15 ans",
+    "age_60p": r"et " + NUM + r"\s*% ont 60 ans et plus",
     "higher_edu": NUM + r"\s*% le niveau sup[ée]rieur",
     "unemployment": r"taux de ch[ôo]mage.*?il est de " + NUM + r"\s*%",
     "owners": NUM + r"\s*% sont propri[ée]taires",

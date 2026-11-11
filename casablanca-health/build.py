@@ -59,7 +59,7 @@ if os.environ.get("GOOGLE_PLACES"):
                 continue
             seen_ids.add(p["id"])
             cats = {p.get("primary")} | set(p.get("types") or [])
-            if any(st.startswith("lab") for st in p.get("streams") or []):
+            if any(st.startswith(("lab", "collect")) for st in p.get("streams") or []):
                 cats.add("lab_search")  # found by the "laboratoire d'analyses médicales" keyword search
             add(p["lat"], p["lon"], p.get("name"), cats, p.get("primary"), "Google")
 
@@ -210,21 +210,32 @@ if os.environ.get("COMMUNES"):
         if c.get("affluence") is None and c["province"] in prov_aff:
             s = prov_aff[c["province"]]
             c["affluence"], c["aff_estimated"] = round(s[0] / s[1], 1), True
+    # age test-use index: relative lab-test use by age (assumption: under 15 ×0.4, 15–59 ×1, 60+ ×2.5), regional mean = 1
+    AGE_W = (0.4, 1.0, 2.5)
+    for c in raw:
+        so = c.get("socio") or {}
+        if so.get("age_u15") is not None and so.get("age_60p") is not None:
+            u, o = so["age_u15"], so["age_60p"]
+            c["age_raw"] = (u * AGE_W[0] + (100 - u - o) * AGE_W[1] + o * AGE_W[2]) / 100
+    have = [c for c in raw if c.get("age_raw")]
+    age_mean = sum(c["age_raw"] * c["pop"] for c in have) / sum(c["pop"] for c in have) if have else 1
     for c, t in zip(raw, tally):
         communes.append({"n": re.sub(r"^(Commune|Arrondissement|Municipalité)\s+(de la|de l'|du|des|de|d'|d’)?\s*", "", c["name"]),
                          "full": c["name"], "ar": c.get("name_ar"), "code": c["code"], "prov": c["province"],
                          "pop": c["pop"], "hh": c["households"], "pop14": c.get("pop14"),
                          "growth": c.get("growth"), "aff": c.get("affluence"), "affEst": c.get("aff_estimated", False),
+                         "ageIdx": round(c["age_raw"] / age_mean, 3) if c.get("age_raw") else None,
                          "socio": {k: (c.get("socio") or {}).get(k) for k in
                                    ("higher_edu", "modern_housing", "slums", "poverty", "poverty14", "unemployment",
-                                    "illiteracy")} if c.get("socio") else None,
+                                    "illiteracy", "age_u15", "age_60p")} if c.get("socio") else None,
                          **t, "p": c["polys"]})
 
 # residents on a 400 m grid (fetch_buildings.py): [lat, lon, residents 2024, growth %/yr, commune index]
 popcells = json.load(open(os.environ["POPCELLS"])) if os.environ.get("POPCELLS") else []
+drive = json.load(open(os.environ["DRIVE"])) if os.environ.get("DRIVE") else None  # drivetime.py
 
 data = {"pts": pts, "labels": labels, "roads": roads, "areas": areas, "provinces": provinces, "region": region_outline,
-        "communes": communes, "popcells": popcells,
+        "communes": communes, "popcells": popcells, "drive": drive,
         "meta": {"source": "Overture Maps Foundation, Places + Divisions + Transportation, release 2026-10-21.0",
                  "counts": dict(counts)}}
 OUTDIR = Path(os.environ.get("OUT_DIR", HERE))
