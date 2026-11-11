@@ -1,0 +1,311 @@
+<title>Casablanca Lab Gap Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Zones of Casablanca with many doctors, clinics and hospitals but few medical laboratories.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>/*__LEAFLET_CSS__*/</style>
+<style>
+/* Layout: one-screen tool — ranked panel on the left, vector map on the right; stacks map-first on phones. */
+:root {
+  --bg: #f3f5f4; --panel: #ffffff; --fg: #15221f; --muted: #5b6a65; --line: #dfe5e2;
+  --water: #d6e3e8; --land: #f7f6f1; --road: #d9d6cc; --road-major: #c7bfae; --border: #9fb0aa;
+  --lab: #1f57c8; --hosp: #8a3fa8; --doc: #2f8a74; --dent: #9a9a8c;
+  --s1: #fbe6b4; --s2: #f6c26c; --s3: #ec8b3d; --s4: #d4502b; --s5: #9d2320;
+  --chip: #eef2f0; --focus: #1f57c8;
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1615; --panel: #151e1c; --fg: #e6ece9; --muted: #95a49f; --line: #26322f;
+  --water: #0d1a20; --land: #1b2422; --road: #2c3633; --road-major: #44504b; --border: #4d5d58;
+  --lab: #6c9cff; --hosp: #c88ae0; --doc: #5cc4a8; --dent: #7c8079;
+  --s1: #4a3a1c; --s2: #7d5520; --s3: #b56a24; --s4: #e0662f; --s5: #ff8a5c;
+  --chip: #1f2a27; --focus: #6c9cff; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1615; --panel: #151e1c; --fg: #e6ece9; --muted: #95a49f; --line: #26322f;
+  --water: #0d1a20; --land: #1b2422; --road: #2c3633; --road-major: #44504b; --border: #4d5d58;
+  --lab: #6c9cff; --hosp: #c88ae0; --doc: #5cc4a8; --dent: #7c8079;
+  --s1: #4a3a1c; --s2: #7d5520; --s3: #b56a24; --s4: #e0662f; --s5: #ff8a5c;
+  --chip: #1f2a27; --focus: #6c9cff; color-scheme: dark; }
+
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font: 14px/1.45 var(--f-body); }
+.app { height: 100%; display: grid; grid-template-columns: minmax(320px, 400px) 1fr; }
+.panel { overflow-y: auto; background: var(--panel); border-right: 1px solid var(--line);
+  padding-block: 20px 28px; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: 18px;
+  display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+#map { height: 100%; background: var(--water); }
+h1 { font: 800 1.45rem/1.15 var(--f-display); letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h2 { font: 700 0.72rem/1 var(--f-display); text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); margin: 0 0 10px; }
+.lede { color: var(--muted); margin: 6px 0 0; max-width: 60ch; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.stat b { font: 500 1.15rem/1 var(--f-data); font-variant-numeric: tabular-nums; }
+.stat span { font-size: 0.72rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
+.sq { width: 9px; height: 9px; border-radius: 2px; display: inline-block; flex: none; }
+
+.controls { display: grid; gap: 12px; }
+.ctl { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 10px; }
+.ctl label { font-weight: 500; }
+.ctl output { font: 500 0.85rem var(--f-data); font-variant-numeric: tabular-nums; color: var(--muted); }
+.ctl input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--focus); }
+.ctl .hint { grid-column: 1 / -1; font-size: 0.75rem; color: var(--muted); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { font: 500 0.8rem var(--f-data); background: transparent; color: var(--fg); border: 0; padding: 5px 9px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--panel); }
+.toggles { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.toggles label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.zones { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.zone { display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 10px 8px; border-radius: 8px; cursor: pointer; border: 0; background: none; color: inherit; text-align: left; font: inherit; width: 100%; }
+.zone:hover, .zone.active { background: var(--chip); }
+.rank { font: 800 1.05rem/1.4 var(--f-display); color: var(--s5); font-variant-numeric: tabular-nums; }
+.zone .name { font-weight: 600; }
+.zone .district { color: var(--muted); font-weight: 400; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.chip { font: 400 0.72rem/1 var(--f-data); background: var(--chip); padding: 4px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.zone:hover .chip, .zone.active .chip { background: var(--panel); }
+.chip.zero { color: var(--s5); font-weight: 500; }
+
+.legend { display: flex; align-items: center; gap: 6px; font: 0.72rem var(--f-data); color: var(--muted); flex-wrap: wrap; }
+.ramp { display: flex; height: 10px; border-radius: 2px; overflow: hidden; flex: 1 1 140px; min-width: 120px; }
+.ramp i { flex: 1; }
+details { border-top: 1px solid var(--line); padding-top: 14px; }
+summary { cursor: pointer; font-weight: 600; }
+details p, details li { color: var(--muted); font-size: 0.82rem; max-width: 62ch; }
+details ul { padding-left: 18px; margin: 6px 0; }
+.src { font-size: 0.72rem; color: var(--muted); }
+
+.leaflet-container { font: 13px/1.4 var(--f-body); background: var(--water); }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--panel); color: var(--fg); box-shadow: 0 4px 18px rgb(0 0 0 / 0.18); }
+.leaflet-popup-content { margin: 12px 14px; min-width: 220px; }
+.pop h3 { font: 700 0.95rem var(--f-display); margin: 0 0 6px; }
+.pop table { border-collapse: collapse; font: 0.78rem var(--f-data); font-variant-numeric: tabular-nums; }
+.pop td { padding: 1px 10px 1px 0; }
+.pop ul { margin: 6px 0 0; padding-left: 16px; font-size: 0.78rem; max-height: 150px; overflow: auto; }
+.leaflet-bar a { background: var(--panel); color: var(--fg); border-color: var(--line); }
+.leaflet-control-attribution { background: color-mix(in srgb, var(--panel) 85%, transparent) !important; color: var(--muted); }
+.lbl { font: 600 10px/1 var(--f-display); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); white-space: nowrap; text-shadow: 0 0 3px var(--land), 0 0 3px var(--land); pointer-events: none; }
+.pin { font: 800 12px/22px var(--f-display); width: 22px; height: 22px; text-align: center; border-radius: 50%; background: var(--fg); color: var(--panel); box-shadow: 0 1px 4px rgb(0 0 0 / 0.35); }
+
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: 58vh auto; height: auto; }
+  #map { height: 58vh; order: -1; }
+  .panel { border-right: 0; overflow: visible; padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="app">
+  <aside class="panel" aria-label="Analysis">
+    <header>
+      <h1>Where Casablanca's doctors outnumber its labs</h1>
+      <p class="lede">Each hexagon counts the clinics, hospitals and doctors within walking catchment, then divides by the number of medical laboratories in the same catchment. Hot zones are where demand for blood work is high and no lab is close.</p>
+    </header>
+
+    <section class="stats" aria-label="Places mapped">
+      <div class="stat"><b id="n-H">0</b><span><i class="dot" style="background:var(--hosp)"></i>Hospitals &amp; clinics</span></div>
+      <div class="stat"><b id="n-D">0</b><span><i class="dot" style="background:var(--doc)"></i>Doctors</span></div>
+      <div class="stat"><b id="n-T">0</b><span><i class="dot" style="background:var(--dent)"></i>Dentists</span></div>
+      <div class="stat"><b id="n-L">0</b><span><i class="sq" style="background:var(--lab)"></i>Labs</span></div>
+    </section>
+
+    <section>
+      <h2>Top opportunity zones</h2>
+      <div class="legend" aria-hidden="true"><span>Gap score</span><span class="ramp"><i style="background:var(--s1)"></i><i style="background:var(--s2)"></i><i style="background:var(--s3)"></i><i style="background:var(--s4)"></i><i style="background:var(--s5)"></i></span><span id="ramp-max"></span></div>
+      <ol class="zones" id="zones"></ol>
+    </section>
+
+    <section class="controls" aria-label="Settings">
+      <h2>Settings</h2>
+      <div class="ctl">
+        <label id="radius-label">Catchment radius</label>
+        <div class="seg" role="group" aria-labelledby="radius-label" id="radius">
+          <button type="button" data-v="500" aria-pressed="false">500 m</button>
+          <button type="button" data-v="1000" aria-pressed="true">1 km</button>
+          <button type="button" data-v="1500" aria-pressed="false">1.5 km</button>
+        </div>
+      </div>
+      <div class="ctl">
+        <label for="wH">Weight of a hospital or clinic</label><output for="wH" id="wH-out">×3</output>
+        <input type="range" id="wH" min="1" max="6" step="1" value="3">
+        <span class="hint">A clinic houses several prescribing doctors, so it counts as more than one cabinet.</span>
+      </div>
+      <div class="ctl">
+        <label for="minD">Minimum demand to rank a zone</label><output for="minD" id="minD-out">10</output>
+        <input type="range" id="minD" min="4" max="40" step="1" value="10">
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="wT"> Count dentists as demand</label>
+      </div>
+      <div class="toggles" aria-label="Map layers">
+        <label><input type="checkbox" id="showL" checked> <i class="sq" style="background:var(--lab)"></i>Labs</label>
+        <label><input type="checkbox" id="showH" checked> <i class="dot" style="background:var(--hosp)"></i>Clinics</label>
+        <label><input type="checkbox" id="showD"> <i class="dot" style="background:var(--doc)"></i>Doctors</label>
+        <label><input type="checkbox" id="showHex" checked> Hexagons</label>
+      </div>
+    </section>
+
+    <details>
+      <summary>Method and limits</summary>
+      <ul>
+        <li><b>Data.</b> Overture Maps Places (release 2026-10-21), which merges OpenStreetMap with Meta and Microsoft business listings. Places were classified by category and by name (for example "Laboratoire d'analyses médicales", "Clinique", "Dr …", مختبر, مصحة). Veterinary, aesthetic, physiotherapy and pharmacy listings are excluded.</li>
+        <li><b>Score.</b> For each 400 m hexagon: demand = clinics × weight + doctors (+ dentists if ticked) within the catchment radius; gap score = demand ÷ (labs in the same radius + 1). Zones are ranked by score, keeping one zone per catchment so the list does not repeat the same area.</li>
+        <li><b>Coverage.</b> The source lists far fewer cabinets than really exist in Casablanca, and coverage is better in central districts. Read scores as relative signals, then verify on the ground or against DabaDoc, Med.ma or the Ordre des Médecins directory.</li>
+        <li><b>Hospitals.</b> Public hospitals and large private clinics usually run an in-house lab. A high score driven by one big hospital is a weaker signal than one driven by many independent cabinets.</li>
+        <li><b>Not modelled.</b> Population, income, rent, sample-collection points and home-collection services.</li>
+      </ul>
+    </details>
+    <p class="src">Data © Overture Maps Foundation contributors (CDLA Permissive 2.0, ODbL for OpenStreetMap-derived records).</p>
+  </aside>
+  <div id="map" role="region" aria-label="Map of Casablanca"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>/*__ANALYSIS__*/</script>
+<script>
+const DATA = /*__DATA__*/null;
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmtM = m => !isFinite(m) ? '>20 km' : m < 1000 ? Math.round(m / 10) * 10 + ' m' : (m / 1000).toFixed(1) + ' km';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const KIND = { H: 'Clinic / hospital', D: 'Doctor', T: 'Dentist', L: 'Laboratory' };
+
+const counts = { H: 0, D: 0, T: 0, L: 0 };
+DATA.pts.forEach(p => counts[p[2]]++);
+for (const k in counts) $('n-' + k).textContent = counts[k];
+
+const state = { radius: 1000, wH: 3, wT: 0, minDemand: 10 };
+const map = L.map('map', { preferCanvas: true, zoomSnap: 0.25, attributionControl: true, minZoom: 10, maxZoom: 18 })
+  .fitBounds([[33.50, -7.72], [33.63, -7.47]]);
+map.attributionControl.setPrefix(false).addAttribution('Overture Maps Foundation');
+
+const base = L.layerGroup().addTo(map), hexLayer = L.layerGroup().addTo(map), ptLayers = { L: L.layerGroup(), H: L.layerGroup(), D: L.layerGroup() };
+const labelLayer = L.layerGroup().addTo(map), pinLayer = L.layerGroup().addTo(map);
+let result = null, hexById = new Map(), activeIdx = -1;
+
+function drawBase() {
+  base.clearLayers();
+  const ll = ring => ring.map(c => [c[1], c[0]]);
+  for (const a of DATA.areas) L.polygon(a.p.map(poly => poly.map(ll)), { stroke: false, fillColor: css('--land'), fillOpacity: 1, interactive: false }).addTo(base);
+  for (const a of DATA.areas) if (a.t === 'macrohood' || a.t === 'localadmin')
+    L.polygon(a.p.map(poly => poly.map(ll)), { color: css('--border'), weight: 0.8, dashArray: '3 3', fill: false, interactive: false }).addTo(base);
+  const order = ['secondary', 'primary', 'trunk', 'motorway'];
+  for (const cls of order) if (DATA.roads[cls])
+    L.polyline(DATA.roads[cls].map(ll), { color: css(cls === 'secondary' ? '--road' : '--road-major'), weight: cls === 'motorway' ? 2.2 : cls === 'secondary' ? 0.8 : 1.4, interactive: false }).addTo(base);
+}
+
+function drawLabels() {
+  labelLayer.clearLayers();
+  if (map.getZoom() < 12) return;
+  const seen = new Set();
+  for (const l of DATA.labels) {
+    if (l.t !== 'macrohood' || /^(Arrondissement|Pachalik|Province|Préfecture|Cercle)/i.test(l.n) || seen.has(l.n)) continue;
+    seen.add(l.n);
+    L.marker([l.lat, l.lon], { interactive: false, keyboard: false, icon: L.divIcon({ className: '', html: `<span class="lbl">${esc(l.n)}</span>`, iconSize: [0, 0] }) }).addTo(labelLayer);
+  }
+}
+
+function drawPoints() {
+  for (const k in ptLayers) ptLayers[k].clearLayers();
+  const col = { L: css('--lab'), H: css('--hosp'), D: css('--doc') };
+  for (const p of DATA.pts) {
+    if (!ptLayers[p[2]]) continue;
+    const isLab = p[2] === 'L';
+    L.circleMarker([p[0], p[1]], { radius: isLab ? 5.5 : 3.2, color: isLab ? css('--panel') : col[p[2]], weight: isLab ? 1.5 : 0, fillColor: col[p[2]], fillOpacity: isLab ? 1 : 0.85 })
+      .bindTooltip(`<b>${esc(p[3])}</b><br>${KIND[p[2]]}${p[4] ? ' · ' + esc(p[4].replace(/_/g, ' ')) : ''}`, { direction: 'top', offset: [0, -4] })
+      .addTo(ptLayers[p[2]]);
+  }
+  syncLayers();
+}
+
+// Canvas draws in insertion order, so points are re-added after hexagons to stay on top (labs last).
+function syncLayers() {
+  for (const k of ['D', 'H', 'L']) ptLayers[k].remove();
+  $('showHex').checked ? hexLayer.addTo(map) : hexLayer.remove();
+  for (const k of ['D', 'H', 'L']) if ($('show' + k).checked) ptLayers[k].addTo(map);
+}
+
+function binsFor(scores) {
+  const s = [...scores].sort((a, b) => a - b), q = f => s[Math.min(s.length - 1, Math.floor(f * s.length))];
+  return [q(0.4), q(0.65), q(0.85), q(0.95)];
+}
+
+function hexPopup(h) {
+  const R = state.radius, [x, y] = [h.x, h.y];
+  const near = result.pts.filter(p => Math.hypot(p.x - x, p.y - y) <= R && (p.c === 'L' || p.c === 'H' || p.c === 'D' || (p.c === 'T' && state.wT)));
+  near.sort((a, b) => (a.c === 'L' ? -1 : 0) - (b.c === 'L' ? -1 : 0) || a.c.localeCompare(b.c));
+  const hood = GapAnalysis.nearestLabel(DATA.labels, h.lat, h.lon, ['neighborhood', 'microhood']);
+  const dist = GapAnalysis.nearestLabel(DATA.labels, h.lat, h.lon, ['macrohood']);
+  return `<div class="pop"><h3>${esc(hood)}${dist && dist !== hood ? ' · ' + esc(dist) : ''}</h3>
+    <table><tr><td>Gap score</td><td><b>${h.score.toFixed(1)}</b></td></tr>
+    <tr><td>Clinics &amp; hospitals</td><td>${h.n.H}</td></tr><tr><td>Doctors</td><td>${h.n.D}</td></tr>
+    ${state.wT ? `<tr><td>Dentists</td><td>${h.n.T}</td></tr>` : ''}
+    <tr><td>Labs within ${fmtM(R)}</td><td>${h.labs}</td></tr><tr><td>Nearest lab</td><td>${fmtM(h.nearest)}</td></tr></table>
+    <ul>${near.slice(0, 40).map(p => `<li>${p.c === 'L' ? '<b>Lab:</b> ' : ''}${esc(p.name)}</li>`).join('')}</ul></div>`;
+}
+
+function run() {
+  result = GapAnalysis.analyse(DATA, { hex: 400, radius: state.radius, wH: state.wH, wD: 1, wT: state.wT, minDemand: state.minDemand });
+  hexLayer.clearLayers(); pinLayer.clearLayers(); hexById.clear();
+  const q = result.hexes.filter(h => h.qualifies);
+  const cuts = binsFor(q.map(h => h.score)), ramp = ['--s1', '--s2', '--s3', '--s4', '--s5'].map(css);
+  $('ramp-max').textContent = q.length ? 'up to ' + Math.max(...q.map(h => h.score)).toFixed(0) : '';
+  for (const h of result.hexes) {
+    if (!h.qualifies) {
+      L.polygon(h.corners, { stroke: false, fillColor: css('--muted'), fillOpacity: 0.07, interactive: false }).addTo(hexLayer);
+      continue;
+    }
+    const bin = cuts.filter(c => h.score > c).length;
+    const poly = L.polygon(h.corners, { color: css('--panel'), weight: 0.6, fillColor: ramp[bin], fillOpacity: 0.78 })
+      .bindPopup(() => hexPopup(h), { maxWidth: 300 }).addTo(hexLayer);
+    hexById.set(h, poly);
+  }
+  const list = $('zones'); list.innerHTML = '';
+  result.top.forEach((h, i) => {
+    const hood = GapAnalysis.nearestLabel(DATA.labels, h.lat, h.lon, ['neighborhood', 'microhood']);
+    const dist = GapAnalysis.nearestLabel(DATA.labels, h.lat, h.lon, ['macrohood']);
+    const li = document.createElement('li');
+    li.innerHTML = `<button class="zone" type="button"><span class="rank">${i + 1}</span><span>
+      <span class="name">${esc(hood)}</span>${dist && dist !== hood ? ` <span class="district">· ${esc(dist)}</span>` : ''}
+      <span class="chips"><span class="chip">score ${h.score.toFixed(1)}</span>
+      <span class="chip"><i class="dot" style="background:var(--hosp)"></i>${h.n.H}</span>
+      <span class="chip"><i class="dot" style="background:var(--doc)"></i>${h.n.D}</span>
+      <span class="chip ${h.labs ? '' : 'zero'}"><i class="sq" style="background:var(--lab)"></i>${h.labs} within ${fmtM(state.radius)}</span>
+      <span class="chip">nearest lab ${fmtM(h.nearest)}</span></span></span></button>`;
+    li.firstChild.addEventListener('click', () => focusZone(i));
+    list.appendChild(li);
+    L.marker([h.lat, h.lon], { icon: L.divIcon({ className: '', html: `<div class="pin">${i + 1}</div>`, iconSize: [22, 22], iconAnchor: [11, 11] }), title: hood, keyboard: false })
+      .on('click', () => focusZone(i)).addTo(pinLayer);
+    L.circle([h.lat, h.lon], { radius: state.radius, color: css('--fg'), weight: 1, dashArray: '4 4', fill: false, interactive: false }).addTo(pinLayer);
+  });
+  syncLayers();
+}
+
+function focusZone(i) {
+  const h = result.top[i]; activeIdx = i;
+  document.querySelectorAll('.zone').forEach((b, j) => b.classList.toggle('active', j === i));
+  map.flyTo([h.lat, h.lon], 14.5, { duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 0.8 });
+  L.popup({ maxWidth: 300 }).setLatLng([h.lat, h.lon]).setContent(hexPopup(h)).openOn(map);
+}
+
+$('radius').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  [...$('radius').children].forEach(x => x.setAttribute('aria-pressed', x === b));
+  state.radius = +b.dataset.v; run();
+});
+$('wH').addEventListener('input', e => { state.wH = +e.target.value; $('wH-out').textContent = '×' + state.wH; run(); });
+$('minD').addEventListener('input', e => { state.minDemand = +e.target.value; $('minD-out').textContent = state.minDemand; run(); });
+$('wT').addEventListener('change', e => { state.wT = e.target.checked ? 1 : 0; run(); });
+['showL', 'showH', 'showD', 'showHex'].forEach(id => $(id).addEventListener('change', syncLayers));
+map.on('zoomend', drawLabels);
+
+function redrawAll() { drawBase(); drawPoints(); drawLabels(); run(); }
+redrawAll();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redrawAll);
+new MutationObserver(redrawAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+</script>
