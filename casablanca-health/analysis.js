@@ -95,7 +95,8 @@
 
   // ---------------------------------------------------------------------------------------------------------
   // Site model (the "Best sites" tab): expected demand a NEW lab would capture at each candidate location.
-  //   demand at point z      D_z = α · residents_z · (1 + g_z)^years  +  (1 − α) · k · prescriber weight_z
+  //   demand at point z      D_z = α · residents_z · (1 + g_z)^years · (affluence_z / 100)^γ  +  (1 − α) · k · prescriber weight_z
+  //     affluence_z: the commune's income proxy (HCP fiches communales 2024; 100 = regional average)
   //   pull of a site at d    f(d) = max(d, 300 m)^−β
   //   share captured from z  P_cz = f(d_cz) / ( f(d_cz) + Σ_j A_j f(d_jz) + f(D0) )            (Huff model)
   //     A_j = 1 for a medical lab, 0.5 for a public hospital and 0.3 for a private clinic (in-house labs)
@@ -105,13 +106,17 @@
   // k rescales prescriber weights so both demand channels have the same regional total.
   // Result is in "resident-equivalents captured"; × tests per resident per year × average ticket = revenue estimate.
   function siteModel(data, opts) {
-    const o = Object.assign({ alpha: 0.6, beta: 2, years: 3, maxDist: 6000, hex: 500, includePatho: false, topN: 15,
+    const o = Object.assign({ alpha: 0.6, beta: 2, years: 3, gamma: 1, maxDist: 6000, hex: 500, includePatho: false, topN: 15,
       outside: 3000, inHouse: { HU: 0.5, HP: 0.3 } }, opts);
     const pts = points(data), wt = weightsFor(o);
     const labs = pts.filter(p => isCompetitor(p, o));
     const rivals = labs.map(p => Object.assign({ A: 1 }, p))
       .concat(pts.filter(p => o.inHouse[p.s]).map(p => Object.assign({ A: o.inHouse[p.s] }, p)));
-    const res = (data.popcells || []).map(c => { const [x, y] = toXY(c[0], c[1]); return { x, y, v: c[2] * Math.pow(1 + (c[3] || 0) / 100, o.years), pop: c[2], g: c[3], ci: c[4] }; });
+    const affOf = ci => ((data.communes || [])[ci] || {}).aff || 100;
+    const res = (data.popcells || []).map(c => {
+      const [x, y] = toXY(c[0], c[1]), aff = affOf(c[4]);
+      return { x, y, v: c[2] * Math.pow(1 + (c[3] || 0) / 100, o.years) * Math.pow(aff / 100, o.gamma), pop: c[2], g: c[3], aff, ci: c[4] };
+    });
     const pre = pts.filter(p => p.c !== 'L' && (wt[p.s] || 0) > 0).map(p => ({ x: p.x, y: p.y, v: wt[p.s] }));
     const totR = res.reduce((a, r) => a + r.v, 0) || 1, totP = pre.reduce((a, r) => a + r.v, 0) || 1;
     const k = totR / totP;
@@ -140,13 +145,13 @@
     }
     // context for each candidate (only computed for the shortlist and on demand)
     const describe = c => {
-      let pop = 0, pop14w = 0, gsum = 0;
-      for (const [r] of ri.near(c.x, c.y, 2000)) { pop += r.pop; if (r.g != null) { gsum += r.g * r.pop; pop14w += r.pop; } }
+      let pop = 0, pop14w = 0, gsum = 0, asum = 0;
+      for (const [r] of ri.near(c.x, c.y, 2000)) { pop += r.pop; asum += r.aff * r.pop; if (r.g != null) { gsum += r.g * r.pop; pop14w += r.pop; } }
       const labs1 = li.near(c.x, c.y, 1000).length, labs2 = li.near(c.x, c.y, 2000).length;
       let nearest = Infinity;
       for (const rr of [2000, 6000, 20000]) { const n = li.near(c.x, c.y, rr); if (n.length) { nearest = Math.min(...n.map(v => v[1])); break; } }
       const presc = pi.near(c.x, c.y, 1000).reduce((a, [p]) => a + p.v, 0);
-      return Object.assign(c, { pop2km: pop, growth: pop14w ? gsum / pop14w : null, labs1, labs2, nearest, presc1km: Math.round(presc * 10) / 10 });
+      return Object.assign(c, { pop2km: pop, growth: pop14w ? gsum / pop14w : null, aff2km: pop ? asum / pop : null, labs1, labs2, nearest, presc1km: Math.round(presc * 10) / 10 });
     };
     if (o.province) for (const c of cands) c.prov = provinceOf(data, c.lat, c.lon);
     const pool = cands.filter(c => !o.province || c.prov === o.province).sort((a, b) => b.score - a.score);
@@ -216,10 +221,10 @@
   if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.main === module) {
     const data = JSON.parse(require('fs').readFileSync(process.argv[2] || 'data.json', 'utf8'));
     const sm = siteModel(data, { province: process.argv[3] || '' });
-    console.log(`SITE MODEL (alpha .6, beta 2, 3 years): ${sm.cands.length} candidates, ${sm.labs} competing labs`);
+    console.log(`SITE MODEL (alpha .6, beta 2, 3 years, gamma 1): ${sm.cands.length} candidates, ${sm.labs} competing labs`);
     sm.top.forEach((c, i) => {
       const z = zoneName(data, c.lat, c.lon);
-      console.log(`${i + 1}. ${z.hood} (${z.district}) ${c.lat.toFixed(4)},${c.lon.toFixed(4)} captures ${Math.round(c.score)} res-eq (${Math.round(100 * c.fromR / c.score)}% residents) | pop 2km ${Math.round(c.pop2km)} growth ${c.growth == null ? '?' : c.growth.toFixed(1)}%/yr | labs 1km ${c.labs1} 2km ${c.labs2} nearest ${Math.round(c.nearest)}m | prescribers 1km ${c.presc1km}`);
+      console.log(`${i + 1}. ${z.hood} (${z.district}) ${c.lat.toFixed(4)},${c.lon.toFixed(4)} captures ${Math.round(c.score)} res-eq (${Math.round(100 * c.fromR / c.score)}% residents) | pop 2km ${Math.round(c.pop2km)} affluence ${c.aff2km ? Math.round(c.aff2km) : '?'} growth ${c.growth == null ? '?' : c.growth.toFixed(1)}%/yr | labs 1km ${c.labs1} 2km ${c.labs2} nearest ${Math.round(c.nearest)}m | prescribers 1km ${c.presc1km}`);
     });
     console.log('ZONES (prescriber gap):');
     const res = analyse(data, { hex: 400, radius: 1000, wH: 3, wT: 0, minDemand: 10, province: process.argv[3] || '' });

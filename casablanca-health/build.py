@@ -69,46 +69,66 @@ print("classified by source:sub:", dict(sorted(counts.items())))
 import math, unicodedata
 
 
-def norm(n):
+GENERIC = set("""clinique clinic clinica polyclinique cabinet laboratoire laboratoires laboratory labo lab centre center
+medical medicale medicales medicaux analyse analyses biologie biologiques biologique biomedicales dr docteur doctor pr
+professeur de du la le les d l des et a au aux en casablanca casa maroc morocco clinical hospital hopital medico
+chirurgicale multidisciplinaire prive privee international internationale specialise specialisee groupe""".split())
+# place names: "Laboratoire Bouskoura" and "Laboratoire Izdihar Bouskoura" are different labs
+PLACE_WORDS = set()
+
+
+def words(n):
     latin = re.sub(r"[\u0600-\u06ff]+", " ", n)
     if re.search(r"[A-Za-z]{3}", latin):
         n = latin  # bilingual names: compare the Latin part only
     n = unicodedata.normalize("NFKD", n.lower())
     n = "".join(ch for ch in n if not unicodedata.combining(ch))
-    n = re.sub(r"\b(clinique|clinic|clinica|polyclinique|cabinet|laboratoire|laboratory|labo|lab|centre|center|"
-               r"medical|medicale|medicales|analyses?|dr|docteur|de|du|la|le|d|l|des|et|casablanca|maroc|clinical|hospital|"
-               r"hopital|medico|chirurgicale|multidisciplinaire|privee?|international|internationale)\b", " ", n)
-    return re.sub(r"[^a-z0-9\u0600-\u06ff]+", "", n)
+    return [w.rstrip("s") if len(w) > 4 else w for w in re.findall(r"[a-z0-9\u0600-\u06ff]+", n)]
+
+
+def norm(n):
+    """distinctive words of a name (generic words and place names removed), plus the full word list"""
+    w = words(n)
+    return (tuple(x for x in w if x not in GENERIC and x not in PLACE_WORDS), tuple(x for x in w if x not in GENERIC))
 
 
 def same_name(a, b):
-    if not a or not b:
+    (da, fa), (db, fb) = a, b
+    if not fa or not fb:
         return False
-    a, b = a.rstrip("s"), b.rstrip("s")
-    if a == b or (min(len(a), len(b)) >= 5 and (a in b or b in a)):
-        return True
-    # tolerate small spelling differences between sources
-    import difflib
-    return min(len(a), len(b)) >= 6 and difflib.SequenceMatcher(None, a, b).ratio() >= 0.85
+    if da and db:
+        A, B = " ".join(da), " ".join(db)
+        if set(da) <= set(db) or set(db) <= set(da):
+            return True
+        import difflib  # tolerate small spelling differences between sources
+        return min(len(A), len(B)) >= 6 and difflib.SequenceMatcher(None, A, B).ratio() >= 0.85
+    # one name is only generic words + a place name: duplicate only if the full names match
+    return fa == fb
 
 
 def metres(p, q):
     return math.hypot((p[0] - q[0]) * 110540, (p[1] - q[1]) * 92800)
 
 
+for nm in [d.get("name") or "" for d in divs] + [c.get("name", "") for c in (json.load(open(os.environ["COMMUNES"]))
+                                                                            if os.environ.get("COMMUNES") else [])]:
+    nm = re.sub(r"^(commune|arrondissement|municipalit[ée]|pachalik|province|pr[ée]fecture)\s+(de |d'|du |des )?", "", nm, flags=re.I)
+    PLACE_WORDS.update(w for w in words(nm) if len(w) >= 4)
+PLACE_WORDS -= {"ibn", "sina", "roch", "rochd", "pasteur", "atla", "andalou", "anoual", "alqod", "qods"}  # common lab names
+
 # drop duplicates: same class and matching name within 300 m (1.5 km for labs), or an unnamed point within 40 m
 kept = []
 for p in pts:
-    k = norm(p[3]) if p[3] != "(sans nom)" else ""
+    k = norm(p[3]) if p[3] != "(sans nom)" else ((), ())
     dup = False
     for q in kept:
         if q[2] != p[2] or abs(q[0] - p[0]) > 0.015 or abs(q[1] - p[1]) > 0.018:
             continue
-        kq = norm(q[3]) if q[3] != "(sans nom)" else ""
+        kq = norm(q[3]) if q[3] != "(sans nom)" else ((), ())
         d = metres(p, q)
         # lab names are distinctive and sources place them up to ~1 km apart; other types: 300 m
-        reach = 1500 if p[2] == "L" and min(len(k), len(kq)) >= 5 else 300
-        if (d <= reach and same_name(k, kq)) or ((not k or not kq) and d <= 40):
+        reach = 1500 if p[2] == "L" and ((k[0] and kq[0]) or (k[1] and k[1] == kq[1] and len(" ".join(k[1])) >= 8)) else 300
+        if (d <= reach and same_name(k, kq)) or ((not k[1] or not kq[1]) and d <= 40):
             dup = True
             if q[5] != p[5] and p[5] not in q[5]:
                 q[5] = q[5] + "+" + p[5]
@@ -180,11 +200,25 @@ if os.environ.get("COMMUNES"):
         tally[i]["sub"][p[6]] = tally[i]["sub"].get(p[6], 0) + 1
         p.append(i)
     print("points outside any commune polygon:", unassigned)
+    # affluence index (hcp_fiches.py); communes without a fact sheet get their province's population-weighted mean
+    prov_aff = {}
+    for c in raw:
+        if c.get("affluence") is not None:
+            s = prov_aff.setdefault(c["province"], [0.0, 0])
+            s[0] += c["affluence"] * c["pop"]; s[1] += c["pop"]
+    for c in raw:
+        if c.get("affluence") is None and c["province"] in prov_aff:
+            s = prov_aff[c["province"]]
+            c["affluence"], c["aff_estimated"] = round(s[0] / s[1], 1), True
     for c, t in zip(raw, tally):
         communes.append({"n": re.sub(r"^(Commune|Arrondissement|Municipalité)\s+(de la|de l'|du|des|de|d'|d’)?\s*", "", c["name"]),
                          "full": c["name"], "ar": c.get("name_ar"), "code": c["code"], "prov": c["province"],
                          "pop": c["pop"], "hh": c["households"], "pop14": c.get("pop14"),
-                         "growth": c.get("growth"), **t, "p": c["polys"]})
+                         "growth": c.get("growth"), "aff": c.get("affluence"), "affEst": c.get("aff_estimated", False),
+                         "socio": {k: (c.get("socio") or {}).get(k) for k in
+                                   ("higher_edu", "modern_housing", "slums", "poverty", "poverty14", "unemployment",
+                                    "illiteracy")} if c.get("socio") else None,
+                         **t, "p": c["polys"]})
 
 # residents on a 400 m grid (fetch_buildings.py): [lat, lon, residents 2024, growth %/yr, commune index]
 popcells = json.load(open(os.environ["POPCELLS"])) if os.environ.get("POPCELLS") else []

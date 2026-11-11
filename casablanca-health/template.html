@@ -160,6 +160,9 @@ details ul { padding-left: 18px; margin: 6px 0; }
           <div class="ctl"><label for="beta">How much distance deters patients</label><output id="beta-out">β = 2</output>
             <input type="range" id="beta" min="1" max="3" step="0.5" value="2">
             <span class="hint">Higher means patients only use the closest lab.</span></div>
+          <div class="ctl"><label for="gamma">Weight of income</label><output id="gamma-out">γ = 1</output>
+            <input type="range" id="gamma" min="0" max="2" step="0.5" value="1">
+            <span class="hint">0 ignores income. 1: a commune at affluence 120 counts each resident 20% more.</span></div>
           <div class="ctl"><label for="years">Project population ahead</label><output id="years-out">3 years</output>
             <input type="range" id="years" min="0" max="6" step="1" value="3"></div>
           <div class="toggles"><label><input type="checkbox" id="patho"> Count pathology labs as competitors</label></div>
@@ -212,17 +215,18 @@ details ul { padding-left: 18px; margin: 6px 0; }
       <summary>Method and limits</summary>
       <ul>
         <li><b>Data.</b> Two open sources merged and de-duplicated: Overture Maps Places (release 2026-10-21, mostly Meta and Microsoft business listings) and OpenStreetMap (October 2026 snapshot, which adds most public hospitals and CNSS polyclinics). <span id="google-note" hidden>A third source, Google Places (searched November 2026), adds most private cabinets and labs and is kept private to this page. </span>Population: official legal population by commune and arrondissement from the HCP census (RGPH 2024), joined to commune boundaries. Hover a point to see which source it came from. Labs were also searched by name ("laboratoire d'analyses médicales", مختبر التحليلات الطبية), because Google files some under generic categories. Every place is classified into 14 types by name and category in French, English and Arabic; vets, pharmacies, physiotherapists, psychologists, opticians, aesthetic-only practices, suppliers and offices are excluded. Hover a point to see its type.</li>
-        <li><b>Best sites formula.</b> For a candidate site c and each nearby demand point z: demand D<sub>z</sub> = α × residents × (1 + growth)<sup>years</sup> + (1 − α) × k × prescriber weight. The share a new lab wins is P = f(d<sub>cz</sub>) ÷ (f(d<sub>cz</sub>) + Σ A<sub>j</sub> f(d<sub>jz</sub>) + f(3 km)), with f(d) = d<sup>−β</sup> (Huff gravity model). A<sub>j</sub> = 1 for each lab, 0.5 for a public hospital and 0.3 for a private clinic (in-house labs); f(3 km) is the outside option (going further, hospital lab, home collection, no test). Site score = Σ D<sub>z</sub> × P within 6 km, in residents captured.</li>
+        <li><b>Best sites formula.</b> For a candidate site c and each nearby demand point z: demand D<sub>z</sub> = α × residents × (1 + growth)<sup>years</sup> × (affluence ÷ 100)<sup>γ</sup> + (1 − α) × k × prescriber weight. The share a new lab wins is P = f(d<sub>cz</sub>) ÷ (f(d<sub>cz</sub>) + Σ A<sub>j</sub> f(d<sub>jz</sub>) + f(3 km)), with f(d) = d<sup>−β</sup> (Huff gravity model). A<sub>j</sub> = 1 for each lab, 0.5 for a public hospital and 0.3 for a private clinic (in-house labs); f(3 km) is the outside option (going further, hospital lab, home collection, no test). Site score = Σ D<sub>z</sub> × P within 6 km, in residents captured.</li>
         <li><b>Prescriber weights.</b> Private clinic 3 (slider), medical centre 2, specialist who orders many tests (endocrino, gynéco, cardio, interne, gastro, néphro, pédiatre…) 1.5, GP 1.2, doctor of unknown specialty 1, public hospital and health centre 1, specialist who orders few tests (ophtalmo, dermato, ORL, psychiatre, chirurgien) 0.3, eye/skin clinic and dialysis 0.5, imaging 0, dentist 0 (or 0.3 if ticked).</li>
+        <li><b>Income.</b> HCP does not publish household income by commune, so the affluence index is a proxy built from each commune's 2024 census fact sheet (fiches communales): share with university education, share living in apartments or villas, share in makeshift housing or slums, multidimensional poverty, unemployment and illiteracy. Each is standardised across the region's communes, averaged, and scaled so the regional average is 100. Méchouar and Moulay Abdellah have no fact sheet and use their province's average.</li>
         <li><b>Residents.</b> Each commune's population is spread over a 400 m grid by building footprint and by density of all mapped places; in 42 sparsely mapped rural communes it is spread evenly, so rural results are rougher.</li>
         <li><b>Doctor gaps tab.</b> For each 400 m hexagon: weighted prescribers within the radius ÷ (labs in the same radius + 1).</li>
         <li><b>Coverage.</b> The source lists far fewer cabinets than really exist in Casablanca, and coverage is better in central districts. Read scores as relative signals, then verify on the ground or against DabaDoc, Med.ma or the Ordre des Médecins directory.</li>
         <li><b>Hospitals.</b> Public hospitals and large private clinics usually run an in-house lab. A high score driven by one big hospital is a weaker signal than one driven by many independent cabinets.</li>
         <li><b>Communes tab.</b> Residents per lab = RGPH 2024 population of the commune ÷ labs located in it. Patients cross commune lines, so a commune next to a well-served one can look worse than it is; check the nearest-lab distance on the map.</li>
-        <li><b>Not modelled.</b> Income and insurance mix, rent, visibility and parking, lab quality or opening hours, and sample-collection points run by existing labs.</li>
+        <li><b>Not modelled.</b> Insurance mix (AMO, CNOPS, private), rent, visibility and parking, lab quality or opening hours, and sample-collection points run by existing labs.</li>
       </ul>
     </details>
-    <p class="src">Data © Overture Maps Foundation contributors (CDLA Permissive 2.0) and © OpenStreetMap contributors (ODbL). Population: Haut-Commissariat au Plan, RGPH 2024.</p>
+    <p class="src">Data © Overture Maps Foundation contributors (CDLA Permissive 2.0) and © OpenStreetMap contributors (ODbL). Population and socio-economic indicators: Haut-Commissariat au Plan, RGPH 2014 and 2024.</p>
   </aside>
   <div id="map" role="region" aria-label="Map of Casablanca"></div>
 </div>
@@ -243,7 +247,7 @@ DATA.pts.forEach(p => counts[p[2]]++);
 for (const k in counts) $('n-' + k).textContent = counts[k];
 
 
-const state = { radius: 1000, wH: 3, wT: 0, minDemand: 10, province: '', view: 'sites', minPop: 20000, alpha: 0.6, beta: 2, years: 3, patho: false };
+const state = { radius: 1000, wH: 3, wT: 0, minDemand: 10, province: '', view: 'sites', minPop: 20000, alpha: 0.6, beta: 2, years: 3, gamma: 1, patho: false };
 const fmtN = n => n.toLocaleString('en-US');
 const COMMUNES = DATA.communes || [];
 // province of each commune, from the same boundaries as the Area menu
@@ -349,7 +353,7 @@ function run() {
     }
     const bin = cuts.filter(c => h.score > c).length;
     const poly = L.polygon(h.corners, { color: css('--panel'), weight: 0.6, fillColor: ramp[bin], fillOpacity: 0.78 })
-      .bindPopup(() => hexPopup(h), { maxWidth: 300 }).addTo(hexLayer);
+      .bindPopup(() => hexPopup(h), { maxWidth: 300, maxHeight: 360 }).addTo(hexLayer);
     hexById.set(h, poly);
   }
   const list = $('zones'); list.innerHTML = '';
@@ -377,7 +381,7 @@ function focusZone(i) {
   const h = result.top[i]; activeIdx = i;
   document.querySelectorAll('.zone').forEach((b, j) => b.classList.toggle('active', j === i));
   map.flyTo([h.lat, h.lon], 14.5, { duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 0.8 });
-  L.popup({ maxWidth: 300 }).setLatLng([h.lat, h.lon]).setContent(hexPopup(h)).openOn(map);
+  L.popup({ maxWidth: 300, maxHeight: 360 }).setLatLng([h.lat, h.lon]).setContent(hexPopup(h)).openOn(map);
 }
 
 $('radius').addEventListener('click', e => {
@@ -396,6 +400,7 @@ function sitePopup(c) {
     <tr><td>…of which from residents</td><td>${Math.round(100 * c.fromR / c.score)}%</td></tr>
     <tr><td>Residents within 2 km (2024)</td><td>${fmtN(Math.round(c.pop2km))}</td></tr>
     <tr><td>Growth 2014–24</td><td>${c.growth == null ? '–' : (c.growth > 0 ? '+' : '') + c.growth.toFixed(1) + '% / year'}</td></tr>
+    <tr><td>Affluence index (100 = region)</td><td>${c.aff2km ? Math.round(c.aff2km) : '–'}</td></tr>
     <tr><td>Labs within 1 km / 2 km</td><td>${c.labs1} / ${c.labs2}</td></tr><tr><td>Nearest lab</td><td>${fmtM(c.nearest)}</td></tr>
     <tr><td>Prescriber weight within 1 km</td><td>${c.presc1km}</td></tr>
     ${cm ? `<tr><td>Commune</td><td>${esc(cm.n)} (${fmtN(cm.pop)})</td></tr>` : ''}</table></div>`;
@@ -404,10 +409,10 @@ function focusSite(i) {
   const c = sites.top[i];
   document.querySelectorAll('#sites .zone').forEach((b, j) => b.classList.toggle('active', j === i));
   map.flyTo([c.lat, c.lon], 14.5, { duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 0.8 });
-  L.popup({ maxWidth: 320 }).setLatLng([c.lat, c.lon]).setContent(sitePopup(c)).openOn(map);
+  L.popup({ maxWidth: 320, maxHeight: 360 }).setLatLng([c.lat, c.lon]).setContent(sitePopup(c)).openOn(map);
 }
 function runSites() {
-  sites = GapAnalysis.siteModel(DATA, { alpha: state.alpha, beta: state.beta, years: state.years, includePatho: state.patho, province: state.province });
+  sites = GapAnalysis.siteModel(DATA, { alpha: state.alpha, beta: state.beta, years: state.years, gamma: state.gamma, includePatho: state.patho, province: state.province });
   siteLayer.clearLayers(); sitePins.clearLayers();
   const sorted = sites.cands.slice().sort((a, b) => b.score - a.score);
   const shown = sorted.slice(0, 7000), ramp = ['--s1', '--s2', '--s3', '--s4', '--s5'].map(css);
@@ -416,7 +421,7 @@ function runSites() {
   $('site-max').textContent = sorted.length ? 'up to ' + fmtK(sorted[0].score) : '';
   for (const c of shown) {
     const bin = cuts.filter(t => c.score > t).length;
-    L.polygon(c.corners, { stroke: false, fillColor: ramp[bin], fillOpacity: 0.72 }).bindPopup(() => sitePopup(c), { maxWidth: 320 }).addTo(siteLayer);
+    L.polygon(c.corners, { stroke: false, fillColor: ramp[bin], fillOpacity: 0.72 }).bindPopup(() => sitePopup(c), { maxWidth: 320, maxHeight: 360 }).addTo(siteLayer);
   }
   const list = $('sites'); list.innerHTML = '';
   sites.top.forEach((c, i) => {
@@ -426,6 +431,7 @@ function runSites() {
       <span class="chips"><span class="chip">captures ${fmtK(c.score)}</span>
       <span class="chip">${fmtK(c.pop2km)} residents ≤ 2 km</span>
       ${c.growth != null ? `<span class="chip">${c.growth > 0 ? '+' : ''}${c.growth.toFixed(1)}%/yr</span>` : ''}
+      ${c.aff2km ? `<span class="chip">affluence ${Math.round(c.aff2km)}</span>` : ''}
       <span class="chip ${c.labs1 ? '' : 'zero'}"><i class="sq" style="background:var(--lab)"></i>${c.labs1} ≤ 1 km</span>
       <span class="chip">nearest lab ${fmtM(c.nearest)}</span></span></span></button>`;
     li.firstChild.addEventListener('click', () => focusSite(i));
@@ -438,6 +444,7 @@ function runSites() {
 const queueSites = () => { clearTimeout(siteTimer); $('sites').style.opacity = 0.5; siteTimer = setTimeout(() => { runSites(); $('sites').style.opacity = 1; }, 150); };
 $('alpha').addEventListener('input', e => { state.alpha = e.target.value / 100; $('alpha-out').textContent = `${e.target.value}% / ${100 - e.target.value}%`; queueSites(); });
 $('beta').addEventListener('input', e => { state.beta = +e.target.value; $('beta-out').textContent = 'β = ' + state.beta; queueSites(); });
+$('gamma').addEventListener('input', e => { state.gamma = +e.target.value; $('gamma-out').textContent = 'γ = ' + state.gamma; queueSites(); });
 $('years').addEventListener('input', e => { state.years = +e.target.value; $('years-out').textContent = state.years + (state.years === 1 ? ' year' : ' years'); queueSites(); });
 $('patho').addEventListener('change', e => { state.patho = e.target.checked; queueSites(); run(); });
 
@@ -457,6 +464,12 @@ function communePopup(i) {
     <tr><td>Population (RGPH 2024)</td><td><b>${fmtN(c.pop)}</b></td></tr>
     ${c.pop14 ? `<tr><td>Population (RGPH 2014)</td><td>${fmtN(c.pop14)}</td></tr><tr><td>Growth 2014–24</td><td><b>${c.growth > 0 ? '+' : ''}${c.growth.toFixed(1)}% / year</b></td></tr>` : ''}
     <tr><td>Households</td><td>${fmtN(c.hh)}</td></tr>
+    ${c.aff != null ? `<tr><td>Affluence index (100 = region)</td><td><b>${Math.round(c.aff)}</b>${c.affEst ? ' (province average)' : ''}</td></tr>` : ''}
+    ${c.socio ? `<tr><td>University education</td><td>${c.socio.higher_edu}%</td></tr>
+    <tr><td>Living in apartments or villas</td><td>${Math.round(c.socio.modern_housing)}%</td></tr>
+    <tr><td>Makeshift housing / slums</td><td>${c.socio.slums}%</td></tr>
+    <tr><td>Multidimensional poverty</td><td>${c.socio.poverty}%${c.socio.poverty14 != null ? ' (2014: ' + c.socio.poverty14 + '%)' : ''}</td></tr>
+    <tr><td>Unemployment</td><td>${c.socio.unemployment}%</td></tr>` : ''}
     <tr><td>Labs</td><td>${c.L}</td></tr><tr><td>Clinics &amp; hospitals</td><td>${c.H}</td></tr><tr><td>Doctors</td><td>${c.D}</td></tr><tr><td>Dentists</td><td>${c.T}</td></tr>
     <tr><td>Residents per lab</td><td><b>${c.L ? fmtN(Math.round(c.pop / c.L)) : 'no lab'}</b></td></tr>
     <tr><td>Residents per doctor</td><td>${c.D ? fmtN(Math.round(c.pop / c.D)) : 'no doctor'}</td></tr></table>
@@ -467,13 +480,13 @@ function focusCommune(i) {
   const c = COMMUNES[i];
   document.querySelectorAll('#communes .zone').forEach(b => b.classList.toggle('active', +b.dataset.i === i));
   map.fitBounds(communeBounds(c), { padding: [30, 30], maxZoom: 14 });
-  L.popup({ maxWidth: 320 }).setLatLng([c.lat, c.lon]).setContent(communePopup(i)).openOn(map);
+  L.popup({ maxWidth: 320, maxHeight: 360 }).setLatLng([c.lat, c.lon]).setContent(communePopup(i)).openOn(map);
 }
 function renderCommunes() {
   communeLayer.clearLayers();
   COMMUNES.forEach((c, i) => {
     L.polygon(c.p.map(poly => poly.map(r => r.map(([x, y]) => [y, x]))), { color: css('--panel'), weight: 0.8, fillColor: communeFill(c), fillOpacity: 0.62 })
-      .bindPopup(() => communePopup(i), { maxWidth: 320 }).addTo(communeLayer);
+      .bindPopup(() => communePopup(i), { maxWidth: 320, maxHeight: 360 }).addTo(communeLayer);
   });
   const list = $('communes'); list.innerHTML = '';
   const key = c => c.L ? c.pop / c.L : 1e9 + c.pop;
@@ -482,7 +495,7 @@ function renderCommunes() {
       const li = document.createElement('li');
       li.innerHTML = `<button class="zone" type="button" data-i="${i}"><span class="rank">${rank + 1}</span><span>
         <span class="name">${esc(c.n)}</span> <span class="district">· ${esc(c.provR)}</span>
-        <span class="chips"><span class="chip">${fmtN(c.pop)} residents</span>${c.growth != null ? `<span class="chip">${c.growth > 0 ? '+' : ''}${c.growth.toFixed(1)}%/yr since 2014</span>` : ''}
+        <span class="chips"><span class="chip">${fmtN(c.pop)} residents</span>${c.growth != null ? `<span class="chip">${c.growth > 0 ? '+' : ''}${c.growth.toFixed(1)}%/yr since 2014</span>` : ''}${c.aff != null ? `<span class="chip">affluence ${Math.round(c.aff)}</span>` : ''}
         <span class="chip ${c.L ? '' : 'zero'}"><i class="sq" style="background:var(--lab)"></i>${perLab(c)}</span>
         <span class="chip"><i class="dot" style="background:var(--hosp)"></i>${c.H}</span>
         <span class="chip"><i class="dot" style="background:var(--doc)"></i>${c.D}</span></span></span></button>`;

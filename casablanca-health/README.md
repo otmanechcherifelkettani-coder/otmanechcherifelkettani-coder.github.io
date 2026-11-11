@@ -16,7 +16,7 @@ merged with OpenStreetMap health features from the Overpass API (`osm_health.jso
 For a candidate site *c* and every demand point *z* within 6 km:
 
 ```
-D_z   = α · residents_z · (1 + g_z)^years  +  (1 − α) · k · prescriber_weight_z     demand at z
+D_z   = α · residents_z · (1 + g_z)^years · (affluence_z/100)^γ  +  (1 − α) · k · prescriber_weight_z
 f(d)  = max(d, 300 m)^−β                                                           pull of a site at distance d
 P_cz  = f(d_cz) / ( f(d_cz) + Σ_j A_j · f(d_jz) + f(3 km) )                        share a NEW lab at c wins (Huff)
 Score = Σ_z D_z · P_cz                                                             in residents captured
@@ -24,6 +24,10 @@ Score = Σ_z D_z · P_cz                                                        
 
 - residents_z: HCP RGPH 2024 commune population spread over a 400 m grid (building footprint + place density);
   g_z: the commune's annual growth 2014–2024; years: projection horizon (default 3).
+- affluence_z: income proxy of the commune (100 = regional average, γ = 1 by default). HCP publishes no income by
+  commune, so `hcp_fiches.py` builds it from the RGPH 2024 fiches communales: university education, share living in
+  apartments or villas, makeshift housing / slums, multidimensional poverty, unemployment and illiteracy
+  (each standardised across communes, averaged, ±1 SD = ±25 points).
 - prescriber weights: private clinic 3, medical centre 2, high-test specialist 1.5, GP 1.2, unknown doctor 1,
   public hospital / health centre 1, eye-skin clinic and dialysis 0.5, low-test specialist 0.3, imaging and dentist 0.
   k rescales them so both channels have the same regional total; α = 0.6 by default.
@@ -47,6 +51,8 @@ python3 fetch_communes.py pop2024.xlsx region.json communes.json
 # HCP 2014 legal population (https://www.hcp.ma/reg-casablanca/docs/docs/pop_legal_2014.pdf) -> growth 2014-24
 python3 hcp_2014.py pop_legal_2014.pdf communes.json
 python3 fetch_buildings.py communes.json places.json popcells.json   # residents on a 400 m grid
+# HCP fiches communales RGPH 2024 (one PDF per province, hcp.ma/reg-casablanca) -> affluence index
+python3 hcp_fiches.py fiches/ communes.json
 REGION=region.json COMMUNES=communes.json POPCELLS=popcells.json python3 build.py places.json divisions.json context.json osm_health.json
 node analysis.js data.json "Nouaceur"                    # text ranking, optionally for one province
 ```
