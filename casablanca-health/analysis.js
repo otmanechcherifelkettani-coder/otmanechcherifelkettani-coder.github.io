@@ -75,7 +75,7 @@
   function nearestLabel(labels, lat, lon, types) {
     let best = null, bd = Infinity;
     for (const l of labels) {
-      if (!types.includes(l.t)) continue;
+      if (!types.includes(l.t) || /^(Pr[ée]fecture|Arrondissement|Pachalik|Province|Cercle)/i.test(l.n)) continue;
       const [x1, y1] = toXY(lat, lon), [x2, y2] = toXY(l.lat, l.lon);
       const d = Math.hypot(x1 - x2, y1 - y2);
       if (d < bd) { bd = d; best = l; }

@@ -22,7 +22,7 @@ LAB_NAME = re.compile(
     re.I)
 LAB_EXCL = re.compile(
     r"dentaire|proth[eè]s|photo|zoopole|novovet|v[ée]t[ée]rin|sanofi|sterifil|fillmed|coudon|radiolog|neuroclinique|"
-    r"\bhse\b|methc|complexe sportif|lpee|essais|structures|sols|roches|التجارب|تصوير|filorga|chlorophylle|lamapro|oculaire|cosm|pharmaceut|liman",
+    r"\bhse\b|methc|complexe sportif|lpee|essais|supplies|psycho|hypno|structures|sols|roches|التجارب|تصوير|filorga|chlorophylle|lamapro|oculaire|cosm|pharmaceut|liman",
     re.I)
 
 HOSP_CATS = {"hospital", "emergency_department", "surgery_center", "outpatient_care_facility", "medical_center",
@@ -47,7 +47,9 @@ DENT_NAME = re.compile(r"dentaire|dentiste|dental|orthodont", re.I)
 NOT_MED = re.compile(
     r"v[ée]t[ée]rin|\bvet\b|bijou|phone|stone|esth[ée]ti|aesthetic|botox|filler|beaut|spa\b|laser|amincis|media\b|"
     r"optique|pharmacie|\bpara\b|kin[ée]|r[ée][ée]ducation|physio|orthophon|hijama|حجامة|صيدلية|تلقيح|simulation|"
-    r"psychanalyse|compl[ée]mentaire|التكميلي|looxwell", re.I)
+    r"psychanalyse|compl[ée]mentaire|التكميلي|looxwell|psycholog|psychoth|hypno|coach|counsel|d[ée]l[ée]gation|"
+    r"\bdirr?ection\b|anapec|minist|en construction|supplies|fournitures|nutrition(?!ni)|di[ée]t[ée]ti|"
+    r"orthoptie|ost[ée]opath|podolog|sophrolog", re.I)
 NON_MED_PRIMARY = {"veterinarian", "beauty_salon", "spa", "eyewear_store", "mobile_phone_store", "clothing_store",
                    "public_relations", "janitorial_service", "electronic_equipment_supplier", "boat_dealer",
                    "pharmacy", "travel_and_transportation", "education", "nail_salon", "hair_salon"}
@@ -139,21 +141,70 @@ if len(sys.argv) > 4:
         spec = t.get("healthcare:speciality")
         pts.append([round(lat, 5), round(lon, 5), c, name or "(sans nom)", kind + (f" · {spec}" if spec else ""), "OSM"])
     print("osm:", osm_counts)
+
+# ---------- Google Places (optional, env GOOGLE_PLACES=path) ----------
+# Kept out of the public repo build: Google's terms restrict storing and redistributing Places content.
+
+
+def classify_google(p):
+    name = p.get("name") or ""
+    types = set(p.get("types") or [])
+    prim = p.get("primary") or ""
+    if p.get("status") in ("CLOSED_PERMANENTLY",):
+        return None
+    if VET.search(name) or "veterinary_care" in types:
+        return None
+    if "medical_lab" in types or prim == "medical_lab":
+        return None if LAB_EXCL.search(name) else "L"
+    if (LAB_NAME.search(name) or re.search(r"\w{3,}lab\b", name, re.I)) and not LAB_EXCL.search(name):
+        return "L"
+    if DENT_NAME.search(name) or types & {"dentist", "dental_clinic"}:
+        return "T"
+    if NOT_MED.search(name) and not SPECIALTY.search(name):
+        return None
+    if types & {"physiotherapist", "pharmacy", "drugstore", "spa", "beauty_salon"} and not SPECIALTY.search(name):
+        return None
+    if HOSP_NAME.search(name) or prim in ("hospital", "general_hospital"):
+        return "H"
+    if DOC_NAME.search(name) or SPECIALTY.search(name):
+        return "D"
+    if types & {"doctor", "medical_clinic", "medical_center"}:
+        return "D"  # most Moroccan "medical clinic" listings are single practices
+    return None
+
+
+import os
+
+if os.environ.get("GOOGLE_PLACES"):
+    g_counts = {}
+    for p in json.load(open(os.environ["GOOGLE_PLACES"]))["places"]:
+        c = classify_google(p)
+        if not c:
+            continue
+        g_counts[c] = g_counts.get(c, 0) + 1
+        pts.append([round(p["lat"], 5), round(p["lon"], 5), c, p.get("name") or "(sans nom)",
+                    p.get("primary") or "", "Google"])
+    print("google:", g_counts)
 # drop duplicate listings: same class, same normalised name, within 200 m
 import math, unicodedata
 
 
 def norm(n):
+    latin = re.sub(r"[\u0600-\u06ff]+", " ", n)
+    if re.search(r"[A-Za-z]{3}", latin):
+        n = latin  # bilingual names: compare the Latin part only
     n = unicodedata.normalize("NFKD", n.lower())
     n = "".join(ch for ch in n if not unicodedata.combining(ch))
     n = re.sub(r"\b(clinique|clinic|clinica|polyclinique|cabinet|laboratoire|laboratory|labo|lab|centre|center|"
-               r"medical|medicale|medicales|analyses?|dr|docteur|de|du|la|le|d|l|des|et|casablanca|maroc)\b", " ", n)
+               r"medical|medicale|medicales|analyses?|dr|docteur|de|du|la|le|d|l|des|et|casablanca|maroc|clinical|hospital|"
+               r"hopital|medico|chirurgicale|multidisciplinaire|privee?|international|internationale)\b", " ", n)
     return re.sub(r"[^a-z0-9\u0600-\u06ff]+", "", n)
 
 
 def same_name(a, b):
     if not a or not b:
         return False
+    a, b = a.rstrip("s"), b.rstrip("s")
     if a == b or (min(len(a), len(b)) >= 5 and (a in b or b in a)):
         return True
     # tolerate small spelling differences between sources
@@ -204,17 +255,19 @@ areas = [{"n": a["name"], "t": a["subtype"], "p": a["polys"]} for a in ctx["area
 data = {"pts": pts, "labels": labels, "roads": roads, "areas": areas,
         "meta": {"source": "Overture Maps Foundation, Places + Divisions + Transportation, release 2026-10-21.0",
                  "counts": counts}}
-(HERE / "data.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
+OUTDIR = Path(os.environ.get("OUT_DIR", HERE))
+OUTDIR.mkdir(parents=True, exist_ok=True)
+(OUTDIR / "data.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
 
 tpl = (HERE / "template.html").read_text()
 page = (tpl.replace("/*__LEAFLET_CSS__*/", (HERE / "vendor" / "leaflet.css").read_text())
         .replace("/*__ANALYSIS__*/", (HERE / "analysis.js").read_text())
         .replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))
 # artifact.html: bare body content (the artifact host adds the document skeleton)
-(HERE / "artifact.html").write_text(page)
+(OUTDIR / "artifact.html").write_text(page)
 # index.html: standalone document for GitHub Pages
-(HERE / "index.html").write_text(
+(OUTDIR / "index.html").write_text(
     '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
     '<style>body{margin:0}[hidden]{display:none!important}</style>\n</head>\n<body>\n' + page + '\n</body>\n</html>\n')
-print("wrote index.html", (HERE / "index.html").stat().st_size // 1024, "KB")
+print("wrote", OUTDIR, (OUTDIR / "index.html").stat().st_size // 1024, "KB")
