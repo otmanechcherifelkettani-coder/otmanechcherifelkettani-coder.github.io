@@ -242,8 +242,34 @@ for p in pts:
     counts[p[2]] = counts.get(p[2], 0) + 1
 print("classified:", counts)
 
+# ---------- region clip (optional env REGION=region.json from fetch_region.py) ----------
+provinces, region_outline = [], None
+if os.environ.get("REGION"):
+    from shapely.geometry import shape, Point, mapping
+    from shapely.prepared import prep
+    reg = json.load(open(os.environ["REGION"]))
+    rgeom = shape(reg["region"]["geom"])
+    rprep = prep(rgeom.buffer(0.005))
+    before = len(pts)
+    pts = [p for p in pts if rprep.contains(Point(p[1], p[0]))]
+    print("outside region removed:", before - len(pts))
+
+    def rings(g):
+        m = mapping(g.simplify(0.003))
+        polys = [m["coordinates"]] if m["type"] == "Polygon" else m["coordinates"]
+        return [[[[round(c[0], 4), round(c[1], 4)] for c in ring] for ring in poly] for poly in polys]
+
+    for p in reg["provinces"]:
+        nm = re.sub(r"^(Province|Préfecture)\s+(de la|de l'|du|des|de|d'|d’)\s*", "", p["name"])
+        provinces.append({"n": nm, "p": rings(shape(p["geom"]))})
+    region_outline = rings(rgeom)
+    counts = {}
+    for p in pts:
+        counts[p[2]] = counts.get(p[2], 0) + 1
+    print("in region:", counts)
+
 labels = [{"n": d["name"], "t": d["subtype"], "lat": round(d["lat"], 5), "lon": round(d["lon"], 5)}
-          for d in divs if d["subtype"] in ("neighborhood", "macrohood", "microhood") and d["name"]]
+          for d in divs if d["subtype"] in ("neighborhood", "macrohood", "microhood", "locality") and d["name"]]
 
 # merge road segments by class into fewer multi-lines
 roads = {}
@@ -252,7 +278,7 @@ for rd in ctx["roads"]:
 # keep the arrondissement / commune polygons (drop prefecture-scale 'county' shapes, keep for outline)
 areas = [{"n": a["name"], "t": a["subtype"], "p": a["polys"]} for a in ctx["areas"]]
 
-data = {"pts": pts, "labels": labels, "roads": roads, "areas": areas,
+data = {"pts": pts, "labels": labels, "roads": roads, "areas": areas, "provinces": provinces, "region": region_outline,
         "meta": {"source": "Overture Maps Foundation, Places + Divisions + Transportation, release 2026-10-21.0",
                  "counts": counts}}
 OUTDIR = Path(os.environ.get("OUT_DIR", HERE))

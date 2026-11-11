@@ -4,6 +4,7 @@ Reads only the parquet row groups whose bbox statistics overlap the Casablanca
 bounding box, using HTTP range requests, so the full ~13 GB theme is never downloaded.
 """
 import json
+import os
 import re
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -15,7 +16,8 @@ import requests
 RELEASE = sys.argv[1] if len(sys.argv) > 1 else "2026-10-21.0"
 BUCKET = "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
 # Greater Casablanca (prefecture + Ain Harrouda/Mohammedia edge excluded)
-XMIN, YMIN, XMAX, YMAX = -7.75, 33.45, -7.40, 33.66
+XMIN, YMIN, XMAX, YMAX = (map(float, os.environ["BBOX"].split(",")) if os.environ.get("BBOX")
+                          else (-7.75, 33.45, -7.40, 33.66))  # BBOX="xmin,ymin,xmax,ymax"
 OUT = sys.argv[2] if len(sys.argv) > 2 else "places_casablanca.json"
 
 listing = requests.get(

@@ -3,6 +3,7 @@
 Output: context.json with {"areas": [...], "roads": [...]} as simplified lon/lat coordinate lists.
 """
 import json
+import os
 import re
 import sys
 from concurrent.futures import ThreadPoolExecutor
@@ -16,8 +17,10 @@ from shapely.geometry import box, mapping
 RELEASE = sys.argv[1] if len(sys.argv) > 1 else "2026-10-21.0"
 OUT = sys.argv[2] if len(sys.argv) > 2 else "context.json"
 BUCKET = "https://overturemaps-us-west-2.s3.us-west-2.amazonaws.com"
-XMIN, YMIN, XMAX, YMAX = -7.75, 33.45, -7.40, 33.66
+XMIN, YMIN, XMAX, YMAX = (map(float, os.environ["BBOX"].split(",")) if os.environ.get("BBOX")
+                          else (-7.75, 33.45, -7.40, 33.66))  # BBOX="xmin,ymin,xmax,ymax"
 CLIP = box(XMIN, YMIN, XMAX, YMAX)
+LARGE = (XMAX - XMIN) > 1  # region-scale: lighter roads, coarser polygons
 fs = fsspec.filesystem("http", block_size=4 * 1024 * 1024)
 
 
@@ -77,13 +80,13 @@ areas = []
 for r in area_rows:
     n = r["names"] or {}
     name = dict(n.get("common") or {}).get("fr") or n.get("primary")
-    c = coords(wkb.loads(r["geometry"]), 0.0004)
+    c = coords(wkb.loads(r["geometry"]), 0.001 if LARGE else 0.0004)
     if c:
         areas.append({"name": name, "subtype": r["subtype"], "polys": c})
 print(f"{len(areas)} areas", flush=True)
 
 # Major roads
-ROAD = {"motorway", "trunk", "primary", "secondary"}
+ROAD = {"motorway", "trunk", "primary"} if LARGE else {"motorway", "trunk", "primary", "secondary"}
 road_rows = []
 with ThreadPoolExecutor(6) as ex:
     for rs in ex.map(lambda k: read_bbox(k, ["class", "subtype", "geometry"],
@@ -92,7 +95,7 @@ with ThreadPoolExecutor(6) as ex:
         road_rows.extend(rs)
 roads = []
 for r in road_rows:
-    c = coords(wkb.loads(r["geometry"]), 0.0002)
+    c = coords(wkb.loads(r["geometry"]), 0.0006 if LARGE else 0.0002)
     if c:
         roads.append({"cls": r["class"], "lines": c})
 print(f"{len(roads)} road segments", flush=True)

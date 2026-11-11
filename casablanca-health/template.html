@@ -59,6 +59,8 @@ h2 { font: 700 0.72rem/1 var(--f-display); text-transform: uppercase; letter-spa
 .toggles label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
+.area-pick { margin: 10px 0 6px; grid-template-columns: auto 1fr; }
+.area-pick select { font: 500 0.88rem var(--f-body); padding: 5px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); min-width: 0; }
 .zones { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
 .zone { display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 10px 8px; border-radius: 8px; cursor: pointer; border: 0; background: none; color: inherit; text-align: left; font: inherit; width: 100%; }
 .zone:hover, .zone.active { background: var(--chip); }
@@ -103,7 +105,7 @@ details ul { padding-left: 18px; margin: 6px 0; }
 <div class="app">
   <aside class="panel" aria-label="Analysis">
     <header>
-      <h1>Where Casablanca's doctors outnumber its labs</h1>
+      <h1>Where Casablanca-Settat's doctors outnumber its labs</h1>
       <p class="lede">Each hexagon counts the clinics, hospitals and doctors within walking catchment, then divides by the number of medical laboratories in the same catchment. Hot zones are where demand for blood work is high and no lab is close.</p>
     </header>
 
@@ -117,6 +119,8 @@ details ul { padding-left: 18px; margin: 6px 0; }
     <section>
       <h2>Top opportunity zones</h2>
       <div class="legend" aria-hidden="true"><span>Gap score</span><span class="ramp"><i style="background:var(--s1)"></i><i style="background:var(--s2)"></i><i style="background:var(--s3)"></i><i style="background:var(--s4)"></i><i style="background:var(--s5)"></i></span><span id="ramp-max"></span></div>
+      <div class="ctl area-pick"><label for="province">Area</label>
+        <select id="province"><option value="">Whole region</option></select></div>
       <ol class="zones" id="zones"></ol>
     </section>
 
@@ -180,9 +184,11 @@ DATA.pts.forEach(p => counts[p[2]]++);
 for (const k in counts) $('n-' + k).textContent = counts[k];
 
 
-const state = { radius: 1000, wH: 3, wT: 0, minDemand: 10 };
-const map = L.map('map', { preferCanvas: true, zoomSnap: 0.25, attributionControl: true, minZoom: 10, maxZoom: 18 })
-  .fitBounds([[33.50, -7.72], [33.63, -7.47]]);
+const state = { radius: 1000, wH: 3, wT: 0, minDemand: 10, province: '' };
+for (const p of DATA.provinces || []) { const o = document.createElement('option'); o.value = o.textContent = p.n; $('province').appendChild(o); }
+if (!(DATA.provinces || []).length) $('province').closest('.ctl').hidden = true;
+const map = L.map('map', { preferCanvas: true, zoomSnap: 0.25, attributionControl: true, minZoom: 8, maxZoom: 18 })
+  .fitBounds(DATA.region ? [[33.33, -7.93], [33.72, -7.33]] : [[33.50, -7.72], [33.63, -7.47]]);
 map.attributionControl.setPrefix(false).addAttribution('Overture Maps Foundation · © OpenStreetMap contributors');
 if (DATA.pts.some(p => (p[5] || '').includes('Google'))) { $('google-note').hidden = false; map.attributionControl.addAttribution('Google'); }
 
@@ -194,19 +200,26 @@ function drawBase() {
   base.clearLayers();
   const ll = ring => ring.map(c => [c[1], c[0]]);
   for (const a of DATA.areas) L.polygon(a.p.map(poly => poly.map(ll)), { stroke: false, fillColor: css('--land'), fillOpacity: 1, interactive: false }).addTo(base);
-  for (const a of DATA.areas) if (a.t === 'macrohood' || a.t === 'localadmin')
+  for (const a of DATA.areas) if (a.t === 'macrohood' || (a.t === 'localadmin' && !DATA.region))
     L.polygon(a.p.map(poly => poly.map(ll)), { color: css('--border'), weight: 0.8, dashArray: '3 3', fill: false, interactive: false }).addTo(base);
+  for (const p of DATA.provinces || [])
+    L.polygon(p.p.map(poly => poly.map(ll)), { color: css('--border'), weight: 1.1, dashArray: '5 4', fill: false, interactive: false }).addTo(base);
+  if (DATA.region) L.polygon(DATA.region.map(poly => poly.map(ll)), { color: css('--fg'), weight: 1.6, opacity: 0.55, fill: false, interactive: false }).addTo(base);
   const order = ['secondary', 'primary', 'trunk', 'motorway'];
   for (const cls of order) if (DATA.roads[cls])
     L.polyline(DATA.roads[cls].map(ll), { color: css(cls === 'secondary' ? '--road' : '--road-major'), weight: cls === 'motorway' ? 2.2 : cls === 'secondary' ? 0.8 : 1.4, interactive: false }).addTo(base);
 }
 
+// Towns whose names stay visible when zoomed out (labels for other localities appear on zoom)
+const TOWNS = new Set(['Casablanca', 'Mohammédia', 'Mohammedia', 'Bouskoura', 'Dar Bouazza', 'Nouaceur', 'Médiouna', 'Mediouna', 'Berrechid', 'Had Soualem', 'Settat', 'El Jadida', 'Azemmour', 'Sidi Bennour', 'Benslimane', 'Bouznika', 'Tit Mellil', 'Ain Harrouda', 'Aïn Harrouda', 'Deroua', 'Soualem', 'Ben Ahmed', 'Bir Jdid', 'Lahraouyine', 'Sidi Rahal', 'El Gara', 'Tamaris', 'Oulad Saleh', 'Zenata', 'Sahel Oulad Hriz', 'Oualidia']);
+
 function drawLabels() {
   labelLayer.clearLayers();
-  if (map.getZoom() < 12) return;
-  const seen = new Set();
+  const z = map.getZoom(), seen = new Set();
+  // towns from zoom 10.5, Casablanca districts from zoom 12; few enough to stay readable
+  const show = l => (l.t === 'macrohood' && z >= 12) || (l.t === 'locality' && z >= 10.5 && (z >= 12 || TOWNS.has(l.n)));
   for (const l of DATA.labels) {
-    if (l.t !== 'macrohood' || /^(Arrondissement|Pachalik|Province|Préfecture|Cercle)/i.test(l.n) || seen.has(l.n)) continue;
+    if (!show(l) || /^(Arrondissement|Pachalik|Province|Préfecture|Cercle|Caïdat|Commune)/i.test(l.n) || seen.has(l.n)) continue;
     seen.add(l.n);
     L.marker([l.lat, l.lon], { interactive: false, keyboard: false, icon: L.divIcon({ className: '', html: `<span class="lbl">${esc(l.n)}</span>`, iconSize: [0, 0] }) }).addTo(labelLayer);
   }
@@ -241,8 +254,7 @@ function hexPopup(h) {
   const R = state.radius, [x, y] = [h.x, h.y];
   const near = result.pts.filter(p => Math.hypot(p.x - x, p.y - y) <= R && (p.c === 'L' || p.c === 'H' || p.c === 'D' || (p.c === 'T' && state.wT)));
   near.sort((a, b) => (a.c === 'L' ? -1 : 0) - (b.c === 'L' ? -1 : 0) || a.c.localeCompare(b.c));
-  const hood = GapAnalysis.nearestLabel(DATA.labels, h.lat, h.lon, ['neighborhood', 'microhood']);
-  const dist = GapAnalysis.nearestLabel(DATA.labels, h.lat, h.lon, ['macrohood']);
+  const { hood, district: dist } = GapAnalysis.zoneName(DATA, h.lat, h.lon);
   return `<div class="pop"><h3>${esc(hood)}${dist && dist !== hood ? ' · ' + esc(dist) : ''}</h3>
     <table><tr><td>Gap score</td><td><b>${h.score.toFixed(1)}</b></td></tr>
     <tr><td>Clinics &amp; hospitals</td><td>${h.n.H}</td></tr><tr><td>Doctors</td><td>${h.n.D}</td></tr>
@@ -252,7 +264,7 @@ function hexPopup(h) {
 }
 
 function run() {
-  result = GapAnalysis.analyse(DATA, { hex: 400, radius: state.radius, wH: state.wH, wD: 1, wT: state.wT, minDemand: state.minDemand });
+  result = GapAnalysis.analyse(DATA, { hex: 400, radius: state.radius, wH: state.wH, wD: 1, wT: state.wT, minDemand: state.minDemand, province: state.province });
   hexLayer.clearLayers(); pinLayer.clearLayers(); hexById.clear();
   const q = result.hexes.filter(h => h.qualifies);
   const cuts = binsFor(q.map(h => h.score)), ramp = ['--s1', '--s2', '--s3', '--s4', '--s5'].map(css);
@@ -269,8 +281,7 @@ function run() {
   }
   const list = $('zones'); list.innerHTML = '';
   result.top.forEach((h, i) => {
-    const hood = GapAnalysis.nearestLabel(DATA.labels, h.lat, h.lon, ['neighborhood', 'microhood']);
-    const dist = GapAnalysis.nearestLabel(DATA.labels, h.lat, h.lon, ['macrohood']);
+    const { hood, district: dist } = GapAnalysis.zoneName(DATA, h.lat, h.lon);
     const li = document.createElement('li');
     li.innerHTML = `<button class="zone" type="button"><span class="rank">${i + 1}</span><span>
       <span class="name">${esc(hood)}</span>${dist && dist !== hood ? ` <span class="district">· ${esc(dist)}</span>` : ''}
@@ -299,6 +310,12 @@ $('radius').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   [...$('radius').children].forEach(x => x.setAttribute('aria-pressed', x === b));
   state.radius = +b.dataset.v; run();
+});
+$('province').addEventListener('change', e => {
+  state.province = e.target.value; run();
+  const p = (DATA.provinces || []).find(x => x.n === state.province);
+  const rings = p ? p.p : DATA.region;
+  if (rings) map.fitBounds(L.latLngBounds(rings.flat(2).map(c => [c[1], c[0]])), { padding: [20, 20] });
 });
 $('wH').addEventListener('input', e => { state.wH = +e.target.value; $('wH-out').textContent = '×' + state.wH; run(); });
 $('minD').addEventListener('input', e => { state.minDemand = +e.target.value; $('minD-out').textContent = state.minDemand; run(); });

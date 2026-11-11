@@ -18,7 +18,15 @@ import requests
 OUT = sys.argv[1]
 MAX_REQ = int(sys.argv[2]) if len(sys.argv) > 2 else 2500
 KEY = os.environ["places_key"]
-XMIN, YMIN, XMAX, YMAX = -7.75, 33.45, -7.40, 33.66
+XMIN, YMIN, XMAX, YMAX = (map(float, os.environ["BBOX"].split(",")) if os.environ.get("BBOX")
+                          else (-7.75, 33.45, -7.40, 33.66))
+STEP = float(os.environ.get("STEP", 2000))  # starting cell size in metres
+# REGION: GeoJSON-ish file with {"region": {"geom": ...}}; cells outside it are not searched.
+# SKIP_BBOX: area already harvested; cells fully inside it are not searched.
+from shapely.geometry import box as _box, shape as _shape
+REGION = _shape(json.load(open(os.environ["REGION"]))["region"]["geom"]).buffer(0.01) if os.environ.get("REGION") else None
+SKIP = _box(*map(float, os.environ["SKIP_BBOX"].split(","))) if os.environ.get("SKIP_BBOX") else None
+skipped = 0
 KX, KY = math.cos(math.radians(33.57)) * 111320, 110540
 STREAMS = {
     "lab": ["medical_lab"],
@@ -47,8 +55,13 @@ def search(types, lat, lon, radius):
 
 
 def cell(stream, x0, y0, x1, y1, depth=0):
+    global skipped
     if nreq >= MAX_REQ:
         return False
+    ll = _box(x0 / KX - 7.6, y0 / KY + 33.57, x1 / KX - 7.6, y1 / KY + 33.57)
+    if (REGION is not None and not REGION.intersects(ll)) or (SKIP is not None and SKIP.contains(ll)):
+        skipped += 1
+        return True
     cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
     radius = math.hypot(x1 - x0, y1 - y0) / 2
     res = search(STREAMS[stream], cy / KY + 33.57, cx / KX - 7.6, radius)
@@ -72,7 +85,7 @@ complete = True
 for stream in STREAMS:
     X0, Y0 = (XMIN + 7.6) * KX, (YMIN - 33.57) * KY
     X1, Y1 = (XMAX + 7.6) * KX, (YMAX - 33.57) * KY
-    step = 2000
+    step = STEP
     y = Y0
     while y < Y1:
         x = X0
@@ -84,4 +97,4 @@ for stream in STREAMS:
 
 out = [p for p in places.values() if XMIN <= p["lon"] <= XMAX and YMIN <= p["lat"] <= YMAX]
 json.dump({"requests": nreq, "complete": complete, "places": out}, open(OUT, "w"), ensure_ascii=False)
-print(f"requests {nreq}, complete={complete}, places in bbox {len(out)}")
+print(f"requests {nreq}, skipped cells {skipped}, complete={complete}, places in bbox {len(out)}")
