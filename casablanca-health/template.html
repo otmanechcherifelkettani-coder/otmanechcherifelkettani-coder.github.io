@@ -72,6 +72,7 @@ h2 { font: 700 0.72rem/1 var(--f-display); text-transform: uppercase; letter-spa
 .tabs button { font: 600 0.82rem var(--f-display); background: none; border: 0; color: var(--muted); padding: 7px 2px; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
 .tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
 .pop-pick { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; margin: 2px 0 6px; flex-wrap: wrap; }
+.site-ctl { margin: 8px 0 10px; gap: 10px; }
 .area-pick { margin: 10px 0 6px; grid-template-columns: auto 1fr; }
 .area-pick select { font: 500 0.88rem var(--f-body); padding: 5px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); min-width: 0; }
 .zones { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
@@ -119,7 +120,7 @@ details ul { padding-left: 18px; margin: 6px 0; }
   <aside class="panel" aria-label="Analysis">
     <header>
       <h1>Where Casablanca-Settat's doctors outnumber its labs</h1>
-      <p class="lede">Each hexagon counts the clinics, hospitals and doctors within walking catchment, then divides by the number of medical laboratories in the same catchment. Hot zones are where demand for blood work is high and no lab is close.</p>
+      <p class="lede">Where would a new medical analysis lab win the most patients? Best sites combines where people live (HCP census 2024 and growth since 2014), where tests get prescribed, and how close every existing lab is.</p>
     </header>
 
     <section class="stats" aria-label="Places mapped">
@@ -135,7 +136,7 @@ details ul { padding-left: 18px; margin: 6px 0; }
         <input type="search" id="q" placeholder="Name, e.g. Anoual, Bennani, Akdital" autocomplete="off" aria-label="Search by name">
         <select id="q-type" aria-label="Type of place">
           <option value="">All types</option><option value="L">Labs</option><option value="H">Clinics &amp; hospitals</option>
-          <option value="D">Doctors</option><option value="T">Dentists</option>
+          <option value="D">Doctors</option><option value="T">Dentists</option><option value="LP">Pathology labs</option>
         </select>
       </div>
       <p class="hint-line" id="q-count">Matches are ringed on the map. Click one to zoom to it.</p>
@@ -144,12 +145,28 @@ details ul { padding-left: 18px; margin: 6px 0; }
 
     <section>
       <div class="tabs" role="tablist" aria-label="Ranking">
-        <button type="button" role="tab" id="tab-zones" aria-selected="true" aria-controls="pane-zones">Zones (1 km)</button>
-        <button type="button" role="tab" id="tab-communes" aria-selected="false" aria-controls="pane-communes">Communes (per resident)</button>
+        <button type="button" role="tab" id="tab-sites" aria-selected="true" aria-controls="pane-sites">Best sites</button>
+        <button type="button" role="tab" id="tab-zones" aria-selected="false" aria-controls="pane-zones">Doctor gaps</button>
+        <button type="button" role="tab" id="tab-communes" aria-selected="false" aria-controls="pane-communes">Communes</button>
       </div>
       <div class="ctl area-pick"><label for="province">Area</label>
         <select id="province"><option value="">Whole region</option></select></div>
-      <div id="pane-zones" role="tabpanel" aria-labelledby="tab-zones">
+      <div id="pane-sites" role="tabpanel" aria-labelledby="tab-sites">
+        <p class="hint-line">Each site's score is the demand a <b>new</b> lab there would win from residents (2024 census, grown at each commune's 2014–24 rate) and from prescribers, after sharing it with every existing lab by distance. Unit: residents captured.</p>
+        <div class="legend" aria-hidden="true"><span>Site score</span><span class="ramp"><i style="background:var(--s1)"></i><i style="background:var(--s2)"></i><i style="background:var(--s3)"></i><i style="background:var(--s4)"></i><i style="background:var(--s5)"></i></span><span id="site-max"></span></div>
+        <div class="controls site-ctl">
+          <div class="ctl"><label for="alpha">Weight of residents vs prescribers</label><output id="alpha-out">60% / 40%</output>
+            <input type="range" id="alpha" min="0" max="100" step="10" value="60"></div>
+          <div class="ctl"><label for="beta">How much distance deters patients</label><output id="beta-out">β = 2</output>
+            <input type="range" id="beta" min="1" max="3" step="0.5" value="2">
+            <span class="hint">Higher means patients only use the closest lab.</span></div>
+          <div class="ctl"><label for="years">Project population ahead</label><output id="years-out">3 years</output>
+            <input type="range" id="years" min="0" max="6" step="1" value="3"></div>
+          <div class="toggles"><label><input type="checkbox" id="patho"> Count pathology labs as competitors</label></div>
+        </div>
+        <ol class="zones" id="sites"></ol>
+      </div>
+      <div id="pane-zones" role="tabpanel" aria-labelledby="tab-zones" hidden>
         <div class="legend" aria-hidden="true"><span>Gap score</span><span class="ramp"><i style="background:var(--s1)"></i><i style="background:var(--s2)"></i><i style="background:var(--s3)"></i><i style="background:var(--s4)"></i><i style="background:var(--s5)"></i></span><span id="ramp-max"></span></div>
         <ol class="zones" id="zones"></ol>
       </div>
@@ -194,12 +211,15 @@ details ul { padding-left: 18px; margin: 6px 0; }
     <details>
       <summary>Method and limits</summary>
       <ul>
-        <li><b>Data.</b> Two open sources merged and de-duplicated: Overture Maps Places (release 2026-10-21, mostly Meta and Microsoft business listings) and OpenStreetMap (October 2026 snapshot, which adds most public hospitals and CNSS polyclinics). <span id="google-note" hidden>A third source, Google Places (searched November 2026), adds most private cabinets and labs and is kept private to this page. </span>Population: official legal population by commune and arrondissement from the HCP census (RGPH 2024), joined to commune boundaries. Hover a point to see which source it came from. Places were classified by category and by name (for example "Laboratoire d'analyses médicales", "Clinique", "Dr …", مختبر, مصحة). Veterinary, aesthetic, physiotherapy and pharmacy listings are excluded.</li>
-        <li><b>Score.</b> For each 400 m hexagon: demand = clinics × weight + doctors (+ dentists if ticked) within the catchment radius; gap score = demand ÷ (labs in the same radius + 1). Zones are ranked by score, keeping one zone per catchment so the list does not repeat the same area.</li>
+        <li><b>Data.</b> Two open sources merged and de-duplicated: Overture Maps Places (release 2026-10-21, mostly Meta and Microsoft business listings) and OpenStreetMap (October 2026 snapshot, which adds most public hospitals and CNSS polyclinics). <span id="google-note" hidden>A third source, Google Places (searched November 2026), adds most private cabinets and labs and is kept private to this page. </span>Population: official legal population by commune and arrondissement from the HCP census (RGPH 2024), joined to commune boundaries. Hover a point to see which source it came from. Labs were also searched by name ("laboratoire d'analyses médicales", مختبر التحليلات الطبية), because Google files some under generic categories. Every place is classified into 14 types by name and category in French, English and Arabic; vets, pharmacies, physiotherapists, psychologists, opticians, aesthetic-only practices, suppliers and offices are excluded. Hover a point to see its type.</li>
+        <li><b>Best sites formula.</b> For a candidate site c and each nearby demand point z: demand D<sub>z</sub> = α × residents × (1 + growth)<sup>years</sup> + (1 − α) × k × prescriber weight. The share a new lab wins is P = f(d<sub>cz</sub>) ÷ (f(d<sub>cz</sub>) + Σ A<sub>j</sub> f(d<sub>jz</sub>) + f(3 km)), with f(d) = d<sup>−β</sup> (Huff gravity model). A<sub>j</sub> = 1 for each lab, 0.5 for a public hospital and 0.3 for a private clinic (in-house labs); f(3 km) is the outside option (going further, hospital lab, home collection, no test). Site score = Σ D<sub>z</sub> × P within 6 km, in residents captured.</li>
+        <li><b>Prescriber weights.</b> Private clinic 3 (slider), medical centre 2, specialist who orders many tests (endocrino, gynéco, cardio, interne, gastro, néphro, pédiatre…) 1.5, GP 1.2, doctor of unknown specialty 1, public hospital and health centre 1, specialist who orders few tests (ophtalmo, dermato, ORL, psychiatre, chirurgien) 0.3, eye/skin clinic and dialysis 0.5, imaging 0, dentist 0 (or 0.3 if ticked).</li>
+        <li><b>Residents.</b> Each commune's population is spread over a 400 m grid by building footprint and by density of all mapped places; in 42 sparsely mapped rural communes it is spread evenly, so rural results are rougher.</li>
+        <li><b>Doctor gaps tab.</b> For each 400 m hexagon: weighted prescribers within the radius ÷ (labs in the same radius + 1).</li>
         <li><b>Coverage.</b> The source lists far fewer cabinets than really exist in Casablanca, and coverage is better in central districts. Read scores as relative signals, then verify on the ground or against DabaDoc, Med.ma or the Ordre des Médecins directory.</li>
         <li><b>Hospitals.</b> Public hospitals and large private clinics usually run an in-house lab. A high score driven by one big hospital is a weaker signal than one driven by many independent cabinets.</li>
         <li><b>Communes tab.</b> Residents per lab = RGPH 2024 population of the commune ÷ labs located in it. Patients cross commune lines, so a commune next to a well-served one can look worse than it is; check the nearest-lab distance on the map.</li>
-        <li><b>Not modelled.</b> Income, rent, population growth since 2024, sample-collection points and home-collection services.</li>
+        <li><b>Not modelled.</b> Income and insurance mix, rent, visibility and parking, lab quality or opening hours, and sample-collection points run by existing labs.</li>
       </ul>
     </details>
     <p class="src">Data © Overture Maps Foundation contributors (CDLA Permissive 2.0) and © OpenStreetMap contributors (ODbL). Population: Haut-Commissariat au Plan, RGPH 2024.</p>
@@ -216,13 +236,14 @@ const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).
 const fmtM = m => !isFinite(m) ? '>20 km' : m < 1000 ? Math.round(m / 10) * 10 + ' m' : (m / 1000).toFixed(1) + ' km';
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const KIND = { H: 'Clinic / hospital', D: 'Doctor', T: 'Dentist', L: 'Laboratory' };
+const SUBL = GapAnalysis.SUB_LABEL, kindOf = p => SUBL[p[6]] || KIND[p[2]];
 
 const counts = { H: 0, D: 0, T: 0, L: 0 };
 DATA.pts.forEach(p => counts[p[2]]++);
 for (const k in counts) $('n-' + k).textContent = counts[k];
 
 
-const state = { radius: 1000, wH: 3, wT: 0, minDemand: 10, province: '', view: 'zones', minPop: 20000 };
+const state = { radius: 1000, wH: 3, wT: 0, minDemand: 10, province: '', view: 'sites', minPop: 20000, alpha: 0.6, beta: 2, years: 3, patho: false };
 const fmtN = n => n.toLocaleString('en-US');
 const COMMUNES = DATA.communes || [];
 // province of each commune, from the same boundaries as the Area menu
@@ -239,7 +260,7 @@ map.attributionControl.setPrefix(false).addAttribution('Overture Maps Foundation
 if (DATA.pts.some(p => (p[5] || '').includes('Google'))) { $('google-note').hidden = false; map.attributionControl.addAttribution('Google'); }
 
 const base = L.layerGroup().addTo(map), hexLayer = L.layerGroup().addTo(map), ptLayers = { L: L.layerGroup(), H: L.layerGroup(), D: L.layerGroup() };
-const labelLayer = L.layerGroup().addTo(map), pinLayer = L.layerGroup().addTo(map), communeLayer = L.layerGroup(), hiLayer = L.layerGroup();
+const labelLayer = L.layerGroup().addTo(map), pinLayer = L.layerGroup().addTo(map), communeLayer = L.layerGroup(), hiLayer = L.layerGroup(), siteLayer = L.layerGroup(), sitePins = L.layerGroup();
 let result = null, hexById = new Map(), activeIdx = -1;
 
 function drawBase() {
@@ -278,7 +299,7 @@ function drawPoints() {
     if (!ptLayers[p[2]]) continue;
     const isLab = p[2] === 'L';
     L.circleMarker([p[0], p[1]], { renderer: ptRenderer, pane: 'pts', radius: isLab ? 5.5 : 3.2, color: isLab ? css('--panel') : col[p[2]], weight: isLab ? 1.5 : 0, fillColor: col[p[2]], fillOpacity: isLab ? 1 : 0.85 })
-      .bindTooltip(`<b>${esc(p[3])}</b><br>${KIND[p[2]]}${p[4] ? ' · ' + esc(p[4].replace(/_/g, ' ')) : ''}${COMMUNES[p[6]] ? '<br>' + esc(COMMUNES[p[6]].n) : ''}<br><small>Source: ${esc(p[5] || 'Overture')}</small>`, { direction: 'top', offset: [0, -4] })
+      .bindTooltip(`<b>${esc(p[3])}</b><br>${kindOf(p)}${COMMUNES[p[7]] ? '<br>' + esc(COMMUNES[p[7]].n) : ''}<br><small>Source: ${esc(p[5] || 'Overture')}</small>`, { direction: 'top', offset: [0, -4] })
       .addTo(ptLayers[p[2]]);
   }
   syncLayers();
@@ -287,8 +308,9 @@ function drawPoints() {
 // Canvas draws in insertion order, so points are re-added after hexagons to stay on top (labs last).
 function syncLayers() {
   for (const k of ['D', 'H', 'L']) ptLayers[k].remove();
-  hexLayer.remove(); pinLayer.remove(); communeLayer.remove(); hiLayer.remove();
+  hexLayer.remove(); pinLayer.remove(); communeLayer.remove(); hiLayer.remove(); siteLayer.remove(); sitePins.remove();
   if (state.view === 'communes') communeLayer.addTo(map);
+  else if (state.view === 'sites') { if ($('showHex').checked) siteLayer.addTo(map); sitePins.addTo(map); }
   else { if ($('showHex').checked) hexLayer.addTo(map); pinLayer.addTo(map); }
   for (const k of ['D', 'H', 'L']) if ($('show' + k).checked) ptLayers[k].addTo(map);
   hiLayer.addTo(map);
@@ -315,7 +337,7 @@ function hexPopup(h) {
 }
 
 function run() {
-  result = GapAnalysis.analyse(DATA, { hex: 400, radius: state.radius, wH: state.wH, wD: 1, wT: state.wT, minDemand: state.minDemand, province: state.province });
+  result = GapAnalysis.analyse(DATA, { hex: 400, radius: state.radius, wH: state.wH, wD: 1, wT: state.wT, minDemand: state.minDemand, province: state.province, includePatho: state.patho });
   hexLayer.clearLayers(); pinLayer.clearLayers(); hexById.clear();
   const q = result.hexes.filter(h => h.qualifies);
   const cuts = binsFor(q.map(h => h.score)), ramp = ['--s1', '--s2', '--s3', '--s4', '--s5'].map(css);
@@ -363,6 +385,62 @@ $('radius').addEventListener('click', e => {
   [...$('radius').children].forEach(x => x.setAttribute('aria-pressed', x === b));
   state.radius = +b.dataset.v; run();
 });
+// ---------- best sites (Huff model, see analysis.js) ----------
+let sites = null, siteTimer = null;
+const fmtK = n => n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + 'k' : String(Math.round(n));
+function sitePopup(c) {
+  const z = GapAnalysis.zoneName(DATA, c.lat, c.lon), cm = COMMUNES[GapAnalysis.communeOf(DATA, c.lat, c.lon)];
+  sites.describe(c);
+  return `<div class="pop"><h3>${esc(z.hood)}${z.district && z.district !== z.hood ? ' · ' + esc(z.district) : ''}</h3><table>
+    <tr><td>Site score</td><td><b>${fmtN(Math.round(c.score))}</b> residents captured</td></tr>
+    <tr><td>…of which from residents</td><td>${Math.round(100 * c.fromR / c.score)}%</td></tr>
+    <tr><td>Residents within 2 km (2024)</td><td>${fmtN(Math.round(c.pop2km))}</td></tr>
+    <tr><td>Growth 2014–24</td><td>${c.growth == null ? '–' : (c.growth > 0 ? '+' : '') + c.growth.toFixed(1) + '% / year'}</td></tr>
+    <tr><td>Labs within 1 km / 2 km</td><td>${c.labs1} / ${c.labs2}</td></tr><tr><td>Nearest lab</td><td>${fmtM(c.nearest)}</td></tr>
+    <tr><td>Prescriber weight within 1 km</td><td>${c.presc1km}</td></tr>
+    ${cm ? `<tr><td>Commune</td><td>${esc(cm.n)} (${fmtN(cm.pop)})</td></tr>` : ''}</table></div>`;
+}
+function focusSite(i) {
+  const c = sites.top[i];
+  document.querySelectorAll('#sites .zone').forEach((b, j) => b.classList.toggle('active', j === i));
+  map.flyTo([c.lat, c.lon], 14.5, { duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 0.8 });
+  L.popup({ maxWidth: 320 }).setLatLng([c.lat, c.lon]).setContent(sitePopup(c)).openOn(map);
+}
+function runSites() {
+  sites = GapAnalysis.siteModel(DATA, { alpha: state.alpha, beta: state.beta, years: state.years, includePatho: state.patho, province: state.province });
+  siteLayer.clearLayers(); sitePins.clearLayers();
+  const sorted = sites.cands.slice().sort((a, b) => b.score - a.score);
+  const shown = sorted.slice(0, 7000), ramp = ['--s1', '--s2', '--s3', '--s4', '--s5'].map(css);
+  const q = f => shown[Math.min(shown.length - 1, Math.floor((1 - f) * shown.length))]?.score ?? 0;
+  const cuts = [q(0.4), q(0.65), q(0.85), q(0.95)];
+  $('site-max').textContent = sorted.length ? 'up to ' + fmtK(sorted[0].score) : '';
+  for (const c of shown) {
+    const bin = cuts.filter(t => c.score > t).length;
+    L.polygon(c.corners, { stroke: false, fillColor: ramp[bin], fillOpacity: 0.72 }).bindPopup(() => sitePopup(c), { maxWidth: 320 }).addTo(siteLayer);
+  }
+  const list = $('sites'); list.innerHTML = '';
+  sites.top.forEach((c, i) => {
+    const z = GapAnalysis.zoneName(DATA, c.lat, c.lon), li = document.createElement('li');
+    li.innerHTML = `<button class="zone" type="button"><span class="rank">${i + 1}</span><span>
+      <span class="name">${esc(z.hood)}</span>${z.district && z.district !== z.hood ? ` <span class="district">· ${esc(z.district)}</span>` : ''}
+      <span class="chips"><span class="chip">captures ${fmtK(c.score)}</span>
+      <span class="chip">${fmtK(c.pop2km)} residents ≤ 2 km</span>
+      ${c.growth != null ? `<span class="chip">${c.growth > 0 ? '+' : ''}${c.growth.toFixed(1)}%/yr</span>` : ''}
+      <span class="chip ${c.labs1 ? '' : 'zero'}"><i class="sq" style="background:var(--lab)"></i>${c.labs1} ≤ 1 km</span>
+      <span class="chip">nearest lab ${fmtM(c.nearest)}</span></span></span></button>`;
+    li.firstChild.addEventListener('click', () => focusSite(i));
+    list.appendChild(li);
+    L.marker([c.lat, c.lon], { icon: L.divIcon({ className: '', html: `<div class="pin">${i + 1}</div>`, iconSize: [22, 22], iconAnchor: [11, 11] }), title: z.hood, keyboard: false })
+      .on('click', () => focusSite(i)).addTo(sitePins);
+  });
+  syncLayers();
+}
+const queueSites = () => { clearTimeout(siteTimer); $('sites').style.opacity = 0.5; siteTimer = setTimeout(() => { runSites(); $('sites').style.opacity = 1; }, 150); };
+$('alpha').addEventListener('input', e => { state.alpha = e.target.value / 100; $('alpha-out').textContent = `${e.target.value}% / ${100 - e.target.value}%`; queueSites(); });
+$('beta').addEventListener('input', e => { state.beta = +e.target.value; $('beta-out').textContent = 'β = ' + state.beta; queueSites(); });
+$('years').addEventListener('input', e => { state.years = +e.target.value; $('years-out').textContent = state.years + (state.years === 1 ? ' year' : ' years'); queueSites(); });
+$('patho').addEventListener('change', e => { state.patho = e.target.checked; queueSites(); run(); });
+
 // ---------- communes: residents per lab ----------
 const RPL_CUTS = [15000, 30000, 50000];
 function communeFill(c) {
@@ -373,10 +451,12 @@ function communeFill(c) {
 const perLab = c => c.L ? `1 lab per ${fmtN(Math.round(c.pop / c.L))} residents` : 'no lab';
 function communePopup(i) {
   const c = COMMUNES[i];
-  const labs = DATA.pts.filter(p => p[6] === i && p[2] === 'L').map(p => p[3]);
+  const labs = DATA.pts.filter(p => p[7] === i && p[6] === 'L').map(p => p[3]);
   return `<div class="pop"><h3>${esc(c.n)}${c.ar ? ' · ' + esc(c.ar) : ''}</h3>
     <table><tr><td>Province</td><td>${esc(c.provR)}</td></tr>
-    <tr><td>Population (RGPH 2024)</td><td><b>${fmtN(c.pop)}</b></td></tr><tr><td>Households</td><td>${fmtN(c.hh)}</td></tr>
+    <tr><td>Population (RGPH 2024)</td><td><b>${fmtN(c.pop)}</b></td></tr>
+    ${c.pop14 ? `<tr><td>Population (RGPH 2014)</td><td>${fmtN(c.pop14)}</td></tr><tr><td>Growth 2014–24</td><td><b>${c.growth > 0 ? '+' : ''}${c.growth.toFixed(1)}% / year</b></td></tr>` : ''}
+    <tr><td>Households</td><td>${fmtN(c.hh)}</td></tr>
     <tr><td>Labs</td><td>${c.L}</td></tr><tr><td>Clinics &amp; hospitals</td><td>${c.H}</td></tr><tr><td>Doctors</td><td>${c.D}</td></tr><tr><td>Dentists</td><td>${c.T}</td></tr>
     <tr><td>Residents per lab</td><td><b>${c.L ? fmtN(Math.round(c.pop / c.L)) : 'no lab'}</b></td></tr>
     <tr><td>Residents per doctor</td><td>${c.D ? fmtN(Math.round(c.pop / c.D)) : 'no doctor'}</td></tr></table>
@@ -402,7 +482,7 @@ function renderCommunes() {
       const li = document.createElement('li');
       li.innerHTML = `<button class="zone" type="button" data-i="${i}"><span class="rank">${rank + 1}</span><span>
         <span class="name">${esc(c.n)}</span> <span class="district">· ${esc(c.provR)}</span>
-        <span class="chips"><span class="chip">${fmtN(c.pop)} residents</span>
+        <span class="chips"><span class="chip">${fmtN(c.pop)} residents</span>${c.growth != null ? `<span class="chip">${c.growth > 0 ? '+' : ''}${c.growth.toFixed(1)}%/yr since 2014</span>` : ''}
         <span class="chip ${c.L ? '' : 'zero'}"><i class="sq" style="background:var(--lab)"></i>${perLab(c)}</span>
         <span class="chip"><i class="dot" style="background:var(--hosp)"></i>${c.H}</span>
         <span class="chip"><i class="dot" style="background:var(--doc)"></i>${c.D}</span></span></span></button>`;
@@ -414,23 +494,24 @@ function renderCommunes() {
 
 function setView(v) {
   state.view = v;
-  $('tab-zones').setAttribute('aria-selected', v === 'zones');
-  $('tab-communes').setAttribute('aria-selected', v === 'communes');
-  $('pane-zones').hidden = v !== 'zones';
-  $('pane-communes').hidden = v !== 'communes';
+  for (const t of ['sites', 'zones', 'communes']) {
+    $('tab-' + t).setAttribute('aria-selected', v === t);
+    $('pane-' + t).hidden = v !== t;
+  }
   map.closePopup(); syncLayers();
 }
 $('tab-zones').addEventListener('click', () => setView('zones'));
+$('tab-sites').addEventListener('click', () => setView('sites'));
 $('tab-communes').addEventListener('click', () => setView('communes'));
 $('minPop').addEventListener('change', e => { state.minPop = +e.target.value; renderCommunes(); });
 
 // ---------- search ----------
 const fold = s => (s || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-const SEARCH = DATA.pts.map((p, i) => ({ i, k: fold(p[3] + ' ' + p[4].replace(/_/g, ' ') + ' ' + (COMMUNES[p[6]] ? COMMUNES[p[6]].n : '')) }));
+const SEARCH = DATA.pts.map((p, i) => ({ i, k: fold(p[3] + ' ' + p[4].replace(/_/g, ' ') + ' ' + (SUBL[p[6]] || '') + ' ' + (COMMUNES[p[7]] ? COMMUNES[p[7]].n : '')) }));
 const KCOL = { L: '--lab', H: '--hosp', D: '--doc', T: '--dent' };
 function pointPopup(p) {
-  const cm = COMMUNES[p[6]];
-  return `<div class="pop"><h3>${esc(p[3])}</h3><table><tr><td>Type</td><td>${KIND[p[2]]}</td></tr>
+  const cm = COMMUNES[p[7]];
+  return `<div class="pop"><h3>${esc(p[3])}</h3><table><tr><td>Type</td><td>${kindOf(p)}</td></tr>
     ${p[4] ? `<tr><td>Category</td><td>${esc(p[4].replace(/_/g, ' '))}</td></tr>` : ''}
     ${cm ? `<tr><td>Commune</td><td>${esc(cm.n)} (${fmtN(cm.pop)} residents)</td></tr>` : ''}
     <tr><td>Source</td><td>${esc(p[5] || 'Overture')}</td></tr></table></div>`;
@@ -440,12 +521,12 @@ function runSearch() {
   const terms = fold($('q').value).split(/\s+/).filter(Boolean), type = $('q-type').value;
   const out = $('q-results'); out.innerHTML = ''; hiLayer.clearLayers();
   if (!terms.length) { $('q-count').textContent = 'Matches are ringed on the map. Click one to zoom to it.'; return; }
-  const hits = SEARCH.filter(s => (!type || DATA.pts[s.i][2] === type) && terms.every(t => s.k.includes(t))).map(s => DATA.pts[s.i]);
+  const hits = SEARCH.filter(s => (!type || DATA.pts[s.i][2] === type || DATA.pts[s.i][6] === type) && terms.every(t => s.k.includes(t))).map(s => DATA.pts[s.i]);
   $('q-count').textContent = hits.length ? `${fmtN(hits.length)} match${hits.length > 1 ? 'es' : ''}${hits.length > 50 ? ', first 50 listed' : ''}` : 'No match. Try part of the name, without "Dr" or "Laboratoire".';
   hits.slice(0, 400).forEach(p => L.circleMarker([p[0], p[1]], { renderer: hiRenderer, pane: 'hi', radius: 8, color: css('--fg'), weight: 2, fill: false, interactive: false }).addTo(hiLayer));
   hits.slice(0, 50).forEach(p => {
-    const li = document.createElement('li'), cm = COMMUNES[p[6]];
-    li.innerHTML = `<button type="button"><i class="${p[2] === 'L' ? 'sq' : 'dot'}" style="background:var(${KCOL[p[2]]})"></i><span><span class="r-name">${esc(p[3])}</span><span class="r-meta">${KIND[p[2]]}${cm ? ' · ' + esc(cm.n) : ''}</span></span></button>`;
+    const li = document.createElement('li'), cm = COMMUNES[p[7]];
+    li.innerHTML = `<button type="button"><i class="${p[2] === 'L' ? 'sq' : 'dot'}" style="background:var(${KCOL[p[2]]})"></i><span><span class="r-name">${esc(p[3])}</span><span class="r-meta">${kindOf(p)}${cm ? ' · ' + esc(cm.n) : ''}</span></span></button>`;
     li.firstChild.addEventListener('click', () => {
       out.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === li.firstChild));
       map.flyTo([p[0], p[1]], 17, { duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 0.8 });
@@ -458,7 +539,7 @@ $('q').addEventListener('input', () => { clearTimeout(searchTimer); searchTimer 
 $('q-type').addEventListener('change', runSearch);
 
 $('province').addEventListener('change', e => {
-  state.province = e.target.value; run(); renderCommunes();
+  state.province = e.target.value; run(); renderCommunes(); runSites();
   const p = (DATA.provinces || []).find(x => x.n === state.province);
   const rings = p ? p.p : DATA.region;
   if (rings) map.fitBounds(L.latLngBounds(rings.flat(2).map(c => [c[1], c[0]])), { padding: [20, 20] });
@@ -469,7 +550,7 @@ $('wT').addEventListener('change', e => { state.wT = e.target.checked ? 1 : 0; r
 ['showL', 'showH', 'showD', 'showHex'].forEach(id => $(id).addEventListener('change', syncLayers));
 map.on('zoomend', drawLabels);
 
-function redrawAll() { drawBase(); drawPoints(); drawLabels(); renderCommunes(); run(); runSearch(); }
+function redrawAll() { drawBase(); drawPoints(); drawLabels(); renderCommunes(); run(); runSites(); runSearch(); }
 redrawAll();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redrawAll);
 new MutationObserver(redrawAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });

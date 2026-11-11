@@ -29,7 +29,7 @@ XMIN, YMIN, XMAX, YMAX = map(float, os.environ.get("BBOX", "-9.07,32.29,-6.75,33
 def norm(s):
     s = unicodedata.normalize("NFKD", (s or "").lower())
     s = "".join(ch for ch in s if not unicodedata.combining(ch))
-    s = re.sub(r"^(commune|arrondissement|municipalite|pachalik|caidat)\s+(de la|de l'|du|des|de|d'|d’)?\s*", "", s)
+    s = re.sub(r"^(commune|arrondissement|municipalite|pachalik|caidat)\s+(?:(?:de la|du|des|de)\s+|d['’]|de l['’])?", "", s)
     s = re.sub(r"\b(ouled|oulad|ould)\b", "oulad", s)
     s = re.sub(r"[^a-z0-9]", "", s)
     return s.replace("ou", "u").replace("ch", "sh").replace("ee", "e")

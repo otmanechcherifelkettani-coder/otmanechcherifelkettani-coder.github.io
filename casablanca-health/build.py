@@ -1,4 +1,4 @@
-"""Classify Overture places into labs / hospitals-clinics / doctors / dentists and build the map page.
+"""Merge Overture, OpenStreetMap and (optionally) Google places, classify them with classify.py, and build the map page.
 
 Usage: python3 build.py <places.json> <divisions.json> <context.json>
 Writes data.json (classified points + base map) and index.html (template.html with data inlined).
@@ -15,176 +15,56 @@ places = json.load(open(places_p))
 divs = json.load(open(divs_p))
 ctx = json.load(open(ctx_p))
 
-# ---------- classification rules ----------
-LAB_CATS = {"laboratory_testing", "b2b_clinical_lab", "medical_laboratory", "pathology_lab"}
-LAB_NAME = re.compile(
-    r"^\s*(laboratoire|labo)\b|analyses?\s+m[ée]dical|centre\s+de\s+biologie|\bbiolog|institut\s+pasteur|mختبر|مختبر",
-    re.I)
-LAB_EXCL = re.compile(
-    r"dentaire|proth[eè]s|photo|zoopole|novovet|v[ée]t[ée]rin|sanofi|sterifil|fillmed|coudon|radiolog|neuroclinique|"
-    r"\bhse\b|methc|complexe sportif|lpee|essais|supplies|psycho|hypno|structures|sols|roches|التجارب|تصوير|filorga|chlorophylle|lamapro|oculaire|cosm|pharmaceut|liman",
-    re.I)
+# ---------- classification (shared rules in classify.py) ----------
+import os
+from classify import classify as classify_place, MAIN
 
-HOSP_CATS = {"hospital", "emergency_department", "surgery_center", "outpatient_care_facility", "medical_center",
-             "dialysis_clinic", "maternity_center", "fertility_clinic", "blood_and_plasma_donation_center"}
-HOSP_NAME = re.compile(r"\bclinique\b|polyclinique|h[oô]pital|\bchu\b|centre\s+hospitalier|مصحة|مستشفى", re.I)
-DOC_CATS = {"doctors_office", "family_practice", "internal_medicine", "cardiology", "dermatology",
-            "obstetrics_and_gynecology", "pediatric_clinic", "gastroenterology", "rheumatology",
-            "ear_nose_and_throat", "pulmonology", "endocrinology", "oncology", "neurology", "urology", "nephrology",
-            "psychiatry", "allergy_and_immunology", "orthopedics", "gerontology", "surgery",
-            "plastic_and_reconstructive_surgery", "vision_or_eye_care_clinic", "reproductive_perinatal_and_womens_care",
-            "prenatal_and_perinatal_care", "neuropathology", "behavioral_or_mental_health_clinic",
-            "osteopathic_medicine", "radiology", "infectious_disease", "hematology", "anesthesiology",
-            "sports_medicine", "pediatrics", "general_practice"}
-DOC_NAME = re.compile(
-    r"^\s*(dr\.?|docteur|pr\.?\s|professeur)\b|\bdr\.?\s|cabinet\s+(m[ée]dical|de\s+m[ée]decine|du\s+dr|de\s+dr|dr)|"
-    r"centre\s+(de\s+sant[ée]|m[ée]dical)|الدكتور|طبيب",
-    re.I)
-DENT_CATS = {"dental_clinic", "cosmetic_dentistry", "general_dentistry", "orthodontics", "pediatric_dentistry",
-             "prosthodontics", "periodontics", "oral_and_maxillofacial_surgery", "endodontics"}
-DENT_NAME = re.compile(r"dentaire|dentiste|dental|orthodont", re.I)
-# names that look medical but are not (vets, beauty, gadgets)
-NOT_MED = re.compile(
-    r"v[ée]t[ée]rin|\bvet\b|bijou|phone|stone|esth[ée]ti|aesthetic|botox|filler|beaut|spa\b|laser|amincis|media\b|"
-    r"optique|pharmacie|\bpara\b|kin[ée]|r[ée][ée]ducation|physio|orthophon|hijama|حجامة|صيدلية|تلقيح|simulation|"
-    r"psychanalyse|compl[ée]mentaire|التكميلي|looxwell|psycholog|psychoth|hypno|coach|counsel|d[ée]l[ée]gation|"
-    r"\bdirr?ection\b|anapec|minist|en construction|supplies|fournitures|nutrition(?!ni)|di[ée]t[ée]ti|"
-    r"orthoptie|ost[ée]opath|podolog|sophrolog", re.I)
-NON_MED_PRIMARY = {"veterinarian", "beauty_salon", "spa", "eyewear_store", "mobile_phone_store", "clothing_store",
-                   "public_relations", "janitorial_service", "electronic_equipment_supplier", "boat_dealer",
-                   "pharmacy", "travel_and_transportation", "education", "nail_salon", "hair_salon"}
-
-
-SPECIALTY = re.compile(
-    r"dermato|ophtalm|gyn[ée]co|cardiolog|cardio\b|p[ée]diatr|endocrin|diab[ée]to|gastro|pneumo|n[ée]phro|neurolog|"
-    r"urolog|rhumato|oncolog|canc[ée]ro|psychiatr|\borl\b|oto-rhino|traumato|orthop[ée]d|g[ée]n[ée]raliste|"
-    r"m[ée]decine (g[ée]n[ée]rale|interne)|interniste|h[ée]matolog|infectiolog|allergolog|chirurgien(?! esth)|"
-    r"maladies du sommeil|طبيب|أمراض", re.I)
-VET = re.compile(r"v[ée]t[ée]rin|\bvet\b", re.I)
-
-
-def classify(r):
-    name = (r.get("name") or "").strip()
-    prim = r.get("primary")
-    hier = r.get("hierarchy") or []
-    is_health = bool(hier) and hier[0] == "health_care"
-    # labs
-    if (prim in LAB_CATS or (LAB_NAME.search(name) and (is_health or prim is None))) and not LAB_EXCL.search(name):
-        return "L"
-    if prim in NON_MED_PRIMARY:
-        return None
-    if prim in DENT_CATS or (DENT_NAME.search(name) and (is_health or prim is None)):
-        return "T"
-    # a named medical specialty wins over aesthetic/laser wording (dermatologists, ophthalmologists ...)
-    if SPECIALTY.search(name) and (is_health or prim is None) and not VET.search(name):
-        return "H" if HOSP_NAME.search(name) else "D"
-    if NOT_MED.search(name):
-        return None
-    medical = is_health or prim is None
-    if HOSP_NAME.search(name) and medical:
-        return "H"
-    if DOC_NAME.search(name) and medical:
-        return "D"
-    if prim in HOSP_CATS:
-        return "H"
-    if prim in DOC_CATS:
-        return "D"
-    return None
-
-
+# point layout: [lat, lon, main class, name, source category, source, sub class]  (+ commune index appended later)
 pts = []
 counts = {}
+
+
+def add(lat, lon, name, cats, catlabel, source):
+    r = classify_place(name, cats)
+    if not r:
+        return
+    main, sub = r
+    counts[source + ":" + sub] = counts.get(source + ":" + sub, 0) + 1
+    pts.append([round(lat, 5), round(lon, 5), main, name or "(sans nom)", catlabel or "", source, sub])
+
+
 for r in places:
-    c = classify(r)
-    if not c:
+    if (r.get("status") or "").lower() == "closed":
         continue
-    counts[c] = counts.get(c, 0) + 1
-    pts.append([round(r["lat"], 5), round(r["lon"], 5), c, r.get("name") or "(sans nom)", r.get("primary") or "", "Overture"])
-print("overture:", counts)
+    add(r["lat"], r["lon"], r.get("name"), {r.get("primary")} | set(r.get("alternate") or []), r.get("primary"),
+        "Overture")
 
 # ---------- OpenStreetMap (optional 4th argument: Overpass JSON) ----------
-OSM_CLASS = {"laboratory": "L", "hospital": "H", "clinic": "H", "doctors": "D", "doctor": "D", "dentist": "T"}
-
-
-def classify_osm(t):
-    name = t.get("name") or t.get("name:fr") or t.get("name:ar") or ""
-    kind = t.get("healthcare") or t.get("amenity")
-    if kind in ("pharmacy", "veterinary") or t.get("amenity") in ("pharmacy", "veterinary"):
-        return None, name
-    if (LAB_NAME.search(name) or re.search(r"\w{3,}lab\b|^laboratory$", name, re.I)) and not LAB_EXCL.search(name):
-        return "L", name  # the name says lab even when the OSM tag says clinic/doctor
-    if kind in OSM_CLASS:
-        c = OSM_CLASS[kind]
-        if c != "L" and DENT_NAME.search(name):
-            return "T", name
-        if c != "L" and NOT_MED.search(name) and not SPECIALTY.search(name):
-            return None, name
-        if c == "L" and LAB_EXCL.search(name):
-            return None, name
-        if c == "H" and DOC_NAME.search(name) and not HOSP_NAME.search(name):
-            c = "D"  # amenity=clinic used for a single doctor's cabinet
-        return c, name
-    # untagged or other healthcare values: fall back to the name rules
-    return classify({"name": name, "primary": None, "hierarchy": []}), name
-
-
 if len(sys.argv) > 4:
-    osm_counts = {}
     for e in json.load(open(sys.argv[4]))["elements"]:
         t = e.get("tags", {})
-        c, name = classify_osm(t)
-        if not c:
-            continue
+        name = t.get("name") or t.get("name:fr") or t.get("name:ar") or ""
+        cats = {t.get("amenity"), t.get("healthcare")} | set(re.split(r"[;,]", t.get("healthcare:speciality", "")))
         lat, lon = (e["lat"], e["lon"]) if "lat" in e else (e["center"]["lat"], e["center"]["lon"])
-        osm_counts[c] = osm_counts.get(c, 0) + 1
-        kind = t.get("healthcare") or t.get("amenity") or ""
         spec = t.get("healthcare:speciality")
-        pts.append([round(lat, 5), round(lon, 5), c, name or "(sans nom)", kind + (f" · {spec}" if spec else ""), "OSM"])
-    print("osm:", osm_counts)
+        add(lat, lon, name, cats, (t.get("healthcare") or t.get("amenity") or "") + (f" · {spec}" if spec else ""), "OSM")
 
-# ---------- Google Places (optional, env GOOGLE_PLACES=path) ----------
+# ---------- Google Places (optional, env GOOGLE_PLACES=path[,path...]) ----------
 # Kept out of the public repo build: Google's terms restrict storing and redistributing Places content.
-
-
-def classify_google(p):
-    name = p.get("name") or ""
-    types = set(p.get("types") or [])
-    prim = p.get("primary") or ""
-    if p.get("status") in ("CLOSED_PERMANENTLY",):
-        return None
-    if VET.search(name) or "veterinary_care" in types:
-        return None
-    if "medical_lab" in types or prim == "medical_lab":
-        return None if LAB_EXCL.search(name) else "L"
-    if (LAB_NAME.search(name) or re.search(r"\w{3,}lab\b", name, re.I)) and not LAB_EXCL.search(name):
-        return "L"
-    if DENT_NAME.search(name) or types & {"dentist", "dental_clinic"}:
-        return "T"
-    if NOT_MED.search(name) and not SPECIALTY.search(name):
-        return None
-    if types & {"physiotherapist", "pharmacy", "drugstore", "spa", "beauty_salon"} and not SPECIALTY.search(name):
-        return None
-    if HOSP_NAME.search(name) or prim in ("hospital", "general_hospital"):
-        return "H"
-    if DOC_NAME.search(name) or SPECIALTY.search(name):
-        return "D"
-    if types & {"doctor", "medical_clinic", "medical_center"}:
-        return "D"  # most Moroccan "medical clinic" listings are single practices
-    return None
-
-
-import os
-
 if os.environ.get("GOOGLE_PLACES"):
-    g_counts = {}
-    for p in json.load(open(os.environ["GOOGLE_PLACES"]))["places"]:
-        c = classify_google(p)
-        if not c:
-            continue
-        g_counts[c] = g_counts.get(c, 0) + 1
-        pts.append([round(p["lat"], 5), round(p["lon"], 5), c, p.get("name") or "(sans nom)",
-                    p.get("primary") or "", "Google"])
-    print("google:", g_counts)
+    seen_ids = set()
+    for path in os.environ["GOOGLE_PLACES"].split(","):
+        for p in json.load(open(path))["places"]:
+            if p["id"] in seen_ids or p.get("status") in ("CLOSED_PERMANENTLY", "CLOSED_TEMPORARILY"):
+                continue
+            seen_ids.add(p["id"])
+            cats = {p.get("primary")} | set(p.get("types") or [])
+            if any(st.startswith("lab") for st in p.get("streams") or []):
+                cats.add("lab_search")  # found by the "laboratoire d'analyses médicales" keyword search
+            add(p["lat"], p["lon"], p.get("name"), cats, p.get("primary"), "Google")
+
+from collections import Counter
+print("classified by source:sub:", dict(sorted(counts.items())))
 # drop duplicate listings: same class, same normalised name, within 200 m
 import math, unicodedata
 
@@ -216,20 +96,24 @@ def metres(p, q):
     return math.hypot((p[0] - q[0]) * 110540, (p[1] - q[1]) * 92800)
 
 
-# drop duplicates: same class and matching name within 300 m, or an unnamed point within 40 m of the same class
+# drop duplicates: same class and matching name within 300 m (1.5 km for labs), or an unnamed point within 40 m
 kept = []
 for p in pts:
     k = norm(p[3]) if p[3] != "(sans nom)" else ""
     dup = False
     for q in kept:
-        if q[2] != p[2] or abs(q[0] - p[0]) > 0.003 or abs(q[1] - p[1]) > 0.0035:
+        if q[2] != p[2] or abs(q[0] - p[0]) > 0.015 or abs(q[1] - p[1]) > 0.018:
             continue
         kq = norm(q[3]) if q[3] != "(sans nom)" else ""
         d = metres(p, q)
-        if (d <= 300 and same_name(k, kq)) or ((not k or not kq) and d <= 40):
+        # lab names are distinctive and sources place them up to ~1 km apart; other types: 300 m
+        reach = 1500 if p[2] == "L" and min(len(k), len(kq)) >= 5 else 300
+        if (d <= reach and same_name(k, kq)) or ((not k or not kq) and d <= 40):
             dup = True
             if q[5] != p[5] and p[5] not in q[5]:
                 q[5] = q[5] + "+" + p[5]
+            if q[6] in ("DU", "MC") and p[6] not in ("DU",):
+                q[6] = p[6]  # keep the more specific label
             break
     if not dup:
         kept.append(p)
@@ -237,10 +121,8 @@ print("duplicates removed:", len(pts) - len(kept))
 from collections import Counter
 print("by source:", Counter(p[5] for p in kept))
 pts = kept
-counts = {}
-for p in pts:
-    counts[p[2]] = counts.get(p[2], 0) + 1
-print("classified:", counts)
+counts = Counter(p[6] for p in pts)
+print("after de-duplication:", dict(sorted(counts.items())))
 
 # ---------- region clip (optional env REGION=region.json from fetch_region.py) ----------
 provinces, region_outline = [], None
@@ -263,10 +145,8 @@ if os.environ.get("REGION"):
         nm = re.sub(r"^(Province|Préfecture)\s+(de la|de l'|du|des|de|d'|d’)\s*", "", p["name"])
         provinces.append({"n": nm, "p": rings(shape(p["geom"]))})
     region_outline = rings(rgeom)
-    counts = {}
-    for p in pts:
-        counts[p[2]] = counts.get(p[2], 0) + 1
-    print("in region:", counts)
+    counts = Counter(p[6] for p in pts)
+    print("in region:", dict(sorted(counts.items())))
 
 labels = [{"n": d["name"], "t": d["subtype"], "lat": round(d["lat"], 5), "lon": round(d["lon"], 5)}
           for d in divs if d["subtype"] in ("neighborhood", "macrohood", "microhood", "locality") and d["name"]]
@@ -286,7 +166,7 @@ if os.environ.get("COMMUNES"):
     raw = [c for c in json.load(open(os.environ["COMMUNES"])) if c.get("polys")]
     geoms = [shape({"type": "MultiPolygon", "coordinates": c["polys"]}).buffer(0) for c in raw]
     tree = STRtree(geoms)
-    tally = [{"H": 0, "D": 0, "T": 0, "L": 0} for _ in raw]
+    tally = [{"H": 0, "D": 0, "T": 0, "L": 0, "sub": {}} for _ in raw]
     unassigned = 0
     for p in pts:
         pt = Point(p[1], p[0])
@@ -297,17 +177,22 @@ if os.environ.get("COMMUNES"):
             continue
         i = int(min(hits, key=lambda j: geoms[j].area))  # smallest unit wins where boundaries overlap
         tally[i][p[2]] += 1
+        tally[i]["sub"][p[6]] = tally[i]["sub"].get(p[6], 0) + 1
         p.append(i)
     print("points outside any commune polygon:", unassigned)
     for c, t in zip(raw, tally):
         communes.append({"n": re.sub(r"^(Commune|Arrondissement|Municipalité)\s+(de la|de l'|du|des|de|d'|d’)?\s*", "", c["name"]),
                          "full": c["name"], "ar": c.get("name_ar"), "code": c["code"], "prov": c["province"],
-                         "pop": c["pop"], "hh": c["households"], **t, "p": c["polys"]})
+                         "pop": c["pop"], "hh": c["households"], "pop14": c.get("pop14"),
+                         "growth": c.get("growth"), **t, "p": c["polys"]})
+
+# residents on a 400 m grid (fetch_buildings.py): [lat, lon, residents 2024, growth %/yr, commune index]
+popcells = json.load(open(os.environ["POPCELLS"])) if os.environ.get("POPCELLS") else []
 
 data = {"pts": pts, "labels": labels, "roads": roads, "areas": areas, "provinces": provinces, "region": region_outline,
-        "communes": communes,
+        "communes": communes, "popcells": popcells,
         "meta": {"source": "Overture Maps Foundation, Places + Divisions + Transportation, release 2026-10-21.0",
-                 "counts": counts}}
+                 "counts": dict(counts)}}
 OUTDIR = Path(os.environ.get("OUT_DIR", HERE))
 OUTDIR.mkdir(parents=True, exist_ok=True)
 (OUTDIR / "data.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))

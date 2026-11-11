@@ -26,12 +26,31 @@
     };
   }
 
-  // opts: {hex (edge length m), radius (m), wH, wD, wT, minDemand}
+  // Default lab-test demand weight of each kind of prescriber (one GP cabinet = 1.2, see README "Formula").
+  const WEIGHTS = { HP: 3, HU: 1, CS: 1, MC: 2, HD: 0.5, IM: 0, HL: 0.5, DG: 1.2, DS: 1.5, DL: 0.3, DU: 1, T: 0 };
+  const SUB_LABEL = { L: 'Medical lab', LP: 'Pathology lab', HP: 'Private clinic', HL: 'Specialty clinic (eye, skin…)',
+    HU: 'Public hospital', CS: 'Public health centre', MC: 'Medical centre / SOS médecins', HD: 'Dialysis centre',
+    IM: 'Imaging centre', DG: 'General practitioner', DS: 'Specialist, many tests', DL: 'Specialist, few tests',
+    DU: 'Doctor (specialty not stated)', T: 'Dentist' };
+
+  function weightsFor(opts) {
+    const w = Object.assign({}, WEIGHTS, opts.weights || {});
+    if (opts.wH != null) w.HP = opts.wH;
+    if (opts.wT != null) w.T = opts.wT ? 0.3 : 0;
+    return w;
+  }
+  const isCompetitor = (p, opts) => p.c === 'L' && (p.s !== 'LP' || opts.includePatho);
+
+  function points(data) {
+    return data.pts.map(p => { const [x, y] = toXY(p[0], p[1]); return { lat: p[0], lon: p[1], c: p[2], name: p[3], cat: p[4], src: p[5], s: p[6] || p[2], x, y }; });
+  }
+
+  // opts: {hex (edge length m), radius (m), wH, wT, weights, minDemand, includePatho, province}
   function analyse(data, opts) {
-    const pts = data.pts.map(p => { const [x, y] = toXY(p[0], p[1]); return { lat: p[0], lon: p[1], c: p[2], name: p[3], cat: p[4], x, y }; });
-    const w = { H: opts.wH, D: opts.wD, T: opts.wT, L: 0 };
-    const demandPts = pts.filter(p => p.c !== 'L' && w[p.c] > 0);
-    const labs = pts.filter(p => p.c === 'L');
+    const pts = points(data);
+    const wt = weightsFor(opts);
+    const demandPts = pts.filter(p => p.c !== 'L' && (wt[p.s] || 0) > 0);
+    const labs = pts.filter(p => isCompetitor(p, opts));
     const R = opts.radius;
     const di = bucketIndex(demandPts, 500), li = bucketIndex(labs, 500);
     const labsAll = bucketIndex(labs, 2000);
@@ -46,7 +65,7 @@
         const near = di.near(x, y, R);
         if (!near.length) continue;
         let demand = 0; const n = { H: 0, D: 0, T: 0 };
-        for (const [p] of near) { demand += w[p.c]; n[p.c]++; }
+        for (const [p] of near) { demand += wt[p.s] || 0; n[p.c]++; }
         const nl = li.near(x, y, R).length;
         // nearest lab distance (search widening)
         let nearest = Infinity;
@@ -54,6 +73,7 @@
           const c = labsAll.near(x, y, rr);
           if (c.length) { nearest = Math.min(...c.map(v => v[1])); break; }
         }
+        demand = Math.round(demand * 10) / 10;
         const score = demand / (nl + 1);
         const corners = [];
         for (let k = 0; k < 6; k++) { const a = Math.PI / 180 * (60 * k - 30); corners.push(toLL(x + s * Math.cos(a), y + s * Math.sin(a))); }
@@ -71,6 +91,72 @@
       if (picked.length >= (opts.topN || 15)) break;
     }
     return { hexes, top: picked, demandCount: demandPts.length, labCount: labs.length, pts };
+  }
+
+  // ---------------------------------------------------------------------------------------------------------
+  // Site model (the "Best sites" tab): expected demand a NEW lab would capture at each candidate location.
+  //   demand at point z      D_z = α · residents_z · (1 + g_z)^years  +  (1 − α) · k · prescriber weight_z
+  //   pull of a site at d    f(d) = max(d, 300 m)^−β
+  //   share captured from z  P_cz = f(d_cz) / ( f(d_cz) + Σ_j A_j f(d_jz) + f(D0) )            (Huff model)
+  //     A_j = 1 for a medical lab, 0.5 for a public hospital and 0.3 for a private clinic (in-house labs)
+  //     f(D0) = the "outside option": as attractive as a lab D0 = 3 km away (going to the city, hospital,
+  //     home sample collection, or not testing). Without it a site with no competitor "captures" everyone.
+  //   site score             S_c = Σ_z D_z · P_cz       over z within maxDist of c
+  // k rescales prescriber weights so both demand channels have the same regional total.
+  // Result is in "resident-equivalents captured"; × tests per resident per year × average ticket = revenue estimate.
+  function siteModel(data, opts) {
+    const o = Object.assign({ alpha: 0.6, beta: 2, years: 3, maxDist: 6000, hex: 500, includePatho: false, topN: 15,
+      outside: 3000, inHouse: { HU: 0.5, HP: 0.3 } }, opts);
+    const pts = points(data), wt = weightsFor(o);
+    const labs = pts.filter(p => isCompetitor(p, o));
+    const rivals = labs.map(p => Object.assign({ A: 1 }, p))
+      .concat(pts.filter(p => o.inHouse[p.s]).map(p => Object.assign({ A: o.inHouse[p.s] }, p)));
+    const res = (data.popcells || []).map(c => { const [x, y] = toXY(c[0], c[1]); return { x, y, v: c[2] * Math.pow(1 + (c[3] || 0) / 100, o.years), pop: c[2], g: c[3], ci: c[4] }; });
+    const pre = pts.filter(p => p.c !== 'L' && (wt[p.s] || 0) > 0).map(p => ({ x: p.x, y: p.y, v: wt[p.s] }));
+    const totR = res.reduce((a, r) => a + r.v, 0) || 1, totP = pre.reduce((a, r) => a + r.v, 0) || 1;
+    const k = totR / totP;
+    const demand = res.map(r => ({ x: r.x, y: r.y, v: o.alpha * r.v, kind: 'R' }))
+      .concat(pre.map(p => ({ x: p.x, y: p.y, v: (1 - o.alpha) * k * p.v, kind: 'P' })));
+    const f = d => Math.pow(Math.max(d, 300) / 1000, -o.beta);
+    const li = bucketIndex(labs, 2000), vi = bucketIndex(rivals, 2000), F0 = f(o.outside);
+    for (const z of demand) { z.S = F0; for (const [j, d] of vi.near(z.x, z.y, o.maxDist)) z.S += j.A * f(d); }
+    const di = bucketIndex(demand, 1000), ri = bucketIndex(res, 1000), pi = bucketIndex(pre, 1000);
+    // candidates: hexagon centres with residents or prescribers within 1.5 km
+    let xmin = Infinity, xmax = -Infinity, ymin = Infinity, ymax = -Infinity;
+    for (const z of demand) { xmin = Math.min(xmin, z.x); xmax = Math.max(xmax, z.x); ymin = Math.min(ymin, z.y); ymax = Math.max(ymax, z.y); }
+    const s = o.hex, hw = Math.sqrt(3) * s, cands = [];
+    for (let r = Math.floor(ymin / (1.5 * s)) - 1; r <= Math.ceil(ymax / (1.5 * s)) + 1; r++) {
+      const y = r * 1.5 * s, off = (r & 1) ? hw / 2 : 0;
+      for (let x = Math.floor(xmin / hw) * hw - hw + off; x <= xmax + hw; x += hw) {
+        const local = di.near(x, y, 1500);
+        if (local.reduce((a, [z]) => a + z.v, 0) < 200) continue; // too little demand nearby to be worth scoring
+        let score = 0, fromR = 0;
+        for (const [z, d] of di.near(x, y, o.maxDist)) { const fc = f(d); const c = z.v * fc / (fc + z.S); score += c; if (z.kind === 'R') fromR += c; }
+        const corners = [];
+        for (let q = 0; q < 6; q++) { const a = Math.PI / 180 * (60 * q - 30); corners.push(toLL(x + s * Math.cos(a), y + s * Math.sin(a))); }
+        const [lat, lon] = toLL(x, y);
+        cands.push({ x, y, lat, lon, score, fromR, corners });
+      }
+    }
+    // context for each candidate (only computed for the shortlist and on demand)
+    const describe = c => {
+      let pop = 0, pop14w = 0, gsum = 0;
+      for (const [r] of ri.near(c.x, c.y, 2000)) { pop += r.pop; if (r.g != null) { gsum += r.g * r.pop; pop14w += r.pop; } }
+      const labs1 = li.near(c.x, c.y, 1000).length, labs2 = li.near(c.x, c.y, 2000).length;
+      let nearest = Infinity;
+      for (const rr of [2000, 6000, 20000]) { const n = li.near(c.x, c.y, rr); if (n.length) { nearest = Math.min(...n.map(v => v[1])); break; } }
+      const presc = pi.near(c.x, c.y, 1000).reduce((a, [p]) => a + p.v, 0);
+      return Object.assign(c, { pop2km: pop, growth: pop14w ? gsum / pop14w : null, labs1, labs2, nearest, presc1km: Math.round(presc * 10) / 10 });
+    };
+    if (o.province) for (const c of cands) c.prov = provinceOf(data, c.lat, c.lon);
+    const pool = cands.filter(c => !o.province || c.prov === o.province).sort((a, b) => b.score - a.score);
+    const top = [];
+    for (const c of pool) {
+      if (top.some(t => Math.hypot(t.x - c.x, t.y - c.y) < 2500)) continue; // one pick per 2.5 km
+      top.push(describe(c));
+      if (top.length >= o.topN) break;
+    }
+    return { cands, top, describe, k, labs: labs.length };
   }
 
   function nearestLabel(labels, lat, lon, types, maxDist = Infinity) {
@@ -124,12 +210,19 @@
     return -1;
   }
 
-  const api = { analyse, nearestLabel, zoneName, provinceOf, communeOf, inPolys, toXY, toLL };
+  const api = { analyse, siteModel, WEIGHTS, SUB_LABEL, nearestLabel, zoneName, provinceOf, communeOf, inPolys, toXY, toLL };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.GapAnalysis = api;
 
   if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.main === module) {
     const data = JSON.parse(require('fs').readFileSync(process.argv[2] || 'data.json', 'utf8'));
-    const res = analyse(data, { hex: 400, radius: 1000, wH: 3, wD: 1, wT: 0, minDemand: 10, province: process.argv[3] || '' });
+    const sm = siteModel(data, { province: process.argv[3] || '' });
+    console.log(`SITE MODEL (alpha .6, beta 2, 3 years): ${sm.cands.length} candidates, ${sm.labs} competing labs`);
+    sm.top.forEach((c, i) => {
+      const z = zoneName(data, c.lat, c.lon);
+      console.log(`${i + 1}. ${z.hood} (${z.district}) ${c.lat.toFixed(4)},${c.lon.toFixed(4)} captures ${Math.round(c.score)} res-eq (${Math.round(100 * c.fromR / c.score)}% residents) | pop 2km ${Math.round(c.pop2km)} growth ${c.growth == null ? '?' : c.growth.toFixed(1)}%/yr | labs 1km ${c.labs1} 2km ${c.labs2} nearest ${Math.round(c.nearest)}m | prescribers 1km ${c.presc1km}`);
+    });
+    console.log('ZONES (prescriber gap):');
+    const res = analyse(data, { hex: 400, radius: 1000, wH: 3, wT: 0, minDemand: 10, province: process.argv[3] || '' });
     console.log(`demand points ${res.demandCount}, labs ${res.labCount}, hexes ${res.hexes.length}, qualifying ${res.hexes.filter(h => h.qualifies).length}`);
     res.top.forEach((h, i) => {
       const z = zoneName(data, h.lat, h.lon);
