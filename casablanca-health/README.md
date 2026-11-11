@@ -7,7 +7,8 @@ Open `index.html` (served by GitHub Pages at `/casablanca-health/`).
 ## Data
 
 [Overture Maps](https://overturemaps.org) release `2026-10-21.0`: Places, Divisions and Transportation themes,
-read straight from the public S3 bucket with HTTP range requests (only row groups overlapping Casablanca are downloaded).
+read straight from the public S3 bucket with HTTP range requests (only row groups overlapping Casablanca are downloaded),
+merged with OpenStreetMap health features from the Overpass API (`osm_health.json`, query in `osm_health.overpassql`).
 
 ## Rebuild
 
@@ -16,7 +17,8 @@ pip install pyarrow fsspec aiohttp requests shapely
 python3 fetch_overture.py 2026-10-21.0 places.json      # health and other places in the bbox
 python3 fetch_context.py 2026-10-21.0 context.json      # district polygons + major roads
 # divisions.json (neighbourhood names) comes from the same bucket: theme=divisions/type=division
-python3 build.py places.json divisions.json context.json  # classify, write data.json, index.html, artifact.html
+curl -A "casablanca-health" https://overpass.openstreetmap.fr/api/interpreter --data-urlencode data@osm_health.overpassql -o osm_health.json
+python3 build.py places.json divisions.json context.json osm_health.json  # classify, merge, de-duplicate, write pages
 node analysis.js data.json                               # text summary of the top zones
 ```
 

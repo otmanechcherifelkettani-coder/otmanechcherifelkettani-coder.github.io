@@ -153,14 +153,14 @@ details ul { padding-left: 18px; margin: 6px 0; }
     <details>
       <summary>Method and limits</summary>
       <ul>
-        <li><b>Data.</b> Overture Maps Places (release 2026-10-21), which merges OpenStreetMap with Meta and Microsoft business listings. Places were classified by category and by name (for example "Laboratoire d'analyses médicales", "Clinique", "Dr …", مختبر, مصحة). Veterinary, aesthetic, physiotherapy and pharmacy listings are excluded.</li>
+        <li><b>Data.</b> Two open sources merged and de-duplicated: Overture Maps Places (release 2026-10-21, mostly Meta and Microsoft business listings) and OpenStreetMap (October 2026 snapshot, which adds most public hospitals and CNSS polyclinics). Hover a point to see which source it came from. Places were classified by category and by name (for example "Laboratoire d'analyses médicales", "Clinique", "Dr …", مختبر, مصحة). Veterinary, aesthetic, physiotherapy and pharmacy listings are excluded.</li>
         <li><b>Score.</b> For each 400 m hexagon: demand = clinics × weight + doctors (+ dentists if ticked) within the catchment radius; gap score = demand ÷ (labs in the same radius + 1). Zones are ranked by score, keeping one zone per catchment so the list does not repeat the same area.</li>
         <li><b>Coverage.</b> The source lists far fewer cabinets than really exist in Casablanca, and coverage is better in central districts. Read scores as relative signals, then verify on the ground or against DabaDoc, Med.ma or the Ordre des Médecins directory.</li>
         <li><b>Hospitals.</b> Public hospitals and large private clinics usually run an in-house lab. A high score driven by one big hospital is a weaker signal than one driven by many independent cabinets.</li>
         <li><b>Not modelled.</b> Population, income, rent, sample-collection points and home-collection services.</li>
       </ul>
     </details>
-    <p class="src">Data © Overture Maps Foundation contributors (CDLA Permissive 2.0, ODbL for OpenStreetMap-derived records).</p>
+    <p class="src">Data © Overture Maps Foundation contributors (CDLA Permissive 2.0) and © OpenStreetMap contributors (ODbL).</p>
   </aside>
   <div id="map" role="region" aria-label="Map of Casablanca"></div>
 </div>
@@ -182,7 +182,7 @@ for (const k in counts) $('n-' + k).textContent = counts[k];
 const state = { radius: 1000, wH: 3, wT: 0, minDemand: 10 };
 const map = L.map('map', { preferCanvas: true, zoomSnap: 0.25, attributionControl: true, minZoom: 10, maxZoom: 18 })
   .fitBounds([[33.50, -7.72], [33.63, -7.47]]);
-map.attributionControl.setPrefix(false).addAttribution('Overture Maps Foundation');
+map.attributionControl.setPrefix(false).addAttribution('Overture Maps Foundation · © OpenStreetMap contributors');
 
 const base = L.layerGroup().addTo(map), hexLayer = L.layerGroup().addTo(map), ptLayers = { L: L.layerGroup(), H: L.layerGroup(), D: L.layerGroup() };
 const labelLayer = L.layerGroup().addTo(map), pinLayer = L.layerGroup().addTo(map);
@@ -217,7 +217,7 @@ function drawPoints() {
     if (!ptLayers[p[2]]) continue;
     const isLab = p[2] === 'L';
     L.circleMarker([p[0], p[1]], { radius: isLab ? 5.5 : 3.2, color: isLab ? css('--panel') : col[p[2]], weight: isLab ? 1.5 : 0, fillColor: col[p[2]], fillOpacity: isLab ? 1 : 0.85 })
-      .bindTooltip(`<b>${esc(p[3])}</b><br>${KIND[p[2]]}${p[4] ? ' · ' + esc(p[4].replace(/_/g, ' ')) : ''}`, { direction: 'top', offset: [0, -4] })
+      .bindTooltip(`<b>${esc(p[3])}</b><br>${KIND[p[2]]}${p[4] ? ' · ' + esc(p[4].replace(/_/g, ' ')) : ''}<br><small>Source: ${esc(p[5] || 'Overture')}</small>`, { direction: 'top', offset: [0, -4] })
       .addTo(ptLayers[p[2]]);
   }
   syncLayers();
