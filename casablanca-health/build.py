@@ -278,7 +278,34 @@ for rd in ctx["roads"]:
 # keep the arrondissement / commune polygons (drop prefecture-scale 'county' shapes, keep for outline)
 areas = [{"n": a["name"], "t": a["subtype"], "p": a["polys"]} for a in ctx["areas"]]
 
+# ---------- communes with HCP RGPH 2024 population (optional env COMMUNES=communes.json) ----------
+communes = []
+if os.environ.get("COMMUNES"):
+    from shapely.geometry import Point, shape
+    from shapely.strtree import STRtree
+    raw = [c for c in json.load(open(os.environ["COMMUNES"])) if c.get("polys")]
+    geoms = [shape({"type": "MultiPolygon", "coordinates": c["polys"]}).buffer(0) for c in raw]
+    tree = STRtree(geoms)
+    tally = [{"H": 0, "D": 0, "T": 0, "L": 0} for _ in raw]
+    unassigned = 0
+    for p in pts:
+        pt = Point(p[1], p[0])
+        hits = [i for i in tree.query(pt) if geoms[i].contains(pt)]
+        if not hits:
+            unassigned += 1
+            p.append(-1)
+            continue
+        i = int(min(hits, key=lambda j: geoms[j].area))  # smallest unit wins where boundaries overlap
+        tally[i][p[2]] += 1
+        p.append(i)
+    print("points outside any commune polygon:", unassigned)
+    for c, t in zip(raw, tally):
+        communes.append({"n": re.sub(r"^(Commune|Arrondissement|Municipalité)\s+(de la|de l'|du|des|de|d'|d’)?\s*", "", c["name"]),
+                         "full": c["name"], "ar": c.get("name_ar"), "code": c["code"], "prov": c["province"],
+                         "pop": c["pop"], "hh": c["households"], **t, "p": c["polys"]})
+
 data = {"pts": pts, "labels": labels, "roads": roads, "areas": areas, "provinces": provinces, "region": region_outline,
+        "communes": communes,
         "meta": {"source": "Overture Maps Foundation, Places + Divisions + Transportation, release 2026-10-21.0",
                  "counts": counts}}
 OUTDIR = Path(os.environ.get("OUT_DIR", HERE))

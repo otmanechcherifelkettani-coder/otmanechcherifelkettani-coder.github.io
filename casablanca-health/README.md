@@ -21,7 +21,9 @@ python3 fetch_overture.py 2026-10-21.0 places.json
 python3 fetch_divisions.py 2026-10-21.0 divisions.json   # neighbourhood and town names
 python3 fetch_context.py 2026-10-21.0 context.json       # district polygons + major roads
 curl -A "casablanca-health" https://overpass.openstreetmap.fr/api/interpreter --data-urlencode data@osm_health.overpassql -o osm_health.json
-REGION=region.json python3 build.py places.json divisions.json context.json osm_health.json
+# HCP RGPH 2024 legal population (Excel from https://www.hcp.ma/reg-casablanca/attachment/2664423/)
+python3 fetch_communes.py pop2024.xlsx region.json communes.json
+REGION=region.json COMMUNES=communes.json python3 build.py places.json divisions.json context.json osm_health.json
 node analysis.js data.json "Nouaceur"                    # text ranking, optionally for one province
 ```
 
@@ -29,7 +31,7 @@ Optional private Google Places layer (needs `places_key`; output stays out of th
 
 ```bash
 BBOX=$BBOX STEP=8000 REGION=region.json python3 fetch_google.py google.json 3500
-GOOGLE_PLACES=google.json REGION=region.json OUT_DIR=private python3 build.py places.json divisions.json context.json osm_health.json
+GOOGLE_PLACES=google.json REGION=region.json COMMUNES=communes.json OUT_DIR=private python3 build.py places.json divisions.json context.json osm_health.json
 ```
 
 ## Method
@@ -39,6 +41,13 @@ GOOGLE_PLACES=google.json REGION=region.json OUT_DIR=private python3 build.py pl
 - 400 m hexagon grid. For each hexagon: demand = clinics × weight (default 3) + doctors (+ dentists, optional)
   within the catchment radius (default 1 km); gap score = demand ÷ (labs within the radius + 1).
 - Zones are ranked by score with one zone per catchment.
+
+## Population
+
+`communes.json` holds the official legal population and households of the region's 168 communes and Casablanca
+arrondissements (HCP, RGPH 2024), joined to Overture boundaries (exact or fuzzy name match within the province; three
+manual aliases: Charrate = Cherrat, Assoukhour Assawda = Roches Noires, Ech-Challalate = Chellalate). The Communes tab
+ranks them by residents per lab.
 
 ## Limits
 

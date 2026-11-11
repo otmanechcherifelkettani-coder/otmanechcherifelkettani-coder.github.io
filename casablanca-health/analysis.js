@@ -117,7 +117,14 @@
     if (/casablanca/i.test(prov)) district = nearestLabel(data.labels, lat, lon, ['macrohood'], 6000) || prov;
     return { hood, district: district === hood ? prov : district, prov };
   }
-  const api = { analyse, nearestLabel, zoneName, provinceOf, toXY, toLL };
+  // index into data.communes of the commune containing a point (-1 if none)
+  function communeOf(data, lat, lon) {
+    const cs = data.communes || [];
+    for (let i = 0; i < cs.length; i++) if (inPolys(cs[i].p, lat, lon)) return i;
+    return -1;
+  }
+
+  const api = { analyse, nearestLabel, zoneName, provinceOf, communeOf, inPolys, toXY, toLL };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.GapAnalysis = api;
 
   if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.main === module) {
