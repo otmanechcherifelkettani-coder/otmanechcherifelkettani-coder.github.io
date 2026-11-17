@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS conversations (
     id INTEGER PRIMARY KEY,
     contact_id INTEGER NOT NULL REFERENCES contacts(id),
     handler TEXT DEFAULT 'ai',          -- ai | human
+    team TEXT DEFAULT 'admissions',     -- owning team; staff only see their teams' conversations
     assignee TEXT,
     status TEXT DEFAULT 'open',         -- open | closed
     last_inbound_at REAL,
@@ -46,7 +47,7 @@ CREATE TABLE IF NOT EXISTS conversations (
 CREATE TABLE IF NOT EXISTS messages (
     id INTEGER PRIMARY KEY,
     conversation_id INTEGER NOT NULL REFERENCES conversations(id),
-    direction TEXT NOT NULL,            -- in | out
+    direction TEXT NOT NULL,            -- in | out | note (internal, not sent)
     author TEXT NOT NULL,               -- contact | ai | <staff name> | system
     text TEXT NOT NULL,
     created_at REAL
@@ -89,6 +90,7 @@ def cursor():
         if _conn is None:
             _conn = _connect()
             _conn.executescript(SCHEMA)
+            _migrate(_conn)
         cur = _conn.cursor()
         try:
             yield cur
@@ -96,6 +98,24 @@ def cursor():
         except Exception:
             _conn.rollback()
             raise
+
+
+def _migrate(conn):
+    cols = {r["name"] for r in conn.execute("PRAGMA table_info(conversations)")}
+    if "team" not in cols:
+        conn.execute("ALTER TABLE conversations ADD COLUMN team TEXT DEFAULT 'admissions'")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_conv_team ON conversations(team)")
+    conn.commit()
+
+
+def _team_clause(teams, col="cv.team"):
+    """SQL fragment restricting to the given teams (None = all teams)."""
+    if teams is None:
+        return "", []
+    teams = sorted(teams)
+    if not teams:
+        return " AND 0", []
+    return f" AND {col} IN ({','.join('?' * len(teams))})", teams
 
 
 def reset_for_tests(path: str):
@@ -160,7 +180,7 @@ def get_contact(contact_id: int):
 
 CONTACT_FIELDS = {"name", "language", "kind", "lead_status", "program_interest", "level",
                   "city", "intake", "notes", "tags", "subscribed"}
-CONV_FIELDS = {"handler", "assignee", "status", "last_inbound_at", "last_outbound_at",
+CONV_FIELDS = {"handler", "team", "assignee", "status", "last_inbound_at", "last_outbound_at",
                "followups_sent", "pending_human_notes"}
 
 
@@ -192,8 +212,9 @@ def add_message(conv_id: int, direction: str, author: str, text: str):
             "INSERT INTO messages(conversation_id, direction, author, text, created_at) VALUES(?,?,?,?,?)",
             (conv_id, direction, author, text, now()),
         )
-        col = "last_inbound_at" if direction == "in" else "last_outbound_at"
-        c.execute(f"UPDATE conversations SET {col}=?, updated_at=? WHERE id=?", (now(), now(), conv_id))
+        if direction in ("in", "out"):  # 'note' = internal system note, never sent
+            col = "last_inbound_at" if direction == "in" else "last_outbound_at"
+            c.execute(f"UPDATE conversations SET {col}=?, updated_at=? WHERE id=?", (now(), now(), conv_id))
 
 
 def list_messages(conv_id: int):
@@ -227,24 +248,32 @@ def add_escalation(conv_id: int, category: str, summary: str):
         return c.lastrowid
 
 
-def list_escalations(conv_id: int | None = None, unresolved_only=True):
-    q = "SELECT * FROM escalations WHERE 1=1"
+def list_escalations(conv_id: int | None = None, unresolved_only=True, teams=None):
+    q = "SELECT e.*, cv.team FROM escalations e JOIN conversations cv ON cv.id=e.conversation_id WHERE 1=1"
     args = []
     if conv_id is not None:
-        q += " AND conversation_id=?"
+        q += " AND e.conversation_id=?"
         args.append(conv_id)
     if unresolved_only:
-        q += " AND resolved=0"
+        q += " AND e.resolved=0"
+    clause, targs = _team_clause(teams)
     with cursor() as c:
-        c.execute(q + " ORDER BY id DESC", args)
+        c.execute(q + clause + " ORDER BY e.id DESC", args + targs)
         return [row(r) for r in c.fetchall()]
+
+
+def get_escalation(esc_id: int):
+    with cursor() as c:
+        c.execute("SELECT * FROM escalations WHERE id=?", (esc_id,))
+        return row(c.fetchone())
 
 
 # ---------- inbox queries ----------
 
-def list_conversations(handler: str | None = None, q: str | None = None, lead_status: str | None = None):
+def list_conversations(handler: str | None = None, q: str | None = None, lead_status: str | None = None,
+                       teams=None, team: str | None = None):
     sql = """SELECT cv.*, ct.name, ct.channel, ct.external_id, ct.lead_status, ct.kind,
-                    (SELECT text FROM messages m WHERE m.conversation_id=cv.id ORDER BY m.id DESC LIMIT 1) AS last_text,
+                    (SELECT text FROM messages m WHERE m.conversation_id=cv.id AND m.direction!='note' ORDER BY m.id DESC LIMIT 1) AS last_text,
                     (SELECT COUNT(*) FROM escalations e WHERE e.conversation_id=cv.id AND e.resolved=0) AS open_escalations
              FROM conversations cv JOIN contacts ct ON ct.id=cv.contact_id WHERE 1=1"""
     args = []
@@ -257,16 +286,30 @@ def list_conversations(handler: str | None = None, q: str | None = None, lead_st
     if q:
         sql += " AND (ct.name LIKE ? OR ct.external_id LIKE ? OR EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id=cv.id AND m.text LIKE ?))"
         args += [f"%{q}%"] * 3
-    sql += " ORDER BY cv.updated_at DESC LIMIT 200"
+    if team:
+        sql += " AND cv.team=?"
+        args.append(team)
+    clause, targs = _team_clause(teams)
+    sql += clause + " ORDER BY cv.updated_at DESC LIMIT 200"
+    args += targs
     with cursor() as c:
         c.execute(sql, args)
         return [row(r) for r in c.fetchall()]
 
 
-def list_contacts(filters: dict | None = None):
+def _visible_contacts_clause(teams):
+    """Contacts are visible if one of their conversations is in the user's teams."""
+    if teams is None:
+        return "", []
+    clause, targs = _team_clause(teams)
+    return f" AND id IN (SELECT cv.contact_id FROM conversations cv WHERE 1=1{clause})", targs
+
+
+def list_contacts(filters: dict | None = None, teams=None):
     filters = filters or {}
-    sql = "SELECT * FROM contacts WHERE 1=1"
-    args = []
+    vclause, vargs = _visible_contacts_clause(teams)
+    sql = "SELECT * FROM contacts WHERE 1=1" + vclause
+    args = list(vargs)
     for key in ("channel", "kind", "lead_status", "language", "city"):
         if filters.get(key):
             sql += f" AND {key}=?"
@@ -286,15 +329,17 @@ def list_contacts(filters: dict | None = None):
         return [row(r) for r in c.fetchall()]
 
 
-def contact_stats():
+def contact_stats(teams=None):
+    vclause, vargs = _visible_contacts_clause(teams)
+    cclause, cargs = _team_clause(teams, "team")
     with cursor() as c:
-        c.execute("""SELECT channel, COUNT(*) total, SUM(subscribed) subscribed,
+        c.execute(f"""SELECT channel, COUNT(*) total, SUM(subscribed) subscribed,
                      SUM(CASE WHEN subscribed=0 THEN 1 ELSE 0 END) unsubscribed
-                     FROM contacts GROUP BY channel""")
+                     FROM contacts WHERE 1=1{vclause} GROUP BY channel""", vargs)
         by_channel = [row(r) for r in c.fetchall()]
-        c.execute("SELECT lead_status, COUNT(*) n FROM contacts GROUP BY lead_status")
+        c.execute(f"SELECT lead_status, COUNT(*) n FROM contacts WHERE 1=1{vclause} GROUP BY lead_status", vargs)
         by_status = {r["lead_status"]: r["n"] for r in c.fetchall()}
-        c.execute("SELECT handler, COUNT(*) n FROM conversations WHERE status='open' GROUP BY handler")
+        c.execute(f"SELECT handler, COUNT(*) n FROM conversations WHERE status='open'{cclause} GROUP BY handler", cargs)
         by_handler = {r["handler"]: r["n"] for r in c.fetchall()}
     return {"by_channel": by_channel, "by_lead_status": by_status, "open_by_handler": by_handler}
 
@@ -313,3 +358,12 @@ def followup_candidates(silent_since: float, max_followups: int):
             (max_followups, silent_since),
         )
         return [row(r) for r in c.fetchall()]
+
+
+def contact_visible(contact_id: int, teams) -> bool:
+    if teams is None:
+        return True
+    clause, targs = _team_clause(teams)
+    with cursor() as c:
+        c.execute(f"SELECT 1 FROM conversations cv WHERE cv.contact_id=?{clause} LIMIT 1", [contact_id] + targs)
+        return c.fetchone() is not None

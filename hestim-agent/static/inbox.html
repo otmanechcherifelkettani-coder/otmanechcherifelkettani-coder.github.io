@@ -51,7 +51,8 @@ input,textarea,select{font:inherit;color:var(--ink)}
 .prev{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:3px;min-width:0}
 .prev svg{width:18px;height:18px;fill:var(--muted)}.prev span{overflow:hidden;text-overflow:ellipsis}
 .pill{font-size:11px;border-radius:10px;padding:1px 7px;white-space:nowrap;font-weight:500}
-.p-ai{background:var(--chip-on);color:var(--chip-on-ink)}.p-human{background:#fff3e0;color:#b45309}
+.p-ai{background:var(--chip-on);color:var(--chip-on-ink)}.p-team{border:1px solid var(--line);color:var(--muted);font-weight:400}
+.field select{flex:1;border:1px solid var(--line);background:var(--input);border-radius:8px;padding:8px 10px;color:var(--ink)}.sect .help{color:var(--muted);font-size:12.5px;margin:8px 0 0}.p-human{background:#fff3e0;color:#b45309}
 @media (prefers-color-scheme:dark){.p-human{background:#3d2a12;color:#f6b25b}}
 .unread{background:var(--brand);color:var(--brand-ink);border-radius:10px;min-width:20px;height:20px;display:grid;place-items:center;font-size:12px;font-weight:600;padding:0 6px}
 .unread.urgent{background:var(--danger);color:#fff}
@@ -132,7 +133,7 @@ input,textarea,select{font:inherit;color:var(--ink)}
   <button data-v="esc" title="Escalades" aria-label="Escalades"><svg viewBox="0 0 24 24"><path d="M12 2 1 21h22L12 2zm0 4 7.5 13h-15L12 6zm-1 4v5h2v-5h-2zm0 6v2h2v-2h-2z"/></svg><span class="count hidden" id="c-esc" style="background:var(--danger);color:#fff"></span></button>
   <button data-v="contacts" title="Contacts" aria-label="Contacts"><svg viewBox="0 0 24 24"><path d="M16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-2.3 0-7 1.2-7 3.5V19h14v-2.5C15 14.2 10.3 13 8 13zm8 0h-1c1.2.9 2 2 2 3.5V19h6v-2.5c0-2.3-4.7-3.5-7-3.5z"/></svg></button>
   <div class="sep"></div>
-  <button data-v="test" title="Tester l'agent" aria-label="Tester l'agent"><svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .7-.4 1.4-1 1.7V7h5a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3h5V5.7A2 2 0 0 1 12 2zM9 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg></button>
+  <button data-v="test" id="rail-test" title="Tester l'agent" aria-label="Tester l'agent"><svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .7-.4 1.4-1 1.7V7h5a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3h5V5.7A2 2 0 0 1 12 2zM9 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg></button>
   <div class="grow"></div>
   <div class="me" id="me" title=""></div>
 </nav>
@@ -145,13 +146,13 @@ input,textarea,select{font:inherit;color:var(--ink)}
   <div class="chips" id="chips">
     <button class="chip on" data-f="">Toutes</button>
     <button class="chip" data-f="handler:ai">IA</button>
-    <button class="chip" data-f="handler:human">Équipe<b id="n-human"></b></button>
+    <button class="chip" data-f="handler:human">Humain<b id="n-human"></b></button>
     <button class="chip" data-f="lead_status:ready">Prêts</button>
     <button class="chip" data-f="lead_status:undecided">Indécis</button>
     <button class="chip" data-f="lead_status:enrolled">Étudiants</button>
   </div>
   <div class="chats" id="chats"></div>
-  <div class="foot">Réponses de l'IA signées « Nora » · Les conversations reprises par l'équipe passent en orange</div>
+  <div class="foot" id="foot">Réponses de l'IA signées « Nora » · Les conversations reprises par l'équipe passent en orange</div>
 </section>
 
 <!-- main area -->
@@ -170,7 +171,7 @@ input,textarea,select{font:inherit;color:var(--ink)}
       <button class="icon-btn" id="h-info" title="Fiche contact" aria-label="Fiche contact"><svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg></button>
       <button class="icon-btn" id="h-menu" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M12 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg></button>
       <div class="menu" id="menu">
-        <button data-a="info">Fiche contact</button><button data-a="assign">Attribuer à un collègue</button>
+        <button data-a="info">Fiche contact</button><button data-a="assign">Attribuer à un collègue</button><button data-a="transfer">Transférer vers une équipe</button>
         <button data-a="assignme">M'attribuer la discussion</button><button data-a="close">Clôturer la discussion</button>
       </div>
     </header>
@@ -225,7 +226,9 @@ function hhmm(t){const d=new Date(t*1000),n=new Date();if(d.toDateString()===n.t
 function dayLabel(t){const d=new Date(t*1000),n=new Date();if(d.toDateString()===n.toDateString())return "Aujourd'hui";const y=new Date(n);y.setDate(n.getDate()-1);
   if(d.toDateString()===y.toDateString())return 'Hier';return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}
 
-let state={view:'chats',filter:'',sel:null,data:null,me:'',testId:null};
+let state={view:'chats',filter:'',sel:null,data:null,me:'',testId:null,admin:false,teams:[],labels:{},staff:[]};
+const teamLabel=t=>state.labels[t]||t;
+const multiTeam=()=>state.admin||state.teams.length>1;
 
 /* ---------- navigation ---------- */
 document.querySelectorAll('.rail button[data-v]').forEach(b=>b.onclick=()=>show(b.dataset.v));
@@ -254,7 +257,7 @@ async function loadChats(){
     return `<div class="chat ${r.id===state.sel?'sel':''}" data-id="${r.id}">${avatar(name)}<div class="body">
       <div class="row"><span class="name">${esc(name)}</span><span class="time ${waiting?'new':''}">${r.updated_at?hhmm(r.updated_at):''}</span></div>
       <div class="row"><span class="prev">${lastOut?TICKS:''}<span>${esc(r.last_text||'')}</span></span>
-      <span style="display:flex;gap:5px;align-items:center">${r.handler==='ai'?'<span class="pill p-ai">IA</span>':'<span class="pill p-human">'+esc(r.assignee||'Équipe')+'</span>'}
+      <span style="display:flex;gap:5px;align-items:center">${multiTeam()?`<span class="pill p-team">${esc(teamLabel(r.team))}</span>`:''}${r.handler==='ai'?'<span class="pill p-ai">IA</span>':'<span class="pill p-human">'+esc(r.assignee||'Équipe')+'</span>'}
       ${r.open_escalations?`<span class="unread ${waiting?'urgent':''}">${r.open_escalations}</span>`:''}</span></div></div></div>`}).join('')
     ||'<p style="color:var(--muted);text-align:center;padding:24px">Aucune discussion</p>';
   document.querySelectorAll('.chat').forEach(c=>c.onclick=()=>openConv(+c.dataset.id));
@@ -266,7 +269,7 @@ async function openConv(id,keepScroll){
   $('#empty').classList.add('hidden');$('#conv').classList.remove('hidden');document.body.classList.add('in-chat');
   $('#h-av').outerHTML=`<div class="av sm" id="h-av" style="background:${colorFor(name)}">${esc(initials(name))}</div>`;
   $('#h-name').textContent=name;
-  $('#h-sub').textContent=[CH[ct.channel]||ct.channel,STATUS[ct.lead_status]||ct.lead_status,c.handler==='ai'?'Gérée par l\'IA':'Gérée par '+(c.assignee||'l\'équipe')].join(' · ');
+  $('#h-sub').textContent=[CH[ct.channel]||ct.channel,teamLabel(c.team),STATUS[ct.lead_status]||ct.lead_status,c.handler==='ai'?'Gérée par l\'IA':'Gérée par '+(c.assignee||'l\'équipe')].join(' · ');
   const tk=$('#h-take');
   if(c.handler==='ai'){tk.className='takeover';tk.innerHTML='<span class="long">Prendre le contrôle</span><span class="short">Reprendre</span>'}else{tk.className='takeover ghost';tk.innerHTML='<span class="long">Rendre à l\'IA</span><span class="short">IA</span>'}
   tk.onclick=async()=>{await api(`/api/conversations/${id}/${c.handler==='ai'?'takeover':'release'}`,{method:'POST'});openConv(id);loadChats()};
@@ -277,6 +280,7 @@ async function openConv(id,keepScroll){
   const items=[...d.messages,...escs].sort((a,b)=>a.created_at-b.created_at);
   for(const m of items){
     const day=dayLabel(m.created_at);if(day!==lastDay){html+=`<div class="day"><span>${esc(day)}</span></div>`;lastDay=day;prevDir=''}
+    if(m.direction==='note'){html+=`<div class="sys"><span>↪ ${esc(m.text)}</span></div>`;prevDir='';continue}
     if(m._esc){html+=`<div class="sys"><span>⚑ Escalade ${esc(m.category)}${m.resolved?' (résolue)':''} : ${esc(m.summary)}</span></div>`;prevDir='';continue}
     const first=m.direction!==prevDir||m.author!==prevAuthor;
     const who=m.direction==='out'&&first?(m.author==='ai'?'<span class="author">Nora · IA</span>':`<span class="author staff">${esc(m.author)}</span>`):'';
@@ -309,7 +313,7 @@ function appendSys(t){$('#typing')?.remove();$('#wall').insertAdjacentHTML('befo
 $('#h-menu').onclick=e=>{e.stopPropagation();$('#menu').classList.toggle('open')};document.addEventListener('click',()=>$('#menu').classList.remove('open'));
 $('#menu').onclick=async e=>{const a=e.target.dataset.a;if(!a)return;const id=state.sel;
   if(a==='info')openDrawer();
-  if(a==='assign'){const who=prompt('Attribuer la discussion à :',state.data.conversation.assignee||'');if(who!==null){await api(`/api/conversations/${id}/assign`,{method:'POST',body:JSON.stringify({assignee:who})});openConv(id);loadChats()}}
+  if(a==='assign'||a==='transfer'){openDrawer();setTimeout(()=>$(a==='assign'?'#d-asg':'#d-team')?.focus(),50)}
   if(a==='assignme'){await api(`/api/conversations/${id}/assign`,{method:'POST',body:JSON.stringify({assignee:state.me})});openConv(id);loadChats()}
   if(a==='close'&&confirm('Clôturer cette discussion ? Le prochain message du contact en ouvrira une nouvelle.')){await api(`/api/conversations/${id}/close`,{method:'POST'});$('#back').click()}};
 $('#h-info').onclick=openDrawer;$('#h-who').onclick=openDrawer;$('#d-close').onclick=()=>$('#drawer').classList.remove('open');
@@ -317,10 +321,15 @@ function openDrawer(){$('#drawer').classList.add('open');renderDrawer()}
 function renderDrawer(){const {contact:ct,conversation:c,escalations:es}=state.data;const name=ct.name||ct.external_id;
   $('#d-body').innerHTML=`<div class="sect hero">${avatar(name)}<div style="font-size:22px">${esc(name)}</div><div style="color:var(--muted)">${esc(CH[ct.channel]||ct.channel)} · ${esc(ct.external_id)}</div></div>
   <div class="sect"><h4>Profil (rempli par l'IA)</h4><div class="kv">${[['Type',KIND[ct.kind]||ct.kind],['Statut',STATUS[ct.lead_status]||ct.lead_status],['Langue',ct.language],['Programme',ct.program_interest],['Niveau',ct.level],['Rentrée',ct.intake],['Ville',ct.city],['Relances',ct.subscribed?'activées':'désabonné']].map(([k,v])=>`<span>${k}</span><span>${esc(v)||'—'}</span>`).join('')}</div></div>
-  <div class="sect"><h4>Attribuer à un collègue</h4><div class="field"><input id="d-asg" value="${esc(c.assignee)}" placeholder="Nom du conseiller"><button class="btn primary" id="d-asgb">OK</button></div></div>
+  <div class="sect"><h4>Équipe</h4><div class="field"><select id="d-team">${Object.keys(state.labels).map(t=>`<option value="${t}" ${t===c.team?'selected':''}>${esc(teamLabel(t))}</option>`).join('')}</select><button class="btn primary" id="d-teamb">Transférer</button></div>
+    <p class="help">Seuls les membres de l'équipe choisie (et la direction) verront cette discussion.</p></div>
+  <div class="sect"><h4>Attribuer à un collègue</h4><div class="field"><select id="d-asg"><option value="">Personne</option>${state.staff.filter(u=>u.admin||u.teams.includes(c.team)).map(u=>`<option ${u.name===c.assignee?'selected':''}>${esc(u.name)}</option>`).join('')}</select><button class="btn primary" id="d-asgb">OK</button></div></div>
   <div class="sect"><h4>Notes de l'IA</h4><div style="white-space:pre-wrap">${esc(ct.notes)||'—'}</div></div>
   <div class="sect"><h4>Escalades</h4>${es.map(e=>`<div class="esc ${e.category==='urgent'?'urgent':''}"><b>${esc(e.category)}</b>${e.resolved?' · résolue':''}<br>${esc(e.summary)}</div>`).join('')||'<span style="color:var(--muted)">Aucune</span>'}</div>
   <div class="sect"><button class="danger-link" id="d-close-conv"><svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>Clôturer la discussion</button></div>`;
+  $('#d-teamb').onclick=async()=>{const t=$('#d-team').value;if(t===c.team)return;
+    const r=await api(`/api/conversations/${c.id}/team`,{method:'POST',body:JSON.stringify({team:t})});
+    if(r.still_visible){openConv(c.id)}else{$('#drawer').classList.remove('open');$('#back').click()}loadChats()};
   $('#d-asgb').onclick=async()=>{await api(`/api/conversations/${c.id}/assign`,{method:'POST',body:JSON.stringify({assignee:$('#d-asg').value})});openConv(c.id);loadChats()};
   $('#d-close-conv').onclick=()=>{$('#menu [data-a=close]').click()}}
 
@@ -370,7 +379,15 @@ async function loadEsc(){const rows=await api('/api/escalations');
   document.querySelectorAll('.trow[data-c]').forEach(t=>t.onclick=()=>{show('chats');openConv(+t.dataset.c)})}
 
 /* ---------- boot ---------- */
-api('/api/me').then(m=>{state.me=m.user;$('#me').textContent=initials(m.user);$('#me').title='Connecté : '+m.user}).catch(()=>{});
+api('/api/me').then(m=>{state.me=m.user;state.admin=m.admin;state.teams=m.teams;state.labels=m.team_labels;
+  const role=m.admin?'Direction (toutes les équipes)':m.teams.map(teamLabel).join(', ');
+  $('#me').textContent=initials(m.user);$('#me').title=`Connecté : ${m.user} · ${role}`;
+  $('#foot').textContent=`Connecté : ${m.user} · ${role}`;
+  if(!m.can_test){$('#rail-test').classList.add('hidden');$('#newtest').classList.add('hidden')}
+  if(multiTeam()){const chips=$('#chips');m.teams.forEach(t=>{const b=document.createElement('button');b.className='chip';b.dataset.f='team:'+t;b.textContent=teamLabel(t);
+    b.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===b));state.filter=b.dataset.f;loadChats()};chips.appendChild(b)})}
+  loadChats()}).catch(()=>{});
+api('/api/staff').then(r=>state.staff=r).catch(()=>{});
 loadChats();
 setInterval(()=>{if(state.view==='chats'){loadChats();if(state.sel)openConv(state.sel,true)}},8000);
 </script>

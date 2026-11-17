@@ -46,16 +46,48 @@ app = FastAPI(title="HESTIM Agent", lifespan=lifespan)
 security = HTTPBasic()
 
 
-def staff(creds: HTTPBasicCredentials = Depends(security)) -> str:
-    expected = config.staff_accounts().get(creds.username)
-    if expected is None or not secrets.compare_digest(creds.password.encode(), expected.encode()):
+class User(BaseModel):
+    name: str
+    teams: set[str] | None  # None = admin, sees every team
+
+    @property
+    def is_admin(self) -> bool:
+        return self.teams is None
+
+    def can_see(self, team: str) -> bool:
+        return self.teams is None or team in self.teams
+
+
+def staff(creds: HTTPBasicCredentials = Depends(security)) -> User:
+    account = config.staff_accounts().get(creds.username)
+    if account is None or not secrets.compare_digest(creds.password.encode(), account["password"].encode()):
         raise HTTPException(401, headers={"WWW-Authenticate": "Basic"})
-    return creds.username
+    return User(name=creds.username, teams=account["teams"])
+
+
+def visible_conversation(conv_id: int, user: User) -> dict:
+    """Load a conversation the user may see. Invisible ones answer 404 so their existence is not revealed."""
+    conv = db.get_conversation(conv_id)
+    if not conv or not user.can_see(conv["team"]):
+        raise HTTPException(404)
+    return conv
 
 
 @app.get("/api/me")
-def me(user: str = Depends(staff)):
-    return {"user": user}
+def me(user: User = Depends(staff)):
+    teams = sorted(config.TEAMS) if user.is_admin else sorted(user.teams)
+    return {"user": user.name, "admin": user.is_admin, "teams": teams, "team_labels": config.TEAMS,
+            "can_test": user.can_see(config.DEFAULT_TEAM)}
+
+
+@app.get("/api/staff")
+def staff_list(user: User = Depends(staff)):
+    """Colleagues the user can hand a conversation to, with the teams they cover."""
+    out = []
+    for name, acc in config.staff_accounts().items():
+        teams = sorted(config.TEAMS) if acc["teams"] is None else sorted(acc["teams"])
+        out.append({"name": name, "teams": teams, "admin": acc["teams"] is None})
+    return out
 
 
 # ---------------- inbound pipeline ----------------
@@ -96,37 +128,40 @@ class WebMessage(BaseModel):
 
 
 @app.post("/api/chat")
-def web_chat(msg: WebMessage, _user: str = Depends(staff)):
-    """Talk to the agent from the inbox's test panel (channel 'web')."""
+def web_chat(msg: WebMessage, user: User = Depends(staff)):
+    """Talk to the agent from the inbox's test panel (channel 'web'). Test chats start in admissions."""
+    if not user.can_see(config.DEFAULT_TEAM):
+        raise HTTPException(403, "Le mode test est réservé aux équipes admissions et admin.")
     reply = handle_inbound("web", msg.external_id, msg.name, msg.text)
     return {"reply": reply}
 
 
 # ---------------- inbox API ----------------
+# Every endpoint below is scoped to the caller's teams; admins see everything.
 
 @app.get("/api/conversations")
 def conversations(handler: str | None = None, q: str | None = None, lead_status: str | None = None,
-                  _user: str = Depends(staff)):
-    return db.list_conversations(handler, q, lead_status)
+                  team: str | None = None, user: User = Depends(staff)):
+    return db.list_conversations(handler, q, lead_status, teams=user.teams, team=team)
 
 
 @app.get("/api/conversations/{conv_id}")
-def conversation(conv_id: int, _user: str = Depends(staff)):
-    conv = db.get_conversation(conv_id)
-    if not conv:
-        raise HTTPException(404)
+def conversation(conv_id: int, user: User = Depends(staff)):
+    conv = visible_conversation(conv_id, user)
     return {"conversation": conv, "contact": db.get_contact(conv["contact_id"]),
             "messages": db.list_messages(conv_id), "escalations": db.list_escalations(conv_id, False)}
 
 
 @app.post("/api/conversations/{conv_id}/takeover")
-def takeover(conv_id: int, user: str = Depends(staff)):
-    db.update_conversation(conv_id, handler="human", assignee=db.get_conversation(conv_id)["assignee"] or user)
+def takeover(conv_id: int, user: User = Depends(staff)):
+    conv = visible_conversation(conv_id, user)
+    db.update_conversation(conv_id, handler="human", assignee=conv["assignee"] or user.name)
     return {"ok": True}
 
 
 @app.post("/api/conversations/{conv_id}/release")
-def release(conv_id: int, _user: str = Depends(staff)):
+def release(conv_id: int, user: User = Depends(staff)):
+    visible_conversation(conv_id, user)
     db.update_conversation(conv_id, handler="ai")
     return {"ok": True}
 
@@ -136,64 +171,91 @@ class Assign(BaseModel):
 
 
 @app.post("/api/conversations/{conv_id}/assign")
-def assign(conv_id: int, body: Assign, _user: str = Depends(staff)):
-    db.update_conversation(conv_id, assignee=body.assignee)
+def assign(conv_id: int, body: Assign, user: User = Depends(staff)):
+    conv = visible_conversation(conv_id, user)
+    if body.assignee:
+        target = config.staff_accounts().get(body.assignee)
+        if target is None:
+            raise HTTPException(400, "Collègue inconnu")
+        if target["teams"] is not None and conv["team"] not in target["teams"]:
+            raise HTTPException(400, f"{body.assignee} ne fait pas partie de l'équipe "
+                                     f"{config.TEAMS[conv['team']]}. Transférez d'abord la discussion.")
+    db.update_conversation(conv_id, assignee=body.assignee or None)
     return {"ok": True}
+
+
+class Transfer(BaseModel):
+    team: str
+
+
+@app.post("/api/conversations/{conv_id}/team")
+def transfer(conv_id: int, body: Transfer, user: User = Depends(staff)):
+    conv = visible_conversation(conv_id, user)
+    if body.team not in config.TEAMS:
+        raise HTTPException(400, "Équipe inconnue")
+    from agent.tools import route_to_team
+    route_to_team(conv, body.team, by=user.name)
+    return {"ok": True, "still_visible": user.can_see(body.team)}
 
 
 class Reply(BaseModel):
     text: str
-    author: str | None = None
 
 
 @app.post("/api/conversations/{conv_id}/reply")
-def human_reply(conv_id: int, body: Reply, user: str = Depends(staff)):
-    conv = db.get_conversation(conv_id)
-    if not conv:
-        raise HTTPException(404)
+def human_reply(conv_id: int, body: Reply, user: User = Depends(staff)):
+    conv = visible_conversation(conv_id, user)
     contact = db.get_contact(conv["contact_id"])
     if not meta.send(contact["channel"], contact["external_id"], body.text):
         raise HTTPException(502, "delivery failed")
-    db.add_message(conv_id, "out", body.author or user, body.text)
+    db.add_message(conv_id, "out", user.name, body.text)
     notes = json.loads(conv["pending_human_notes"] or "[]") + [body.text]
-    db.update_conversation(conv_id, handler="human", pending_human_notes=json.dumps(notes, ensure_ascii=False))
+    db.update_conversation(conv_id, handler="human", assignee=conv["assignee"] or user.name,
+                           pending_human_notes=json.dumps(notes, ensure_ascii=False))
     return {"ok": True}
 
 
 @app.post("/api/conversations/{conv_id}/close")
-def close(conv_id: int, _user: str = Depends(staff)):
+def close(conv_id: int, user: User = Depends(staff)):
+    visible_conversation(conv_id, user)
     db.update_conversation(conv_id, status="closed")
     return {"ok": True}
 
 
 @app.post("/api/escalations/{esc_id}/resolve")
-def resolve(esc_id: int, _user: str = Depends(staff)):
+def resolve(esc_id: int, user: User = Depends(staff)):
+    esc = db.get_escalation(esc_id)
+    if not esc:
+        raise HTTPException(404)
+    visible_conversation(esc["conversation_id"], user)
     with db.cursor() as c:
         c.execute("UPDATE escalations SET resolved=1 WHERE id=?", (esc_id,))
     return {"ok": True}
 
 
 @app.get("/api/escalations")
-def escalations(_user: str = Depends(staff)):
-    return db.list_escalations()
+def escalations(user: User = Depends(staff)):
+    return db.list_escalations(teams=user.teams)
 
 
 # ---------------- contacts ----------------
+# A contact is visible when one of their conversations belongs to one of the user's teams.
 
 @app.get("/api/contacts")
 def contacts(channel: str | None = None, kind: str | None = None, lead_status: str | None = None,
-             text: str | None = None, _user: str = Depends(staff)):
-    return db.list_contacts({"channel": channel, "kind": kind, "lead_status": lead_status, "text": text})
+             text: str | None = None, user: User = Depends(staff)):
+    return db.list_contacts({"channel": channel, "kind": kind, "lead_status": lead_status, "text": text},
+                            teams=user.teams)
 
 
 @app.get("/api/contacts/stats")
-def stats(_user: str = Depends(staff)):
-    return db.contact_stats()
+def stats(user: User = Depends(staff)):
+    return db.contact_stats(teams=user.teams)
 
 
 @app.get("/api/contacts/export.csv")
-def export(_user: str = Depends(staff)):
-    rows = db.list_contacts()
+def export(user: User = Depends(staff)):
+    rows = db.list_contacts(teams=user.teams)
     buf = io.StringIO()
     if rows:
         w = csv.DictWriter(buf, fieldnames=list(rows[0].keys()))
@@ -226,7 +288,7 @@ ASK_SCHEMA = {
 
 
 @app.post("/api/contacts/ask")
-def ask_contacts(body: Ask, _user: str = Depends(staff)):
+def ask_contacts(body: Ask, user: User = Depends(staff)):
     """'Demandez à l'IA': turn a natural-language question into contact filters."""
     resp = core.client().messages.create(
         model=config.MODEL,
@@ -239,13 +301,13 @@ def ask_contacts(body: Ask, _user: str = Depends(staff)):
     if resp.stop_reason == "refusal":
         raise HTTPException(422, "question refusée")
     filters = json.loads(next(b.text for b in resp.content if b.type == "text"))
-    return {"filters": filters, "explanation": filters.pop("explanation"), "contacts": db.list_contacts(filters)}
+    return {"filters": filters, "explanation": filters.pop("explanation"), "contacts": db.list_contacts(filters, teams=user.teams)}
 
 
 # ---------------- UI ----------------
 
 @app.get("/")
-def inbox(_user: str = Depends(staff)):
+def inbox(_user: User = Depends(staff)):
     return FileResponse(STATIC / "inbox.html")
 
 

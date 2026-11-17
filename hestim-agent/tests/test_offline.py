@@ -178,6 +178,67 @@ def test_per_staff_logins(monkeypatch):
     import app as app_module
     monkeypatch.setenv("INBOX_USERS", "Amal:pw1,Karim:pw2")
     client = TestClient(app_module.app)
-    assert client.get("/api/me", auth=("Amal", "pw1")).json() == {"user": "Amal"}
+    assert client.get("/api/me", auth=("Amal", "pw1")).json()["user"] == "Amal"
     assert client.get("/api/me", auth=("Amal", "pw2")).status_code == 401
     assert client.get("/api/me", auth=(config.INBOX_USER, config.INBOX_PASSWORD)).status_code == 401
+
+
+def test_roles_scope_everything_to_team(monkeypatch):
+    """Finance only sees finance chats; admin sees all; routing follows escalations."""
+    from fastapi.testclient import TestClient
+    import app as app_module
+    monkeypatch.setenv("INBOX_USERS", "Fatima:f:finance,Karim:k:admissions,Dir:d:admin,Sara:s:admissions|scolarite")
+    client = TestClient(app_module.app)
+    FIN, ADM, DIR, SARA = ("Fatima", "f"), ("Karim", "k"), ("Dir", "d"), ("Sara", "s")
+
+    # a prospect chat (stays in admissions) and a student chat the agent routes to finance
+    _p, prospect = db.get_or_create_conversation("whatsapp", "p1", "Prospect")
+    db.add_message(prospect["id"], "in", "contact", "bonjour")
+    db.add_escalation(prospect["id"], "admissions", "appel")
+    core.set_client(FakeClient([
+        ("tool_use", [tool("escalate_to_human", {"category": "finance", "summary": "reçu manquant", "handoff": False})]),
+        ("end_turn", [text("Je transmets au service finance.")]),
+    ]))
+    _s, student = db.get_or_create_conversation("whatsapp", "s1", "Étudiant")
+    core.run_turn(student["id"], "je n'ai pas reçu mon reçu")
+    assert db.get_conversation(student["id"])["team"] == "finance"
+    notes = [m for m in db.list_messages(student["id"]) if m["direction"] == "note"]
+    assert notes and "Finance" in notes[0]["text"]
+
+    ids = lambda who: {c["id"] for c in client.get("/api/conversations", auth=who).json()}
+    assert ids(FIN) == {student["id"]}
+    assert ids(ADM) == {prospect["id"]}
+    assert ids(DIR) == {student["id"], prospect["id"]}
+    assert ids(SARA) == {prospect["id"]}
+
+    # direct access to another team's chat is a 404, for reads and every action
+    assert client.get(f"/api/conversations/{prospect['id']}", auth=FIN).status_code == 404
+    for action in ("takeover", "release", "close"):
+        assert client.post(f"/api/conversations/{prospect['id']}/{action}", auth=FIN).status_code == 404
+    assert client.post(f"/api/conversations/{prospect['id']}/reply", json={"text": "x"}, auth=FIN).status_code == 404
+    esc_id = db.list_escalations(prospect["id"])[0]["id"]
+    assert client.post(f"/api/escalations/{esc_id}/resolve", auth=FIN).status_code == 404
+
+    # escalations, contacts, stats and export are scoped too
+    assert {e["conversation_id"] for e in client.get("/api/escalations", auth=FIN).json()} == {student["id"]}
+    assert [c["name"] for c in client.get("/api/contacts", auth=FIN).json()] == ["Étudiant"]
+    assert sum(c["total"] for c in client.get("/api/contacts/stats", auth=FIN).json()["by_channel"]) == 1
+    assert "Prospect" not in client.get("/api/contacts/export.csv", auth=FIN).text
+
+    # assigning to someone outside the team is refused; transfer moves visibility
+    r = client.post(f"/api/conversations/{student['id']}/assign", json={"assignee": "Karim"}, auth=FIN)
+    assert r.status_code == 400
+    assert client.post(f"/api/conversations/{student['id']}/assign", json={"assignee": "Fatima"}, auth=FIN).status_code == 200
+    r = client.post(f"/api/conversations/{student['id']}/team", json={"team": "scolarite"}, auth=FIN).json()
+    assert r == {"ok": True, "still_visible": False}
+    assert ids(FIN) == set() and student["id"] in ids(SARA)
+    assert db.get_conversation(student["id"])["assignee"] is None
+
+    # test mode is for admissions/admin only
+    assert client.post("/api/chat", json={"external_id": "t", "text": "x"}, auth=FIN).status_code == 403
+
+
+def test_unknown_role_is_rejected(monkeypatch):
+    monkeypatch.setenv("INBOX_USERS", "X:pw:compta")
+    with pytest.raises(ValueError):
+        config.staff_accounts()

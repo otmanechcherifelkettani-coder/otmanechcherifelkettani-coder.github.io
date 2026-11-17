@@ -18,6 +18,25 @@ conversation complète. Le schéma reprend celui du document Palete (Moringa / G
 ## Interface équipe (`/`)
 Interface façon messagerie (liste de discussions, bulles, mode clair/sombre, mobile). Chaque membre de l'équipe a son propre identifiant (`INBOX_USERS`) ; son nom signe ses réponses.
 
+### Rôles et équipes
+Chaque discussion appartient à **une** équipe. Chaque membre ne voit que les discussions, contacts,
+escalades, statistiques et exports de ses équipes. C'est appliqué côté serveur : une discussion
+d'une autre équipe répond « introuvable », y compris par l'API.
+
+| Équipe | Reçoit |
+|---|---|
+| `admissions` | Toutes les nouvelles discussions, appels conseiller, questions sans réponse dans la base |
+| `finance` | Escalades `finance` (paiements, reçus, échéanciers) |
+| `scolarite` | Escalades `scolarite` (attestations, notes, inscriptions administratives) |
+| `vie_etudiante` | Escalades `urgent` (harcèlement, santé, sécurité, plaintes) |
+| `admin` (rôle) | Tout, avec filtres par équipe |
+
+Quand l'agent escalade, la discussion passe automatiquement à l'équipe concernée (une note
+« Transférée de … vers … » apparaît dans le fil). Un membre peut aussi la **transférer** à une autre
+équipe et ne peut l'**attribuer** qu'à un collègue de l'équipe qui la détient. Le routage se règle
+dans `config.py` (`TEAMS`, `ESCALATION_TEAM`). Exemple :
+`INBOX_USERS="Direction:pw0:admin,Karim:pw1:admissions,Fatima:pw2:finance,Sara:pw3:scolarite|vie_etudiante"`
+
 - **Conversations** : recherche et filtres (IA / équipe, statut du lead) ; badge indiquant qui gère la conversation ; **Attribuer** à un collègue ; **Prendre le contrôle** (coupe l'autopilote) et **Rendre à l'IA** ; réponse manuelle. L'IA voit ensuite ce que l'équipe a écrit.
 - **Contacts** : vue d'ensemble (total, abonnés et désabonnés, par canal, prêts, indécis), filtres, export CSV, et **Demandez à l'IA** (« prospects prêts intéressés par l'ingénierie à Casablanca »).
 - **Escalades** : file à traiter par l'équipe, à marquer comme résolues.

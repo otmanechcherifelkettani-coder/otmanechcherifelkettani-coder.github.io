@@ -1,6 +1,7 @@
 """Tools the agent can call. Definitions are a fixed, ordered list so the prompt cache stays warm."""
 import json
 
+import config
 import db
 
 _NULLABLE_STR = {"type": ["string", "null"]}
@@ -120,10 +121,12 @@ def execute(name: str, args: dict, conv: dict) -> str:
         when = args.get("preferred_time") or "non précisé"
         db.update_contact(cid, lead_status="ready")
         db.add_escalation(conv_id, "admissions", f"Appel conseiller demandé (créneau: {when}). {args['summary']}")
+        route_to_team(conv, "admissions")
         return "Demande transmise à l'équipe admissions. Un conseiller va contacter le prospect."
 
     if name == "escalate_to_human":
         db.add_escalation(conv_id, args["category"], args["summary"])
+        route_to_team(conv, config.ESCALATION_TEAM.get(args["category"], config.DEFAULT_TEAM))
         if args["handoff"]:
             db.update_conversation(conv_id, handler="human")
             return "Conversation transférée à l'équipe. Préviens le contact qu'un membre de l'équipe reprend ici."
@@ -134,6 +137,17 @@ def execute(name: str, args: dict, conv: dict) -> str:
         return "Contact désabonné : plus aucune relance."
 
     raise ValueError(f"unknown tool {name}")
+
+
+def route_to_team(conv: dict, team: str, by: str = "IA"):
+    """Move a conversation to the team that owns it, leaving an internal note in the thread."""
+    current = db.get_conversation(conv["id"])
+    if current["team"] == team:
+        return
+    db.update_conversation(conv["id"], team=team, assignee=None)
+    db.add_message(conv["id"], "note", "system",
+                   f"Transférée de {config.TEAMS.get(current['team'], current['team'])} vers "
+                   f"{config.TEAMS.get(team, team)} par {by}")
 
 
 def validate(name: str, args) -> str | None:
