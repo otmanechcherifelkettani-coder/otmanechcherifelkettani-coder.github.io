@@ -171,3 +171,13 @@ def test_system_prompt_is_stable_and_contains_kb():
     from agent.prompt import system_prompt
     assert system_prompt() == system_prompt()
     assert "[À CONFIRMER]" in system_prompt()
+
+
+def test_per_staff_logins(monkeypatch):
+    from fastapi.testclient import TestClient
+    import app as app_module
+    monkeypatch.setenv("INBOX_USERS", "Amal:pw1,Karim:pw2")
+    client = TestClient(app_module.app)
+    assert client.get("/api/me", auth=("Amal", "pw1")).json() == {"user": "Amal"}
+    assert client.get("/api/me", auth=("Amal", "pw2")).status_code == 401
+    assert client.get("/api/me", auth=(config.INBOX_USER, config.INBOX_PASSWORD)).status_code == 401

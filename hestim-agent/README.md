@@ -16,6 +16,8 @@ conversation complète. Le schéma reprend celui du document Palete (Moringa / G
 | **Exactitude** | Ne répond qu'à partir de `knowledge/hestim_kb.md`. Ne cite jamais une info marquée `[À CONFIRMER]`. |
 
 ## Interface équipe (`/`)
+Interface façon messagerie (liste de discussions, bulles, mode clair/sombre, mobile). Chaque membre de l'équipe a son propre identifiant (`INBOX_USERS`) ; son nom signe ses réponses.
+
 - **Conversations** : recherche et filtres (IA / équipe, statut du lead) ; badge indiquant qui gère la conversation ; **Attribuer** à un collègue ; **Prendre le contrôle** (coupe l'autopilote) et **Rendre à l'IA** ; réponse manuelle. L'IA voit ensuite ce que l'équipe a écrit.
 - **Contacts** : vue d'ensemble (total, abonnés et désabonnés, par canal, prêts, indécis), filtres, export CSV, et **Demandez à l'IA** (« prospects prêts intéressés par l'ingénierie à Casablanca »).
 - **Escalades** : file à traiter par l'équipe, à marquer comme résolues.
@@ -56,7 +58,19 @@ sont en mode *dry-run* (écrits dans les logs).
 2. URL du webhook : `https://<votre-domaine>/webhook`. Verify token : `META_VERIFY_TOKEN`.
    Abonner les champs `messages` (WhatsApp) et `messages` (Instagram).
 3. Renseigner `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `INSTAGRAM_PAGE_TOKEN`, `META_APP_SECRET`.
-4. Héberger derrière HTTPS (Render, Railway, Fly.io, VPS…). GitHub Pages ne convient pas : il faut un serveur.
+4. Héberger derrière HTTPS (voir ci-dessous). GitHub Pages ne convient pas : il faut un serveur.
+
+### Hébergement
+L'app est un seul conteneur (`Dockerfile`) avec une base SQLite sur un volume persistant.
+```bash
+docker build -t hestim-agent .
+```
+```bash
+docker run -d -p 8000:8000 --env-file .env -v hestim-data:/app/data hestim-agent
+```
+Fonctionne sur tout hébergeur de conteneurs avec disque persistant et HTTPS (Render, Railway,
+Fly.io, ou un VPS avec Caddy/Nginx). Les données (conversations d'élèves marocains) relèvent de la
+loi 09-08 : la déclaration ou l'autorisation CNDP et le lieu d'hébergement sont à valider avec HESTIM.
 
 > WhatsApp n'autorise le texte libre que dans les 24 h suivant le dernier message du contact.
 > Pour relancer au-delà, créez des **message templates** approuvés dans le WhatsApp Manager.

@@ -3,140 +3,376 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HESTIM · Inbox</title>
+<title>HESTIM Inbox</title>
 <style>
-:root{--bg:#f6f7f9;--panel:#fff;--ink:#14171c;--muted:#6b7280;--line:#e5e7eb;--accent:#0b4f9c;--accent-ink:#fff;
---ai:#e7f0fb;--ai-ink:#0b4f9c;--human:#fdf1e3;--human-ink:#9a4d00;--in:#f1f2f4;--out:#dbe9fb;--danger:#b42318}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1115;--panel:#171a20;--ink:#e8eaed;--muted:#9aa1ac;--line:#2a2f38;--accent:#5b9cf0;--accent-ink:#0b0d10;
---ai:#16263b;--ai-ink:#8bbcf5;--human:#3a2a17;--human-ink:#f3b46b;--in:#20242c;--out:#1b3150;--danger:#f97066}}
-*{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
-header{display:flex;gap:16px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
-header b{font-size:15px}nav{display:flex;gap:4px;flex-wrap:wrap}
-nav button{border:0;background:none;color:var(--muted);padding:6px 10px;border-radius:6px;cursor:pointer;font:inherit}
-nav button.on{background:var(--ai);color:var(--ai-ink);font-weight:600}
-main{height:calc(100vh - 49px)}.view{display:none;height:100%}.view.on{display:flex}
-.list{width:340px;border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-width:0}
-.filters{padding:10px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
-input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
-.filters input{flex:1 1 100%}
-.items{overflow:auto;flex:1}.item{padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
-.item:hover,.item.sel{background:var(--bg)}.item .top{display:flex;justify-content:space-between;gap:8px}
-.item .txt{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.badge{font-size:11px;padding:1px 7px;border-radius:999px;white-space:nowrap}.b-ai{background:var(--ai);color:var(--ai-ink)}.b-human{background:var(--human);color:var(--human-ink)}
-.b-esc{background:var(--danger);color:#fff}.b-st{border:1px solid var(--line);color:var(--muted)}
-.pane{flex:1;display:flex;flex-direction:column;min-width:0}
-.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
-.bar .grow{flex:1}.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;padding:6px 10px;cursor:pointer;font:inherit}
-.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.msgs{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
-.m{max-width:72%;padding:8px 11px;border-radius:10px;white-space:pre-wrap;word-wrap:break-word}
-.m.in{background:var(--in);align-self:flex-start}.m.out{background:var(--out);align-self:flex-end}
-.m small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
-.compose{display:flex;gap:8px;padding:10px 16px;border-top:1px solid var(--line);background:var(--panel)}.compose textarea{flex:1;resize:none;height:44px}
-.side{width:280px;border-left:1px solid var(--line);background:var(--panel);padding:14px;overflow:auto}
-.side h4{margin:14px 0 6px;font-size:12px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em}.kv{display:grid;grid-template-columns:96px 1fr;gap:3px 8px;font-size:13px}
-.kv span:nth-child(odd){color:var(--muted)}.esc{border:1px solid var(--line);border-radius:6px;padding:8px;margin-bottom:6px;font-size:13px}
-.empty{margin:auto;color:var(--muted)}
-.wrap{flex:1;overflow:auto;padding:16px}.cards{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;min-width:130px}.card b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
-.card span{color:var(--muted);font-size:12px}
-table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:8px;font-size:13px}
-th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500}
-.ask{display:flex;gap:8px;margin-bottom:10px}.ask input{flex:1}.hint{color:var(--muted);margin:0 0 12px}
-@media (max-width:820px){.side{display:none}.list{width:100%}.view.on.has-sel .list{display:none}.m{max-width:88%}}
+:root{
+  --rail:#f0f2f5;--panel:#fff;--hover:#f5f6f6;--sel:#f0f2f5;--line:#e9edef;--ink:#111b21;--muted:#667781;--icon:#54656f;
+  --brand:#25d366;--brand-dark:#008069;--brand-ink:#fff;--chip:#fff;--chip-on:#d9fdd3;--chip-on-ink:#008069;
+  --chat-bg:#efeae2;--doodle:#d9d2c5;--in:#fff;--out:#d9fdd3;--quote-out:#d1f4cc;--tick:#53bdeb;--input:#f0f2f5;--danger:#e53935;
+  --shadow:0 1px .5px rgba(11,20,26,.13)
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --rail:#202c33;--panel:#111b21;--hover:#202c33;--sel:#2a3942;--line:#222d34;--ink:#e9edef;--muted:#8696a0;--icon:#aebac1;
+  --brand:#00a884;--brand-dark:#00a884;--brand-ink:#111b21;--chip:#111b21;--chip-on:#0a332c;--chip-on-ink:#00a884;
+  --chat-bg:#0b141a;--doodle:#1b252b;--in:#202c33;--out:#005c4b;--quote-out:#025144;--input:#2a3942;--shadow:0 1px .5px rgba(0,0,0,.3)}}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;font:14.2px/1.45 "Segoe UI",Helvetica,"Helvetica Neue",system-ui,-apple-system,Roboto,sans-serif;color:var(--ink);background:var(--panel);display:flex;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+svg{width:24px;height:24px;fill:var(--icon);flex:none}
+input,textarea,select{font:inherit;color:var(--ink)}
+/* rail */
+.rail{width:64px;background:var(--rail);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:6px}
+.rail button{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;position:relative}
+.rail button:hover{background:var(--line)}.rail button.on{background:var(--line)}
+.rail .count{position:absolute;top:-4px;right:-6px;background:var(--brand);color:var(--brand-ink);font-size:11px;font-weight:600;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center;padding:0 5px}
+.rail .sep{width:32px;height:1px;background:var(--line);margin:4px 0}.rail .grow{flex:1}
+.me{width:32px;height:32px;border-radius:50%;background:var(--brand-dark);color:#fff;display:grid;place-items:center;font-weight:600;font-size:13px}
+/* list column */
+.col{width:clamp(320px,32vw,460px);border-right:1px solid var(--line);display:flex;flex-direction:column;background:var(--panel);min-width:0}
+.col-head{display:flex;align-items:center;padding:14px 16px 8px 20px;gap:8px}
+.col-head h1{font-size:22px;font-weight:700;color:var(--brand-dark);margin:0;flex:1;letter-spacing:-.2px}
+.fab{width:44px;height:44px;border-radius:50%;background:var(--brand);display:grid;place-items:center}.fab svg{fill:#fff}
+.icon-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center}.icon-btn:hover{background:var(--hover)}
+.search{margin:4px 16px 8px;display:flex;align-items:center;gap:14px;background:var(--input);border-radius:22px;padding:0 16px;height:40px}
+.search svg{width:20px;height:20px}.search input{border:0;background:none;outline:0;flex:1}
+.chips{display:flex;gap:8px;padding:2px 16px 10px;overflow-x:auto;scrollbar-width:none}
+.chip{border:1px solid var(--line);background:var(--chip);border-radius:18px;padding:5px 12px;white-space:nowrap;color:var(--muted);font-size:14px}
+.chip b{font-weight:400;margin-left:4px;font-size:12px}.chip.on{background:var(--chip-on);color:var(--chip-on-ink);border-color:transparent;font-weight:500}
+.chats{overflow-y:auto;flex:1;padding:0 8px}
+.chat{display:flex;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;align-items:center}
+.chat:hover{background:var(--hover)}.chat.sel{background:var(--sel)}
+.av{width:49px;height:49px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-weight:600;font-size:18px}
+.av.sm{width:40px;height:40px;font-size:15px}
+.chat .body{flex:1;min-width:0;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:-10px}
+.chat:hover .body,.chat.sel .body{border-color:transparent}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.name{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.time{font-size:12px;color:var(--muted);white-space:nowrap}.time.new{color:var(--brand-dark);font-weight:500}
+.prev{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:3px;min-width:0}
+.prev svg{width:18px;height:18px;fill:var(--muted)}.prev span{overflow:hidden;text-overflow:ellipsis}
+.pill{font-size:11px;border-radius:10px;padding:1px 7px;white-space:nowrap;font-weight:500}
+.p-ai{background:var(--chip-on);color:var(--chip-on-ink)}.p-human{background:#fff3e0;color:#b45309}
+@media (prefers-color-scheme:dark){.p-human{background:#3d2a12;color:#f6b25b}}
+.unread{background:var(--brand);color:var(--brand-ink);border-radius:10px;min-width:20px;height:20px;display:grid;place-items:center;font-size:12px;font-weight:600;padding:0 6px}
+.unread.urgent{background:var(--danger);color:#fff}
+.foot{border-top:1px solid var(--line);padding:14px;text-align:center;color:var(--muted);font-size:13px}
+/* conversation */
+.main{flex:1;display:flex;min-width:0;position:relative}
+.conv{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--chat-bg)}
+.conv-head{height:64px;background:var(--panel);display:flex;align-items:center;gap:14px;padding:0 16px;border-bottom:1px solid var(--line);flex:none}
+.conv-head .who{flex:1;min-width:0;cursor:pointer}.conv-head .who .name{font-size:16px}
+.conv-head .sub{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.takeover{border-radius:18px;padding:7px 14px;font-weight:500;background:var(--brand-dark);color:#fff;white-space:nowrap}
+.takeover.ghost{background:none;color:var(--brand-dark);border:1px solid var(--brand-dark)}
+.wall{flex:1;overflow-y:auto;padding:16px 7% 8px;position:relative;
+  background-color:var(--chat-bg);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23000' stroke-opacity='.06' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M20 30h22v16H20zM24 46l-2 6 8-6'/%3E%3Ccircle cx='110' cy='32' r='10'/%3E%3Cpath d='M106 32h8M110 28v8'/%3E%3Cpath d='M60 90l8-14 8 14z'/%3E%3Cpath d='M128 96c0-6 10-6 10 0s-10 12-10 12-10-6-10-12 10-6 10 0'/%3E%3Cpath d='M20 120h18v-4l8 6-8 6v-4H20z'/%3E%3Cpath d='M86 136a8 8 0 1 0 16 0'/%3E%3Cpath d='M44 68l4-4 4 4-4 4zM146 60l3-3 3 3-3 3z'/%3E%3C/g%3E%3C/svg%3E")}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wall{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.05' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M20 30h22v16H20zM24 46l-2 6 8-6'/%3E%3Ccircle cx='110' cy='32' r='10'/%3E%3Cpath d='M106 32h8M110 28v8'/%3E%3Cpath d='M60 90l8-14 8 14z'/%3E%3Cpath d='M128 96c0-6 10-6 10 0s-10 12-10 12-10-6-10-12 10-6 10 0'/%3E%3Cpath d='M20 120h18v-4l8 6-8 6v-4H20z'/%3E%3Cpath d='M86 136a8 8 0 1 0 16 0'/%3E%3Cpath d='M44 68l4-4 4 4-4 4zM146 60l3-3 3 3-3 3z'/%3E%3C/g%3E%3C/svg%3E")}}
+.day{text-align:center;margin:10px 0}.day span{background:var(--panel);color:var(--muted);font-size:12.5px;padding:5px 12px;border-radius:8px;box-shadow:var(--shadow);text-transform:uppercase}
+.sys{text-align:center;margin:8px 0}.sys span{background:#fff5c4;color:#54656f;font-size:12.5px;padding:5px 12px;border-radius:8px;box-shadow:var(--shadow);display:inline-block;max-width:80%}
+@media (prefers-color-scheme:dark){.sys span{background:#1f2c33;color:#ffd279}}
+.msg{display:flex;margin:2px 0}.msg.out{justify-content:flex-end}.msg.first{margin-top:10px}
+.bub{max-width:min(65%,560px);padding:6px 7px 8px 9px;border-radius:7.5px;box-shadow:var(--shadow);position:relative;white-space:pre-wrap;word-wrap:break-word;font-size:14.2px}
+.msg.in .bub{background:var(--in)}.msg.out .bub{background:var(--out)}
+.msg.first.in .bub{border-top-left-radius:0}.msg.first.out .bub{border-top-right-radius:0}
+.msg.first.in .bub::before,.msg.first.out .bub::before{content:"";position:absolute;top:0;width:8px;height:13px}
+.msg.first.in .bub::before{left:-8px;background:var(--in);clip-path:polygon(0 0,100% 0,100% 100%)}
+.msg.first.out .bub::before{right:-8px;background:var(--out);clip-path:polygon(0 0,100% 0,0 100%)}
+.author{font-size:12.8px;font-weight:500;color:var(--brand-dark);margin-bottom:2px;display:block}
+.author.staff{color:#b45309}@media (prefers-color-scheme:dark){.author.staff{color:#f6b25b}}
+.meta{float:right;margin:6px 0 -6px 12px;font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:3px;white-space:nowrap;position:relative;top:4px}
+.meta svg{width:16px;height:11px;fill:var(--tick)}
+.composer{display:flex;align-items:center;gap:6px;padding:8px 16px 12px;flex:none}
+.composer .box{flex:1;display:flex;align-items:flex-end;gap:4px;background:var(--panel);border-radius:26px;padding:5px 8px;box-shadow:var(--shadow)}
+.composer textarea{flex:1;border:0;outline:0;resize:none;background:none;padding:9px 6px;max-height:120px;height:40px;line-height:22px}
+.send{width:44px;height:44px;border-radius:50%;background:var(--brand-dark);display:grid;place-items:center;flex:none}.send svg{fill:#fff}
+.banner{text-align:center;font-size:12.5px;color:var(--muted);padding:0 16px 6px}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);text-align:center;padding:24px;background:var(--rail);border-bottom:6px solid var(--brand)}
+.empty h2{font-weight:300;font-size:30px;color:var(--ink);margin:0}
+/* drawer & menus */
+.drawer{width:380px;background:var(--panel);border-left:1px solid var(--line);display:none;flex-direction:column;overflow:hidden}
+.drawer.open{display:flex}.drawer-head{height:64px;display:flex;align-items:center;gap:20px;padding:0 20px;border-bottom:1px solid var(--line);font-size:16px}
+.drawer-body{overflow-y:auto;flex:1;background:var(--rail)}.sect{background:var(--panel);padding:16px 24px;margin-bottom:10px}
+.sect h4{margin:0 0 10px;font-weight:400;color:var(--muted);font-size:14px}
+.hero{text-align:center}.hero .av{width:120px;height:120px;font-size:44px;margin:8px auto 12px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;font-size:14px}.kv span:nth-child(odd){color:var(--muted)}
+.esc{border-left:3px solid var(--brand);padding:6px 10px;margin:6px 0;background:var(--rail);border-radius:4px;font-size:13.5px}.esc.urgent{border-color:var(--danger)}
+.field{display:flex;gap:8px}.field input{flex:1;border:1px solid var(--line);background:var(--input);border-radius:8px;padding:8px 10px;outline:0}
+.btn{border-radius:18px;padding:7px 14px;font-weight:500;border:1px solid var(--line)}.btn.primary{background:var(--brand-dark);color:#fff;border-color:transparent}
+.danger-link{color:var(--danger);display:flex;gap:16px;align-items:center;padding:6px 0}.danger-link svg{fill:var(--danger)}
+.menu{position:absolute;right:16px;top:56px;background:var(--panel);border-radius:6px;box-shadow:0 2px 5px rgba(11,20,26,.26),0 2px 10px rgba(11,20,26,.16);padding:8px 0;z-index:5;display:none;min-width:220px}
+.menu.open{display:block}.menu button{display:block;width:100%;text-align:left;padding:10px 24px}.menu button:hover{background:var(--hover)}
+/* full-width pages (contacts, escalations) */
+.page{flex:1;overflow:auto;background:var(--rail);padding:20px}
+.page h2{margin:0 0 14px;font-size:20px;font-weight:500}
+.ask{display:flex;gap:10px;background:var(--panel);border-radius:22px;padding:4px 4px 4px 16px;align-items:center;box-shadow:var(--shadow);margin-bottom:8px}
+.ask input{flex:1;border:0;outline:0;background:none;height:36px}
+.hint{color:var(--muted);margin:6px 4px 14px;min-height:20px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.stat{background:var(--panel);border-radius:10px;padding:10px 16px;min-width:120px;box-shadow:var(--shadow)}.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums}.stat span{color:var(--muted);font-size:12.5px}
+.table{background:var(--panel);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+.trow{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);cursor:pointer}.trow:hover{background:var(--hover)}
+.trow .grow{flex:1;min-width:0}.trow .small{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tools select,.tools a{border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:6px 12px;color:var(--ink);text-decoration:none}
+.hidden{display:none!important}.takeover .short{display:none}@media (max-width:860px){.takeover .short{display:inline}}.back{display:none}
+@media (max-width:860px){
+  .rail{position:fixed;bottom:0;left:0;right:0;width:auto;height:58px;flex-direction:row;justify-content:space-around;padding:0 8px;z-index:6;border-right:0;border-top:1px solid var(--line)}
+  .rail .sep,.rail .grow,.rail .me{display:none}
+  body{padding-bottom:58px}.col{width:100%;border-right:0}.main{display:none}
+  body.in-chat .col,body.in-page .col{display:none}body.in-page .main{display:flex}body.in-chat .col{display:none}body.in-chat .main{display:flex}body.in-chat .rail{display:none}body.in-chat{padding-bottom:0}
+  .back{display:grid}.wall{padding:12px 4%}.bub{max-width:85%}.drawer.open{position:absolute;inset:0;width:auto;z-index:4}
+  .page{padding:16px}.takeover .long{display:none}.conv-head{gap:8px;padding:0 8px}.takeover{padding:6px 12px;font-size:13px}#h-info{display:none}
+}
 </style>
 </head>
 <body>
-<header><b>HESTIM · Agent</b>
-<nav><button data-v="conv" class="on">Conversations</button><button data-v="contacts">Contacts</button><button data-v="esc">Escalades</button><button data-v="test">Tester l'agent</button></nav>
-</header>
-<main>
-<section class="view on" id="v-conv">
-  <div class="list">
-    <div class="filters">
-      <input id="q" placeholder="Rechercher un nom, numéro, message…">
-      <select id="fh"><option value="">Tous</option><option value="ai">Gérées par l'IA</option><option value="human">Gérées par l'équipe</option></select>
-      <select id="fs"><option value="">Tous statuts</option><option>ready</option><option>undecided</option><option>general</option><option>new</option><option>enrolled</option><option>not_fit</option></select>
-    </div>
-    <div class="items" id="convs"></div>
+<nav class="rail" aria-label="Navigation">
+  <button class="on" data-v="chats" title="Discussions" aria-label="Discussions"><svg viewBox="0 0 24 24"><path d="M4.9 21.4 3 22l.7-3.7A9 9 0 1 1 12 21a9 9 0 0 1-4.3-1.1l-2.8 1.5zm2.9-3.1.5.3A7 7 0 1 0 5 12a7 7 0 0 0 .9 3.4l.3.5-.4 2.2 2-.8zM8 10h8v2H8zm0 3h5v2H8z"/></svg><span class="count hidden" id="c-chats"></span></button>
+  <button data-v="esc" title="Escalades" aria-label="Escalades"><svg viewBox="0 0 24 24"><path d="M12 2 1 21h22L12 2zm0 4 7.5 13h-15L12 6zm-1 4v5h2v-5h-2zm0 6v2h2v-2h-2z"/></svg><span class="count hidden" id="c-esc" style="background:var(--danger);color:#fff"></span></button>
+  <button data-v="contacts" title="Contacts" aria-label="Contacts"><svg viewBox="0 0 24 24"><path d="M16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-2.3 0-7 1.2-7 3.5V19h14v-2.5C15 14.2 10.3 13 8 13zm8 0h-1c1.2.9 2 2 2 3.5V19h6v-2.5c0-2.3-4.7-3.5-7-3.5z"/></svg></button>
+  <div class="sep"></div>
+  <button data-v="test" title="Tester l'agent" aria-label="Tester l'agent"><svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .7-.4 1.4-1 1.7V7h5a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3h5V5.7A2 2 0 0 1 12 2zM9 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg></button>
+  <div class="grow"></div>
+  <div class="me" id="me" title=""></div>
+</nav>
+
+<!-- conversations list -->
+<section class="col" id="col">
+  <div class="col-head"><h1>HESTIM Inbox</h1>
+    <button class="fab" id="newtest" title="Nouvelle conversation de test" aria-label="Nouvelle conversation de test"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button></div>
+  <label class="search"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.8l-.3-.3A6.5 6.5 0 1 0 14 15.4l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/></svg><input id="q" placeholder="Rechercher un nom, un numéro, un message"></label>
+  <div class="chips" id="chips">
+    <button class="chip on" data-f="">Toutes</button>
+    <button class="chip" data-f="handler:ai">IA</button>
+    <button class="chip" data-f="handler:human">Équipe<b id="n-human"></b></button>
+    <button class="chip" data-f="lead_status:ready">Prêts</button>
+    <button class="chip" data-f="lead_status:undecided">Indécis</button>
+    <button class="chip" data-f="lead_status:enrolled">Étudiants</button>
   </div>
-  <div class="pane" id="pane"><div class="empty">Sélectionnez une conversation</div></div>
-  <aside class="side" id="side"></aside>
+  <div class="chats" id="chats"></div>
+  <div class="foot">Réponses de l'IA signées « Nora » · Les conversations reprises par l'équipe passent en orange</div>
 </section>
 
-<section class="view" id="v-contacts"><div class="wrap">
-  <div class="ask"><input id="askq" placeholder="Demandez à l'IA : « prospects prêts intéressés par l'ingénierie à Casablanca »"><button class="btn primary" id="askb">Demander</button></div>
-  <p class="hint" id="askx"></p>
-  <div class="cards" id="cards"></div>
-  <div class="filters" style="padding:0 0 10px;border:0">
-    <select id="cc"><option value="">Tous canaux</option><option>whatsapp</option><option>instagram</option><option>web</option></select>
-    <select id="ck"><option value="">Tous types</option><option>prospect</option><option>parent</option><option>student</option><option>unknown</option></select>
-    <select id="cs"><option value="">Tous statuts</option><option>ready</option><option>undecided</option><option>general</option><option>new</option><option>enrolled</option><option>not_fit</option></select>
-    <a class="btn" href="/api/contacts/export.csv">Exporter CSV</a>
+<!-- main area -->
+<section class="main" id="main">
+  <div class="empty" id="empty">
+    <svg viewBox="0 0 24 24" style="width:72px;height:72px;fill:var(--brand-dark)"><path d="M4.9 21.4 3 22l.7-3.7A9 9 0 1 1 12 21a9 9 0 0 1-4.3-1.1l-2.8 1.5z"/></svg>
+    <h2>HESTIM Inbox</h2>
+    <p>L'IA répond à chaque message WhatsApp et Instagram.<br>Ouvrez une discussion pour la suivre, l'attribuer ou en prendre le contrôle.</p>
   </div>
-  <table><thead><tr><th>Nom</th><th>Canal</th><th>Type</th><th>Statut</th><th>Programme</th><th>Niveau</th><th>Ville</th></tr></thead><tbody id="ctab"></tbody></table>
-</div></section>
+  <div class="conv hidden" id="conv">
+    <header class="conv-head">
+      <button class="icon-btn back" id="back" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z"/></svg></button>
+      <div class="av sm" id="h-av"></div>
+      <div class="who" id="h-who"><div class="name" id="h-name"></div><div class="sub" id="h-sub"></div></div>
+      <button class="takeover" id="h-take"></button>
+      <button class="icon-btn" id="h-info" title="Fiche contact" aria-label="Fiche contact"><svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg></button>
+      <button class="icon-btn" id="h-menu" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M12 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg></button>
+      <div class="menu" id="menu">
+        <button data-a="info">Fiche contact</button><button data-a="assign">Attribuer à un collègue</button>
+        <button data-a="assignme">M'attribuer la discussion</button><button data-a="close">Clôturer la discussion</button>
+      </div>
+    </header>
+    <div class="wall" id="wall"></div>
+    <div class="banner" id="banner"></div>
+    <div class="composer">
+      <div class="box">
+        <textarea id="input" rows="1" placeholder="Écrire un message"></textarea>
+      </div>
+      <button class="send" id="send" aria-label="Envoyer"><svg viewBox="0 0 24 24"><path d="M1.1 21.8 23 12 1.1 2.2 1 9.8l15.6 2.2L1 14.2z"/></svg></button>
+    </div>
+  </div>
+  <aside class="drawer" id="drawer">
+    <div class="drawer-head"><button class="icon-btn" id="d-close" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6z"/></svg></button>Fiche contact</div>
+    <div class="drawer-body" id="d-body"></div>
+  </aside>
 
-<section class="view" id="v-esc"><div class="wrap"><table><thead><tr><th>Catégorie</th><th>Résumé</th><th>Conversation</th><th></th></tr></thead><tbody id="etab"></tbody></table></div></section>
+  <div class="page hidden" id="p-contacts">
+    <h2>Contacts</h2>
+    <div class="ask"><input id="askq" placeholder="Demandez à l'IA : « prospects prêts intéressés par l'ingénierie à Casablanca »"><button class="btn primary" id="askb">Demander</button></div>
+    <div class="hint" id="askx"></div>
+    <div class="stats" id="stats"></div>
+    <div class="tools">
+      <select id="cc"><option value="">Tous les canaux</option><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option><option value="web">Test</option></select>
+      <select id="ck"><option value="">Tous les types</option><option value="prospect">Prospect</option><option value="parent">Parent</option><option value="student">Étudiant</option><option value="unknown">Inconnu</option></select>
+      <select id="cs"><option value="">Tous les statuts</option><option value="ready">Prêt</option><option value="undecided">Indécis</option><option value="general">Question générale</option><option value="new">Nouveau</option><option value="enrolled">Inscrit</option><option value="not_fit">Hors cible</option></select>
+      <a href="/api/contacts/export.csv">Exporter en CSV</a>
+    </div>
+    <div class="table" id="ctab"></div>
+  </div>
 
-<section class="view" id="v-test"><div class="pane">
-  <div class="bar"><span class="grow">Simulez un contact (canal « web ») : français, darija, arabe, anglais…</span><button class="btn" id="tnew">Nouveau contact</button></div>
-  <div class="msgs" id="tmsgs"></div>
-  <div class="compose"><textarea id="tin" placeholder="Salam, chhal les frais dyal l'ingénierie ?"></textarea><button class="btn primary" id="tsend">Envoyer</button></div>
-</div></section>
-</main>
+  <div class="page hidden" id="p-esc">
+    <h2>Escalades à traiter</h2>
+    <div class="table" id="etab"></div>
+  </div>
+</section>
+
 <script>
-const $=s=>document.querySelector(s), esc=s=>(s??'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const api=async(p,o={})=>{const r=await fetch(p,{headers:{'Content-Type':'application/json'},...o});if(!r.ok)throw new Error(await r.text());return r.json()};
-const ago=t=>{if(!t)return'';const s=Date.now()/1000-t;return s<60?'à l\'instant':s<3600?Math.floor(s/60)+' min':s<86400?Math.floor(s/3600)+' h':Math.floor(s/86400)+' j'};
-const hb=h=>h==='ai'?'<span class="badge b-ai">IA</span>':'<span class="badge b-human">Équipe</span>';
-let sel=null;
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
-  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v));({contacts:loadContacts,esc:loadEsc,conv:loadConvs})[b.dataset.v]?.()});
+const $=s=>document.querySelector(s);
+const esc=s=>(s??'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(p,o={}){const r=await fetch(p,{headers:{'Content-Type':'application/json'},...o});if(!r.ok)throw new Error((await r.text())||r.status);return r.json()}
+const PALETTE=['#00a884','#53bdeb','#ff8a65','#a78bfa','#f59e0b','#06b6d4','#ec4899','#84cc16'];
+const colorFor=s=>PALETTE[[...(s||'?')].reduce((a,c)=>a+c.charCodeAt(0),0)%PALETTE.length];
+const initials=s=>(s||'?').replace(/[^\p{L}\p{N} ]/gu,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'#';
+const avatar=(name,cls='')=>`<div class="av ${cls}" style="background:${colorFor(name)}">${esc(initials(name))}</div>`;
+const STATUS={ready:'Prêt',undecided:'Indécis',general:'Question générale',new:'Nouveau',enrolled:'Inscrit',not_fit:'Hors cible'};
+const KIND={prospect:'Prospect',parent:'Parent',student:'Étudiant',other:'Autre',unknown:'Inconnu'};
+const CH={whatsapp:'WhatsApp',instagram:'Instagram',web:'Test'};
+const TICKS='<svg viewBox="0 0 16 11"><path d="M11.1.7 10.4 0 4.6 6.6 2.1 4.2l-.7.7 3.2 3.2zM15.3.7 14.6 0 8.8 6.6l-.9-.9-.7.7 1.6 1.6z"/></svg>';
+function hhmm(t){const d=new Date(t*1000),n=new Date();if(d.toDateString()===n.toDateString())return d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  const y=new Date(n);y.setDate(n.getDate()-1);if(d.toDateString()===y.toDateString())return 'Hier';return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'})}
+function dayLabel(t){const d=new Date(t*1000),n=new Date();if(d.toDateString()===n.toDateString())return "Aujourd'hui";const y=new Date(n);y.setDate(n.getDate()-1);
+  if(d.toDateString()===y.toDateString())return 'Hier';return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}
 
-async function loadConvs(){const p=new URLSearchParams();if($('#q').value)p.set('q',$('#q').value);if($('#fh').value)p.set('handler',$('#fh').value);if($('#fs').value)p.set('lead_status',$('#fs').value);
+let state={view:'chats',filter:'',sel:null,data:null,me:'',testId:null};
+
+/* ---------- navigation ---------- */
+document.querySelectorAll('.rail button[data-v]').forEach(b=>b.onclick=()=>show(b.dataset.v));
+function show(v){state.view=v;document.querySelectorAll('.rail button[data-v]').forEach(x=>x.classList.toggle('on',x.dataset.v===v));
+  const chat=v==='chats'||v==='test';
+  $('#col').classList.toggle('hidden',!chat);
+  $('#p-contacts').classList.toggle('hidden',v!=='contacts');$('#p-esc').classList.toggle('hidden',v!=='esc');
+  document.body.classList.toggle('in-page',!chat);
+  if(!chat){$('#conv').classList.add('hidden');$('#empty').classList.add('hidden');$('#drawer').classList.remove('open')}
+  else if(v==='chats'){if(state.sel){$('#conv').classList.remove('hidden')}else{$('#conv').classList.add('hidden');$('#empty').classList.remove('hidden');document.body.classList.remove('in-chat')}}
+  if(v==='contacts')loadContacts();if(v==='esc')loadEsc();if(v==='test')newTest();if(v==='chats')loadChats()}
+
+/* ---------- conversation list ---------- */
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));state.filter=c.dataset.f;loadChats()});
+let qt;$('#q').addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(loadChats,250)});
+async function loadChats(){
+  const p=new URLSearchParams();if($('#q').value)p.set('q',$('#q').value);
+  if(state.filter){const [k,v]=state.filter.split(':');p.set(k,v)}
   const rows=await api('/api/conversations?'+p);
-  $('#convs').innerHTML=rows.map(r=>`<div class="item ${r.id===sel?'sel':''}" data-id="${r.id}"><div class="top"><b>${esc(r.name||r.external_id)}</b><span>${hb(r.handler)} ${r.open_escalations?'<span class="badge b-esc">'+r.open_escalations+'</span>':''}</span></div>
-  <div class="top"><span class="txt">${esc(r.last_text)}</span><span class="badge b-st">${esc(r.lead_status)}</span></div><small style="color:var(--muted)">${esc(r.channel)} · ${ago(r.updated_at)}${r.assignee?' · '+esc(r.assignee):''}</small></div>`).join('')||'<p class="empty" style="padding:16px">Aucune conversation</p>';
-  document.querySelectorAll('.item').forEach(i=>i.onclick=()=>openConv(+i.dataset.id));}
-let t;['#q','#fh','#fs'].forEach(s=>$(s).addEventListener('input',()=>{clearTimeout(t);t=setTimeout(loadConvs,250)}));
+  const all=state.filter||$('#q').value?await api('/api/conversations'):rows;
+  const nh=all.filter(r=>r.handler==='human').length;$('#n-human').textContent=nh?nh:'';
+  const nesc=all.reduce((a,r)=>a+(r.open_escalations||0),0);$('#c-esc').textContent=nesc;$('#c-esc').classList.toggle('hidden',!nesc);
+  $('#c-chats').textContent=nh;$('#c-chats').classList.toggle('hidden',!nh);
+  $('#chats').innerHTML=rows.map(r=>{const name=r.name||r.external_id;const lastOut=r.last_outbound_at&&(!r.last_inbound_at||r.last_outbound_at>=r.last_inbound_at);
+    const waiting=r.handler==='human'&&!lastOut;
+    return `<div class="chat ${r.id===state.sel?'sel':''}" data-id="${r.id}">${avatar(name)}<div class="body">
+      <div class="row"><span class="name">${esc(name)}</span><span class="time ${waiting?'new':''}">${r.updated_at?hhmm(r.updated_at):''}</span></div>
+      <div class="row"><span class="prev">${lastOut?TICKS:''}<span>${esc(r.last_text||'')}</span></span>
+      <span style="display:flex;gap:5px;align-items:center">${r.handler==='ai'?'<span class="pill p-ai">IA</span>':'<span class="pill p-human">'+esc(r.assignee||'Équipe')+'</span>'}
+      ${r.open_escalations?`<span class="unread ${waiting?'urgent':''}">${r.open_escalations}</span>`:''}</span></div></div></div>`}).join('')
+    ||'<p style="color:var(--muted);text-align:center;padding:24px">Aucune discussion</p>';
+  document.querySelectorAll('.chat').forEach(c=>c.onclick=()=>openConv(+c.dataset.id));
+}
 
-async function openConv(id){sel=id;$('#v-conv').classList.add('has-sel');const d=await api('/api/conversations/'+id),c=d.conversation,ct=d.contact;
-  $('#pane').innerHTML=`<div class="bar"><button class="btn" id="back" style="display:none">←</button><b class="grow">${esc(ct.name||ct.external_id)} ${hb(c.handler)}</b>
-   <input id="asg" placeholder="Attribuer à…" value="${esc(c.assignee)}" style="width:140px"><button class="btn" id="asgb">Attribuer</button>
-   ${c.handler==='ai'?'<button class="btn primary" id="tk">Prendre le contrôle</button>':'<button class="btn" id="rl">Rendre à l\'IA</button>'}<button class="btn" id="cl">Clôturer</button></div>
-   <div class="msgs" id="msgs">${d.messages.map(m=>`<div class="m ${m.direction}">${esc(m.text)}<small>${esc(m.author==='contact'?'':m.author==='ai'?'IA':m.author)} ${ago(m.created_at)}</small></div>`).join('')}</div>
-   <div class="compose"><textarea id="rep" placeholder="${c.handler==='ai'?'Répondre vous-même désactive l\'autopilote…':'Votre réponse…'}"></textarea><button class="btn primary" id="send">Envoyer</button></div>`;
-  $('#msgs').scrollTop=1e9;if(matchMedia('(max-width:820px)').matches)$('#back').style.display='';
-  $('#back').onclick=()=>{$('#v-conv').classList.remove('has-sel')};
-  $('#asgb').onclick=async()=>{await api(`/api/conversations/${id}/assign`,{method:'POST',body:JSON.stringify({assignee:$('#asg').value})});loadConvs()};
-  $('#tk')&&($('#tk').onclick=async()=>{await api(`/api/conversations/${id}/takeover`,{method:'POST'});openConv(id);loadConvs()});
-  $('#rl')&&($('#rl').onclick=async()=>{await api(`/api/conversations/${id}/release`,{method:'POST'});openConv(id);loadConvs()});
-  $('#cl').onclick=async()=>{await api(`/api/conversations/${id}/close`,{method:'POST'});loadConvs()};
-  $('#send').onclick=async()=>{const v=$('#rep').value.trim();if(!v)return;await api(`/api/conversations/${id}/reply`,{method:'POST',body:JSON.stringify({text:v})});openConv(id);loadConvs()};
-  $('#side').innerHTML=`<h4>Fiche contact</h4><div class="kv">${[['Canal',ct.channel],['Identifiant',ct.external_id],['Type',ct.kind],['Statut',ct.lead_status],['Langue',ct.language],['Programme',ct.program_interest],['Niveau',ct.level],['Rentrée',ct.intake],['Ville',ct.city],['Abonné',ct.subscribed?'oui':'non']].map(([k,v])=>`<span>${k}</span><span>${esc(v)||'—'}</span>`).join('')}</div>
-   <h4>Notes de l'IA</h4><div style="white-space:pre-wrap;font-size:13px">${esc(ct.notes)||'—'}</div>
-   <h4>Escalades</h4>${d.escalations.map(e=>`<div class="esc"><b>${esc(e.category)}</b>${e.resolved?' · résolue':''}<br>${esc(e.summary)}</div>`).join('')||'—'}`;
-  loadConvs();}
+/* ---------- open conversation ---------- */
+async function openConv(id,keepScroll){
+  state.sel=id;const d=await api('/api/conversations/'+id);state.data=d;const c=d.conversation,ct=d.contact,name=ct.name||ct.external_id;
+  $('#empty').classList.add('hidden');$('#conv').classList.remove('hidden');document.body.classList.add('in-chat');
+  $('#h-av').outerHTML=`<div class="av sm" id="h-av" style="background:${colorFor(name)}">${esc(initials(name))}</div>`;
+  $('#h-name').textContent=name;
+  $('#h-sub').textContent=[CH[ct.channel]||ct.channel,STATUS[ct.lead_status]||ct.lead_status,c.handler==='ai'?'Gérée par l\'IA':'Gérée par '+(c.assignee||'l\'équipe')].join(' · ');
+  const tk=$('#h-take');
+  if(c.handler==='ai'){tk.className='takeover';tk.innerHTML='<span class="long">Prendre le contrôle</span><span class="short">Reprendre</span>'}else{tk.className='takeover ghost';tk.innerHTML='<span class="long">Rendre à l\'IA</span><span class="short">IA</span>'}
+  tk.onclick=async()=>{await api(`/api/conversations/${id}/${c.handler==='ai'?'takeover':'release'}`,{method:'POST'});openConv(id);loadChats()};
+  $('#banner').textContent=c.handler==='ai'?'Nora (IA) répond automatiquement. Écrire ici désactive l\'autopilote pour cette discussion.':'Autopilote désactivé : c\'est votre équipe qui répond. « Rendre à l\'IA » pour le réactiver.';
+  // messages, grouped like a messenger
+  let html='',lastDay='',prevDir='',prevAuthor='';
+  const escs=d.escalations.map(e=>({...e,_esc:1,created_at:e.created_at}));
+  const items=[...d.messages,...escs].sort((a,b)=>a.created_at-b.created_at);
+  for(const m of items){
+    const day=dayLabel(m.created_at);if(day!==lastDay){html+=`<div class="day"><span>${esc(day)}</span></div>`;lastDay=day;prevDir=''}
+    if(m._esc){html+=`<div class="sys"><span>⚑ Escalade ${esc(m.category)}${m.resolved?' (résolue)':''} : ${esc(m.summary)}</span></div>`;prevDir='';continue}
+    const first=m.direction!==prevDir||m.author!==prevAuthor;
+    const who=m.direction==='out'&&first?(m.author==='ai'?'<span class="author">Nora · IA</span>':`<span class="author staff">${esc(m.author)}</span>`):'';
+    const t=new Date(m.created_at*1000).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    html+=`<div class="msg ${m.direction} ${first?'first':''}"><div class="bub">${who}${esc(m.text)}<span class="meta">${t}${m.direction==='out'?TICKS:''}</span></div></div>`;
+    prevDir=m.direction;prevAuthor=m.author}
+  const wall=$('#wall');const atBottom=wall.scrollHeight-wall.scrollTop-wall.clientHeight<80;
+  wall.innerHTML=html;if(!keepScroll||atBottom)wall.scrollTop=wall.scrollHeight;
+  if($('#drawer').classList.contains('open'))renderDrawer();
+  document.querySelectorAll('.chat').forEach(x=>x.classList.toggle('sel',+x.dataset.id===id));
+}
+$('#back').onclick=()=>{document.body.classList.remove('in-chat');state.sel=null;$('#conv').classList.add('hidden');$('#empty').classList.remove('hidden');$('#drawer').classList.remove('open');loadChats()};
 
-async function loadContacts(rows){const s=await api('/api/contacts/stats');const tot=s.by_channel.reduce((a,c)=>a+c.total,0),sub=s.by_channel.reduce((a,c)=>a+(c.subscribed||0),0);
-  $('#cards').innerHTML=[['Contacts',tot],['Abonnés',sub],['Désabonnés',tot-sub],...s.by_channel.map(c=>[c.channel,c.total]),['Prêts (ready)',s.by_lead_status.ready||0],['Indécis',s.by_lead_status.undecided||0]].map(([k,v])=>`<div class="card"><b>${v}</b><span>${esc(k)}</span></div>`).join('');
-  if(!rows){const p=new URLSearchParams();[['channel','#cc'],['kind','#ck'],['lead_status','#cs']].forEach(([k,s])=>$(s).value&&p.set(k,$(s).value));rows=await api('/api/contacts?'+p)}
-  $('#ctab').innerHTML=rows.map(r=>`<tr><td>${esc(r.name||r.external_id)}</td><td>${esc(r.channel)}</td><td>${esc(r.kind)}</td><td>${esc(r.lead_status)}</td><td>${esc(r.program_interest)}</td><td>${esc(r.level)}</td><td>${esc(r.city)}</td></tr>`).join('')||'<tr><td colspan="7">Aucun contact</td></tr>';}
+/* composer */
+const input=$('#input');
+input.addEventListener('input',()=>{input.style.height='40px';input.style.height=Math.min(input.scrollHeight,120)+'px'});
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('#send').click()}});
+$('#send').onclick=async()=>{const v=input.value.trim();if(!v||!state.sel)return;input.value='';input.style.height='40px';
+  const ct=state.data.contact;
+  if(ct.channel==='web'&&state.view==='test'){ // test mode: you play the contact
+    appendBubble('in',v);appendTyping();
+    try{const r=await api('/api/chat',{method:'POST',body:JSON.stringify({external_id:ct.external_id,text:v})});await openConv(state.sel);if(!r.reply)appendSys('Discussion transférée à l\'équipe : l\'IA ne répond plus.')}
+    catch(e){appendSys('Erreur : '+e.message)}loadChats();return}
+  try{await api(`/api/conversations/${state.sel}/reply`,{method:'POST',body:JSON.stringify({text:v})});openConv(state.sel);loadChats()}catch(e){appendSys('Envoi impossible : '+e.message)}};
+function appendBubble(dir,t){$('#wall').insertAdjacentHTML('beforeend',`<div class="msg ${dir} first"><div class="bub">${esc(t)}<span class="meta">${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span></div></div>`);$('#wall').scrollTop=1e9}
+function appendTyping(){$('#wall').insertAdjacentHTML('beforeend','<div class="msg out first" id="typing"><div class="bub"><span class="author">Nora · IA</span><i style="color:var(--muted)">écrit…</i></div></div>');$('#wall').scrollTop=1e9}
+function appendSys(t){$('#typing')?.remove();$('#wall').insertAdjacentHTML('beforeend',`<div class="sys"><span>${esc(t)}</span></div>`);$('#wall').scrollTop=1e9}
+
+/* header menu + drawer */
+$('#h-menu').onclick=e=>{e.stopPropagation();$('#menu').classList.toggle('open')};document.addEventListener('click',()=>$('#menu').classList.remove('open'));
+$('#menu').onclick=async e=>{const a=e.target.dataset.a;if(!a)return;const id=state.sel;
+  if(a==='info')openDrawer();
+  if(a==='assign'){const who=prompt('Attribuer la discussion à :',state.data.conversation.assignee||'');if(who!==null){await api(`/api/conversations/${id}/assign`,{method:'POST',body:JSON.stringify({assignee:who})});openConv(id);loadChats()}}
+  if(a==='assignme'){await api(`/api/conversations/${id}/assign`,{method:'POST',body:JSON.stringify({assignee:state.me})});openConv(id);loadChats()}
+  if(a==='close'&&confirm('Clôturer cette discussion ? Le prochain message du contact en ouvrira une nouvelle.')){await api(`/api/conversations/${id}/close`,{method:'POST'});$('#back').click()}};
+$('#h-info').onclick=openDrawer;$('#h-who').onclick=openDrawer;$('#d-close').onclick=()=>$('#drawer').classList.remove('open');
+function openDrawer(){$('#drawer').classList.add('open');renderDrawer()}
+function renderDrawer(){const {contact:ct,conversation:c,escalations:es}=state.data;const name=ct.name||ct.external_id;
+  $('#d-body').innerHTML=`<div class="sect hero">${avatar(name)}<div style="font-size:22px">${esc(name)}</div><div style="color:var(--muted)">${esc(CH[ct.channel]||ct.channel)} · ${esc(ct.external_id)}</div></div>
+  <div class="sect"><h4>Profil (rempli par l'IA)</h4><div class="kv">${[['Type',KIND[ct.kind]||ct.kind],['Statut',STATUS[ct.lead_status]||ct.lead_status],['Langue',ct.language],['Programme',ct.program_interest],['Niveau',ct.level],['Rentrée',ct.intake],['Ville',ct.city],['Relances',ct.subscribed?'activées':'désabonné']].map(([k,v])=>`<span>${k}</span><span>${esc(v)||'—'}</span>`).join('')}</div></div>
+  <div class="sect"><h4>Attribuer à un collègue</h4><div class="field"><input id="d-asg" value="${esc(c.assignee)}" placeholder="Nom du conseiller"><button class="btn primary" id="d-asgb">OK</button></div></div>
+  <div class="sect"><h4>Notes de l'IA</h4><div style="white-space:pre-wrap">${esc(ct.notes)||'—'}</div></div>
+  <div class="sect"><h4>Escalades</h4>${es.map(e=>`<div class="esc ${e.category==='urgent'?'urgent':''}"><b>${esc(e.category)}</b>${e.resolved?' · résolue':''}<br>${esc(e.summary)}</div>`).join('')||'<span style="color:var(--muted)">Aucune</span>'}</div>
+  <div class="sect"><button class="danger-link" id="d-close-conv"><svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>Clôturer la discussion</button></div>`;
+  $('#d-asgb').onclick=async()=>{await api(`/api/conversations/${c.id}/assign`,{method:'POST',body:JSON.stringify({assignee:$('#d-asg').value})});openConv(c.id);loadChats()};
+  $('#d-close-conv').onclick=()=>{$('#menu [data-a=close]').click()}}
+
+/* ---------- test mode: you are the contact ---------- */
+$('#newtest').onclick=()=>show('test');
+async function newTest(){state.testId='test-'+Math.random().toString(36).slice(2,8);
+  // create the conversation by sending nothing: show an empty chat with instructions
+  state.sel=null;state.data={contact:{channel:'web',external_id:state.testId},conversation:{}};
+  document.body.classList.add('in-chat');$('#empty').classList.add('hidden');$('#conv').classList.remove('hidden');$('#drawer').classList.remove('open');
+  $('#h-av').outerHTML=`<div class="av sm" id="h-av" style="background:${colorFor(state.testId)}">T</div>`;
+  $('#h-name').textContent='Test · vous jouez le contact';$('#h-sub').textContent='Écrivez comme un prospect : français, darija, arabe, anglais…';
+  $('#h-take').className='takeover ghost';$('#h-take').textContent='Nouveau test';$('#h-take').onclick=newTest;
+  $('#wall').innerHTML='<div class="sys"><span>Mode test : vos messages arrivent comme ceux d\'un contact, et Nora répond comme en production.</span></div>';
+  $('#banner').textContent='';input.placeholder='Salam, chhal les frais dyal l\'ingénierie ?';input.focus();
+  $('#send').onclick=async()=>{const v=input.value.trim();if(!v)return;input.value='';appendBubble('out',v);appendTyping();
+    try{const r=await api('/api/chat',{method:'POST',body:JSON.stringify({external_id:state.testId,text:v,name:'Test'})});$('#typing')?.remove();
+      if(r.reply)$('#wall').insertAdjacentHTML('beforeend',`<div class="msg in first"><div class="bub"><span class="author">Nora · IA</span>${esc(r.reply)}<span class="meta">${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span></div></div>`);
+      else appendSys('Discussion transférée à l\'équipe : l\'IA ne répond plus. Retrouvez-la dans Discussions.');$('#wall').scrollTop=1e9;loadChats()}
+    catch(e){appendSys('Erreur : '+e.message)}};
+}
+// restore normal send handler when leaving test mode
+const normalSend=$('#send').onclick;
+const _open=openConv;openConv=async(id,k)=>{$('#send').onclick=normalSend;input.placeholder='Écrire un message';if(state.view==='test'){state.view='chats';document.querySelectorAll('.rail button[data-v]').forEach(x=>x.classList.toggle('on',x.dataset.v==='chats'))}return _open(id,k)};
+
+/* ---------- contacts ---------- */
 ['#cc','#ck','#cs'].forEach(s=>$(s).onchange=()=>{$('#askx').textContent='';loadContacts()});
-$('#askb').onclick=async()=>{$('#askx').textContent='…';try{const r=await api('/api/contacts/ask',{method:'POST',body:JSON.stringify({question:$('#askq').value})});$('#askx').textContent=r.explanation+' — '+r.contacts.length+' contact(s)';loadContacts(r.contacts)}catch(e){$('#askx').textContent='Erreur : '+e.message}};
+$('#askq').addEventListener('keydown',e=>{if(e.key==='Enter')$('#askb').click()});
+$('#askb').onclick=async()=>{if(!$('#askq').value.trim())return;$('#askx').textContent='L\'IA cherche…';
+  try{const r=await api('/api/contacts/ask',{method:'POST',body:JSON.stringify({question:$('#askq').value})});$('#askx').textContent=`${r.explanation} · ${r.contacts.length} contact(s)`;loadContacts(r.contacts)}
+  catch(e){$('#askx').textContent='Erreur : '+e.message}};
+async function loadContacts(rows){
+  const s=await api('/api/contacts/stats');const tot=s.by_channel.reduce((a,c)=>a+c.total,0),sub=s.by_channel.reduce((a,c)=>a+(c.subscribed||0),0);
+  $('#stats').innerHTML=[['Contacts',tot],['Abonnés',sub],['Désabonnés',tot-sub],...s.by_channel.map(c=>[CH[c.channel]||c.channel,c.total]),['Prêts',s.by_lead_status.ready||0],['Indécis',s.by_lead_status.undecided||0]]
+    .map(([k,v])=>`<div class="stat"><b>${v}</b><span>${esc(k)}</span></div>`).join('');
+  if(!rows){const p=new URLSearchParams();[['channel','#cc'],['kind','#ck'],['lead_status','#cs']].forEach(([k,sel])=>$(sel).value&&p.set(k,$(sel).value));rows=await api('/api/contacts?'+p)}
+  $('#ctab').innerHTML=rows.map(r=>{const n=r.name||r.external_id;return `<div class="trow" data-cid="${r.id}">${avatar(n,'sm')}<div class="grow"><div class="row"><span>${esc(n)}</span><span class="pill p-ai">${esc(STATUS[r.lead_status]||r.lead_status)}</span></div>
+    <div class="small">${esc([CH[r.channel]||r.channel,KIND[r.kind]||r.kind,r.program_interest,r.level,r.city].filter(Boolean).join(' · '))}</div></div></div>`}).join('')
+    ||'<p style="color:var(--muted);padding:16px;margin:0">Aucun contact</p>';
+  document.querySelectorAll('.trow[data-cid]').forEach(t=>t.onclick=async()=>{const conv=(await api('/api/conversations')).find(c=>c.contact_id===+t.dataset.cid);if(conv){show('chats');openConv(conv.id)}});
+}
 
-async function loadEsc(){const rows=await api('/api/escalations');$('#etab').innerHTML=rows.map(e=>`<tr><td><span class="badge ${e.category==='urgent'?'b-esc':'b-st'}">${esc(e.category)}</span></td><td>${esc(e.summary)}</td><td><a href="#" data-c="${e.conversation_id}">Ouvrir</a></td><td><button class="btn" data-r="${e.id}">Résolue</button></td></tr>`).join('')||'<tr><td colspan="4">Aucune escalade ouverte</td></tr>';
-  document.querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await api(`/api/escalations/${b.dataset.r}/resolve`,{method:'POST'});loadEsc()});
-  document.querySelectorAll('[data-c]').forEach(a=>a.onclick=e=>{e.preventDefault();document.querySelector('nav button[data-v=conv]').click();openConv(+a.dataset.c)});}
+/* ---------- escalations ---------- */
+async function loadEsc(){const rows=await api('/api/escalations');
+  $('#etab').innerHTML=rows.map(e=>`<div class="trow" data-c="${e.conversation_id}"><div class="grow"><div class="row"><b>${esc(e.category)}</b><span class="time">${hhmm(e.created_at)}</span></div><div class="small" style="white-space:normal">${esc(e.summary)}</div></div>
+    <button class="btn" data-r="${e.id}">Résolue</button></div>`).join('')||'<p style="color:var(--muted);padding:16px;margin:0">Aucune escalade ouverte</p>';
+  document.querySelectorAll('[data-r]').forEach(b=>b.onclick=async ev=>{ev.stopPropagation();await api(`/api/escalations/${b.dataset.r}/resolve`,{method:'POST'});loadEsc();loadChats()});
+  document.querySelectorAll('.trow[data-c]').forEach(t=>t.onclick=()=>{show('chats');openConv(+t.dataset.c)})}
 
-let tid='test-'+Math.random().toString(36).slice(2,8);
-const tadd=(cls,txt)=>{$('#tmsgs').insertAdjacentHTML('beforeend',`<div class="m ${cls}">${esc(txt)}</div>`);$('#tmsgs').scrollTop=1e9};
-$('#tnew').onclick=()=>{tid='test-'+Math.random().toString(36).slice(2,8);$('#tmsgs').innerHTML=''};
-$('#tsend').onclick=async()=>{const v=$('#tin').value.trim();if(!v)return;$('#tin').value='';tadd('in',v);tadd('out','…');
-  try{const r=await api('/api/chat',{method:'POST',body:JSON.stringify({external_id:tid,text:v})});$('#tmsgs').lastChild.textContent=r.reply||'(conversation transférée à l\'équipe — pas de réponse IA)'}catch(e){$('#tmsgs').lastChild.textContent='Erreur : '+e.message}};
-$('#tin').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('#tsend').click()}});
-loadConvs();setInterval(()=>{if($('#v-conv').classList.contains('on'))loadConvs()},10000);
+/* ---------- boot ---------- */
+api('/api/me').then(m=>{state.me=m.user;$('#me').textContent=initials(m.user);$('#me').title='Connecté : '+m.user}).catch(()=>{});
+loadChats();
+setInterval(()=>{if(state.view==='chats'){loadChats();if(state.sel)openConv(state.sel,true)}},8000);
 </script>
 </body>
 </html>

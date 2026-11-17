@@ -18,4 +18,19 @@ INBOX_USER = os.getenv("INBOX_USER", "admissions")
 INBOX_PASSWORD = os.getenv("INBOX_PASSWORD", "change-me")
 DB_PATH = os.getenv("DB_PATH", "data/hestim.db")
 
+
+def staff_accounts() -> dict[str, str]:
+    """Per-person logins: INBOX_USERS="Amal:pw1,Karim:pw2". Falls back to the single INBOX_USER."""
+    accounts = {}
+    for pair in os.getenv("INBOX_USERS", "").split(","):
+        if ":" in pair:
+            name, pw = pair.split(":", 1)
+            if name.strip() and pw:
+                accounts[name.strip()] = pw
+    return accounts or {INBOX_USER: INBOX_PASSWORD}
+
+
+# Server-side refusal fallback exists for Opus 5.5 / Opus 5 / Sonnet 5.5 / Fable; not for Haiku.
+SUPPORTS_FALLBACKS = not MODEL.startswith("claude-haiku")
+
 FOLLOWUP_AFTER_HOURS = float(os.getenv("FOLLOWUP_AFTER_HOURS", "20"))

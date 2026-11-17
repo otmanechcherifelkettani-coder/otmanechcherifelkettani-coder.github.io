@@ -40,6 +40,11 @@ def set_client(c):
 
 
 def _call_claude(messages):
+    extra = {}
+    if config.SUPPORTS_FALLBACKS:
+        # Server-side fallback: if a safety classifier declines, the API re-runs the
+        # request on Anthropic's recommended fallback model inside the same call.
+        extra = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
     return client().beta.messages.create(
         model=config.MODEL,
         max_tokens=8000,
@@ -48,10 +53,7 @@ def _call_claude(messages):
         messages=messages,
         output_config={"effort": config.EFFORT},
         cache_control={"type": "ephemeral"},
-        # Server-side fallback: if a safety classifier declines, the API re-runs the
-        # request on Anthropic's recommended fallback model inside the same call.
-        betas=["server-side-fallback-2026-07-01"],
-        fallbacks="default",
+        **extra,
     )
 
 

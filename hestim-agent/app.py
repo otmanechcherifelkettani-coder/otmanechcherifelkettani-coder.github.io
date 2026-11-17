@@ -47,11 +47,15 @@ security = HTTPBasic()
 
 
 def staff(creds: HTTPBasicCredentials = Depends(security)) -> str:
-    ok = secrets.compare_digest(creds.username, config.INBOX_USER) and \
-        secrets.compare_digest(creds.password, config.INBOX_PASSWORD)
-    if not ok:
+    expected = config.staff_accounts().get(creds.username)
+    if expected is None or not secrets.compare_digest(creds.password.encode(), expected.encode()):
         raise HTTPException(401, headers={"WWW-Authenticate": "Basic"})
     return creds.username
+
+
+@app.get("/api/me")
+def me(user: str = Depends(staff)):
+    return {"user": user}
 
 
 # ---------------- inbound pipeline ----------------
