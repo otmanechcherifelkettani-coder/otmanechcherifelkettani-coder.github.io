@@ -1,0 +1,118 @@
+<!doctype html>
+<html
+  lang="fr"
+  data-composition-variables='[
+  {"id":"color-ground","type":"color","label":"Background","default":"#03363D"},
+  {"id":"color-ink","type":"color","label":"Text","default":"#2F3941"},
+  {"id":"color-accent","type":"color","label":"Accent","default":"#1F73B7"},
+  {"id":"font-display","type":"string","label":"Display font","default":"Inter"}
+]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="assets/js/gsap.min.js"></script>
+    <style>
+      :root {
+        --color-ground: #03363d;
+        --color-ink: #2f3941;
+        --color-accent: #1f73b7;
+        --font-display: "Inter";
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--color-ground);
+      }
+      #root {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        font-family: var(--font-display), sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="40"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Scenes: one lane, back to back -->
+      <div
+        id="hook"
+        data-composition-id="hook"
+        data-composition-src="compositions/hook.html"
+        data-start="0"
+        data-duration="7"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="workspace"
+        data-composition-id="workspace"
+        data-composition-src="compositions/workspace.html"
+        data-start="7"
+        data-duration="27"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="outro"
+        data-composition-id="outro"
+        data-composition-src="compositions/outro.html"
+        data-start="34"
+        data-duration="6"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <!-- Voice (Kokoro ff_siwis), own lane -->
+      <audio id="vo1" data-start="0.5" data-duration="6.38" data-track-index="3" data-volume="1" src="assets/vo/vo1.wav"></audio>
+      <audio id="vo2" data-start="7.3" data-duration="5.29" data-track-index="3" data-volume="1" src="assets/vo/vo2.wav"></audio>
+      <audio id="vo3" data-start="13.0" data-duration="7.23" data-track-index="3" data-volume="1" src="assets/vo/vo3.wav"></audio>
+      <audio id="vo4" data-start="22.1" data-duration="4.97" data-track-index="3" data-volume="1" src="assets/vo/vo4.wav"></audio>
+      <audio id="vo5" data-start="28.7" data-duration="2.35" data-track-index="3" data-volume="1" src="assets/vo/vo5.wav"></audio>
+      <audio id="vo6" data-start="34.6" data-duration="3.80" data-track-index="3" data-volume="1" src="assets/vo/vo6.wav"></audio>
+
+      <!-- Music bed, ducked under the narration for the whole film -->
+      <audio
+        id="bg-music"
+        data-start="0"
+        data-duration="40"
+        data-track-index="10"
+        data-volume="0.15"
+        data-fade-in="1"
+        data-fade-out="2.5"
+        src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"
+      ></audio>
+
+      <!-- SFX, one lane (none overlap) -->
+      <audio id="sfx-drop" data-start="1.55" data-duration="0.11" data-track-index="11" data-volume="0.6" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <!-- beat-locked: "Prêt" chip lands at 17.47s strong cue -->
+      <audio id="sfx-ready" data-start="17.45" data-duration="0.06" data-track-index="11" data-volume="0.6" src="assets/sfx/ui/rollover2.ogg"></audio>
+      <audio id="sfx-click" data-start="29.9" data-duration="0.06" data-track-index="11" data-volume="0.7" src="assets/sfx/ui/mouseclick1.ogg"></audio>
+      <audio id="sfx-bell" data-start="37.4" data-duration="1.48" data-track-index="11" data-volume="0.55" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

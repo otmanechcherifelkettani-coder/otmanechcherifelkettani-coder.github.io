@@ -1,0 +1,78 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(1200px 800px at 50% 45%, #0b4a52 0%, #03363d 70%);
+      font-family: "Inter", sans-serif;
+      color: #ffffff;
+    }
+    #hook-time {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 250px;
+      text-align: center;
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      color: #9fc9cd;
+    }
+    #hook-msg {
+      position: absolute;
+      left: 50%;
+      top: 380px;
+      width: 1040px;
+      margin-left: -520px;
+    }
+    #hook-from {
+      font-size: 30px;
+      color: #9fc9cd;
+      margin: 0 0 14px 28px;
+    }
+    #hook-bubble {
+      position: relative;
+      background: #ffffff;
+      color: #111b21;
+      border-radius: 28px;
+      border-top-left-radius: 6px;
+      padding: 34px 44px 30px;
+      font-size: 54px;
+      line-height: 1.25;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+    }
+    #hook-bubble small {
+      display: block;
+      text-align: right;
+      font-size: 28px;
+      color: #54656f;
+      margin-top: 10px;
+    }
+    #hook-closed {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 760px;
+      text-align: center;
+      font-size: 44px;
+      color: #e6f0f1;
+    }
+  </style>
+  <div id="root" data-composition-id="hook" data-width="1920" data-height="1080">
+    <div id="hook-time">SAMEDI · 23:14</div>
+    <div id="hook-msg">
+      <div id="hook-from">WhatsApp · Salma I.</div>
+      <div id="hook-bubble">salam, chhal les frais dyal l'ingénierie&nbsp;?<small>23:14</small></div>
+    </div>
+    <div id="hook-closed">Le bureau des admissions est fermé.</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+        tl.fromTo("#hook-msg", { opacity: 0, y: -60, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "expo.out" }, 1.55);
+    tl.fromTo("#hook-closed", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 4.1);
+    // carry across: the message shrinks toward the inbox
+    tl.to("#hook-time, #hook-closed", { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power3.in" }, 6.35);
+    tl.to("#hook-msg", { x: -560, y: -230, scale: 0.42, opacity: 0, filter: "blur(6px)", duration: 0.6, ease: "power3.in" }, 6.4);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

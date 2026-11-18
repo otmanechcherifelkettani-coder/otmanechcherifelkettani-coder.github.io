@@ -1,0 +1,55 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(1200px 800px at 50% 45%, #0b4a52 0%, #03363d 70%);
+      font-family: "Inter", sans-serif;
+      color: #ffffff;
+    }
+    #out-1 {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 360px;
+      text-align: center;
+      font-size: 84px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    #out-2 {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 488px;
+      text-align: center;
+      font-size: 54px;
+      color: #9fe0c8;
+    }
+    #out-foot {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 760px;
+      text-align: center;
+      font-size: 32px;
+      color: #c9dfe1;
+      letter-spacing: 0.04em;
+    }
+    #out-foot b {
+      color: #ffffff;
+    }
+  </style>
+  <div id="root" data-composition-id="outro" data-width="1920" data-height="1080">
+    <div id="out-1">Chaque message a une réponse.</div>
+    <div id="out-2">Vos conseillers parlent aux bons candidats.</div>
+    <div id="out-foot"><b>HESTIM</b> · Agent IA admissions — Pilote de 7 semaines</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#out-1", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.5);
+    tl.fromTo("#out-2", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 2.1);
+    tl.fromTo("#out-foot", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "expo.out" }, 3.4);
+    window.__timelines["outro"] = tl;
+  </script>
+</template>

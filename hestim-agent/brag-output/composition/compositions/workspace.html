@@ -1,0 +1,281 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #f8f9f9;
+      font-family: "Inter", sans-serif;
+      color: #2f3941;
+      overflow: hidden;
+    }
+    #ws { position: absolute; inset: 0; }
+    /* rail */
+    #ws-rail { position: absolute; left: 0; top: 0; width: 72px; height: 1080px; background: #03363d; }
+    #ws-logo { position: absolute; left: 14px; top: 12px; width: 44px; height: 44px; border-radius: 10px; background: #78a300; color: #03363d; font-weight: 700; font-size: 26px; text-align: center; line-height: 44px; }
+    .ws-ri { position: absolute; left: 22px; width: 28px; height: 28px; border: 3px solid #c2c8cc; border-radius: 8px; }
+    .ws-ri.on { border-color: #ffffff; background: rgba(255,255,255,0.15); }
+    /* top bar */
+    #ws-top { position: absolute; left: 72px; top: 0; width: 1848px; height: 64px; background: #ffffff; border-bottom: 1px solid #d8dcde; }
+    #ws-tab { position: absolute; left: 20px; top: 12px; height: 40px; padding: 0 18px; border-radius: 8px; background: #edf7ff; color: #1f73b7; font-size: 19px; font-weight: 700; line-height: 40px; }
+    #ws-search { position: absolute; left: 640px; top: 12px; width: 520px; height: 40px; border-radius: 20px; background: #f8f9f9; border: 1px solid #d8dcde; color: #5f6b74; font-size: 18px; line-height: 38px; padding-left: 22px; }
+    #ws-me { position: absolute; right: 24px; top: 12px; height: 40px; font-size: 18px; line-height: 40px; color: #2f3941; }
+    #ws-me b { display: inline-block; width: 40px; height: 40px; border-radius: 50%; background: #1f73b7; color: #fff; text-align: center; margin-left: 12px; vertical-align: top; }
+    #ws-me i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #038153; margin-right: 8px; }
+    /* views */
+    #ws-views { position: absolute; left: 72px; top: 64px; width: 280px; height: 1016px; background: #f8f9f9; border-right: 1px solid #d8dcde; padding: 26px 0; }
+    #ws-views h3 { font-size: 15px; letter-spacing: 0.12em; color: #5f6b74; margin: 0 26px 14px; }
+    .ws-view { position: relative; height: 50px; margin: 0 12px; padding: 0 14px; border-radius: 8px; font-size: 19px; line-height: 50px; color: #2f3941; }
+    .ws-view span { position: absolute; right: 14px; color: #5f6b74; }
+    .ws-view.on { background: #e9ebed; font-weight: 700; }
+    /* ticket list */
+    #ws-list { position: absolute; left: 352px; top: 64px; width: 500px; height: 1016px; background: #ffffff; border-right: 1px solid #d8dcde; }
+    #ws-list-head { height: 74px; padding: 22px 24px; font-size: 22px; font-weight: 700; border-bottom: 1px solid #d8dcde; }
+    #ws-rows { position: absolute; left: 0; top: 74px; width: 500px; height: 900px; }
+    .ws-row { position: absolute; left: 0; top: 0; width: 500px; height: 104px; border-bottom: 1px solid #e9ebed; padding: 16px 24px 0 24px; background: #ffffff; }
+    .ws-row .n { font-size: 20px; font-weight: 700; }
+    .ws-row .t { position: absolute; right: 24px; top: 18px; font-size: 16px; color: #5f6b74; }
+    .ws-row .p { font-size: 17px; color: #5f6b74; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 360px; }
+    .ws-row .b { position: absolute; right: 24px; top: 54px; }
+    #ws-sel { position: absolute; left: 0; top: 0; width: 500px; height: 104px; background: #edf7ff; border-left: 5px solid #1f73b7; }
+    .pill { display: inline-block; height: 28px; padding: 0 12px; border-radius: 14px; font-size: 15px; font-weight: 700; line-height: 28px; margin-left: 6px; }
+    .p-ai { background: #edf7ff; color: #1f73b7; }
+    .p-adm { background: #e9ebed; color: #49545c; }
+    .p-fin { background: #fff0e1; color: #9c4f12; }
+    .p-ok { background: #edf8f4; color: #038153; }
+    .p-new { background: #fff7ed; color: #9c4f12; }
+    .p-staff { background: #fff0e1; color: #9c4f12; }
+    /* ticket views (conversation + context) */
+    .tv { position: absolute; left: 852px; top: 64px; width: 1068px; height: 1016px; }
+    .conv { position: absolute; left: 0; top: 0; width: 620px; height: 1016px; background: #ffffff; border-right: 1px solid #d8dcde; }
+    .head { position: absolute; left: 0; top: 0; width: 620px; height: 114px; border-bottom: 1px solid #d8dcde; padding: 18px 24px; }
+    .head .n { font-size: 24px; font-weight: 700; }
+    .head .s { font-size: 17px; color: #5f6b74; margin-top: 4px; }
+    .head .bd { position: absolute; left: 24px; top: 78px; }
+    .head .bd .pill { margin: 0 6px 0 0; }
+    .take { position: absolute; right: 22px; top: 26px; height: 46px; padding: 0 20px; border-radius: 8px; background: #1f73b7; color: #ffffff; font-size: 18px; font-weight: 700; line-height: 46px; }
+    .take .t2 { position: absolute; left: 0; right: 0; text-align: center; top: 0; }
+    .thread { position: absolute; left: 0; top: 114px; width: 620px; height: 772px; overflow: hidden; background: #fbfbfb; }
+    .inner { position: absolute; left: 0; top: 0; width: 620px; padding: 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+    .msg { max-width: 500px; padding: 14px 18px; border-radius: 14px; font-size: 23px; line-height: 1.38; }
+    .msg .who { display: block; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .msg .tm { display: block; text-align: right; font-size: 14px; color: #5f6b74; margin-top: 4px; }
+    .in { align-self: flex-start; background: #ffffff; border: 1px solid #d8dcde; }
+    .in .who { color: #5f6b74; }
+    .ai { align-self: flex-end; background: #edf7ff; border: 1px solid #c3e1f7; }
+    .ai .who { color: #1f73b7; }
+    .st { align-self: flex-end; background: #fff7ed; border: 1px solid #f5d5b5; }
+    .st .who { color: #9c4f12; }
+    .note { align-self: stretch; background: #fff7ed; border-left: 5px solid #9c4f12; border-radius: 6px; padding: 12px 16px; font-size: 18px; color: #49545c; }
+    .note b { color: #9c4f12; }
+    .sys { align-self: center; font-size: 16px; color: #49545c; background: #e9ebed; border-radius: 14px; padding: 6px 14px; }
+    .day { align-self: center; font-size: 14px; font-weight: 700; letter-spacing: 0.14em; color: #5f6b74; }
+    .typing { align-self: flex-end; background: #edf7ff; border: 1px solid #c3e1f7; border-radius: 14px; padding: 12px 18px; font-size: 17px; color: #1f73b7; }
+    .composer { position: absolute; left: 0; top: 886px; width: 620px; height: 130px; border-top: 1px solid #d8dcde; padding: 14px 22px; background: #ffffff; }
+    .composer .tabs { font-size: 16px; color: #5f6b74; }
+    .composer .tabs b { color: #2f3941; border-bottom: 3px solid #1f73b7; padding-bottom: 4px; margin-right: 22px; }
+    .composer .box { margin-top: 14px; height: 52px; border: 1px solid #d8dcde; border-radius: 8px; font-size: 18px; color: #5f6b74; line-height: 50px; padding-left: 16px; }
+    .ctx { position: absolute; left: 620px; top: 0; width: 448px; height: 1016px; background: #ffffff; padding: 26px 24px; }
+    .ctx .av { width: 64px; height: 64px; border-radius: 50%; color: #ffffff; font-size: 24px; font-weight: 700; text-align: center; line-height: 64px; display: inline-block; vertical-align: middle; }
+    .ctx .nm { display: inline-block; vertical-align: middle; margin-left: 16px; }
+    .ctx .nm b { display: block; font-size: 23px; }
+    .ctx .nm span { font-size: 16px; color: #5f6b74; }
+    .ctx h4 { font-size: 14px; letter-spacing: 0.12em; color: #5f6b74; margin: 30px 0 12px; }
+    .f { position: relative; height: 46px; border-bottom: 1px solid #e9ebed; font-size: 19px; line-height: 46px; }
+    .f .k { color: #5f6b74; }
+    .f .v { position: absolute; left: 124px; top: 0; font-weight: 700; color: #2f3941; }
+    .f .v .pill { margin-left: 0; }
+    .esc { margin-top: 4px; border: 1px solid #f5d5b5; background: #fff7ed; border-radius: 8px; padding: 12px 14px; font-size: 17px; line-height: 1.4; }
+    .esc b { color: #9c4f12; }
+    .empty { font-size: 18px; color: #5f6b74; }
+    #ws-cursor { position: absolute; left: 0; top: 0; width: 34px; height: 44px; }
+  </style>
+  <div id="root" data-composition-id="workspace" data-width="1920" data-height="1080">
+    <div id="ws">
+      <div id="ws-rail">
+        <div id="ws-logo">H</div>
+        <div class="ws-ri on" style="top: 96px"></div>
+        <div class="ws-ri" style="top: 152px"></div>
+        <div class="ws-ri" style="top: 208px"></div>
+        <div class="ws-ri" style="top: 264px"></div>
+      </div>
+      <div id="ws-top">
+        <div id="ws-tab">HESTIM Inbox · Admissions</div>
+        <div id="ws-search">Rechercher un contact, un message…</div>
+        <div id="ws-me"><i></i>Karim · Admissions<b>K</b></div>
+      </div>
+      <div id="ws-views">
+        <h3>VUES</h3>
+        <div class="ws-view on">Admissions <span>13</span></div>
+        <div class="ws-view">Finance <span>3</span></div>
+        <div class="ws-view">Scolarité <span>2</span></div>
+        <div class="ws-view">Vie étudiante <span>0</span></div>
+        <h3 style="margin-top: 28px">GESTION</h3>
+        <div class="ws-view">Gérées par l'IA <span>9</span></div>
+        <div class="ws-view">Reprises par l'équipe <span>4</span></div>
+      </div>
+      <div id="ws-list">
+        <div id="ws-list-head">Conversations ouvertes</div>
+        <div id="ws-rows">
+          <div id="ws-sel"></div>
+          <div class="ws-row" id="r-youssef"><div class="n">Youssef A.</div><div class="t">23:41</div><div class="p">je n'ai pas reçu mon reçu du trimestre</div><div class="b"><span class="pill p-ai">IA</span></div></div>
+          <div class="ws-row" id="r-salma"><div class="n">Salma I.</div><div class="t">23:14</div><div class="p">salam, chhal les frais dyal l'ingénierie ?</div><div class="b"><span class="pill p-ai">IA</span></div></div>
+          <div class="ws-row" id="r-bennani"><div class="n">Mme Bennani</div><div class="t">21:02</div><div class="p">Ma fille hésite entre deux écoles</div><div class="b"><span class="pill p-ai">IA</span></div></div>
+          <div class="ws-row" id="r-ines"><div class="n">Ines</div><div class="t">19:47</div><div class="p">fin jat l'école ?</div><div class="b"><span class="pill p-ai">IA</span></div></div>
+          <div class="ws-row" id="r-omar"><div class="n">Omar B.</div><div class="t">18:30</div><div class="p">Master en cours du soir ?</div><div class="b"><span class="pill p-staff">Amal</span></div></div>
+        </div>
+      </div>
+
+      <!-- Salma's conversation -->
+      <div class="tv" id="tv-salma">
+        <div class="conv">
+          <div class="head">
+            <div class="n">Salma I.</div>
+            <div class="s">WhatsApp · Prospect</div>
+            <div class="bd" data-layout-allow-overlap><span class="pill p-adm">Admissions</span><span class="pill p-ai" id="s-badge-ai">IA</span><span class="pill p-staff" id="s-badge-k" style="position: absolute; left: 126px; top: 0">Karim</span></div>
+            <div class="take" id="s-take" data-layout-allow-overlap><span id="s-take-1">Prendre le contrôle</span><span class="t2" id="s-take-2">Rendre à l'IA</span></div>
+          </div>
+          <div class="thread">
+            <div class="inner" id="s-inner" data-layout-allow-overflow>
+              <div class="msg in" id="s-m1"><span class="who">Salma I.</span>salam, chhal les frais dyal l'ingénierie ?<span class="tm">sam. 23:14</span></div>
+              <div class="msg ai" id="s-m2"><span class="who">Nora · IA</span>Mrehba Salma ! Les frais dépendent du programme et du niveau. Chnou l-bac dyalek, w ach bghiti tqra ?<span class="tm">sam. 23:14</span></div>
+              <div class="msg in" id="s-m3"><span class="who">Salma I.</span>Bac 2027 sciences maths, Casa. Bghit génie industriel.<span class="tm">sam. 23:16</span></div>
+              <div class="msg ai" id="s-m4"><span class="who">Nora · IA</span>Mzyan bzaf ! Un conseiller vous appelle lundi après 18 h pour la procédure et les frais exacts.<span class="tm">sam. 23:16</span></div>
+              <div class="note" id="s-note"><b>Note interne · IA</b> — Appel conseiller demandé, lundi après 18 h. Bac 2027 SM, Casablanca, Génie Industriel.</div>
+              <div class="day" id="s-day">LUNDI</div>
+              <div class="msg st" id="s-m6"><span class="who">Karim · Admissions</span>Bonjour Salma, c'est Karim. Je vous appelle à 18 h ?<span class="tm">lun. 09:02</span></div>
+            </div>
+            <div class="typing" id="s-typing" style="position: absolute; right: 24px; top: 150px">Nora écrit…</div>
+          </div>
+          <div class="composer"><div class="tabs"><b>Réponse WhatsApp</b>Note interne</div><div class="box">Écrire un message…</div></div>
+        </div>
+        <div class="ctx">
+          <div class="av" style="background: #8a4fd8">SI</div><div class="nm"><b>Salma I.</b><span>WhatsApp · +212 6•• ••• •11</span></div>
+          <h4>PROFIL · REMPLI PAR L'IA</h4>
+          <div class="f"><span class="k">Langue</span><span class="v" id="s-f-lang">Darija</span></div>
+          <div class="f"><span class="k">Type</span><span class="v" id="s-f-type">Prospect</span></div>
+          <div class="f"><span class="k">Niveau</span><span class="v" id="s-f-lvl">Bac 2027 · Sciences Maths</span></div>
+          <div class="f"><span class="k">Programme</span><span class="v" id="s-f-prog">Génie Industriel</span></div>
+          <div class="f"><span class="k">Ville</span><span class="v" id="s-f-city">Casablanca</span></div>
+          <div class="f"><span class="k">Statut</span><span class="v" data-layout-allow-overlap><span class="pill p-new" id="s-st-new">Nouveau</span><span class="pill p-ok" id="s-st-ok" style="position: absolute; left: 0; top: 9px">Prêt</span></span></div>
+          <div class="f"><span class="k">Équipe</span><span class="v">Admissions</span></div>
+          <h4>ESCALADES</h4>
+          <div class="empty" id="s-esc-empty">Aucune</div>
+          <div class="esc" id="s-esc"><b>admissions</b> — Appel conseiller demandé (lundi après 18 h)</div>
+        </div>
+      </div>
+
+      <!-- Youssef's conversation -->
+      <div class="tv" id="tv-youssef" data-hold>
+        <div class="conv">
+          <div class="head">
+            <div class="n">Youssef A.</div>
+            <div class="s">Instagram · Étudiant</div>
+            <div class="bd" data-layout-allow-overlap><span class="pill p-ai">IA</span><span class="pill p-adm" id="y-team-adm">Admissions</span><span class="pill p-fin" id="y-team-fin" style="position: absolute; left: 48px; top: 0">Finance</span></div>
+            <div class="take"><span>Prendre le contrôle</span></div>
+          </div>
+          <div class="thread">
+            <div class="inner">
+              <div class="msg in" id="y-m1"><span class="who">Youssef A.</span>Bonsoir, je suis en 2e année GI. Je n'ai pas reçu mon reçu du trimestre.<span class="tm">sam. 23:41</span></div>
+              <div class="msg ai" id="y-m2"><span class="who">Nora · IA</span>Bonsoir Youssef. Je transmets votre demande au service finance avec votre nom et votre filière.<span class="tm">sam. 23:41</span></div>
+              <div class="sys" id="y-sys">↪ Transférée de Admissions vers Finance par IA</div>
+            </div>
+          </div>
+          <div class="composer"><div class="tabs"><b>Réponse Instagram</b>Note interne</div><div class="box">Écrire un message…</div></div>
+        </div>
+        <div class="ctx">
+          <div class="av" style="background: #1f73b7">YA</div><div class="nm"><b>Youssef A.</b><span>Instagram · @youssef.a</span></div>
+          <h4>PROFIL · REMPLI PAR L'IA</h4>
+          <div class="f"><span class="k">Langue</span><span class="v">Français</span></div>
+          <div class="f"><span class="k">Type</span><span class="v">Étudiant</span></div>
+          <div class="f"><span class="k">Filière</span><span class="v">GI · 2e année</span></div>
+          <div class="f"><span class="k">Statut</span><span class="v"><span class="pill p-ok">Inscrit</span></span></div>
+          <div class="f"><span class="k">Équipe</span><span class="v" data-layout-allow-overlap><span id="y-f-adm">Admissions</span><span id="y-f-fin" style="position: absolute; left: 0; top: 0; color: #9c4f12">Finance</span></span></div>
+          <h4>ESCALADES</h4>
+          <div class="esc" id="y-esc"><b>finance</b> — Reçu du trimestre manquant, Youssef A., 2e année GI</div>
+        </div>
+      </div>
+
+      <svg id="ws-cursor" viewBox="0 0 34 44"><path d="M2 2 L2 36 L11 28 L17 42 L23 39 L17 26 L30 26 Z" fill="#111" stroke="#fff" stroke-width="2.5" stroke-linejoin="round" /></svg>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const E = "expo.out";
+    // workspace arrives (carry-across from the hook bubble)
+    tl.fromTo("#ws", { opacity: 0, scale: 1.04, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.6, ease: "power4.out" }, 0);
+    // list: Salma's row lands on top, others shift down
+    tl.fromTo("#r-bennani", { y: 0 }, { y: 104, duration: 0.5, ease: E }, 0.5);
+    tl.fromTo("#r-ines", { y: 104 }, { y: 208, duration: 0.5, ease: E }, 0.5);
+    tl.fromTo("#r-omar", { y: 208 }, { y: 312, duration: 0.5, ease: E }, 0.5);
+    tl.fromTo("#r-salma", { y: 0, opacity: 0, x: -40 }, { y: 0, opacity: 1, x: 0, duration: 0.5, ease: E }, 0.55);
+    tl.fromTo("#r-youssef", { opacity: 0, y: 0 }, { opacity: 0, y: 0, duration: 0.01 }, 0);
+    tl.fromTo("#ws-sel", { opacity: 0, y: 0 }, { opacity: 1, y: 0, duration: 0.3 }, 0.9);
+    // Salma's conversation opens
+    tl.fromTo("#tv-salma", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.5, ease: E }, 0.9);
+    tl.fromTo("#tv-youssef", { opacity: 0 }, { opacity: 0, duration: 0.01 }, 0);
+    tl.fromTo("#s-m1", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, 1.1);
+    tl.fromTo("#s-typing", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 1.9);
+    tl.to("#s-typing", { opacity: 0, duration: 0.15 }, 2.7);
+    tl.fromTo("#s-m2", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, ease: E }, 2.75);
+    tl.fromTo("#s-f-lang", { opacity: 0, x: 12 }, { opacity: 1, x: 0, duration: 0.35, ease: E }, 3.4);
+    // hidden-until-later items
+    tl.fromTo(["#s-m3", "#s-m4", "#s-note", "#s-day", "#s-m6"], { opacity: 0, y: 16 }, { opacity: 0, y: 16, duration: 0.01 }, 0);
+    tl.fromTo(["#s-f-type", "#s-f-lvl", "#s-f-prog", "#s-f-city", "#s-esc"], { opacity: 0, x: 12 }, { opacity: 0, x: 12, duration: 0.01 }, 0);
+    tl.fromTo("#s-st-ok", { opacity: 0, scale: 0.6 }, { opacity: 0, scale: 0.6, duration: 0.01 }, 0);
+    tl.fromTo("#s-badge-k", { opacity: 0 }, { opacity: 0, duration: 0.01 }, 0);
+    tl.fromTo("#s-take-2", { opacity: 0 }, { opacity: 0, duration: 0.01 }, 0);
+    tl.fromTo("#ws-cursor", { opacity: 0, x: 1720, y: 980 }, { opacity: 0, x: 1720, y: 980, duration: 0.01 }, 0);
+    // qualification (narration 3 starts at local 6.0)
+    tl.to("#s-m3", { opacity: 1, y: 0, duration: 0.4, ease: E }, 6.2);
+    tl.to("#s-f-type", { opacity: 1, x: 0, duration: 0.35, ease: E }, 7.0);
+    tl.to("#s-f-lvl", { opacity: 1, x: 0, duration: 0.35, ease: E }, 7.7);
+    tl.to("#s-f-prog", { opacity: 1, x: 0, duration: 0.35, ease: E }, 8.6);
+    tl.to("#s-f-city", { opacity: 1, x: 0, duration: 0.35, ease: E }, 9.4);
+    tl.to("#s-m4", { opacity: 1, y: 0, duration: 0.45, ease: E }, 8.2);
+    // beat-locked: 17.47s strong cue (local 10.47)
+    tl.to("#s-st-new", { opacity: 0, duration: 0.15 }, 10.42);
+    tl.to("#s-st-ok", { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 10.47);
+    tl.to("#s-note", { opacity: 1, y: 0, duration: 0.45, ease: E }, 10.8);
+    tl.to("#s-esc-empty", { opacity: 0, duration: 0.15 }, 10.75);
+    tl.to("#s-esc", { opacity: 1, x: 0, duration: 0.4, ease: E }, 10.8);
+    // Youssef's message arrives and becomes the open conversation (narration 4 at local 15.1)
+    tl.to("#r-salma", { y: 104, duration: 0.5, ease: E }, 13.9);
+    tl.to("#r-bennani", { y: 208, duration: 0.5, ease: E }, 13.9);
+    tl.to("#r-ines", { y: 312, duration: 0.5, ease: E }, 13.9);
+    tl.to("#r-omar", { y: 416, duration: 0.5, ease: E }, 13.9);
+    tl.to("#ws-sel", { y: 104, duration: 0.5, ease: E }, 13.9);
+    tl.fromTo("#r-youssef", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.5, ease: E, immediateRender: false }, 13.95);
+    tl.to("#ws-sel", { y: 0, duration: 0.45, ease: "power2.inOut" }, 14.8);
+    tl.to("#tv-salma", { opacity: 0, x: -30, duration: 0.3, ease: "power3.in" }, 14.8);
+    tl.fromTo("#tv-youssef", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.5, ease: E, immediateRender: false }, 15.0);
+    tl.fromTo("#y-m1", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, 15.2);
+    tl.fromTo("#y-m2", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, ease: E }, 16.1);
+    tl.fromTo("#y-sys", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.4, ease: E }, 17.0);
+    tl.fromTo("#y-esc", { opacity: 0, x: 12 }, { opacity: 1, x: 0, duration: 0.4, ease: E }, 17.0);
+    tl.to("#y-team-adm", { opacity: 0, duration: 0.15 }, 17.3);
+    tl.fromTo("#y-team-fin", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 17.35);
+    tl.to("#y-f-adm", { opacity: 0, duration: 0.15 }, 17.3);
+    tl.fromTo("#y-f-fin", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 17.35);
+    // back to Salma on Monday (narration 5 at local 21.7)
+    tl.to("#ws-sel", { y: 104, duration: 0.45, ease: "power2.inOut" }, 21.3);
+    tl.to("#tv-youssef", { opacity: 0, x: -30, duration: 0.3, ease: "power3.in" }, 21.3);
+    tl.to("#tv-salma", { opacity: 1, x: 0, duration: 0.5, ease: E }, 21.55);
+    tl.fromTo("#s-inner", { y: 0 }, { y: -240, duration: 0.6, ease: "power2.inOut" }, 21.6);
+    tl.to("#s-day", { opacity: 1, y: 0, duration: 0.3, ease: E }, 21.8);
+    // cursor clicks "Prendre le contrôle" (button centre ≈ 1371,112)
+    tl.to("#ws-cursor", { opacity: 1, duration: 0.15 }, 21.85);
+    tl.to("#ws-cursor", { x: 1368, y: 112, duration: 0.75, ease: "power2.inOut" }, 21.9);
+    tl.to("#s-take", { scale: 0.94, duration: 0.08, ease: "power2.in" }, 22.9);
+    tl.to("#s-take", { scale: 1, duration: 0.2, ease: "power2.out" }, 22.98);
+    tl.to("#s-take", { backgroundColor: "#ffffff", color: "#1f73b7", boxShadow: "inset 0 0 0 2px #1f73b7", duration: 0.2 }, 22.98);
+    tl.to("#s-take-1", { opacity: 0, duration: 0.12 }, 22.98);
+    tl.to("#s-take-2", { opacity: 1, duration: 0.2 }, 23.02);
+    tl.to("#s-badge-ai", { opacity: 0, duration: 0.15 }, 22.98);
+    tl.to("#s-badge-k", { opacity: 1, duration: 0.25 }, 23.02);
+    tl.to("#ws-cursor", { x: 1500, y: 300, opacity: 0, duration: 0.5, ease: "power2.in" }, 23.3);
+    tl.to("#s-m6", { opacity: 1, y: 0, duration: 0.45, ease: E }, 23.1);
+    // leave toward the outro
+    tl.to("#ws", { opacity: 0, scale: 0.98, filter: "blur(8px)", duration: 0.35, ease: "power3.in" }, 26.6);
+    window.__timelines["workspace"] = tl;
+  </script>
+</template>
