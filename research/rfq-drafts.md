@@ -61,26 +61,25 @@ Thank you,
 
 ---
 
-## GumGlow: CJ Dropshipping (no stock, no MOQ)
-**To:** your CJ sourcing agent (CJ dashboard → Sourcing / chat with agent)
+## GumGlow: electric STRING flosser (small first order)
+**To:** 3–4 Alibaba suppliers from the "electric floss" and "vibrating flosser" listings, plus Shenzhen Aboel Electronic Technology. Search Alibaba for: `electric floss`, `vibrating flosser rechargeable`, `sonic floss pick replaceable head`.
 
-Subject: Branded water flosser dropshipping for the UK: GumGlow
+Subject: Rechargeable electric string flosser + replacement floss heads: samples and small first order (UK brand)
 
-Hi,
+Hello,
 
-I'm launching GumGlow, a UK oral-care brand, on Shopify. I'll dropship through CJ per order, with no bulk stock. I'm looking at these products:
-- Portable All-in-one Dental Flosser (1000mAh, USB-C, 4 nozzles): https://cjdropshipping.com/product/portable-all-in-one-dental-flosser-electric-waterproof-p-1655833416144789504.html
-- Portable Electric Oral Cleaning Scaler (IPX7, 2200mAh): https://cjdropshipping.com/product/home-fashion-portable-electric-oral-cleaning-scaler-p-1620326144715272192.html
+I'm launching GumGlow, a UK oral-care brand, and I'm looking for a **rechargeable vibrating flosser that uses replaceable string-floss heads** (not a water flosser). I'd like to start with samples, then a small first order.
 
 Please confirm:
-1. Current price per unit, and whether either SKU is stocked in your **UK warehouse**. If not, the fastest tracked China→GB line, with cost and days.
-2. **Replacement nozzles** sold separately: SKU and price per 4-pack (for a refill subscription).
-3. **Custom packaging:** branded box and insert card from 1 unit. Cost per order, and the artwork specs.
-4. **Logo on the device** (laser/printed): minimum quantity and cost.
-5. Compliance documents for the exact SKU: **CE / UKCA declaration, RoHS, UN38.3 battery test, MSDS**, and the UK plug/charging cable included.
-6. Whether CJ can move the SKU into the UK warehouse once I reach a steady number of orders per day, and on what terms.
+1. **Your own design:** photos and spec sheet (vibration speed and modes, battery mAh and days per charge, USB-C, IPX rating). Please confirm the design is **your own** and that you'll give written assurance it doesn't infringe third-party patents (especially Flaus or Slate designs).
+2. **Floss heads:** floss material (PTFE-free / PFAS-free preferred), whether they're sold separately, pack options, MOQ and price per 1,000.
+3. **Prices:** handle at 2 / 50 / 100 / 500 units; heads at 1,000 / 3,000 / 10,000.
+4. **Branding at low volume:** logo on the handle (minimum quantity), colours, and a custom box or sticker on a neutral box.
+5. **UK compliance for this exact model:** UKCA or CE Declaration of Conformity, RoHS, **UN38.3 battery test and MSDS**, and a USB-C cable included (no plug needed).
+6. **Samples:** cost and express shipping to the UK (2–3 units with 30 heads each).
+7. Lead time for 100 units, and DDP express cost to the UK.
 
-Thanks,
+Thank you,
 [Name], GumGlow, [email]
 
 ---
