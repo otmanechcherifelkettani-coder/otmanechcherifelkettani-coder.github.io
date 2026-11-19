@@ -61,24 +61,26 @@ Thank you,
 
 ---
 
-## GumGlow: electric flosser
-**To:** Relish Tech (sales@relish-tech.com), plus the Alibaba "private-label electric floss cleaner" seller
+## GumGlow: CJ Dropshipping (no stock, no MOQ)
+**To:** your CJ sourcing agent (CJ dashboard → Sourcing / chat with agent)
 
-Subject: Electric flosser with reusable floss heads: private label for the UK market
+Subject: Branded water flosser dropshipping for the UK: GumGlow
 
-Hello,
+Hi,
 
-I'm launching GumGlow, a UK oral-care brand, and I'm looking for a cordless **electric string-floss device with replaceable or reusable floss heads**. If you only make water flossers, please tell me which of your models would suit a premium UK launch.
+I'm launching GumGlow, a UK oral-care brand, on Shopify. I'll dropship through CJ per order, with no bulk stock. I'm looking at these products:
+- Portable All-in-one Dental Flosser (1000mAh, USB-C, 4 nozzles): https://cjdropshipping.com/product/portable-all-in-one-dental-flosser-electric-waterproof-p-1655833416144789504.html
+- Portable Electric Oral Cleaning Scaler (IPX7, 2200mAh): https://cjdropshipping.com/product/home-fashion-portable-electric-oral-cleaning-scaler-p-1620326144715272192.html
 
-Please confirm or quote:
-1. The models you have (photos and spec sheet), battery capacity, charging (USB-C), and IPX rating
-2. Head type and price per refill head, and the refill pack MOQ
-3. Unit price for 50 in-stock units, and for 1,000 custom-branded units
-4. UK compliance for this exact model: UKCA DoC, EMC/LVD (charger), RoHS, UN38.3 battery report, MSDS
-5. Free sample availability, and the custom sample fee
-6. Production lead time and DDP shipping to the UK
+Please confirm:
+1. Current price per unit, and whether either SKU is stocked in your **UK warehouse**. If not, the fastest tracked China→GB line, with cost and days.
+2. **Replacement nozzles** sold separately: SKU and price per 4-pack (for a refill subscription).
+3. **Custom packaging:** branded box and insert card from 1 unit. Cost per order, and the artwork specs.
+4. **Logo on the device** (laser/printed): minimum quantity and cost.
+5. Compliance documents for the exact SKU: **CE / UKCA declaration, RoHS, UN38.3 battery test, MSDS**, and the UK plug/charging cable included.
+6. Whether CJ can move the SKU into the UK warehouse once I reach a steady number of orders per day, and on what terms.
 
-Thank you,
+Thanks,
 [Name], GumGlow, [email]
 
 ---
