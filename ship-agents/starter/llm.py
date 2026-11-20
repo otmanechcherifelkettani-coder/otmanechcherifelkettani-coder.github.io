@@ -9,7 +9,7 @@ import time
 
 import anthropic
 
-MODEL = os.getenv("AGENT_MODEL", "claude-opus-5-5")
+MODEL = os.getenv("AGENT_MODEL", "claude-haiku-5-5")  # cheapest current model; compare once on a bigger one
 JUDGE_MODEL = os.getenv("JUDGE_MODEL", "claude-sonnet-5-5")
 EFFORT = os.getenv("AGENT_EFFORT", "medium")  # low | medium | high — tune it against your eval, not by feel
 

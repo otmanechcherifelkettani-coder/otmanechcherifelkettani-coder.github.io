@@ -68,6 +68,7 @@ section.block.complete .head h2::after{content:" ✓";color:var(--pass)}
   <p>Clone the site repo (or download the <code>ship-agents/starter</code> folder) and open a terminal in <code>starter</code>.</p>
   <div class="cmd"><pre>python -m venv .venv &amp;&amp; source .venv/bin/activate &amp;&amp; pip install -r requirements.txt</pre><button type="button">Copy</button></div>
   <div class="cmd"><pre>export ANTHROPIC_API_KEY=your-key-here</pre><button type="button">Copy</button></div>
+  <p class="tip">The agent runs on Claude Haiku 5.5 by default, the cheapest current model. In Claude Code on the web you don't need to type any of this: ask Claude to run each block.</p>
   <div class="gate"><b>Gate</b>
     <label><input type="checkbox" id="g0a"> <span>Dependencies installed, key exported</span></label>
     <label><input type="checkbox" id="g0b"> <span>Timer set for each block below (being strict on time is part of the test)</span></label>
@@ -75,9 +76,11 @@ section.block.complete .head h2::after{content:" ✓";color:var(--pass)}
 </section>
 
 <section class="block" id="b1">
-  <div class="head"><span class="time">09:00–09:30</span><h2>Why agents fail</h2></div>
+  <div class="head"><span class="time">09:00–09:45</span><h2>What is an agent, and why most fail</h2></div>
+  <p>Rehearse the opening you will teach. In two minutes, out loud: the difference between a rule-based chatbot, an automation, a chat assistant, one model call in code, a workflow and an agent (the table is in the course pack). Then place these eight on it: a FAQ bot, an email auto-reply, Copilot in Excel, a travel-booking assistant, a script that tags invoices, a support bot that can issue refunds, ChatGPT drafting a cover letter, a pipeline that classifies then routes tickets.</p>
   <p>Read Anthropic's <a href="https://www.anthropic.com/engineering/building-effective-agents">Building effective agents</a> (15 min). Then write, in three lines, why the last LLM system you shipped at work would have failed without evals. That paragraph becomes the opening of your Monday pitch.</p>
   <div class="gate"><b>Gate</b>
+    <label><input type="checkbox" id="g1b"> <span>Agent vs workflow vs chatbot explained out loud in under 2 minutes; 8 examples placed</span></label>
     <label><input type="checkbox" id="g1a"> <span>Article read; three-line story written below</span></label>
   </div>
   <textarea id="n1" aria-label="Your three-line story" placeholder="At [company], our first LLM version… The eval showed… We fixed it by…"></textarea>
@@ -141,7 +144,9 @@ section.block.complete .head h2::after{content:" ✓";color:var(--pass)}
     <li>Label 20 rows yourself in the results CSV (<code>human_pass</code> = 1 or 0), then check the judge.</li>
   </ol>
   <div class="cmd"><pre>python agreement.py results/run-YYYYMMDD-HHMMSS.csv</pre><button type="button">Copy</button></div>
-  <ol start="4"><li>Fix the top failure type (prompt, tool description or code rule). Run again. Record v2.</li></ol>
+  <ol start="4"><li>Fix the top failure type (prompt, tool description or code rule). Run again. Record v2.</li>
+  <li>Optional, once: run the same eval on a bigger model and compare pass rate and cost. Keep Haiku unless the gain is worth the price.</li></ol>
+  <div class="cmd"><pre>AGENT_MODEL=claude-opus-5-5 python eval.py</pre><button type="button">Copy</button></div>
   <div class="score">
     <label for="s_v1">Pass rate v1 (%)<input id="s_v1" inputmode="decimal" placeholder="e.g. 70"></label>
     <label for="s_v2">Pass rate v2 (%)<input id="s_v2" inputmode="decimal" placeholder="e.g. 90"></label>

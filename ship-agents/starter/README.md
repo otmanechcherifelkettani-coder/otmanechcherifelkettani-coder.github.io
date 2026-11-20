@@ -52,9 +52,9 @@ streamlit run app.py
 
 ## Models and cost
 
-Defaults: agent `claude-opus-5-5` at effort `medium`, judge `claude-sonnet-5-5` at effort `low`.
+Defaults: agent `claude-haiku-5-5` (the cheapest current model) at effort `medium`, judge `claude-sonnet-5-5` at effort `low`. Compare once with `AGENT_MODEL=claude-opus-5-5 python eval.py` and keep the bigger model only if the pass rate justifies the cost.
 Change them with `AGENT_MODEL`, `AGENT_EFFORT`, `JUDGE_MODEL`. Server-side refusal fallback is enabled in `llm.py`
-(`fallbacks="default"`), so a declined request is retried on a fallback model inside the same call.
+(`fallbacks="default"`) for models that support it (not Haiku 5.5), so a declined request is retried on a fallback model inside the same call.
 Every call is written to `traces/traces.jsonl` with tokens, cost and latency. Read your traces before changing prompts.
 
 ## Make it yours

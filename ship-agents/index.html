@@ -74,6 +74,7 @@ a{color:var(--accent)}
 <nav class="rail" aria-label="Sections">
   <a href="#offer">The offer</a>
   <a href="#instructor">Instructor</a>
+  <a href="#agent">What is an agent?</a>
   <a href="#method">Method</a>
   <a href="#borrowed">What we borrowed</a>
   <a href="#scope">Taught / not taught</a>
@@ -84,6 +85,7 @@ a{color:var(--accent)}
   <a href="#cases">Case library</a>
   <a href="#toolkit">Student toolkit</a>
   <a href="#build">Instructor toolkit</a>
+  <a href="#needs">Student needs &amp; who pays</a>
   <a href="#logistics">Logistics &amp; price</a>
   <a href="#pitch">Monday pitch</a>
 </nav>
@@ -105,6 +107,20 @@ a{color:var(--accent)}
 <h2 id="instructor">Instructor</h2>
 <p><strong>Otman Kettani.</strong> Strategy consultant, then operator, then builder. Led global post-order support automation at a large food delivery platform, from rule-based workflows to LLM systems: about $15M a year saved, about $20M a year in incremental bookings, CSAT up 20%. Hands-on across system design, prompting, evals and experimentation. Earlier: telecom cost and 5G strategy models in consulting, then a point-of-sale lending launch in fintech. Ships on weekends (Supplyn, a multi-agent growth system). Teaches in French, English, Spanish and Arabic.</p>
 <p class="note">Why it matters to a school: the course is taught by someone who has done the job the students are training for, with numbers. Draft brand notes and open questions are in <code>brand/90_SYNTHESIS.md</code>.</p>
+
+<h2 id="agent">First: what is an agent?</h2>
+<p>Every lab opens here, because students arrive calling everything "an AI" or "a chatbot". The working definition, from Anthropic: an agent is a system where <strong>the model decides its own next step and which tool to use, in a loop</strong>, until the task is done or it hands off. In a workflow, by contrast, your code decides the path and the model fills in steps.</p>
+<div class="scroll"><table>
+<thead><tr><th>What it is</th><th>Who decides the next step</th><th>Example at Atlas Telecom</th><th>Use it when</th></tr></thead>
+<tbody>
+<tr><td>Rule-based chatbot</td><td>Rules written by people</td><td>"Tapez 1 pour votre facture"</td><td>A few fixed paths, no free text</td></tr>
+<tr><td>Automation (script, n8n without AI)</td><td>Code</td><td>Send a bill reminder 3 days before the due date</td><td>Structured input, fixed steps</td></tr>
+<tr><td>Chat assistant (ChatGPT, Claude.ai)</td><td>A person, turn by turn</td><td>An employee asks it to draft a reply to an angry customer</td><td>One person, one-off task, the person checks everything</td></tr>
+<tr><td>One model call in code</td><td>Code calls the model once</td><td>Classify each message: outage, bill, other</td><td>One step on free text</td></tr>
+<tr><td>Workflow</td><td>Code decides the path; the model fills each step</td><td>Classify → look up the outage → draft the reply</td><td>The steps are known in advance</td></tr>
+<tr><td><strong>Agent</strong></td><td><strong>The model, in a loop, with tools</strong></td><td>Verifies the caller, checks the outage, decides between a credit and a human hand-off</td><td>The path depends on the input, and mistakes can be caught (tests, limits, hand-off)</td></tr>
+</tbody></table></div>
+<p><strong>Exercise (10 minutes):</strong> teams place eight real examples on this table (a FAQ bot, an email auto-reply, Copilot in Excel, a travel-booking assistant…). Then the rule the course keeps coming back to: <em>use the simplest row that does the job.</em> An agent is the last row for a reason.</p>
 
 <h2 id="method">The method: four questions in fixed order</h2>
 <p>The course spine is your own Cadence method. Students answer the same four questions you answer for clients, and every session ends on one of them.</p>
@@ -162,8 +178,8 @@ a{color:var(--accent)}
 <div class="scroll"><table>
 <thead><tr><th>Time</th><th>Block</th><th>What happens</th><th>Gate</th></tr></thead>
 <tbody>
-<tr><td class="t">09:00–09:30</td><td>Why agents fail</td><td>The demo-to-production gap. The graduation bar. Teams formed, case confirmed.</td><td class="gate">—</td></tr>
-<tr><td class="t">09:30–10:15</td><td>Q1 + Q2</td><td>Build card: user, problem, baseline number, four kill filters, pattern choice (single call / workflow / agent).</td><td class="gate">Build card approved</td></tr>
+<tr><td class="t">09:00–09:45</td><td>What is an agent, and why most fail</td><td>Chatbot vs automation vs chat assistant vs workflow vs agent, with the placement exercise. The demo-to-production gap. The graduation bar. Teams formed, case confirmed.</td><td class="gate">Each team places the 8 examples correctly</td></tr>
+<tr><td class="t">09:45–10:30</td><td>Q1 + Q2</td><td>Build card: user, problem, baseline number, four kill filters, pattern choice (single call / workflow / agent).</td><td class="gate">Build card approved</td></tr>
 <tr><td class="t">10:30–12:00</td><td>Build v0</td><td>The loop by hand, tools, system prompt, tracing. Live coding then team build.</td><td class="gate">3 typical cases answered end to end, traces logged</td></tr>
 <tr><td class="t">13:00–13:45</td><td>Error analysis</td><td>Run 20 cases. Read traces. Note every failure in plain words, group them, rank the top 3.</td><td class="gate">Failure list with counts</td></tr>
 <tr><td class="t">13:45–14:45</td><td>Evals</td><td>Code checks + judge rubric. Pass bar written before the run. Fix the top failure, run again.</td><td class="gate">Scorecard v1 → v2</td></tr>
@@ -179,7 +195,7 @@ a{color:var(--accent)}
 <thead><tr><th>Week</th><th>Session (4h)</th><th>Between sessions</th><th>Ship gate (pass/fail)</th></tr></thead>
 <tbody>
 <tr><td class="t">0 · async</td><td>Pre-work</td><td>Setup, teams, case chosen, 30 example inputs collected or generated (messy).</td><td class="gate">Repo + 30 examples</td></tr>
-<tr><td class="t">1 · on site</td><td><strong>Value and v0.</strong> 1-Day Lab morning compressed: build card, kill filters, pattern choice, the loop by hand, tracing.</td><td>Finish v0, run it on all 30 examples.</td><td class="gate">Build card + v0 live + traces</td></tr>
+<tr><td class="t">1 · on site</td><td><strong>Value and v0.</strong> What is an agent (placement exercise), then the 1-Day Lab morning compressed: build card, kill filters, pattern choice, the loop by hand, tracing.</td><td>Finish v0, run it on all 30 examples.</td><td class="gate">Build card + v0 live + traces</td></tr>
 <tr><td class="t">2 · online</td><td><strong>Tools and the loop.</strong> Tool design, structured outputs, errors returned to the model, turn cap and hand-off, deterministic checks before the model.</td><td>v1 with real tools on the 30 examples.</td><td class="gate">v1 + loop with exit + all calls logged</td></tr>
 <tr><td class="t">3 · online</td><td><strong>Error analysis and evals.</strong> Open coding on traces, failure types, 50-case eval set stratified typical / edge / refusal / error-prone, code checks, judge calibrated on 20 hand labels.</td><td>Mid-course trace defense: each student explains one failure trace alone, 5 minutes.</td><td class="gate">Baseline scorecard, pass bar written, judge agreement ≥ 0.8</td></tr>
 <tr><td class="t">4 · online</td><td><strong>Guardrails, cost and release.</strong> Five guardrail families, human approval for irreversible actions, cost per task, p95 latency, deploy, shadow then pilot.</td><td>Cross-team use: each team runs 25+ conversations on two other teams' agents and flags failures.</td><td class="gate">Live URL, 50+ runs logged from other users, cost + latency measured</td></tr>
@@ -251,14 +267,42 @@ npx skills add deanpeters/product-manager-skills@workshop-facilitation     # 2.4
 <li><code>brand-discovery</code> to finish the instructor brand (draft in <code>brand/</code>).</li>
 </ul>
 
+<h2 id="needs">What students need, and who pays</h2>
+<div class="scroll"><table>
+<thead><tr><th>Item</th><th>Needed?</th><th>Who provides it</th><th>Cost</th></tr></thead>
+<tbody>
+<tr><td>Laptop with Python 3.11, VS Code, a browser</td><td>Yes</td><td>Student or school</td><td>—</td></tr>
+<tr><td>GitHub account</td><td>Yes (repo, deploy)</td><td>Student</td><td>Free (GitHub Student Developer Pack)</td></tr>
+<tr><td>Anthropic API key</td><td>Yes: the agent runs on it</td><td><strong>You</strong>: one key per team</td><td>Included in your price</td></tr>
+<tr><td>Hosting for the live URL</td><td>5-Week Lab only</td><td>Student</td><td>Free tier (Streamlit Community Cloud)</td></tr>
+<tr><td>Claude Code</td><td>No. Optional from week 2 of the 5-Week Lab</td><td>Runs on the team's API key, or the student's own plan</td><td>Billed to the same capped key</td></tr>
+<tr><td>Claude Team or Enterprise plan</td><td>No</td><td>—</td><td>—</td></tr>
+</tbody></table></div>
+<h3>How the API access works (recommended)</h3>
+<ul>
+<li>You open one Anthropic Console account (pay-as-you-go credits, open to any individual; no enterprise contract).</li>
+<li>One workspace per cohort, with a monthly spend limit set in the Console. One API key per team inside it. Revoke the keys when the lab ends.</li>
+<li>Students build and test on <strong>Claude Haiku 5.5</strong> (the cheapest current model). They run their eval once on a larger model to see whether it buys any accuracy, and they justify their model choice with that result.</li>
+<li>Why you pay rather than the students: no card or currency problems for students, no procurement step at the school, and you control the budget. Put the measured cost from your dry run into your price.</li>
+</ul>
+<h3>Claude Code: allowed, not required</h3>
+<p>1-Day Lab: not needed; the starter kit is provided. 5-Week Lab: allowed from week 2 as a coding assistant. It is safe to allow because each student must explain one failure trace alone at the mid-course defense: a team that let a tool write code it doesn't understand fails there. Claude Code can run on the team's API key, so it is billed to the same capped workspace. If the school later wants Claude for all its students, that is a separate conversation between the school and Anthropic (Claude for Education), not part of your offer.</p>
+
 <h2 id="logistics">Logistics and price</h2>
 <div class="cols">
 <div class="box"><h3>The school provides</h3>
 <ul>
-<li>A room with good Wi-Fi, one laptop per student with Python 3.11.</li>
+<li>A room with good Wi-Fi, one laptop per student.</li>
 <li>Students grouped and the case list chosen two weeks ahead.</li>
-<li>Model API budget (or students' own keys). Measure your own cost per task today and multiply: roughly 300 agent runs per team per 1-Day Lab.</li>
+<li>A slot in the timetable, and a decision on how the lab counts toward the year's grades.</li>
 <li>For Demo Day: a jury of 2–4 partner companies.</li>
+</ul>
+<h3>You provide</h3>
+<ul>
+<li>API access for the lab, capped per cohort.</li>
+<li>Starter kit, case data and the hidden test sets.</li>
+<li>Templates, grading grid, weekly reviews of each team's repo.</li>
+<li>Demo Day format and certificates.</li>
 </ul></div>
 <div class="box"><h3>Price structure</h3>
 <ul>
