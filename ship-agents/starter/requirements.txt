@@ -1,3 +1,4 @@
 anthropic>=2.11
 pydantic>=2
 streamlit>=1.40
+langsmith>=0.4

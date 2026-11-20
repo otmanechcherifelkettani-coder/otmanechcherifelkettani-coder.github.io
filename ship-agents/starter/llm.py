@@ -23,6 +23,17 @@ PRICES = {
 TRACE_FILE = pathlib.Path(__file__).parent / "traces" / "traces.jsonl"
 client = anthropic.Anthropic()
 
+# Optional: see every step in the LangSmith web UI (free plan). Set LANGSMITH_TRACING=true and LANGSMITH_API_KEY.
+# Works on this plain SDK code: no LangChain or LangGraph needed.
+if os.getenv("LANGSMITH_API_KEY"):
+    from langsmith import traceable
+    from langsmith.wrappers import wrap_anthropic
+
+    client = wrap_anthropic(client)
+else:
+    def traceable(*_args, **_kwargs):  # no-op stand-in so the rest of the code is unchanged
+        return lambda fn: fn
+
 
 def cost_usd(model: str, usage) -> float:
     price_in, price_out = PRICES.get(model, (0.0, 0.0))

@@ -37,6 +37,7 @@ Rules:
 End every reply with the next step for the customer."""
 
 
+@llm.traceable(name="atlas-support-agent")
 def run(user_message: str, history: list | None = None, run_id: str | None = None) -> dict:
     run_id = run_id or uuid.uuid4().hex[:8]
     messages = list(history or []) + [{"role": "user", "content": user_message}]

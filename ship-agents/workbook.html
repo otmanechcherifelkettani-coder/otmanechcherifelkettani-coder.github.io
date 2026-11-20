@@ -76,11 +76,14 @@ section.block.complete .head h2::after{content:" ✓";color:var(--pass)}
 </section>
 
 <section class="block" id="b1">
-  <div class="head"><span class="time">09:00–09:45</span><h2>What is an agent, and why most fail</h2></div>
-  <p>Rehearse the opening you will teach. In two minutes, out loud: the difference between a rule-based chatbot, an automation, a chat assistant, one model call in code, a workflow and an agent (the table is in the course pack). Then place these eight on it: a FAQ bot, an email auto-reply, Copilot in Excel, a travel-booking assistant, a script that tags invoices, a support bot that can issue refunds, ChatGPT drafting a cover letter, a pipeline that classifies then routes tickets.</p>
+  <div class="head"><span class="time">09:00–09:45</span><h2>The opening</h2></div>
+  <p>Rehearse the 45-minute opening out loud, timed, from the course pack: (1) what an agent is, in one sentence and four rows; (2) the five rules of a good agent; (3) what students leave with today. The five rules have live demos you can only rehearse once the agent runs, so do part 2 again after block 3.</p>
+  <p>Set up tracing so rule 4 ("see every step") can be shown: create a free LangSmith account, then:</p>
+  <div class="cmd"><pre>export LANGSMITH_TRACING=true LANGSMITH_API_KEY=your-langsmith-key</pre><button type="button">Copy</button></div>
   <p>Read Anthropic's <a href="https://www.anthropic.com/engineering/building-effective-agents">Building effective agents</a> (15 min). Then write, in three lines, why the last LLM system you shipped at work would have failed without evals. That paragraph becomes the opening of your Monday pitch.</p>
   <div class="gate"><b>Gate</b>
-    <label><input type="checkbox" id="g1b"> <span>Agent vs workflow vs chatbot explained out loud in under 2 minutes; 8 examples placed</span></label>
+    <label><input type="checkbox" id="g1b"> <span>Opening delivered out loud in 45 minutes or less</span></label>
+    <label><input type="checkbox" id="g1c"> <span>LangSmith account created, key exported</span></label>
     <label><input type="checkbox" id="g1a"> <span>Article read; three-line story written below</span></label>
   </div>
   <textarea id="n1" aria-label="Your three-line story" placeholder="At [company], our first LLM version… The eval showed… We fixed it by…"></textarea>

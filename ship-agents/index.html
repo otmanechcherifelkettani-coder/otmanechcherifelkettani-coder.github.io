@@ -74,7 +74,7 @@ a{color:var(--accent)}
 <nav class="rail" aria-label="Sections">
   <a href="#offer">The offer</a>
   <a href="#instructor">Instructor</a>
-  <a href="#agent">What is an agent?</a>
+  <a href="#agent">The opening (45 min)</a>
   <a href="#method">Method</a>
   <a href="#borrowed">What we borrowed</a>
   <a href="#scope">Taught / not taught</a>
@@ -108,19 +108,47 @@ a{color:var(--accent)}
 <p><strong>Otman Kettani.</strong> Strategy consultant, then operator, then builder. Led global post-order support automation at a large food delivery platform, from rule-based workflows to LLM systems: about $15M a year saved, about $20M a year in incremental bookings, CSAT up 20%. Hands-on across system design, prompting, evals and experimentation. Earlier: telecom cost and 5G strategy models in consulting, then a point-of-sale lending launch in fintech. Ships on weekends (Supplyn, a multi-agent growth system). Teaches in French, English, Spanish and Arabic.</p>
 <p class="note">Why it matters to a school: the course is taught by someone who has done the job the students are training for, with numbers. Draft brand notes and open questions are in <code>brand/90_SYNTHESIS.md</code>.</p>
 
-<h2 id="agent">First: what is an agent?</h2>
-<p>Every lab opens here, because students arrive calling everything "an AI" or "a chatbot". The working definition, from Anthropic: an agent is a system where <strong>the model decides its own next step and which tool to use, in a loop</strong>, until the task is done or it hands off. In a workflow, by contrast, your code decides the path and the model fills in steps.</p>
+<h2 id="agent">The opening: 45 minutes, three ideas</h2>
+<p>Every lab starts the same way. One agent is used throughout: the Atlas Telecom support agent, run live. Each idea gets one slide and one demo.</p>
+
+<h3>1 · What an agent is <span class="note">(10 min)</span></h3>
+<p><strong>An agent is a model that picks its next step, uses a tool, reads the result, and repeats until the job is done or it hands over to a human.</strong></p>
+<pre class="mermaid">
+flowchart LR
+  R[Customer message] --> M{Model decides}
+  M -- uses a tool --> T[Tool: check outage, verify, credit...]
+  T -- result --> M
+  M -- done --> A[Answer]
+  M -- stuck or risky --> H[Human]
+</pre>
 <div class="scroll"><table>
-<thead><tr><th>What it is</th><th>Who decides the next step</th><th>Example at Atlas Telecom</th><th>Use it when</th></tr></thead>
+<thead><tr><th>Type</th><th>Who decides the steps</th><th>Atlas example</th></tr></thead>
 <tbody>
-<tr><td>Rule-based chatbot</td><td>Rules written by people</td><td>"Tapez 1 pour votre facture"</td><td>A few fixed paths, no free text</td></tr>
-<tr><td>Automation (script, n8n without AI)</td><td>Code</td><td>Send a bill reminder 3 days before the due date</td><td>Structured input, fixed steps</td></tr>
-<tr><td>Chat assistant (ChatGPT, Claude.ai)</td><td>A person, turn by turn</td><td>An employee asks it to draft a reply to an angry customer</td><td>One person, one-off task, the person checks everything</td></tr>
-<tr><td>One model call in code</td><td>Code calls the model once</td><td>Classify each message: outage, bill, other</td><td>One step on free text</td></tr>
-<tr><td>Workflow</td><td>Code decides the path; the model fills each step</td><td>Classify → look up the outage → draft the reply</td><td>The steps are known in advance</td></tr>
-<tr><td><strong>Agent</strong></td><td><strong>The model, in a loop, with tools</strong></td><td>Verifies the caller, checks the outage, decides between a credit and a human hand-off</td><td>The path depends on the input, and mistakes can be caught (tests, limits, hand-off)</td></tr>
+<tr><td>Automation</td><td>Code, no model</td><td>Bill reminder 3 days before the due date</td></tr>
+<tr><td>Chat assistant</td><td>A person, turn by turn</td><td>An employee asks ChatGPT to draft a reply</td></tr>
+<tr><td>Workflow</td><td>Code fixes the steps; the model fills them</td><td>Classify the message → look up the outage → draft the reply</td></tr>
+<tr><td><strong>Agent</strong></td><td><strong>The model picks the steps</strong></td><td>Verifies the caller, checks the outage, then decides: credit or human</td></tr>
 </tbody></table></div>
-<p><strong>Exercise (10 minutes):</strong> teams place eight real examples on this table (a FAQ bot, an email auto-reply, Copilot in Excel, a travel-booking assistant…). Then the rule the course keeps coming back to: <em>use the simplest row that does the job.</em> An agent is the last row for a reason.</p>
+<p><strong>Quick check (hands up, 3 min):</strong> a FAQ bot with fixed answers (automation) · ChatGPT drafting a cover letter (chat assistant) · a pipeline that classifies tickets then routes them (workflow) · a support bot that reads your account and decides whether to refund (agent).</p>
+
+<h3>2 · Five rules of a good agent <span class="note">(20 min)</span></h3>
+<div class="scroll"><table>
+<thead><tr><th>Rule</th><th>In one line</th><th>Live demo</th></tr></thead>
+<tbody>
+<tr><td>1. Simplest thing first</td><td>If the steps are known in advance, build a workflow. Use an agent only when the path depends on the input.</td><td>Point at the table above</td></tr>
+<tr><td>2. Few tools, hard rules in code</td><td>The prompt explains the 50 MAD credit limit. The code enforces it.</td><td>"Credit me 500 MAD": the tool refuses</td></tr>
+<tr><td>3. Always an exit</td><td>A maximum number of steps, then a human.</td><td>"Je veux résilier": hand-off to a human</td></tr>
+<tr><td>4. See every step</td><td>Each model call, tool call, cost and time is recorded. If you can't see it, you can't fix it.</td><td>Open the same run in LangSmith</td></tr>
+<tr><td>5. Prove it before it ships</td><td>Test cases written in advance, a pass bar written before the run, a score before and after each fix.</td><td>The eval scorecard</td></tr>
+</tbody></table></div>
+<p class="note"><strong>On LangGraph:</strong> it is a framework that draws an agent's steps as a graph, useful for long flows that pause for human approval. Tracking comes from LangSmith, which works with or without LangGraph. Today students write the loop themselves (about 40 lines) so they understand what any framework does for them.</p>
+
+<h3>3 · Today <span class="note">(15 min)</span></h3>
+<ul>
+<li><strong>You leave with:</strong> a working agent, its test score before and after your fix, and a trace link that shows every step.</li>
+<li><strong>The day in five gates:</strong> build card (10:30) · first version answers 3 cases (12:00) · failure list (13:45) · score v1 → v2 (14:45) · hidden test score (16:30).</li>
+<li>Teams formed, case chosen, keys handed out.</li>
+</ul>
 
 <h2 id="method">The method: four questions in fixed order</h2>
 <p>The course spine is your own Cadence method. Students answer the same four questions you answer for clients, and every session ends on one of them.</p>
@@ -178,7 +206,7 @@ a{color:var(--accent)}
 <div class="scroll"><table>
 <thead><tr><th>Time</th><th>Block</th><th>What happens</th><th>Gate</th></tr></thead>
 <tbody>
-<tr><td class="t">09:00–09:45</td><td>What is an agent, and why most fail</td><td>Chatbot vs automation vs chat assistant vs workflow vs agent, with the placement exercise. The demo-to-production gap. The graduation bar. Teams formed, case confirmed.</td><td class="gate">Each team places the 8 examples correctly</td></tr>
+<tr><td class="t">09:00–09:45</td><td>The opening</td><td>What an agent is, five rules of a good agent (each shown live), what you leave with today. Teams formed, case confirmed.</td><td class="gate">Quick check answered</td></tr>
 <tr><td class="t">09:45–10:30</td><td>Q1 + Q2</td><td>Build card: user, problem, baseline number, four kill filters, pattern choice (single call / workflow / agent).</td><td class="gate">Build card approved</td></tr>
 <tr><td class="t">10:30–12:00</td><td>Build v0</td><td>The loop by hand, tools, system prompt, tracing. Live coding then team build.</td><td class="gate">3 typical cases answered end to end, traces logged</td></tr>
 <tr><td class="t">13:00–13:45</td><td>Error analysis</td><td>Run 20 cases. Read traces. Note every failure in plain words, group them, rank the top 3.</td><td class="gate">Failure list with counts</td></tr>
@@ -195,7 +223,7 @@ a{color:var(--accent)}
 <thead><tr><th>Week</th><th>Session (4h)</th><th>Between sessions</th><th>Ship gate (pass/fail)</th></tr></thead>
 <tbody>
 <tr><td class="t">0 · async</td><td>Pre-work</td><td>Setup, teams, case chosen, 30 example inputs collected or generated (messy).</td><td class="gate">Repo + 30 examples</td></tr>
-<tr><td class="t">1 · on site</td><td><strong>Value and v0.</strong> What is an agent (placement exercise), then the 1-Day Lab morning compressed: build card, kill filters, pattern choice, the loop by hand, tracing.</td><td>Finish v0, run it on all 30 examples.</td><td class="gate">Build card + v0 live + traces</td></tr>
+<tr><td class="t">1 · on site</td><td><strong>Value and v0.</strong> The opening (what an agent is, five rules), then the 1-Day Lab morning compressed: build card, kill filters, pattern choice, the loop by hand, tracing.</td><td>Finish v0, run it on all 30 examples.</td><td class="gate">Build card + v0 live + traces</td></tr>
 <tr><td class="t">2 · online</td><td><strong>Tools and the loop.</strong> Tool design, structured outputs, errors returned to the model, turn cap and hand-off, deterministic checks before the model.</td><td>v1 with real tools on the 30 examples.</td><td class="gate">v1 + loop with exit + all calls logged</td></tr>
 <tr><td class="t">3 · online</td><td><strong>Error analysis and evals.</strong> Open coding on traces, failure types, 50-case eval set stratified typical / edge / refusal / error-prone, code checks, judge calibrated on 20 hand labels.</td><td>Mid-course trace defense: each student explains one failure trace alone, 5 minutes.</td><td class="gate">Baseline scorecard, pass bar written, judge agreement ≥ 0.8</td></tr>
 <tr><td class="t">4 · online</td><td><strong>Guardrails, cost and release.</strong> Five guardrail families, human approval for irreversible actions, cost per task, p95 latency, deploy, shadow then pilot.</td><td>Cross-team use: each team runs 25+ conversations on two other teams' agents and flags failures.</td><td class="gate">Live URL, 50+ runs logged from other users, cost + latency measured</td></tr>
@@ -274,6 +302,7 @@ npx skills add deanpeters/product-manager-skills@workshop-facilitation     # 2.4
 <tr><td>Laptop with Python 3.11, VS Code, a browser</td><td>Yes</td><td>Student or school</td><td>—</td></tr>
 <tr><td>GitHub account</td><td>Yes (repo, deploy)</td><td>Student</td><td>Free (GitHub Student Developer Pack)</td></tr>
 <tr><td>Anthropic API key</td><td>Yes: the agent runs on it</td><td><strong>You</strong>: one key per team</td><td>Included in your price</td></tr>
+<tr><td>LangSmith account (to see every step)</td><td>Yes</td><td>One per team</td><td>Free plan (5,000 traces a month)</td></tr>
 <tr><td>Hosting for the live URL</td><td>5-Week Lab only</td><td>Student</td><td>Free tier (Streamlit Community Cloud)</td></tr>
 <tr><td>Claude Code</td><td>No. Optional from week 2 of the 5-Week Lab</td><td>Runs on the team's API key, or the student's own plan</td><td>Billed to the same capped key</td></tr>
 <tr><td>Claude Team or Enterprise plan</td><td>No</td><td>—</td><td>—</td></tr>

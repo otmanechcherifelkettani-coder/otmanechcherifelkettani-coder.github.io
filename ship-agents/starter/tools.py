@@ -9,6 +9,8 @@ import json
 import pathlib
 import re
 
+import llm
+
 DATA = pathlib.Path(__file__).parent / "data"
 CUSTOMERS = json.loads((DATA / "customers.json").read_text(encoding="utf-8"))
 OUTAGES = json.loads((DATA / "outages.json").read_text(encoding="utf-8"))
@@ -146,6 +148,7 @@ IMPLEMENTATIONS = {
 }
 
 
+@llm.traceable(run_type="tool", name="tool")
 def execute(name: str, tool_input: dict):
     """Returns (result, is_error). A failing tool is reported to the model, never silently dropped."""
     fn = IMPLEMENTATIONS.get(name)

@@ -50,6 +50,12 @@ python agreement.py results/run-YYYYMMDD-HHMMSS.csv
 streamlit run app.py
 ```
 
+## See every step (optional, recommended)
+
+Create a free LangSmith account, then set `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY`. Every run then shows up in
+the LangSmith web UI as one trace: each model call, each tool call, tokens, cost and time. It wraps this plain SDK
+code; no LangChain or LangGraph needed. Without the key, traces still go to `traces/traces.jsonl`.
+
 ## Models and cost
 
 Defaults: agent `claude-haiku-5-5` (the cheapest current model) at effort `medium`, judge `claude-sonnet-5-5` at effort `low`. Compare once with `AGENT_MODEL=claude-opus-5-5 python eval.py` and keep the bigger model only if the pass rate justifies the cost.
