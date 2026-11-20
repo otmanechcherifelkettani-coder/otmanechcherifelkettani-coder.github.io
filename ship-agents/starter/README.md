@@ -1,6 +1,6 @@
 # Starter kit — Atlas Telecom support agent
 
-The reference project for **Ship Day** (the 1-day format) and week 1 of **Ship Sprint** (the 5-week format).
+The reference project for the **1-Day Lab** and week 1 of the **5-Week Lab**.
 Atlas Telecom is fictional and every record in `data/` is synthetic.
 
 | File | What it teaches |

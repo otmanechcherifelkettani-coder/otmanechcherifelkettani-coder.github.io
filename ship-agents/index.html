@@ -77,8 +77,8 @@ a{color:var(--accent)}
   <a href="#method">Method</a>
   <a href="#borrowed">What we borrowed</a>
   <a href="#scope">Taught / not taught</a>
-  <a href="#shipday">Ship Day (1 day)</a>
-  <a href="#sprint">Ship Sprint (5 weeks)</a>
+  <a href="#shipday">1-Day Lab</a>
+  <a href="#sprint">5-Week Lab</a>
   <a href="#bar">Graduation bar</a>
   <a href="#grading">Grading /20</a>
   <a href="#cases">Case library</a>
@@ -94,13 +94,13 @@ a{color:var(--accent)}
   <h1>Agent Ship Lab</h1>
   <p class="lede">Students ship one AI agent that works: live, tested against a hidden test set, used by people other than its builders, and documented in a one-page Production Report.</p>
   <div class="meta">
-    <span class="chip">Ship Day · 1 day · entry offer</span>
-    <span class="chip">Ship Sprint · 5 half-days · core offer</span>
+    <span class="chip">1-Day Lab · entry offer</span>
+    <span class="chip">5-Week Lab · 5 half-days · core offer</span>
     <span class="chip warn">Working name, to validate</span>
   </div>
 </header>
 
-<p>Two formats, one graduation bar. Ship Day is the way in: it is also session 1 of Ship Sprint, so a school that starts with one day is already partway into the program. Ship Sprint is what you sell.</p>
+<p>Two formats, one graduation bar. The 1-Day Lab is the way in: it is also session 1 of the 5-Week Lab, so a school that starts with one day is already partway into the program. The 5-Week Lab is what you sell.</p>
 
 <h2 id="instructor">Instructor</h2>
 <p><strong>Otman Kettani.</strong> Strategy consultant, then operator, then builder. Led global post-order support automation at a large food delivery platform, from rule-based workflows to LLM systems: about $15M a year saved, about $20M a year in incremental bookings, CSAT up 20%. Hands-on across system design, prompting, evals and experimentation. Earlier: telecom cost and 5G strategy models in consulting, then a point-of-sale lending launch in fintech. Ships on weekends (Supplyn, a multi-agent growth system). Teaches in French, English, Spanish and Arabic.</p>
@@ -157,7 +157,7 @@ a{color:var(--accent)}
 </ul></div>
 </div>
 
-<h2 id="shipday">Ship Day: the 1-day format</h2>
+<h2 id="shipday">1-Day Lab</h2>
 <p>For 30 students max, in teams of 3–4. Teams start from the starter kit and one case from the library. Pre-work (sent a week before): Python 3.11 installed, starter kit cloned, API key working, case chosen.</p>
 <div class="scroll"><table>
 <thead><tr><th>Time</th><th>Block</th><th>What happens</th><th>Gate</th></tr></thead>
@@ -169,17 +169,17 @@ a{color:var(--accent)}
 <tr><td class="t">13:45–14:45</td><td>Evals</td><td>Code checks + judge rubric. Pass bar written before the run. Fix the top failure, run again.</td><td class="gate">Scorecard v1 → v2</td></tr>
 <tr><td class="t">15:00–15:45</td><td>Guardrails + ship</td><td>Mutation guard, escalation, refusal. Deploy the app. Red team: each team attacks another team's URL for 15 minutes and flags failures.</td><td class="gate">Live URL</td></tr>
 <tr><td class="t">15:45–16:30</td><td>Hidden test</td><td>Fix what the red team found. Instructor runs 10 hidden cases on every agent.</td><td class="gate">Hidden-set score</td></tr>
-<tr><td class="t">16:30–17:00</td><td>Demo</td><td>3 minutes per team: live URL, scorecard, one failure fixed, one still open. Leaderboard.</td><td class="gate">Ship Day certificate if score ≥ bar</td></tr>
+<tr><td class="t">16:30–17:00</td><td>Demo</td><td>3 minutes per team: live URL, scorecard, one failure fixed, one still open. Leaderboard.</td><td class="gate">1-Day Lab certificate if score ≥ bar</td></tr>
 </tbody></table></div>
-<p><strong>Leaves with:</strong> a live URL, a build card, a scorecard, and a clear next step (Ship Sprint) for teams that want real users.</p>
+<p><strong>Leaves with:</strong> a live URL, a build card, a scorecard, and a clear next step (the 5-Week Lab) for teams that want real users.</p>
 
-<h2 id="sprint">Ship Sprint: the 5-week format</h2>
+<h2 id="sprint">5-Week Lab</h2>
 <p>Five half-days (4 hours each). Weeks 1 and 5 on site, weeks 2–4 online. About 4–5 hours of team work between sessions. Each team keeps a repo and a weekly ship log; you review each team asynchronously (about 15 minutes per team per week) against that week's gate. One optional online office hour per week.</p>
 <div class="scroll"><table>
 <thead><tr><th>Week</th><th>Session (4h)</th><th>Between sessions</th><th>Ship gate (pass/fail)</th></tr></thead>
 <tbody>
 <tr><td class="t">0 · async</td><td>Pre-work</td><td>Setup, teams, case chosen, 30 example inputs collected or generated (messy).</td><td class="gate">Repo + 30 examples</td></tr>
-<tr><td class="t">1 · on site</td><td><strong>Value and v0.</strong> Ship Day morning compressed: build card, kill filters, pattern choice, the loop by hand, tracing.</td><td>Finish v0, run it on all 30 examples.</td><td class="gate">Build card + v0 live + traces</td></tr>
+<tr><td class="t">1 · on site</td><td><strong>Value and v0.</strong> 1-Day Lab morning compressed: build card, kill filters, pattern choice, the loop by hand, tracing.</td><td>Finish v0, run it on all 30 examples.</td><td class="gate">Build card + v0 live + traces</td></tr>
 <tr><td class="t">2 · online</td><td><strong>Tools and the loop.</strong> Tool design, structured outputs, errors returned to the model, turn cap and hand-off, deterministic checks before the model.</td><td>v1 with real tools on the 30 examples.</td><td class="gate">v1 + loop with exit + all calls logged</td></tr>
 <tr><td class="t">3 · online</td><td><strong>Error analysis and evals.</strong> Open coding on traces, failure types, 50-case eval set stratified typical / edge / refusal / error-prone, code checks, judge calibrated on 20 hand labels.</td><td>Mid-course trace defense: each student explains one failure trace alone, 5 minutes.</td><td class="gate">Baseline scorecard, pass bar written, judge agreement ≥ 0.8</td></tr>
 <tr><td class="t">4 · online</td><td><strong>Guardrails, cost and release.</strong> Five guardrail families, human approval for irreversible actions, cost per task, p95 latency, deploy, shadow then pilot.</td><td>Cross-team use: each team runs 25+ conversations on two other teams' agents and flags failures.</td><td class="gate">Live URL, 50+ runs logged from other users, cost + latency measured</td></tr>
@@ -257,13 +257,13 @@ npx skills add deanpeters/product-manager-skills@workshop-facilitation     # 2.4
 <ul>
 <li>A room with good Wi-Fi, one laptop per student with Python 3.11.</li>
 <li>Students grouped and the case list chosen two weeks ahead.</li>
-<li>Model API budget (or students' own keys). Measure your own cost per task today and multiply: roughly 300 agent runs per team per Ship Day.</li>
+<li>Model API budget (or students' own keys). Measure your own cost per task today and multiply: roughly 300 agent runs per team per 1-Day Lab.</li>
 <li>For Demo Day: a jury of 2–4 partner companies.</li>
 </ul></div>
 <div class="box"><h3>Price structure</h3>
 <ul>
 <li>Flat fee per cohort (max 30 students), not per student.</li>
-<li>Ship Day sold alone; its price is credited if the school books Ship Sprint within 30 days.</li>
+<li>1-Day Lab sold alone; its price is credited if the school books the 5-Week Lab within 30 days.</li>
 <li>Sponsor option: a partner company's real case, priced higher.</li>
 <li>First school: reduced pilot price in exchange for a testimonial, a published case study and an introduction to another school.</li>
 </ul>
