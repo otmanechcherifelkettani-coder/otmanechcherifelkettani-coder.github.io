@@ -1,0 +1,96 @@
+<title>What an Agent Is</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap">
+<style>
+/* Layout: one narrow column, three stacked panels: loop, four types, five rules */
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --fg:#1a2230; --muted:#5b6575; --line:#d9dee6;
+  --accent:#0b6e8a; --accent-soft:#e3f1f5; --agent:#c2410c; --agent-soft:#fdeee5;
+  --display:"Space Grotesk",system-ui,sans-serif; --body:"Inter",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161d; --panel:#18202a; --fg:#e6ebf2; --muted:#9aa5b5; --line:#2b3644;
+  --accent:#5cc3df; --accent-soft:#16303a; --agent:#fb923c; --agent-soft:#3a2416; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161d; --panel:#18202a; --fg:#e6ebf2; --muted:#9aa5b5; --line:#2b3644;
+  --accent:#5cc3df; --accent-soft:#16303a; --agent:#fb923c; --agent-soft:#3a2416; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px}
+main{max-width:760px;margin:0 auto;display:grid;gap:20px}
+h1,h2{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:1.8rem} h2{font-size:1.15rem;margin-bottom:10px}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+p{margin:0;color:var(--muted)}
+section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+.def{font-size:1.05rem;color:var(--fg)} .def b{color:var(--agent)}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:var(--body);font-size:13px;fill:var(--fg)}
+svg .small{font-size:11px;fill:var(--muted)}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:520px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--display);font-weight:500;color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+tr.agent td{background:var(--agent-soft)} tr.agent td:first-child{font-weight:600;color:var(--agent)}
+ol{margin:0;padding-left:1.3rem;display:grid;gap:8px} li b{font-family:var(--display)}
+</style>
+<main>
+  <header style="display:grid;gap:6px">
+    <span class="eyebrow">Agent Ship Lab · 1-Day Lab · The opening</span>
+    <h1>What an agent is</h1>
+    <p class="def">An agent is a model that <b>picks its next step</b>, uses a tool, reads the result, and repeats until the job is done or it hands over to a human.</p>
+  </header>
+
+  <section>
+    <h2>The loop (Atlas Telecom)</h2>
+    <svg viewBox="0 0 700 250" role="img" aria-label="Agent loop diagram">
+      <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--muted)"/></marker></defs>
+      <rect x="10" y="95" width="140" height="56" rx="8" fill="var(--accent-soft)" stroke="var(--accent)"/>
+      <text x="80" y="119" text-anchor="middle">Customer message</text>
+      <text x="80" y="137" text-anchor="middle" class="small">"Coupure fibre à Maarif"</text>
+      <line x1="150" y1="123" x2="243" y2="123" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#a)"/>
+      <rect x="245" y="88" width="160" height="70" rx="35" fill="var(--agent-soft)" stroke="var(--agent)" stroke-width="2"/>
+      <text x="325" y="119" text-anchor="middle" style="font-weight:600">Model decides</text>
+      <text x="325" y="137" text-anchor="middle" class="small">next step?</text>
+      <rect x="245" y="6" width="160" height="50" rx="8" fill="var(--panel)" stroke="var(--line)"/>
+      <text x="325" y="28" text-anchor="middle">Tool</text>
+      <text x="325" y="45" text-anchor="middle" class="small">verify · outage · credit…</text>
+      <path d="M300,88 L300,58" stroke="var(--muted)" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+      <path d="M350,58 L350,86" stroke="var(--muted)" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+      <text x="292" y="76" text-anchor="end" class="small">uses</text>
+      <text x="358" y="76" class="small">result</text>
+      <rect x="520" y="60" width="160" height="48" rx="8" fill="var(--accent-soft)" stroke="var(--accent)"/>
+      <text x="600" y="89" text-anchor="middle">Answer</text>
+      <rect x="520" y="160" width="160" height="48" rx="8" fill="var(--panel)" stroke="var(--agent)" stroke-dasharray="5 4"/>
+      <text x="600" y="189" text-anchor="middle">Human</text>
+      <path d="M405,112 L518,86" stroke="var(--muted)" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+      <path d="M405,138 L518,182" stroke="var(--muted)" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+      <text x="462" y="88" text-anchor="middle" class="small">done</text>
+      <text x="462" y="184" text-anchor="middle" class="small">stuck / risky</text>
+      <text x="325" y="235" text-anchor="middle" class="small">Repeats until done, or until the step limit sends it to a human.</text>
+    </svg>
+  </section>
+
+  <section>
+    <h2>Who decides the steps?</h2>
+    <div class="wrap"><table>
+      <thead><tr><th>Type</th><th>Who decides</th><th>Atlas example</th></tr></thead>
+      <tbody>
+        <tr><td>Automation</td><td>Code, no model</td><td>Bill reminder 3 days before the due date</td></tr>
+        <tr><td>Chat assistant</td><td>A person, turn by turn</td><td>An employee asks ChatGPT to draft a reply</td></tr>
+        <tr><td>Workflow</td><td>Code fixes the steps; the model fills them</td><td>Classify → look up outage → draft reply</td></tr>
+        <tr class="agent"><td>Agent</td><td>The model picks the steps</td><td>Verifies the caller, checks the outage, then decides: credit or human</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Five rules of a good agent</h2>
+    <ol>
+      <li><b>Simplest thing first.</b> Known steps → build a workflow. Agent only when the path depends on the input.</li>
+      <li><b>Few tools, hard rules in code.</b> The prompt explains the 50 MAD credit limit; the code enforces it.</li>
+      <li><b>Always an exit.</b> A maximum number of steps, then a human.</li>
+      <li><b>See every step.</b> Every model call, tool call, cost and time is recorded.</li>
+      <li><b>Prove it before it ships.</b> Test cases and a pass bar written before the run; a score before and after each fix.</li>
+    </ol>
+  </section>
+</main>
