@@ -1,0 +1,4 @@
+[
+  {"id": "T-9001", "customer_id": "C005", "opened": "2026-11-15", "topic": "slow ADSL in the evening", "status": "open", "attempts": 2},
+  {"id": "T-9002", "customer_id": "C004", "opened": "2026-11-02", "topic": "fibre outage compensation", "status": "closed", "attempts": 1}
+]

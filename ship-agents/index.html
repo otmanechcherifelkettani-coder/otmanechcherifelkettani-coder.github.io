@@ -1,0 +1,300 @@
+<title>Agent Ship Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a field manual. Left rail of section links on wide screens, one reading column, tables scroll in place. */
+:root{
+  --bg:#f5f7f4; --surface:#ffffff; --ink:#14201c; --muted:#56655f; --line:#d7dfda;
+  --accent:#0f6b5c; --accent-soft:#e1efe9; --saffron:#b86e00; --saffron-soft:#fbefd9;
+  --pass:#1f7a3f; --stop:#b3261e;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1513; --surface:#151f1c; --ink:#e4ece8; --muted:#9aaba4; --line:#2a3833;
+  --accent:#5cc4ad; --accent-soft:#183a33; --saffron:#f0a838; --saffron-soft:#3a2a10;
+  --pass:#6fd08f; --stop:#ff8a80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1513; --surface:#151f1c; --ink:#e4ece8; --muted:#9aaba4; --line:#2a3833;
+  --accent:#5cc4ad; --accent-soft:#183a33; --saffron:#f0a838; --saffron-soft:#3a2a10;
+  --pass:#6fd08f; --stop:#ff8a80; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px;padding-block:40px 80px}
+nav.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start;font-size:13px}
+nav.rail a{display:block;color:var(--muted);text-decoration:none;padding:5px 0 5px 12px;border-left:2px solid var(--line)}
+nav.rail a:hover,nav.rail a:focus-visible{color:var(--accent);border-left-color:var(--accent);outline:none}
+main{min-width:0;max-width:820px}
+header.top{display:grid;gap:14px;margin-bottom:28px}
+.eyebrow{font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font:700 clamp(34px,5vw,52px)/1.05 var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font:700 28px/1.15 var(--display);margin:56px 0 12px;text-wrap:balance;scroll-margin-top:24px}
+h3{font:600 18px/1.3 var(--display);margin:28px 0 8px}
+p{margin:0 0 12px;max-width:68ch}
+.lede{font-size:18px;color:var(--muted);max-width:60ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:500 12px/1 var(--mono);padding:6px 9px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.chip.warn{background:var(--saffron-soft);color:var(--saffron)}
+.method{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface);margin:16px 0}
+.method div{padding:16px;border-right:1px solid var(--line);min-width:0}
+.method div:last-child{border-right:0}
+.method b{display:block;font:600 12px/1.2 var(--mono);color:var(--saffron);margin-bottom:6px}
+.method strong{display:block;font:600 16px/1.3 var(--display);margin-bottom:6px}
+.method span{font-size:13px;color:var(--muted)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface);margin:12px 0 20px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font:600 11.5px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.t{font:600 12.5px/1.4 var(--mono);white-space:nowrap;color:var(--accent)}
+.gate{font:600 11.5px/1.3 var(--mono);color:var(--saffron)}
+ul{margin:0 0 14px;padding-left:20px;max-width:68ch}
+li{margin:4px 0}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.box{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:16px 18px;min-width:0}
+.box h3{margin-top:0}
+.box.in{border-top:3px solid var(--pass)} .box.out{border-top:3px solid var(--stop)}
+code,kbd{font:13px var(--mono);background:var(--accent-soft);padding:1px 5px;border-radius:3px}
+pre{font:12.5px/1.55 var(--mono);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;overflow-x:auto;margin:8px 0 16px}
+blockquote{margin:12px 0 18px;padding:14px 18px;border-left:3px solid var(--saffron);background:var(--saffron-soft);border-radius:0 8px 8px 0}
+blockquote p{margin:0 0 8px} blockquote p:last-child{margin:0}
+.note{font-size:13px;color:var(--muted)}
+a{color:var(--accent)}
+.total td{font-weight:600}
+.num{font-variant-numeric:tabular-nums;text-align:right}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0}nav.rail{display:none}}
+@media (max-width:640px){.method{grid-template-columns:minmax(0,1fr)}.method div{border-right:0;border-bottom:1px solid var(--line)}.cols{grid-template-columns:minmax(0,1fr)}h2{font-size:24px}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+
+<div class="wrap">
+<nav class="rail" aria-label="Sections">
+  <a href="#offer">The offer</a>
+  <a href="#instructor">Instructor</a>
+  <a href="#method">Method</a>
+  <a href="#borrowed">What we borrowed</a>
+  <a href="#scope">Taught / not taught</a>
+  <a href="#shipday">Ship Day (1 day)</a>
+  <a href="#sprint">Ship Sprint (5 weeks)</a>
+  <a href="#bar">Graduation bar</a>
+  <a href="#grading">Grading /20</a>
+  <a href="#cases">Case library</a>
+  <a href="#toolkit">Student toolkit</a>
+  <a href="#build">Instructor toolkit</a>
+  <a href="#logistics">Logistics &amp; price</a>
+  <a href="#pitch">Monday pitch</a>
+</nav>
+
+<main>
+<header class="top" id="offer">
+  <span class="eyebrow">Course pack · draft for HESTIM · 20 Nov 2026</span>
+  <h1>Agent Ship Lab</h1>
+  <p class="lede">Students ship one AI agent that works: live, tested against a hidden test set, used by people other than its builders, and documented in a one-page Production Report.</p>
+  <div class="meta">
+    <span class="chip">Ship Day · 1 day · entry offer</span>
+    <span class="chip">Ship Sprint · 5 half-days · core offer</span>
+    <span class="chip warn">Working name, to validate</span>
+  </div>
+</header>
+
+<p>Two formats, one graduation bar. Ship Day is the way in: it is also session 1 of Ship Sprint, so a school that starts with one day is already partway into the program. Ship Sprint is what you sell.</p>
+
+<h2 id="instructor">Instructor</h2>
+<p><strong>Otman Kettani.</strong> Strategy consultant, then operator, then builder. Led global post-order support automation at a large food delivery platform, from rule-based workflows to LLM systems: about $15M a year saved, about $20M a year in incremental bookings, CSAT up 20%. Hands-on across system design, prompting, evals and experimentation. Earlier: telecom cost and 5G strategy models in consulting, then a point-of-sale lending launch in fintech. Ships on weekends (Supplyn, a multi-agent growth system). Teaches in French, English, Spanish and Arabic.</p>
+<p class="note">Why it matters to a school: the course is taught by someone who has done the job the students are training for, with numbers. Draft brand notes and open questions are in <code>brand/90_SYNTHESIS.md</code>.</p>
+
+<h2 id="method">The method: four questions in fixed order</h2>
+<p>The course spine is your own Cadence method. Students answer the same four questions you answer for clients, and every session ends on one of them.</p>
+<div class="method">
+  <div><b>Q1</b><strong>Where is the value?</strong><span>Pick one workflow and one person who has the problem. Write the baseline number the agent must move.</span></div>
+  <div><b>Q2</b><strong>What is worth building?</strong><span>Four kill filters: does it need AI, cost of being wrong, would a free chatbot do it, can the output be checked. Then pick the simplest pattern.</span></div>
+  <div><b>Q3</b><strong>How do we ship it smartly?</strong><span>Risk tier, log every call, an eval set as the launch gate, guardrails, human checks on irreversible actions, rollout, monitoring.</span></div>
+  <div><b>Q4</b><strong>Who owns it afterwards?</strong><span>A named owner, a runbook, a rollback switch, and the triggers that force an eval re-run.</span></div>
+</div>
+
+<h2 id="borrowed">What we borrowed from the best programs</h2>
+<p>Nothing here is invented from scratch. Each element is taken from a program in the benchmark and adapted to students.</p>
+<div class="scroll"><table>
+<thead><tr><th>Source</th><th>What they do</th><th>How it shows up here</th></tr></thead>
+<tbody>
+<tr><td>Anthropic, <em>Building effective agents</em></td><td>Start with the simplest solution; workflows before agents; five patterns.</td><td>Q2 decision: single call, workflow pattern or agent, chosen before any code.</td></tr>
+<tr><td>Andrew Ng, Agentic AI</td><td>Raw Python, vendor-neutral; evals and error analysis named as the strongest predictor of who builds well.</td><td>The loop is written by hand with the SDK. No framework in the core path.</td></tr>
+<tr><td>Husain &amp; Shankar, AI Evals</td><td>Error analysis: read traces, open coding, then grouping into failure types. Code checks for deterministic failures, LLM judge for subjective ones, judge validated against human labels.</td><td>Session 3 in full. <code>eval.py</code> + <code>agreement.py</code>; the judge must reach 0.8 agreement before its scores count.</td></tr>
+<tr><td>AI Makerspace</td><td>Certification challenge halfway through; public Demo Day; they publish their certification rate (51.2%).</td><td>Individual trace defense mid-course; Demo Day with a company jury; you publish your own ship rate per cohort.</td></tr>
+<tr><td>Grigorev, AI Engineering Buildcamp</td><td>Production RAG and agents as code; testing, evaluation, monitoring; Demo Day of real projects.</td><td>Monitoring and cost per task are part of the graduation bar, not extras.</td></tr>
+<tr><td>Reganti &amp; Badam</td><td>Problem-first approach to agent design.</td><td>Q1 before Q2: no tool is written before the build card is approved.</td></tr>
+<tr><td>Hugging Face Agents Course</td><td>Certificate tied to a measured score on a benchmark the student does not control.</td><td>Hidden test set held by the instructor; score counts toward the grade.</td></tr>
+<tr><td>Berkeley AgentX–AgentBeats</td><td>Agents ranked on a shared leaderboard.</td><td>Cross-team leaderboard on the hidden set at Demo Day.</td></tr>
+<tr><td>Unit8 Forward Deployed Academy</td><td>The outcome is a job offer from a jury of employers.</td><td>Partner companies sit on the Demo Day jury and test agents live.</td></tr>
+</tbody></table></div>
+
+<h2 id="scope">What is taught, what is left out</h2>
+<div class="cols">
+<div class="box in"><h3>Taught (principles from your installed skills)</h3>
+<ul>
+<li><strong>Kill filters before code</strong> (cadence-build-decision): needs AI? cost of being wrong? wrapper test? verifiable?</li>
+<li><strong>Deterministic first</strong> (regex-vs-llm-structured-text): rules and code for what rules can do, the model for the rest.</li>
+<li><strong>Small action space</strong> (agent-harness-construction): few tools, one job each, descriptions written for the model.</li>
+<li><strong>Loops need exits</strong> (loop-design-check): a done-criterion a machine can check, written boundaries, a retry cap, then a human.</li>
+<li><strong>Eval-driven development</strong> (eval-harness, ai-regression-testing): the eval set is written before the fix and re-run on every prompt change.</li>
+<li><strong>Cost per completed task</strong> (cost-aware-llm-pipeline): measure, then route or lower effort.</li>
+<li><strong>Five guardrail families</strong> (cadence-ship-smart, safety-guard): personal data, injection, policy, groundedness, mutation guard.</li>
+<li><strong>Debug from traces</strong> (agent-introspection-debugging): capture, diagnose, contained fix.</li>
+<li><strong>Ownership</strong> (cadence-own-it): owner, runbook, rollback, re-run triggers.</li>
+</ul></div>
+<div class="box out"><h3>Left out, on purpose</h3>
+<ul>
+<li><strong>Framework tours</strong> (LangChain vs CrewAI vs AutoGen). One SDK, one loop you can read.</li>
+<li><strong>Multi-agent systems</strong> before a single agent passes its eval.</li>
+<li><strong>Fine-tuning</strong> and training models.</li>
+<li><strong>Vector database deep dives.</strong> Retrieval only where the case needs it, done simply.</li>
+<li><strong>"7 agents in 6 weeks."</strong> One agent that works.</li>
+<li><strong>Autonomous loops</strong> without a verifier.</li>
+<li><strong>Prompt trick lists</strong> and AGI talk.</li>
+</ul></div>
+</div>
+
+<h2 id="shipday">Ship Day: the 1-day format</h2>
+<p>For 30 students max, in teams of 3–4. Teams start from the starter kit and one case from the library. Pre-work (sent a week before): Python 3.11 installed, starter kit cloned, API key working, case chosen.</p>
+<div class="scroll"><table>
+<thead><tr><th>Time</th><th>Block</th><th>What happens</th><th>Gate</th></tr></thead>
+<tbody>
+<tr><td class="t">09:00–09:30</td><td>Why agents fail</td><td>The demo-to-production gap. The graduation bar. Teams formed, case confirmed.</td><td class="gate">—</td></tr>
+<tr><td class="t">09:30–10:15</td><td>Q1 + Q2</td><td>Build card: user, problem, baseline number, four kill filters, pattern choice (single call / workflow / agent).</td><td class="gate">Build card approved</td></tr>
+<tr><td class="t">10:30–12:00</td><td>Build v0</td><td>The loop by hand, tools, system prompt, tracing. Live coding then team build.</td><td class="gate">3 typical cases answered end to end, traces logged</td></tr>
+<tr><td class="t">13:00–13:45</td><td>Error analysis</td><td>Run 20 cases. Read traces. Note every failure in plain words, group them, rank the top 3.</td><td class="gate">Failure list with counts</td></tr>
+<tr><td class="t">13:45–14:45</td><td>Evals</td><td>Code checks + judge rubric. Pass bar written before the run. Fix the top failure, run again.</td><td class="gate">Scorecard v1 → v2</td></tr>
+<tr><td class="t">15:00–15:45</td><td>Guardrails + ship</td><td>Mutation guard, escalation, refusal. Deploy the app. Red team: each team attacks another team's URL for 15 minutes and flags failures.</td><td class="gate">Live URL</td></tr>
+<tr><td class="t">15:45–16:30</td><td>Hidden test</td><td>Fix what the red team found. Instructor runs 10 hidden cases on every agent.</td><td class="gate">Hidden-set score</td></tr>
+<tr><td class="t">16:30–17:00</td><td>Demo</td><td>3 minutes per team: live URL, scorecard, one failure fixed, one still open. Leaderboard.</td><td class="gate">Ship Day certificate if score ≥ bar</td></tr>
+</tbody></table></div>
+<p><strong>Leaves with:</strong> a live URL, a build card, a scorecard, and a clear next step (Ship Sprint) for teams that want real users.</p>
+
+<h2 id="sprint">Ship Sprint: the 5-week format</h2>
+<p>Five half-days (4 hours each). Weeks 1 and 5 on site, weeks 2–4 online. About 4–5 hours of team work between sessions. Each team keeps a repo and a weekly ship log; you review each team asynchronously (about 15 minutes per team per week) against that week's gate. One optional online office hour per week.</p>
+<div class="scroll"><table>
+<thead><tr><th>Week</th><th>Session (4h)</th><th>Between sessions</th><th>Ship gate (pass/fail)</th></tr></thead>
+<tbody>
+<tr><td class="t">0 · async</td><td>Pre-work</td><td>Setup, teams, case chosen, 30 example inputs collected or generated (messy).</td><td class="gate">Repo + 30 examples</td></tr>
+<tr><td class="t">1 · on site</td><td><strong>Value and v0.</strong> Ship Day morning compressed: build card, kill filters, pattern choice, the loop by hand, tracing.</td><td>Finish v0, run it on all 30 examples.</td><td class="gate">Build card + v0 live + traces</td></tr>
+<tr><td class="t">2 · online</td><td><strong>Tools and the loop.</strong> Tool design, structured outputs, errors returned to the model, turn cap and hand-off, deterministic checks before the model.</td><td>v1 with real tools on the 30 examples.</td><td class="gate">v1 + loop with exit + all calls logged</td></tr>
+<tr><td class="t">3 · online</td><td><strong>Error analysis and evals.</strong> Open coding on traces, failure types, 50-case eval set stratified typical / edge / refusal / error-prone, code checks, judge calibrated on 20 hand labels.</td><td>Mid-course trace defense: each student explains one failure trace alone, 5 minutes.</td><td class="gate">Baseline scorecard, pass bar written, judge agreement ≥ 0.8</td></tr>
+<tr><td class="t">4 · online</td><td><strong>Guardrails, cost and release.</strong> Five guardrail families, human approval for irreversible actions, cost per task, p95 latency, deploy, shadow then pilot.</td><td>Cross-team use: each team runs 25+ conversations on two other teams' agents and flags failures.</td><td class="gate">Live URL, 50+ runs logged from other users, cost + latency measured</td></tr>
+<tr><td class="t">5 · on site</td><td><strong>Demo Day.</strong> Hidden test set run live. Company jury tests each agent. Production Report and ownership plan presented.</td><td>—</td><td class="gate">Graduation bar</td></tr>
+</tbody></table></div>
+
+<h2 id="bar">Graduation bar (the Ship certificate)</h2>
+<ul>
+<li>A live URL or integration that someone outside the team can use.</li>
+<li>Hidden test set score at or above the bar for the case's risk tier (80% for low, 90% for medium and high).</li>
+<li>LLM judge agreement with human labels of 0.8 or more on both passes and fails.</li>
+<li>50+ logged runs by people outside the team.</li>
+<li>Guardrails shown working on three attacks: prompt injection, someone else's personal data, an irreversible action above the limit.</li>
+<li>One-page Production Report: problem, baseline, failure types found, fixes, pass rate before and after, cost per task, p95 latency, owner.</li>
+<li>Individual trace defense passed.</li>
+</ul>
+<p class="note">Publish the share of students who graduate each cohort, the way AI Makerspace does. A real bar that some students miss is part of what makes the certificate worth something.</p>
+
+<h2 id="grading">Grading grid for the school (/20)</h2>
+<div class="scroll"><table>
+<thead><tr><th>Criterion</th><th>Evidence</th><th class="num">Points</th></tr></thead>
+<tbody>
+<tr><td>Problem framing</td><td>Build card: user, baseline number, kill filters, pattern choice justified</td><td class="num">3</td></tr>
+<tr><td>Working agent</td><td>Live URL, loop with exit, tools, traces</td><td class="num">4</td></tr>
+<tr><td>Eval quality</td><td>50 stratified cases, code checks, judge validated</td><td class="num">4</td></tr>
+<tr><td>Hidden test score</td><td>Score on instructor-held cases</td><td class="num">3</td></tr>
+<tr><td>Guardrails and ownership</td><td>Three attacks handled, owner, runbook, rollback</td><td class="num">2</td></tr>
+<tr><td>Production Report and demo</td><td>One page, numbers before adjectives, jury Q&amp;A</td><td class="num">2</td></tr>
+<tr><td>Individual trace defense</td><td>Explains one failure trace alone (individual grade)</td><td class="num">2</td></tr>
+<tr class="total"><td>Total</td><td></td><td class="num">20</td></tr>
+</tbody></table></div>
+
+<h2 id="cases">Case library</h2>
+<p>Each case is inspired by a sector, uses a fictional company and synthetic, deliberately messy data (typos, French / Darija / English, missing fields, contradictions). Real company names appear only with that company's consent, as a sponsor. The telecom case is fully built in the starter kit; the others follow the same template: context, tools, data to generate, ten traps.</p>
+<div class="scroll"><table>
+<thead><tr><th>Case</th><th>The agent</th><th>Tools</th><th>Traps built into the test set</th><th>Risk</th></tr></thead>
+<tbody>
+<tr><td><strong>Telecom</strong> · Atlas Telecom <span class="chip">built</span></td><td>Level-1 support: outages, balance, bills, goodwill credits</td><td>verify, account, outage, tickets, credit ≤ 50 MAD, escalate</td><td>Spouse asking for a partner's data, injection asking for 500 MAD, invented plan prices, third failed attempt</td><td>Medium</td></tr>
+<tr><td><strong>Banking</strong></td><td>Pre-qualifies consumer credit requests and lists missing documents</td><td>applicant lookup, income rules, document checklist, hand-off</td><td>Asks the agent to approve the loan; income in mixed currencies; missing CIN</td><td>High (no decision, triage only)</td></tr>
+<tr><td><strong>Insurance</strong></td><td>Triages car claims from a written statement</td><td>policy lookup, coverage rules, claim form, adjuster queue</td><td>Uncovered damage, contradictory dates, claim filed twice</td><td>Medium</td></tr>
+<tr><td><strong>Logistics</strong></td><td>Handles delivery exceptions for an e-commerce carrier</td><td>tracking, reschedule slot, address change, refund request</td><td>Address change after dispatch, fake tracking number, angry repeat caller</td><td>Low</td></tr>
+<tr><td><strong>E-commerce</strong></td><td>Returns and refunds</td><td>order lookup, return policy, label, refund ≤ limit</td><td>Return past the window, refund above limit, item never delivered</td><td>Medium</td></tr>
+<tr><td><strong>HR</strong></td><td>Answers candidate questions and schedules interviews (no screening decisions)</td><td>job board, FAQ, calendar, recruiter hand-off</td><td>Asks why they were rejected, asks salary of another candidate, discriminatory request</td><td>High (no ranking of people)</td></tr>
+<tr><td><strong>Industry</strong></td><td>Answers maintenance and safety questions from manuals, with citations</td><td>manual search, part lookup, incident report</td><td>Question outside the manuals, unsafe shortcut request, outdated procedure</td><td>High (cites or refuses)</td></tr>
+</tbody></table></div>
+<p class="note">Premium option: a partner company of the school provides a real problem and anonymized data, and sits on the jury.</p>
+
+<h2 id="toolkit">Student toolkit</h2>
+<h3>Given to every team</h3>
+<ul>
+<li><strong>Starter kit</strong> (<code>ship-agents/starter</code>): the loop, tools, tracing, eval runner, judge check, Streamlit app.</li>
+<li><strong>Templates:</strong> build card, weekly ship log, Production Report, ownership plan.</li>
+<li><strong>Reading, all free:</strong> Anthropic <em>Building effective agents</em>; Hamel Husain's free evals email course; Andrew Ng's Agentic AI module on evals; Hugging Face Agents Course unit 1 (optional).</li>
+</ul>
+<h3>Claude Code skills to share with students</h3>
+<p>From your installed set, worth sharing as-is: <code>loop-design-check</code>, <code>agent-harness-construction</code>, <code>regex-vs-llm-structured-text</code>, <code>eval-harness</code>, <code>cost-aware-llm-pipeline</code>, <code>agent-introspection-debugging</code>, <code>production-audit</code>, <code>safety-guard</code>, plus the bundled <code>claude-api</code>. Make student versions of <code>cadence-build-decision</code> and <code>cadence-ship-smart</code> with <code>skill-creator</code> (shorter, no client templates), so your consulting material stays yours.</p>
+<p>From the public catalog (install counts checked today):</p>
+<pre>npx skills add wshobson/agents@prompt-engineering-patterns            # 24.8K installs
+npx skills add github/awesome-copilot@python-mcp-server-generator      # 10.5K, stretch goal: expose your tools over MCP</pre>
+<p class="note">Not recommended: the public eval skills found today have fewer than 20 installs each and are unvetted. The course's own eval method replaces them.</p>
+
+<h2 id="build">Instructor toolkit (to build and run the course)</h2>
+<pre>npx skills add samber/dev-event-organizer-skills@workshop-program-design   # 6.7K installs
+npx skills add deanpeters/product-manager-skills@workshop-facilitation     # 2.4K installs</pre>
+<ul>
+<li><code>cadence-process-map</code> + <code>cadence-value-finder</code> on HESTIM itself: find internal workflows the school could use as real-user cases.</li>
+<li><code>frontend-slides</code> or the <code>pptx</code> skill for session decks; <code>skill-creator</code> for student skills.</li>
+<li><code>article-writing</code> + <code>brand-voice</code> for the case study after each cohort.</li>
+<li><code>brand-discovery</code> to finish the instructor brand (draft in <code>brand/</code>).</li>
+</ul>
+
+<h2 id="logistics">Logistics and price</h2>
+<div class="cols">
+<div class="box"><h3>The school provides</h3>
+<ul>
+<li>A room with good Wi-Fi, one laptop per student with Python 3.11.</li>
+<li>Students grouped and the case list chosen two weeks ahead.</li>
+<li>Model API budget (or students' own keys). Measure your own cost per task today and multiply: roughly 300 agent runs per team per Ship Day.</li>
+<li>For Demo Day: a jury of 2–4 partner companies.</li>
+</ul></div>
+<div class="box"><h3>Price structure</h3>
+<ul>
+<li>Flat fee per cohort (max 30 students), not per student.</li>
+<li>Ship Day sold alone; its price is credited if the school books Ship Sprint within 30 days.</li>
+<li>Sponsor option: a partner company's real case, priced higher.</li>
+<li>First school: reduced pilot price in exchange for a testimonial, a published case study and an introduction to another school.</li>
+</ul>
+<p class="note">I did not find reliable public rates for training days in Moroccan private schools, so the amount is yours to set. Price from your day rate × days on site + preparation + review hours.</p></div>
+</div>
+
+<h2 id="pitch">Monday pitch (HESTIM)</h2>
+<h3>Talk track, 5 minutes (FR)</h3>
+<blockquote>
+<p><strong>1. Le constat.</strong> Tout le monde construit des démos d'agents IA. Très peu arrivent en production : la majorité des projets pilotes d'agents en entreprise ne sont jamais déployés. Ce qui manque, ce n'est pas le modèle, c'est la méthode pour prouver qu'un agent marche.</p>
+<p><strong>2. Ce que je propose.</strong> En 5 semaines, chaque équipe de vos étudiants livre un agent IA en ligne, testé sur un jeu de tests qu'elle ne voit pas, utilisé par d'autres personnes, avec un rapport de production chiffré.</p>
+<p><strong>3. Pourquoi moi.</strong> J'ai dirigé l'automatisation du support client avec des LLM pour une grande plateforme de livraison : environ 15 millions de dollars économisés par an, satisfaction client en hausse de 20 %. Ce cours, c'est cette méthode, appliquée par vos étudiants.</p>
+<p><strong>4. Ce que gagne l'école.</strong> Un module noté sur 20 avec une grille prête. Un Demo Day avec vos entreprises partenaires dans le jury. Des projets concrets à montrer aux recruteurs et aux futurs étudiants.</p>
+<p><strong>5. La proposition.</strong> On commence par une journée pilote, déduite du programme complet si vous continuez. Je l'ai suivie moi-même cette semaine : voici l'agent et son score.</p>
+</blockquote>
+<h3>Bring to the meeting</h3>
+<ul>
+<li>The agent you build today, live on your phone, and its scorecard (pass rate v1 → v2, cost per task, p95).</li>
+<li>This page, the grading grid, and the case list.</li>
+<li>One question to close: "Which cohort and which semester-2 dates could host the pilot?"</li>
+</ul>
+<h3>Likely objections</h3>
+<div class="scroll"><table>
+<thead><tr><th>They say</th><th>You answer</th></tr></thead>
+<tbody>
+<tr><td>Our students are not all developers.</td><td>Mixed teams. Business students own Q1, Q2, the eval rubric and the Production Report; engineers own the loop. Same bar.</td></tr>
+<tr><td>There are free courses online.</td><td>Free courses teach concepts. This one ends with a live agent graded on a hidden test set, with feedback on each team's traces.</td></tr>
+<tr><td>Who pays for the AI usage?</td><td>Measured per team. Today's pilot cost is on the scorecard; a full cohort is a small fixed budget.</td></tr>
+<tr><td>Can it count as coursework?</td><td>Yes: grading grid /20 included, with an individual component.</td></tr>
+<tr><td>One person for 30 students?</td><td>Teams of 3–4, weekly gates, asynchronous reviews on each repo. Cohorts are capped at 30.</td></tr>
+</tbody></table></div>
+<p class="note">Sources for claims used in the pitch: pilot-to-production failure figures are cited second-hand (Forrester with Anaconda; Deloitte). Say "the majority" unless you have checked the original report.</p>
+</main>
+</div>

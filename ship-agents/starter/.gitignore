@@ -1,0 +1,4 @@
+traces/*.jsonl
+results/*.csv
+.env
+__pycache__/
