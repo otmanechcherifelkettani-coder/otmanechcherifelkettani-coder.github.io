@@ -33,3 +33,16 @@ Format note: one student alone (not a team of 3–4), so the red-team swap is re
   2. Provide a build-card template with one worked example from a different case (e.g. logistics), so students see the builder's-eye voice before writing.
   3. Add "must not break" (guardrail metric) as an explicit field on the template; students won't invent it.
   4. Kill filter 4 ("can the output be checked?") cannot be answered well before the evals block; give the answer shape on the template ("code checks for actions + judge for wording").
+
+### Block 3 — Build v0 (planned 90 min · ~10 exchanges)
+- **Gate: PASS.** 3 typical cases answered end to end (Salma outage, Youssef balance, Khadija suspended), every model and tool call in `traces.jsonl` with cost and latency. Spend at gate: **$0.0022**.
+- Tool design: student listed exactly the six tools of the reference design, verify first, but gave no descriptions and no reason for the order.
+- **Struggled:** reading code. "Where am I expected to check this?" — a student who has never used Claude Code does not know the file panel exists, or that they can ask Claude to show a function. Had to paste the function inline with line numbers. Once shown, answered correctly (line 40, C001 vs C004).
+- **Misread output:** attributed an error line from a different call to Mehdi's credit case. Matching output lines to calls is a skill to teach explicitly before error analysis.
+- **Explained twice:** the system prompt (introduced in one line when the loop was shown; student asked "what is the system prompt?").
+- Predictions before running: 2/2 tool sequences right for the simple cases; Khadija predicted verify → get_account (actual: 5 tool calls incl. a guessed `check_outage("Casablanca")` and a duplicated EN answer). Good material for error analysis.
+- **Course changes:**
+  1. Add a 5-minute "how to read code in Claude Code" moment at the start of build v0 (file panel; "show me function X"; line numbers). Students who never used the tool lose the thread otherwise.
+  2. Define "system prompt" with its own slide/line in the opening, next to model/tool/agent; it's the main lever all afternoon.
+  3. The "predict before you run" ritual worked very well and is cheap (each run ~$0.0006). Make it a formal step in the workbook.
+  4. Writing tools.py + agent.py from zero with the student took most of the block even with the instructor typing. In a 30-student room with teams, the course pack's own plan (start from the starter kit) is right; "from zero" only fits if the instructor live-codes once for everyone.

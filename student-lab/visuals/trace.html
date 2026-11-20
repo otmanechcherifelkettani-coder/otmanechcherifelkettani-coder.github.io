@@ -1,0 +1,57 @@
+<title>Reading One Trace</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* Layout: one column; a vertical timeline of turns, model calls left-marked, tool calls indented */
+:root{
+  --bg:#f6f7f9; --panel:#fff; --fg:#1a2230; --muted:#5b6575; --line:#d9dee6;
+  --model:#0b6e8a; --model-soft:#e3f1f5; --tool:#4d5b6e; --warn:#b45309; --warn-soft:#fdf1df;
+  --display:"Space Grotesk",system-ui,sans-serif; --body:"Inter",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161d; --panel:#18202a; --fg:#e6ebf2; --muted:#9aa5b5; --line:#2b3644;
+  --model:#5cc3df; --model-soft:#16303a; --tool:#aab6c6; --warn:#f59e0b; --warn-soft:#3a2a10; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161d; --panel:#18202a; --fg:#e6ebf2; --muted:#9aa5b5; --line:#2b3644;
+  --model:#5cc3df; --model-soft:#16303a; --tool:#aab6c6; --warn:#f59e0b; --warn-soft:#3a2a10; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px}
+main{max-width:760px;margin:0 auto;display:grid;gap:18px}
+h1{font-family:var(--display);font-size:1.6rem;margin:0;text-wrap:balance}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--model);font-weight:600}
+.msg{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.msg b{font-family:var(--display);font-weight:500;color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+ol.tl{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.step{display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:start}
+.turn{font-family:var(--mono);font-size:.78rem;color:var(--muted);padding-top:10px}
+.card{border-radius:8px;padding:9px 12px;min-width:0;font-size:.9rem}
+.model{background:var(--model-soft);border-left:3px solid var(--model)}
+.tool{background:var(--panel);border:1px solid var(--line);margin-left:16px}
+.tool.flag{background:var(--warn-soft);border-color:var(--warn)}
+code{font-family:var(--mono);font-size:.8rem;overflow-wrap:anywhere}
+.meta{font-family:var(--mono);font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.note{color:var(--warn);font-size:.82rem;font-weight:600}
+.sum{display:flex;flex-wrap:wrap;gap:8px 20px;font-variant-numeric:tabular-nums}
+.sum span{font-family:var(--mono);font-size:.85rem}
+</style>
+<main>
+  <header style="display:grid;gap:6px">
+    <span class="eyebrow">Agent Ship Lab · Build v0 · trace d3ea10f3</span>
+    <h1>Reading one trace</h1>
+    <p style="margin:0;color:var(--muted)">Every line of <code>traces.jsonl</code> for one run: what the model decided, which tools ran, what they returned, cost and time.</p>
+  </header>
+  <div class="msg"><b>Customer</b><br>Ma ligne ne marche plus du tout ! Khadija, 0670112233</div>
+  <ol class="tl">
+    <li class="step"><span class="turn">turn 1</span><div class="card model">Model decides: <strong>use a tool</strong> <span class="meta">· $0.000177 · 0.93s</span></div></li>
+    <li class="step"><span></span><div class="card tool"><code>verify_customer(phone="0670112233", first_name="Khadija")</code><br><span class="meta">→ verified: true, customer_id: C003</span></div></li>
+    <li class="step"><span class="turn">turn 2</span><div class="card model">Model decides: <strong>three tools at once</strong> <span class="meta">· $0.000210 · 0.83s</span></div></li>
+    <li class="step"><span></span><div class="card tool flag"><code>check_outage(city="Casablanca")</code><br><span class="meta">→ OUT-311, Maarif fibre</span><br><span class="note">⚠ Khadija lives in Rabat. The model guessed a city it did not know yet.</span></div></li>
+    <li class="step"><span></span><div class="card tool"><code>get_account(customer_id="C003")</code><br><span class="meta">→ Rabat, Agdal · status: suspended_unpaid · last bill 118 MAD · due 2026-10-30</span></div></li>
+    <li class="step"><span></span><div class="card tool"><code>get_tickets(customer_id="C003")</code><br><span class="meta">→ no tickets</span></div></li>
+    <li class="step"><span class="turn">turn 3</span><div class="card model">Model decides: <strong>check again, right city</strong> <span class="meta">· $0.000284 · 1.04s</span></div></li>
+    <li class="step"><span></span><div class="card tool"><code>check_outage(city="Rabat", district="Agdal")</code><br><span class="meta">→ no known outage there</span></div></li>
+    <li class="step"><span class="turn">turn 4</span><div class="card model">Model decides: <strong>done, write the answer</strong> <span class="meta">· $0.000369 · 2.03s</span></div></li>
+  </ol>
+  <div class="msg"><b>Answer</b><br>Votre compte est <strong>suspendu pour impayé</strong>. Dernière facture <strong>118 MAD</strong>, échue le 30/10/2026. Une fois réglée, le service devrait être rétabli…<br><span class="note">⚠ Then the whole answer is repeated a second time, in English.</span></div>
+  <div class="msg sum"><b style="width:100%">Run summary</b><span>4 turns</span><span>5 tool calls</span><span>$0.00104</span><span>4.82 s</span></div>
+</main>
