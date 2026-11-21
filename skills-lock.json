@@ -6,6 +6,13 @@
       "sourceType": "github",
       "skillPath": "skills/find-skills/SKILL.md",
       "computedHash": "7bc223e2aafbdbf6e50ea243ba6ef67fe432bb069ab439fea0390795dac0bf7f"
+    },
+    "humaniseur-fr": {
+      "source": "samber/cc-skills",
+      "commit": "50a33836b20f690c668af557bd9ef9d07a8c7ef2",
+      "sourceType": "github",
+      "skillPath": "skills/humaniseur-fr/SKILL.md",
+      "computedHash": "dfb3e52bbe43b0bcedaf87de4d37679dd8d8d5d4435868dd471201eaebf24958"
     }
   }
 }
